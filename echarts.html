@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <title>饼图示例</title>
+</head>
+<body style="margin: 0; background: transparent;">
+    <div id="chart" style="width: 100%; height: 100vh;"></div>
+
+    <script>
+        var chart = echarts.init(document.getElementById('chart'));
+
+        var option = {
+            backgroundColor: 'transparent', // 设置背景透明
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                show: false // 隐藏图例
+            },
+            series: [
+                {
+                    name: 'Access From',
+                    type: 'pie',
+                    radius: ['30%', '60%'], // 让饼图更均匀
+                    data: [
+                        { value: 1000, name: 'PC' },
+                        { value: 200, name: 'H5' },
+                        { value: 580, name: '其他' },
+                    ],
+                    label: {
+                        show: true,
+                        formatter: '{b}: {d}%' // 显示名称 + 百分比
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 5,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+
+        chart.setOption(option);
+    </script>
+</body>
+</html>
