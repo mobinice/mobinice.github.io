@@ -42,8 +42,8 @@
 <body>
     <div id="chart"></div>
     <div class="legend">
-        <div><span style="background-color: rgb(255, 70, 131);"></span> 商戶端數據</div>
         <div><span style="background-color: rgb(0, 204, 255);"></span> 系統端數據</div>
+        <div><span style="background-color: rgb(255, 70, 131);"></span> 商戶端數據</div>
     </div>
     <script>
         let base = new Date(2025, 0, 5, 0, 0, 0);
@@ -51,18 +51,33 @@
         let time = [];
         let merchantData = [];
         let systemData = [];
+        let systemBaseValue = 185; // 中間值，波動範圍在170~200之間
 
+        // Generate data
         for (let i = 0; i < 24; i++) {
             let now = new Date(base.getTime() + i * oneHour);
             time.push(["01/05", now.getHours().toString().padStart(2, '0') + ":00"].join(' '));
-            let merchantValue = Math.round(Math.random() * 150 + 50);
-            let systemValue = merchantValue - Math.round(Math.random() * 30);
-            merchantData.push(merchantValue);
-            systemData.push(systemValue);
+
+            // System data fluctuates between 170% and 200%
+            let systemValue = systemBaseValue + Math.round(Math.random() * 30 - 15); // ±15% variation
+            systemData.push(Math.max(170, Math.min(200, systemValue)));
+
+            // Merchant data fluctuates at least 50% below system data
+            let merchantMax = systemValue * 0.5; // 50% of system value as upper limit
+            let merchantMin = merchantMax * 0.7; // Lower limit (70% of merchantMax for fluctuation)
+            let merchantValue = merchantMin + Math.round(Math.random() * (merchantMax - merchantMin));
+            merchantData.push(Math.max(50, Math.min(100, merchantValue))); // Ensure merchant stays within 50%~100%
         }
+
+        // Last hour data
         time.push("01/05 23:59");
-        merchantData.push(Math.round(Math.random() * 150 + 50));
-        systemData.push(merchantData[merchantData.length - 1] - Math.round(Math.random() * 30));
+        let lastSystemValue = systemData[systemData.length - 1] + Math.round(Math.random() * 20 - 10); // Small fluctuation
+        systemData.push(Math.max(170, Math.min(200, lastSystemValue))); // System stays within 170%~200%
+
+        let lastMerchantMax = systemData[systemData.length - 1] * 0.5;
+        let lastMerchantMin = lastMerchantMax * 0.7;
+        let lastMerchantValue = lastMerchantMin + Math.round(Math.random() * (lastMerchantMax - lastMerchantMin));
+        merchantData.push(Math.max(50, Math.min(100, lastMerchantValue))); // Merchant stays within 50%~100%
 
         let option = {
             backgroundColor: '#1e1e1e',
@@ -72,7 +87,7 @@
                     return [pt[0], '10%'];
                 },
                 formatter: function (params) {
-                    return params.map(p => `${p.seriesName}: ${p.value}%`).join('<br>');
+                    return params.map(p => `${p.seriesName}: ${p.value.toFixed(2)}%`).join('<br>');
                 }
             },
             title: {
@@ -97,10 +112,10 @@
             },
             yAxis: {
                 type: 'value',
-                min: 5,
-                max: 200,
-                interval: 20,
-                axisLabel: { formatter: '{value}%', color: '#ffffff' }
+                min: 0,
+                max: 200, // Y-axis upper limit set to 200%
+                interval: 50,
+                axisLabel: { formatter: '{value}%', color: '#ffffff' } // Display percentage on Y-axis
             },
             dataZoom: [
                 { type: 'inside', start: 0, end: 100 },
@@ -112,11 +127,11 @@
                     type: 'line',
                     symbol: 'none',
                     sampling: 'lttb',
-                    itemStyle: { color: 'rgb(0, 204, 255)' },
+                    itemStyle: { color: 'rgb(255, 70, 131)' }, // Red for system
                     areaStyle: {
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                            { offset: 0, color: 'rgb(0, 153, 255)' },
-                            { offset: 1, color: 'rgb(0, 102, 204)' }
+                            { offset: 0, color: 'rgb(255, 120, 68)' },
+                            { offset: 1, color: 'rgb(255, 70, 131)' }
                         ])
                     },
                     data: systemData
@@ -126,14 +141,14 @@
                     type: 'line',
                     symbol: 'none',
                     sampling: 'lttb',
-                    itemStyle: { color: 'rgb(255, 70, 131)' },
+                    itemStyle: { color: 'rgb(0, 204, 255)' }, // Blue for merchant
                     areaStyle: {
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                            { offset: 0, color: 'rgb(255, 120, 68)' },
-                            { offset: 1, color: 'rgb(255, 70, 131)' }
+                            { offset: 0, color: 'rgb(0, 153, 255)' },
+                            { offset: 1, color: 'rgb(0, 102, 204)' }
                         ])
                     },
-                    lineStyle: { opacity: 0 },
+                    lineStyle: { opacity: 0.7 },
                     data: merchantData
                 }
             ]
