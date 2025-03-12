@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事件比分 - API 調用次數</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #chart {
+            width: 90vw;
+            max-width: 463px;
+            height: 72vh;
+            max-height: 372px;
+        }
+        .legend {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .legend div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend span {
+            width: 20px;
+            height: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div id="chart"></div>
+    <div class="legend">
+        <div><span style="background-color: rgb(0, 204, 255);"></span> 系統端數據</div>
+        <div><span style="background-color: rgb(255, 70, 131);"></span> 商戶端數據</div>
+    </div>
+    <script>
+        let base = new Date(2025, 0, 6);
+        let time = [];
+        let merchantData = [];
+        let systemData = [];
+
+        for (let day = 0; day < 8; day++) {
+            let now = new Date(base.getTime() + day * 24 * 3600 * 1000);
+            time.push([(now.getMonth() + 1).toString().padStart(2, '0') + '/' + now.getDate().toString().padStart(2, '0')]);
+
+            let systemValue = Math.round(Math.random() * 10 + 100); // 系統數據: 100~110
+            let merchantValue = Math.round(Math.random() * 25 + 40); // 商戶數據: 40~65 之間大幅波動
+
+            systemData.push(systemValue);
+            merchantData.push(merchantValue);
+        }
+
+        let option = {
+            backgroundColor: '#1e1e1e',
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params) {
+                    return params.map(p => `${p.seriesName}: ${p.value}%`).join('<br>');
+                }
+            },
+            title: {
+                left: 'center',
+                text: '事件比分 - API 調用次數',
+                subtext: 'IceKingBET (商戶名稱)',
+                textStyle: { color: '#ffffff' },
+                subtextStyle: { color: '#aaaaaa' }
+            },
+            toolbox: {
+                feature: {
+                    dataZoom: { yAxisIndex: 'none' },
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: time,
+                axisLabel: { color: '#ffffff' }
+            },
+            yAxis: {
+                type: 'value',
+                min: 0,
+                max: 120,
+                interval: 20,
+                axisLabel: { formatter: '{value}%', color: '#ffffff' }
+            },
+            dataZoom: [
+                { type: 'inside', start: 0, end: 100 },
+                { type: 'slider', start: 0, end: 100 }
+            ],
+            series: [
+                {
+                    name: '系統端數據',
+                    type: 'line',
+                    symbol: 'none',
+                    sampling: 'lttb',
+                    itemStyle: { color: 'rgb(0, 204, 255)' },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgb(0, 153, 255)' },
+                            { offset: 1, color: 'rgb(0, 102, 204)' }
+                        ])
+                    },
+                    data: systemData
+                },
+                {
+                    name: '商戶端數據',
+                    type: 'line',
+                    symbol: 'none',
+                    sampling: 'lttb',
+                    itemStyle: { color: 'rgb(255, 70, 131)' },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgb(255, 120, 68)' },
+                            { offset: 1, color: 'rgb(255, 70, 131)' }
+                        ])
+                    },
+                    lineStyle: { opacity: 0 },
+                    data: merchantData
+                }
+            ]
+        };
+
+        let chart = echarts.init(document.getElementById('chart'));
+        chart.setOption(option);
+
+        window.addEventListener('resize', function () {
+            chart.resize();
+        });
+    </script>
+</body>
+</html>
