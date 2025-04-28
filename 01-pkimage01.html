@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>賽程賠率 - API 調用次數比對</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <style>
+        body {
+            background-color: rgb(16, 12, 41);
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #chart {
+            width: 90vw;
+            max-width: 463px;
+            height: 72vh;
+            max-height: 372px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chart"></div>
+    <script>
+        let base = new Date(2025, 0, 5); // Start from 01/05/2025
+        let oneDay = 24 * 3600 * 1000;
+        let time = [];
+        let systemData = [];
+        let merchant2442320Data = [];
+
+        // Generate 7 days of data (01/05 back to 12/30)
+        for (let i = 6; i >= 0; i--) {
+            let now = new Date(base.getTime() - i * oneDay);
+            time.push([(now.getMonth() + 1).toString().padStart(2, '0') + "/" + now.getDate().toString().padStart(2, '0')]);
+
+            // System standard: 105% to 165%
+            let systemValue = 105 + Math.random() * (165 - 105);
+            systemData.push(systemValue.toFixed(2));
+
+            // Merchant 2442320: 180% to 200%
+            let merchant2442320Value = 180 + Math.random() * (200 - 180);
+            merchant2442320Data.push(merchant2442320Value.toFixed(2));
+        }
+
+        let option = {
+            backgroundColor: 'rgb(16, 12, 41)',
+            tooltip: {
+                trigger: 'axis',
+                position: function (pt) {
+                    return [pt[0], '10%'];
+                },
+                formatter: function (params) {
+                    let tooltip = params[0].axisValueLabel + '<br>';
+                    params.forEach(p => {
+                        let color = p.color;
+                        tooltip += `<span style="display:inline-block;margin-right:5px;width:10px;height:10px;background-color:${color};"></span>` +
+                                  `${p.seriesName}: ${p.value}%<br>`;
+                    });
+                    return tooltip;
+                }
+            },
+            title: {
+                left: 'center',
+                text: '賽程賠率 - API 調用次數比對',
+                subtext: '商戶比較',
+                textStyle: { color: '#ffffff' },
+                subtextStyle: { color: '#aaaaaa' }
+            },
+            legend: {
+                bottom: 0,
+                orient: 'horizontal',
+                data: ['系統標準比例%', '2442320'],
+                textStyle: { color: '#ffffff', fontSize: 10 },
+                icon: 'rect',
+                itemWidth: 15,
+                itemHeight: 8
+            },
+            toolbox: {
+                feature: {
+                    dataZoom: { yAxisIndex: 'none' },
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: 70, // Space for legend below data zoom
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: time,
+                axisLabel: { color: '#ffffff' },
+                axisLine: { lineStyle: { color: '#ffffff' } },
+                axisTick: { lineStyle: { color: '#ffffff' } }
+            },
+            yAxis: {
+                type: 'value',
+                min: 5,
+                max: 200,
+                interval: 20,
+                axisLabel: { formatter: '{value}%', color: '#ffffff' },
+                axisLine: { lineStyle: { color: '#ffffff' } },
+                axisTick: { lineStyle: { color: '#ffffff' } }
+            },
+            dataZoom: [
+                { type: 'inside', start: 0, end: 100 },
+                { start: 0, end: 100, bottom: 30 } // Slider above legend
+            ],
+            series: [
+                {
+                    name: '系統標準比例%',
+                    type: 'line',
+                    symbol: 'circle',
+                    symbolSize: 8,
+                    itemStyle: { color: 'rgb(0, 204, 255)', borderColor: '#ffffff', borderWidth: 2 },
+                    lineStyle: { color: 'rgb(0, 204, 255)' },
+                    data: systemData
+                },
+                {
+                    name: '2442320',
+                    type: 'line',
+                    symbol: 'circle',
+                    symbolSize: 8,
+                    itemStyle: { color: 'rgb(255, 70, 131)', borderColor: '#ffffff', borderWidth: 2 },
+                    lineStyle: { color: 'rgb(255, 70, 131)' },
+                    data: merchant2442320Data
+                }
+            ]
+        };
+
+        let chart = echarts.init(document.getElementById('chart'));
+        chart.setOption(option);
+
+        window.addEventListener('resize', function () {
+            chart.resize();
+        });
+    </script>
+</body>
+</html>
