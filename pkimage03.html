@@ -34,7 +34,6 @@
         let merchant2442320Data = [];
         let merchant2442322BData = [];
         let merchant2442325Data = [];
-        let merchant2442323Data = [];
 
         // Generate 7 days of data (01/05 back to 12/30)
         for (let i = 6; i >= 0; i--) {
@@ -56,10 +55,6 @@
             // Merchant 2442325: 45% to 70%
             let merchant2442325Value = 45 + Math.random() * (70 - 45);
             merchant2442325Data.push(merchant2442325Value.toFixed(2));
-
-            // Merchant 2442323: 45% to 70%
-            let merchant2442323Value = 45 + Math.random() * (70 - 45);
-            merchant2442323Data.push(merchant2442323Value.toFixed(2));
         }
 
         let option = {
@@ -89,7 +84,7 @@
             legend: {
                 bottom: 0,
                 orient: 'horizontal',
-                data: ['系統標準比例%', '2442320', '2442322B', '2442325', '2442323'],
+                data: ['系統標準比例%', '2442320', '2442322B', '2442325'],
                 textStyle: { color: '#ffffff', fontSize: 10 },
                 icon: 'rect',
                 itemWidth: 15,
@@ -165,15 +160,6 @@
                     itemStyle: { color: 'rgb(0, 153, 255)', borderColor: '#ffffff', borderWidth: 2 },
                     lineStyle: { color: 'rgb(0, 153, 255)' },
                     data: merchant2442325Data
-                },
-                {
-                    name: '2442323',
-                    type: 'line',
-                    symbol: 'circle',
-                    symbolSize: 8,
-                    itemStyle: { color: 'rgb(0, 102, 204)', borderColor: '#ffffff', borderWidth: 2 },
-                    lineStyle: { color: 'rgb(0, 102, 204)' },
-                    data: merchant2442323Data
                 }
             ]
         };
