@@ -1,0 +1,1910 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天窗口</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-image: url('background.jpg');  /* 相對路徑 */
+            /* 或者 */
+            background-image: url('background.jpg');   /* 從根目錄開始的路徑 */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* iPhone风格小白点 */
+        .floating-button {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            touch-action: none; /* 防止触摸设备上的默认行为 */
+        }
+        
+        .floating-button:hover {
+            transform: translateY(-50%) scale(1.05);
+        }
+        
+        .floating-button.dragging {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+        
+        .floating-button svg {
+            width: 30px;
+            height: 30px;
+            color: #5996F7;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff4d4f;
+            color: white;
+            border-radius: 50%;
+            min-width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 0 4px;
+        }
+        
+        /* 聊天窗口 */
+        .chat-window {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 450px; /* 增加宽度，防止标题换行 */
+            height: 600px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        
+        /* 聊天窗口头部 */
+        .chat-header {
+            background-color: #5996F7;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        
+        .header-tabs {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .settings-icon-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-icon-button:hover {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+        
+        .settings-icon-button svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .close-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .close-button:hover {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+        
+        .header-tab {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 500;
+            position: relative;
+            margin-right: 10px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap; /* 防止标题换行 */
+        }
+        
+        .header-tab.active {
+            font-weight: 600;
+        }
+        
+        .header-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -12px; /* 调整底线位置，往上移动 */
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: white;
+        }
+        
+        .header-tab .tab-text {
+            margin-right: 5px;
+            position: relative;
+        }
+        
+        .header-tab .bell-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .header-tab .bell-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .header-tab.muted .bell-icon svg {
+            opacity: 0.7;
+        }
+        
+        /* 搜索栏 */
+        .search-bar {
+            padding: 10px 15px;
+            background-color: #f0f0f0; /* 改为灰色背景 */
+            display: flex;
+            align-items: center;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .search-bar.visible {
+            transform: translateY(0);
+        }
+        
+        .search-container {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 20px;
+            padding: 0 10px;
+            height: 36px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-icon {
+            color: #999;
+            margin-right: 8px;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            background: transparent;
+        }
+        
+        .search-clear {
+            display: none;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 5px;
+        }
+        
+        .search-navigation {
+            display: none;
+            margin-left: 10px;
+        }
+        
+        .search-navigation button {
+            background-color: #5996F7;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .search-navigation button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .search-results {
+            display: none;
+            background-color: white;
+            padding: 5px 10px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        /* 聊天内容 */
+        .chat-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 日期分隔线 */
+        .date-separator {
+            text-align: center;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .date-separator span {
+            background-color: white;
+            padding: 0 10px;
+            color: #999;
+            font-size: 13px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .date-separator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #e0e0e0;
+            z-index: 0;
+        }
+        
+        /* 消息样式 */
+        .message {
+            margin-bottom: 15px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        /* 新消息动画 */
+        .message.new-message {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 15px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+            align-self: flex-start;
+            background-color: #E1F0FF;
+            color: #333;
+            border-top-left-radius: 4px;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+        
+        .message-info {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        .message-time {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+        
+        .message-time div {
+            margin-left: 5px;
+        }
+        
+        .action-button {
+            background: none;
+            border: none;
+            color: #5996F7;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 2px 5px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .action-button svg {
+            width: 14px;
+            height: 14px;
+            margin-right: 3px;
+        }
+        
+        .highlighted {
+            background-color: yellow;
+            color: black;
+        }
+        
+        /* 开发者按钮 */
+        .dev-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        /* 模态窗口 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .modal-title-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .code-block {
+            background-color: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: monospace;
+            white-space: pre;
+            line-height: 1.5;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        
+        /* 复制按钮 */
+        .copy-code-button {
+            background-color: #5996F7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        
+        .copy-code-button:hover {
+            background-color: #4785e6;
+        }
+        
+        .copy-code-button svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+        }
+        
+        /* 复制成功提示 */
+        .copy-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .copy-toast.show {
+            opacity: 1;
+        }
+        
+        /* 未读消息标记 */
+        .unread-indicator {
+            position: absolute;
+            top: -2px;
+            right: -8px;
+            width: 8px;
+            height: 8px;
+            background-color: #ff4d4f;
+            border-radius: 50%;
+        }
+        
+        /* 設置按鈕樣式 */
+        .settings-button-container {
+            position: absolute;
+            right: 60px; /* 在關閉按鈕左側 */
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+        }
+        
+        .settings-icon-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-icon-button:hover {
+            opacity: 0.8;
+        }
+        
+        .settings-icon-button svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* 設置面板樣式 */
+        .settings-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: white;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .settings-header {
+            background-color: #5996F7;
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .settings-title {
+            font-size: 20px;
+            font-weight: 500;
+        }
+        
+        .settings-content {
+            flex: 1;
+            padding: 20px 30px;
+            overflow-y: auto;
+        }
+        
+        .settings-section-title {
+            font-size: 17px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .settings-options {
+            padding: 0;
+        }
+        
+        /* 開關按鈕樣式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 80px;
+            height: 24px;
+            margin-left: 20px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ff4d4f;
+            transition: .4s;
+            border-radius: 24px;
+            width: 80px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #52c41a;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(56px);
+        }
+        
+        .settings-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .settings-option:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-option label {
+            font-size: 15px;
+            color: #333;
+            flex: none;
+            min-width: 80px;
+        }
+        
+        .settings-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .settings-action-button {
+            padding: 8px 25px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-action-button.save {
+            background-color: #5996F7;
+            color: white;
+        }
+        
+        .settings-action-button.save:hover {
+            background-color: #4785e6;
+        }
+        
+        .settings-action-button.cancel {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+        
+        .settings-action-button.cancel:hover {
+            background-color: #e8e8e8;
+        }
+    </style>
+</head>
+<body data-new-gr-c-s-check-loaded="14.1103.0" data-gr-ext-installed="">
+    <!-- iPhone风格小白点 -->
+    <div class="floating-button" id="chatButton">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <!-- 足球图标 SVG 路径 -->
+            <path fill="currentColor" d="M177.1 228.6L207.9 320h96.5l29.62-91.38L256 172.1L177.1 228.6zM255.1 0C114.6 0 .0001 114.6 .0001 256S114.6 512 256 512s255.1-114.6 255.1-255.1S397.4 0 255.1 0zM416.6 360.9l-85.4-1.297l-25.15 81.59C290.1 445.5 273.4 448 256 448s-34.09-2.523-50.09-6.859l-25.15-81.59l-85.4 1.297c-18.12-27.66-29.15-60.27-30.88-95.31L137.3 222.5L108.1 143.4C136.2 114.9 171.7 96 211.6 91.47l46.88 75.48h94.09l46.88-75.48c39.9 4.531 75.36 23.38 104.4 51.95l-28.85 79.06l72.78 42.95C545.8 300.6 534.8 333.3 416.6 360.9z"></path>
+        </svg>
+        <div class="notification-badge" id="notificationBadge" style="display: flex;">5</div>
+    </div>
+    
+    <!-- 聊天窗口 -->
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="header-tabs">
+                <div class="header-tab active" data-tab="system">
+                    <span class="tab-text">系統信息<span class="unread-indicator" id="systemUnread" style="display: block;"></span></span>
+                    <span class="bell-icon" title="靜音通知">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                    </span>
+                </div>
+                <div class="header-tab" data-tab="match">
+                    <span class="tab-text">賽事信息<span class="unread-indicator" id="matchUnread" style="display: block;"></span></span>
+                    <span class="bell-icon" title="靜音通知">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                    </span>
+                </div>
+                <div class="header-tab" data-tab="personal">
+                    <span class="tab-text">個人信息<span class="unread-indicator" id="personalUnread" style="display: block;"></span></span>
+                    <span class="bell-icon" title="靜音通知">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="settings-icon-button" id="settingsButton" title="設置">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="19" cy="12" r="1"></circle>
+                        <circle cx="5" cy="12" r="1"></circle>
+                    </svg>
+                </button>
+                <button class="close-button" id="closeButton">×</button>
+            </div>
+        </div>
+        
+        <!-- 設置面板 -->
+        <div class="settings-container" id="settingsContainer">
+            <div class="settings-header">
+                <div class="settings-title">選項</div>
+            </div>
+            <div class="settings-content">
+                <div class="settings-section-title">賽事信息-訊息接收開關</div>
+                <div class="settings-options">
+                    <div class="settings-option">
+                        <label for="scoreChange">比分變動</label>
+                        <label class="switch">
+                            <input type="checkbox" id="scoreChange">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-option">
+                        <label for="oddsSale">盤口開售</label>
+                        <label class="switch">
+                            <input type="checkbox" id="oddsSale">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-option">
+                        <label for="scheduleChange">賽程異動</label>
+                        <label class="switch">
+                            <input type="checkbox" id="scheduleChange">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-option">
+                        <label for="matchCancel">取消賽事</label>
+                        <label class="switch">
+                            <input type="checkbox" id="matchCancel">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-buttons">
+                <button class="settings-action-button cancel" id="settingsCancelButton">取消</button>
+                <button class="settings-action-button save" id="settingsSaveButton">保存</button>
+            </div>
+        </div>
+        
+        <div class="search-bar" id="searchBar">
+            <div class="search-container">
+                <span class="search-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </span>
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索...">
+                <button class="search-clear" id="searchClear">×</button>
+            </div>
+            <div class="search-navigation" id="searchNavigation">
+                <button id="prevResult" disabled="">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg>
+                </button>
+                <button id="nextResult">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="search-results" id="searchResults">
+            找到 <span id="resultCount">0</span> 个结果
+        </div>
+        
+        <div class="chat-content" id="systemContent">
+            <div class="date-separator">
+                <span>2023年5月10日</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    🔧系统维护通知🔧<br>
+                      亲爱的用户您好，为了提供更稳定的服务环境，我们预计于：<br>
+                        维护时间：2025/05/09（四）00:00 ～ 2025/05/09（四）06:00(GMT+8)<br>
+                        预估总时长：6 小時<br>
+                        在此期间，系统将暂停服务，造成不便请见谅。<br>
+                        🌙 别担心，工程师深夜也没打算睡，努力帮你修好每一行代码。感谢您的理解与支持！
+                </div>
+                <div class="message-info">
+                    <div class="message-time">2023/05/10 09:15</div>
+                </div>
+            </div>
+            
+            <div class="date-separator">
+                <span>昨天</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    系统维护已完成，感谢您的耐心等待！
+                </div>
+                <div class="message-info">
+                    <div class="message-time">15:45</div>
+                </div>
+            </div>
+            
+            <div class="date-separator" id="systemTodaySeparator">
+                <span>今天</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    🔧系统维护通知🔧<br>
+                      亲爱的用户您好，为了提供更稳定的服务环境，我们预计于：<br>
+                        维护时间：2025/05/10（四）09:00 ～ 2025/05/10（四）12:00(GMT+8)<br>
+                        预估总时长：3 小時<br>
+                        在此期间，系统将暂停服务，造成不便请见谅。<br>
+                        🧘 趁这段时间，放下屏幕去泡杯茶吧，回来一切都会更顺畅。感谢您的理解与支持！
+                </div>
+                <div class="message-info">
+                    <div class="message-time">10:30</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-content" id="matchContent" style="display: none;">
+            <div class="date-separator">
+                <span>昨天</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    您收藏的比赛 英超联赛 [利物浦 vs 曼城] 已结束，比分 3-2，要看看精彩回放嗎？
+                    <button class="action-button" data-match="liverpool-mancity">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
+                        前往赛事详情
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">23:05</div>
+                </div>
+            </div>
+            
+            <div class="date-separator" id="matchTodaySeparator">
+                <span>今天</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    您置顶的比赛 西班牙甲级联赛 [巴塞罗那 vs 皇家马德里] 将于今晚20:00(GMT+8)开始，请准时观看！
+                    <button class="action-button" data-match="barcelona-realmadrid">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
+                        前往赛事详情
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">09:30</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    比赛结果：巴塞罗那 2-1 皇家马德里，恭喜您的预测成功！
+                </div>
+                <div class="message-info">
+                    <div class="message-time">22:15</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    您收藏的赛事已开售，英超联赛 德国 vs 英国 开赛时间为09:00 GMT(+8)，赶快前往看看吧！
+                    <button class="action-button" data-match="germany-england">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
+                        前往赛事详情
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">22:30</div>
+                </div>
+            </div>
+        </div>
+		
+        <div class="chat-content" id="personalContent" style="display: none;">
+            <div class="date-separator">
+                <span>2023年5月10日</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    系统提醒：您已被人工扣款 1000，目前余额为 2000。若有任何疑问，请随时与我们联系，我们会一直在。
+                </div>
+                <div class="message-info">
+                    <div class="message-time">2023/05/10 09:30</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    合买赛果已出炉! 恭喜您获得2550，加上佣金450，目前余额为 5000
+                    <br>注单号: 5235679989162811
+                    <button class="action-button" data-order="5235679989162811">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        复制单号
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">2023/05/10 14:20</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    合买赛果已出炉! 恭喜您获得1245，已扣除佣金120，目前余额为 6245。
+                    <br>注单号: 5235679989162811
+                    <button class="action-button" data-order="5235679989162811">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        复制单号
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">2023/05/10 18:45</div>
+                </div>
+            </div>
+            
+            <div class="date-separator">
+                <span>昨天</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    很抱歉，您的预约下注失败，扣款金额将退还。
+                    <br>注单号: 5235679989162811
+                    <br>已恢复至余额 1760，请您放心！
+                    <button class="action-button" data-order="5235679989162811">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        复制单号
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">16:30</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    系统已为您人工加款 3000，目前余额为 5800。感谢您的耐心与支持～祝您投注顺利！
+                </div>
+                <div class="message-info">
+                    <div class="message-time">18:15</div>
+                </div>
+            </div>
+            
+            <div class="date-separator" id="personalTodaySeparator">
+                <span>今天</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    亲爱的用户您好～您已成功转入 1000 目前余额为 2200。感谢您一直以来的支持，我会在这里陪您每一步！
+                </div>
+                <div class="message-info">
+                    <div class="message-time">09:15</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    恭喜您获得彩金 500！系统已为您加值，现在余额为 3200。今天的您，光芒万丈！
+                </div>
+                <div class="message-info">
+                    <div class="message-time">10:30</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    您已成功下注 200，下注已提交！
+                    <br>注单号: 32132321312
+                    <br>目前余额为 1800，让我们期待这场赛事为您带来惊喜！
+                    <button class="action-button" data-order="32132321312">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        复制单号
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">11:45</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    预约下注成功，扣款 300，您的余额为 1450。
+                    <br>注单号: 5235679989162811
+                    <br>感谢您的信任～我们会为您的预约投注持续关注！
+                    <button class="action-button" data-order="5235679989162811">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        复制单号
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">13:20</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 复制成功提示 -->
+    <div class="copy-toast" id="copyToast">已复制单号</div>
+    
+    <!-- 开发者按钮 -->
+    <button class="dev-button" id="devButton">开发者信息</button>
+    
+    <!-- 开发者模态窗口 -->
+    <div class="modal" id="devModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-area">
+                    <h2>原生代碼 v34</h2>
+                    <button class="copy-code-button" id="copyCodeButton">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        複製代碼
+                    </button>
+                </div>
+                <button class="modal-close" id="modalClose">×</button>
+            </div>
+            <div class="code-block" id="codeBlock">
+                // 這裡將顯示當前頁面的完整代碼
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 获取DOM元素
+        const chatButton = document.getElementById('chatButton');
+        const chatWindow = document.getElementById('chatWindow');
+        const closeButton = document.getElementById('closeButton');
+        const notificationBadge = document.getElementById('notificationBadge');
+        const headerTabs = document.querySelectorAll('.header-tab');
+        const bellIcons = document.querySelectorAll('.bell-icon');
+        const searchBar = document.getElementById('searchBar');
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const searchResults = document.getElementById('searchResults');
+        const resultCount = document.getElementById('resultCount');
+        const searchNavigation = document.getElementById('searchNavigation');
+        const prevResult = document.getElementById('prevResult');
+        const nextResult = document.getElementById('nextResult');
+        const systemContent = document.getElementById('systemContent');
+        const matchContent = document.getElementById('matchContent');
+        const personalContent = document.getElementById('personalContent');
+        const actionButtons = document.querySelectorAll('.action-button');
+        const devButton = document.getElementById('devButton');
+        const devModal = document.getElementById('devModal');
+        const modalClose = document.getElementById('modalClose');
+        const codeBlock = document.getElementById('codeBlock');
+        const copyToast = document.getElementById('copyToast');
+        const copyCodeButton = document.getElementById('copyCodeButton');
+        
+        // 未读指示器
+        const systemUnread = document.getElementById('systemUnread');
+        const matchUnread = document.getElementById('matchUnread');
+        const personalUnread = document.getElementById('personalUnread');
+        
+        // 初始化变量
+        let currentTab = 'system';
+        let searchMatches = [];
+        let currentMatchIndex = -1;
+        let mutedTabs = {
+            system: false,
+            match: false,
+            personal: false
+        };
+        
+        // 未读消息计数
+        let unreadCounts = {
+            system: 1,
+            match: 2,
+            personal: 2
+        };
+        
+        // 窗口状态
+        let isWindowOpen = false;
+        
+        // 拖拽相关变量
+        let isDragging = false;
+        let startY = 0;
+        let startX = 0;
+        let initialTop = 0;
+        let initialRight = 0;
+        
+        // 随机消息模板
+        const personalMessageTemplates = [
+            "亲爱的用户您好～您已成功转入 {amount} 目前余额为 {balance}。感谢您一直以来的支持，我会在这里陪您每一步！",
+            "恭喜您获得彩金 {amount}！系统已为您加值，现在余额为 {balance}。今天的您，光芒万丈！",
+            "您已成功下注 {amount}，下注已提交！<br>注单号: {orderNumber}<br>目前余额为 {balance}，让我们期待这场赛事为您带来惊喜！",
+            "预约下注成功，扣款 {amount}，您的余额为 {balance}。<br>注单号: {orderNumber}<br>感谢您的信任～我们会为您的预约投注持续关注！",
+            "系统已为您人工加款 {amount}，目前余额为 {balance}。感谢您的耐心与支持～祝您投注顺利！",
+            "您的单号:{orderNumber} 比赛已结果，赛果为赢，已派彩{amount}彩金给您，现在馀额是{balance}，欢迎继续下注，我会与您一起共战双赢！",
+            "合买赛果已出炉! 恭喜您获得{amount}，加上佣金{commission}，目前余额为 {balance}<br>注单号: {orderNumber}"
+        ];
+        
+        // 生成随机数字
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        // 生成随机订单号
+        function generateOrderNumber() {
+            return Math.floor(Math.random() * 9000000000) + 1000000000;
+        }
+        
+        // 获取当前时间
+        function getCurrentTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+        
+        // 更新未读指示器显示
+        function updateUnreadIndicators() {
+            systemUnread.style.display = unreadCounts.system > 0 ? 'block' : 'none';
+            matchUnread.style.display = unreadCounts.match > 0 ? 'block' : 'none';
+            personalUnread.style.display = unreadCounts.personal > 0 ? 'block' : 'none';
+        }
+        
+        // 添加新消息
+        function addNewPersonalMessage() {
+            // 选择随机消息模板
+            const templateIndex = Math.floor(Math.random() * personalMessageTemplates.length);
+            const template = personalMessageTemplates[templateIndex];
+            
+            // 生成随机数据
+            const amount = getRandomNumber(100, 5000);
+            const balance = getRandomNumber(1000, 10000);
+            const orderNumber = generateOrderNumber();
+            const commission = getRandomNumber(50, 500);
+            
+            // 替换模板中的变量
+            let messageText = template
+                .replace('{amount}', amount)
+                .replace('{balance}', balance)
+                .replace('{orderNumber}', orderNumber)
+                .replace('{commission}', commission);
+            
+            // 检查是否需要添加按钮
+            const needsButton = messageText.includes('注单号:') || messageText.includes('注单号：') || messageText.includes('单号:');
+            
+            // 创建消息元素
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message new-message'; // 添加新消息类
+            
+            // 创建消息气泡
+            const bubbleElement = document.createElement('div');
+            bubbleElement.className = 'message-bubble';
+            
+            // 设置消息内容
+            if (needsButton) {
+                // 提取订单号
+                let extractedOrderNumber = orderNumber;
+                if (messageText.includes('注单号:')) {
+                    const match = messageText.match(/注单号:\s*(\d+)/);
+                    if (match) extractedOrderNumber = match[1];
+                } else if (messageText.includes('单号:')) {
+                    const match = messageText.match(/单号:\s*(\d+)/);
+                    if (match) extractedOrderNumber = match[1];
+                }
+                
+                // 添加按钮
+                bubbleElement.innerHTML = messageText;
+                if (!messageText.includes('<button')) {
+                    const buttonHTML = `
+                        <button class="action-button" data-order="${extractedOrderNumber}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            复制单号
+                        </button>
+                    `;
+                    bubbleElement.innerHTML += buttonHTML;
+                }
+            } else {
+                bubbleElement.textContent = messageText;
+            }
+            
+            // 创建消息信息
+            const infoElement = document.createElement('div');
+            infoElement.className = 'message-info';
+            
+            // 添加时间
+            const timeElement = document.createElement('div');
+            timeElement.className = 'message-time';
+            timeElement.textContent = getCurrentTime();
+            infoElement.appendChild(timeElement);
+            
+            // 组装消息
+            messageElement.appendChild(bubbleElement);
+            messageElement.appendChild(infoElement);
+            
+            // 检查是否需要添加今天的日期分隔线
+            const todaySeparator = document.getElementById('personalTodaySeparator');
+            if (!todaySeparator) {
+                // 如果没有今天的分隔线，添加一个
+                const dateSeparator = document.createElement('div');
+                dateSeparator.className = 'date-separator';
+                dateSeparator.id = 'personalTodaySeparator';
+                dateSeparator.innerHTML = '<span>今天</span>';
+                personalContent.appendChild(dateSeparator);
+            }
+            
+            // 添加到个人信息标签页
+            personalContent.appendChild(messageElement);
+            
+            // 滚动到底部
+            personalContent.scrollTop = personalContent.scrollHeight;
+            
+            // 如果窗口未打开或当前不在个人信息标签页，增加未读消息计数
+            if (!isWindowOpen || currentTab !== 'personal') {
+                unreadCounts.personal++;
+                
+                // 如果铃铛没有静音，更新通知徽章
+                if (!mutedTabs.personal) {
+                    updateNotificationCount();
+                }
+                
+                // 更新未读指示器
+                updateUnreadIndicators();
+            }
+            
+            // 添加动画效果，延迟显示消息
+            setTimeout(() => {
+                messageElement.classList.remove('new-message');
+            }, 10);
+        }
+        
+        // 更新未读消息数量
+        function updateNotificationCount() {
+            let totalUnread = 0;
+            
+            // 只计算未静音标签页的未读消息
+            if (!mutedTabs.system) totalUnread += unreadCounts.system;
+            if (!mutedTabs.match) totalUnread += unreadCounts.match;
+            if (!mutedTabs.personal) totalUnread += unreadCounts.personal;
+            
+            // 更新徽章
+            notificationBadge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+            
+            if (totalUnread === 0) {
+                notificationBadge.style.display = 'none';
+            } else {
+                notificationBadge.style.display = 'flex';
+            }
+        }
+        
+        // 切换标签页
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // 更新标签页状态
+            headerTabs.forEach(tab => {
+                const tabId = tab.getAttribute('data-tab');
+                if (tabId === tabName) {
+                    tab.classList.add('active');
+                    
+                    // 重置该标签页的未读消息计数
+                    unreadCounts[tabId] = 0;
+                    updateNotificationCount();
+                    updateUnreadIndicators();
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // 显示对应内容
+            systemContent.style.display = tabName === 'system' ? 'block' : 'none';
+            matchContent.style.display = tabName === 'match' ? 'block' : 'none';
+            personalContent.style.display = tabName === 'personal' ? 'block' : 'none';
+            
+            // 清除搜索结果
+            clearSearch();
+        }
+        
+        // 切换静音状态
+        function toggleMute(tabName) {
+            mutedTabs[tabName] = !mutedTabs[tabName];
+            
+            // 更新UI
+            headerTabs.forEach(tab => {
+                const tabId = tab.getAttribute('data-tab');
+                if (tabId === tabName) {
+                    if (mutedTabs[tabName]) {
+                        tab.querySelector('.bell-icon').innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        `;
+                        tab.querySelector('.bell-icon').title = "取消静音";
+                        tab.querySelector('.bell-icon').classList.add('muted');
+                    } else {
+                        tab.querySelector('.bell-icon').innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                        `;
+                        tab.querySelector('.bell-icon').title = "静音通知";
+                        tab.querySelector('.bell-icon').classList.remove('muted');
+                    }
+                }
+            });
+            
+            // 更新未读消息数量
+            updateNotificationCount();
+        }
+        
+        // 搜索功能
+        function performSearch() {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            if (!searchTerm) {
+                clearSearch();
+                return;
+            }
+            
+            // 清除之前的高亮
+            clearHighlights();
+            
+            // 获取当前标签页的内容
+            const contentElement = document.getElementById(`${currentTab}Content`);
+            const messages = contentElement.querySelectorAll('.message-bubble');
+            
+            // 查找匹配项
+            searchMatches = [];
+            messages.forEach(message => {
+                const text = message.textContent.toLowerCase();
+                let startIndex = 0;
+                let index;
+                
+                while ((index = text.indexOf(searchTerm, startIndex)) > -1) {
+                    searchMatches.push({
+                        element: message,
+                        index: index
+                    });
+                    startIndex = index + searchTerm.length;
+                }
+            });
+            
+            // 更新搜索结果计数
+            resultCount.textContent = searchMatches.length;
+            searchResults.style.display = 'block';
+            
+            // 高亮匹配项
+            if (searchMatches.length > 0) {
+                searchNavigation.style.display = 'flex';
+                currentMatchIndex = 0;
+                highlightCurrentMatch();
+            } else {
+                searchNavigation.style.display = 'none';
+                currentMatchIndex = -1;
+            }
+            
+            // 更新导航按钮状态
+            updateNavigationButtons();
+        }
+        
+        // 清除搜索
+        function clearSearch() {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            searchResults.style.display = 'none';
+            searchNavigation.style.display = 'none';
+            clearHighlights();
+            searchMatches = [];
+            currentMatchIndex = -1;
+        }
+        
+        // 清除高亮
+        function clearHighlights() {
+            const contentElement = document.getElementById(`${currentTab}Content`);
+            const highlights = contentElement.querySelectorAll('.highlighted');
+            highlights.forEach(highlight => {
+                const parent = highlight.parentNode;
+                parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+                parent.normalize();
+            });
+        }
+        
+        // 高亮当前匹配项
+        function highlightCurrentMatch() {
+            if (currentMatchIndex < 0 || currentMatchIndex >= searchMatches.length) return;
+            
+            const match = searchMatches[currentMatchIndex];
+            const element = match.element;
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            
+            // 清除之前的高亮
+            clearHighlights();
+            
+            // 创建高亮文本
+            const text = element.textContent;
+            const lowerText = text.toLowerCase();
+            let startIndex = 0;
+            let index;
+            let newHtml = '';
+            
+            while ((index = lowerText.indexOf(searchTerm, startIndex)) > -1) {
+                newHtml += text.substring(startIndex, index);
+                newHtml += `<span class="highlighted">${text.substring(index, index + searchTerm.length)}</span>`;
+                startIndex = index + searchTerm.length;
+            }
+            newHtml += text.substring(startIndex);
+            
+            // 保存原始HTML中的按钮
+            const buttons = element.querySelectorAll('button');
+            const buttonHtml = Array.from(buttons).map(button => button.outerHTML);
+            
+            // 应用新HTML
+            element.innerHTML = newHtml;
+            
+            // 恢复按钮
+            if (buttonHtml.length > 0) {
+                buttonHtml.forEach(html => {
+                    element.innerHTML += html;
+                });
+            }
+            
+            // 滚动到当前匹配项
+            const highlight = element.querySelector('.highlighted');
+            if (highlight) {
+                highlight.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+        
+        // 更新导航按钮状态
+        function updateNavigationButtons() {
+            prevResult.disabled = currentMatchIndex <= 0;
+            nextResult.disabled = currentMatchIndex >= searchMatches.length - 1;
+        }
+        
+        // 显示复制成功提示
+        function showCopyToast(message) {
+            copyToast.textContent = message || '已复制单号';
+            copyToast.classList.add('show');
+            
+            setTimeout(() => {
+                copyToast.classList.remove('show');
+            }, 2000);
+        }
+        
+        // 复制注单号
+        function copyOrderNumber(orderNumber) {
+            // 创建一个临时文本区域
+            const textarea = document.createElement('textarea');
+            textarea.value = orderNumber;
+            textarea.style.position = 'fixed';  // 防止滚动到底部
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                // 执行复制命令
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopyToast(`已复制注单号: ${orderNumber}`);
+                } else {
+                    console.error('复制失败');
+                    showCopyToast('复制失败，请手动复制');
+                }
+            } catch (err) {
+                console.error('复制出错:', err);
+                showCopyToast('复制失败，请手动复制');
+            }
+            
+            // 移除临时文本区域
+            document.body.removeChild(textarea);
+        }
+        
+        // 复制代码
+        function copyCode() {
+            const codeText = codeBlock.textContent;
+            
+            // 创建一个临时文本区域
+            const textarea = document.createElement('textarea');
+            textarea.value = codeText;
+            textarea.style.position = 'fixed';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                // 执行复制命令
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopyToast('代码已复制到剪贴板');
+                } else {
+                    console.error('复制失败');
+                    showCopyToast('复制失败，请手动复制');
+                }
+            } catch (err) {
+                console.error('复制出错:', err);
+                showCopyToast('复制失败，请手动复制');
+            }
+            
+            // 移除临时文本区域
+            document.body.removeChild(textarea);
+        }
+        
+        // 前往赛事详情
+        function goToMatchDetail(matchId) {
+            alert(`正在前往赛事详情页: ${matchId}`);
+            // 这里可以添加实际的跳转逻辑
+        }
+        
+        // 处理按钮点击
+        function handleButtonClick(button) {
+            if (button.hasAttribute('data-order')) {
+                // 复制注单号
+                const orderNumber = button.getAttribute('data-order');
+                copyOrderNumber(orderNumber);
+            } else if (button.hasAttribute('data-match')) {
+                // 前往赛事详情
+                const matchId = button.getAttribute('data-match');
+                goToMatchDetail(matchId);
+            }
+        }
+        
+        // 显示原生代码
+        function showSourceCode() {
+            const htmlCode = document.documentElement.outerHTML
+                .replace(/<script>\s*window\.__CF\$cv\$params.*?<\/script>/g, '') // 移除 Cloudflare 腳本
+                .replace(/<iframe.*?<\/iframe>/g, ''); // 移除 iframe
+            codeBlock.textContent = htmlCode;
+            devModal.style.display = 'flex';
+        }
+        
+        // 拖拽开始
+        function startDrag(e) {
+            // 如果是触摸事件，获取第一个触摸点
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            
+            isDragging = true;
+            chatButton.classList.add('dragging');
+            
+            // 获取按钮当前位置
+            const rect = chatButton.getBoundingClientRect();
+            startX = clientX;
+            startY = clientY;
+            
+            // 计算按钮的初始位置（相对于视口）
+            initialTop = rect.top;
+            initialRight = window.innerWidth - rect.right;
+            
+            // 阻止默认行为，防止在移动设备上滚动页面
+            e.preventDefault();
+        }
+        
+        // 拖拽中
+        function drag(e) {
+            if (!isDragging) return;
+            
+            // 如果是触摸事件，获取第一个触摸点
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            
+            // 计算移动距离
+            const deltaY = clientY - startY;
+            
+            // 更新按钮位置（只允许垂直移动）
+            const newTop = initialTop + deltaY;
+            
+            // 确保按钮不会移出视口
+            if (newTop >= 0 && newTop <= window.innerHeight - chatButton.offsetHeight) {
+                chatButton.style.top = newTop + 'px';
+                chatButton.style.right = initialRight + 'px';
+                // 移除默认的transform，因为我们现在使用绝对定位
+                chatButton.style.transform = 'none';
+            }
+            
+            e.preventDefault();
+        }
+        
+        // 拖拽结束
+        function endDrag() {
+            if (isDragging) {
+                isDragging = false;
+                chatButton.classList.remove('dragging');
+            }
+        }
+        
+        // 监听键盘按键
+        document.addEventListener('keydown', (e) => {
+            // 如果按下数字1键，添加新消息
+            if (e.key === '1') {
+                addNewPersonalMessage();
+            }
+        });
+        
+        // 事件监听器
+        
+        // 拖拽事件
+        chatButton.addEventListener('mousedown', startDrag);
+        chatButton.addEventListener('touchstart', startDrag);
+        
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag);
+        
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+        
+        // 点击聊天按钮
+        chatButton.addEventListener('click', (e) => {
+            // 如果正在拖拽，不触发点击事件
+            if (isDragging) return;
+            
+            if (chatWindow.style.display === 'flex') {
+                chatWindow.style.display = 'none';
+                chatButton.style.display = 'flex';
+                searchBar.classList.remove('visible');
+                isWindowOpen = false;
+            } else {
+                chatWindow.style.display = 'flex';
+                chatButton.style.display = 'none';
+                setTimeout(() => {
+                    searchBar.classList.add('visible');
+                }, 300);
+                isWindowOpen = true;
+                
+                // 如果当前标签页有未读消息，标记为已读
+                if (unreadCounts[currentTab] > 0) {
+                    unreadCounts[currentTab] = 0;
+                    updateNotificationCount();
+                    updateUnreadIndicators();
+                }
+            }
+        });
+        
+        // 关闭聊天窗口
+        closeButton.addEventListener('click', () => {
+            searchBar.classList.remove('visible');
+            setTimeout(() => {
+                chatWindow.style.display = 'none';
+                chatButton.style.display = 'flex';
+            }, 300);
+            isWindowOpen = false;
+        });
+        
+        // 标签页切换
+        headerTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                if (e.target.closest('.bell-icon')) return; // 如果点击的是铃铛图标，不切换标签
+                const tabName = tab.getAttribute('data-tab');
+                switchTab(tabName);
+            });
+        });
+        
+        // 静音按钮
+        bellIcons.forEach(bell => {
+            bell.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const tabName = bell.closest('.header-tab').getAttribute('data-tab');
+                toggleMute(tabName);
+            });
+        });
+        
+        // 搜索输入
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value) {
+                searchClear.style.display = 'block';
+            } else {
+                searchClear.style.display = 'none';
+                searchResults.style.display = 'none';
+                searchNavigation.style.display = 'none';
+                clearHighlights();
+            }
+        });
+        
+        // 搜索框按Enter键
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // 清除搜索
+        searchClear.addEventListener('click', clearSearch);
+        
+        // 上一个搜索结果
+        prevResult.addEventListener('click', () => {
+            if (currentMatchIndex > 0) {
+                currentMatchIndex--;
+                highlightCurrentMatch();
+                updateNavigationButtons();
+            }
+        });
+        
+        // 下一个搜索结果
+        nextResult.addEventListener('click', () => {
+            if (currentMatchIndex < searchMatches.length - 1) {
+                currentMatchIndex++;
+                highlightCurrentMatch();
+                updateNavigationButtons();
+            }
+        });
+        
+        // 按钮点击事件
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('action-button') || e.target.closest('.action-button')) {
+                const button = e.target.classList.contains('action-button') ? e.target : e.target.closest('.action-button');
+                handleButtonClick(button);
+            }
+        });
+        
+        // 开发者按钮
+        devButton.addEventListener('click', showSourceCode);
+        
+        // 复制代码按钮
+        copyCodeButton.addEventListener('click', copyCode);
+        
+        // 关闭模态窗口
+        modalClose.addEventListener('click', () => {
+            devModal.style.display = 'none';
+        });
+        
+        // 点击模态窗口外部关闭
+        window.addEventListener('click', (e) => {
+            if (e.target === devModal) {
+                devModal.style.display = 'none';
+            }
+        });
+        
+        // 初始化
+        updateNotificationCount();
+        updateUnreadIndicators();
+        
+        // 設置相關元素
+        const settingsButton = document.getElementById('settingsButton');
+        const settingsContainer = document.getElementById('settingsContainer');
+        const settingsSaveButton = document.getElementById('settingsSaveButton');
+        const settingsCancelButton = document.getElementById('settingsCancelButton');
+        
+        // 保存開關狀態
+        let switchStates = {
+            scoreChange: false,
+            oddsSale: false,
+            scheduleChange: false,
+            matchCancel: false
+        };
+        
+        // 顯示設置面板
+        function showSettings() {
+            // 隱藏搜索欄
+            searchBar.classList.remove('visible');
+            
+            // 顯示設置面板
+            settingsContainer.style.display = 'flex';
+            
+            // 恢復之前的開關狀態
+            Object.keys(switchStates).forEach(id => {
+                const checkbox = document.getElementById(id);
+                if (checkbox) {
+                    checkbox.checked = switchStates[id];
+                }
+            });
+        }
+        
+        // 隱藏設置面板
+        function hideSettings() {
+            // 顯示搜索欄
+            searchBar.classList.add('visible');
+            
+            // 隱藏設置面板
+            settingsContainer.style.display = 'none';
+        }
+        
+        // 保存設置
+        function saveSettings() {
+            // 保存所有開關的狀態
+            Object.keys(switchStates).forEach(id => {
+                const checkbox = document.getElementById(id);
+                if (checkbox) {
+                    switchStates[id] = checkbox.checked;
+                }
+            });
+            
+            // 隱藏設置面板
+            hideSettings();
+        }
+        
+        // 設置按鈕點擊事件
+        settingsButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showSettings();
+        });
+        
+        // 保存按鈕點擊事件
+        settingsSaveButton.addEventListener('click', () => {
+            saveSettings();
+        });
+        
+        // 取消按鈕點擊事件
+        settingsCancelButton.addEventListener('click', () => {
+            hideSettings();
+        });
+        
+        // 防止設置面板內的點擊事件冒泡
+        settingsContainer.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93cd3ad6961c49f7',t:'MTc0Njc1MjExMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+</body><grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration></html>
