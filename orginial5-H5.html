@@ -594,29 +594,36 @@
         }
         
         .modal-content {
-            background-color: white;
+            background-color: #252526;
             border-radius: 10px;
-            width: 80%;
-            max-width: 800px;
-            max-height: 80vh;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
             overflow-y: auto;
             padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+            color: #d4d4d4;
         }
         
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3d3d3d;
         }
         
         .modal-title-area {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
+        }
+        
+        .modal-title-area h2 {
+            color: #d4d4d4;
+            font-size: 1.5em;
+            margin: 0;
         }
         
         .modal-close {
@@ -624,20 +631,50 @@
             border: none;
             font-size: 24px;
             cursor: pointer;
-            color: #666;
+            color: #d4d4d4;
+            transition: color 0.2s ease;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        
+        .modal-close:hover {
+            color: #ffffff;
+            background-color: rgba(255,255,255,0.1);
         }
         
         .code-block {
-            background-color: #f8f8f8;
-            border: 1px solid #e0e0e0;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border: 1px solid #2d2d2d;
             border-radius: 5px;
-            padding: 15px;
+            padding: 20px;
             overflow-x: auto;
-            font-family: monospace;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             white-space: pre;
-            line-height: 1.5;
-            font-size: 12px;
+            line-height: 1.6;
+            font-size: 13px;
             margin-bottom: 15px;
+            max-height: 70vh;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        .code-block::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .code-block::-webkit-scrollbar-track {
+            background: #2d2d2d;
+            border-radius: 4px;
+        }
+        
+        .code-block::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 4px;
+        }
+        
+        .code-block::-webkit-scrollbar-thumb:hover {
+            background: #888;
         }
         
         /* 复制按钮 */
@@ -1283,7 +1320,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title-area">
-                    <h2>原生代碼 v34</h2>
+                    <h2>原生代碼 H5V01</h2>
                     <button class="copy-code-button" id="copyCodeButton">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -1891,10 +1928,31 @@
         
         // 显示原生代码
         function showSourceCode() {
+            // 獲取當前文檔的HTML內容
             const htmlCode = document.documentElement.outerHTML
                 .replace(/<script>\s*window\.__CF\$cv\$params.*?<\/script>/g, '') // 移除 Cloudflare 腳本
-                .replace(/<iframe.*?<\/iframe>/g, ''); // 移除 iframe
-            codeBlock.textContent = htmlCode;
+                .replace(/<iframe.*?<\/iframe>/g, '') // 移除 iframe
+                .replace(/<script>\(function\(\)\{.*?\}\)\(\);<\/script>/g, '') // 移除其他自動生成的腳本
+                .replace(/<grammarly-desktop-integration.*?<\/grammarly-desktop-integration>/g, '') // 移除 Grammarly 相關代碼
+                .replace(/data-new-gr-c-s-check-loaded=".*?"/g, '') // 移除 Grammarly 屬性
+                .replace(/data-gr-ext-installed=""/g, '') // 移除 Grammarly 屬性
+                .replace(/<div class="modal-content">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/g, function(match) {
+                    // 保留模態窗口結構，但清理內部代碼塊的內容
+                    return match.replace(/<div class="code-block".*?>.*?<\/div>/g, '<div class="code-block" id="codeBlock"></div>');
+                });
+
+            // 格式化代碼
+            const formattedCode = htmlCode
+                .replace(/></g, '>\n<') // 在標籤之間添加換行
+                .replace(/\n\s*\n/g, '\n') // 移除多餘的空行
+                .replace(/^\s*[\r\n]/gm, '') // 移除空白行
+                .replace(/^(?!\s*$)/gm, '    ') // 添加縮進
+                .trim(); // 移除首尾空白
+
+            // 更新代碼塊內容
+            codeBlock.textContent = formattedCode;
+            
+            // 顯示模態窗口
             devModal.style.display = 'flex';
         }
         
