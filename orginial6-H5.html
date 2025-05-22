@@ -1,0 +1,3179 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天窗口</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #background-image {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 428px;
+            height: 939px;
+            background-image: url('https://mobinice.github.io/428x939.png');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+        
+        /* iPhone风格小白点 */
+        .floating-button {
+            position: fixed;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            touch-action: none;
+            left: calc(50% + 428px/2 - 70px); /* 背景圖寬度的一半減去按鈕寬度和邊距 */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .floating-button:hover {
+            transform: translateY(-50%) scale(1.05);
+        }
+        
+        .floating-button.dragging {
+            transition: none; /* 拖動時禁用過渡效果 */
+        }
+        
+        .floating-button svg {
+            width: 30px;
+            height: 30px;
+            color: #5996F7;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff4d4f;
+            color: white;
+            border-radius: 50%;
+            min-width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 0 4px;
+        }
+        
+            /* 聊天窗口 */
+    .chat-window {
+        position: fixed;
+        width: 400px;
+        max-width: 100%;
+        height: 600px;
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 999;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0.95);
+        opacity: 0;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .chat-window.visible {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+        
+        /* 聊天窗口头部 */
+        .chat-header {
+            background-color: #5996F7;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            height: 60px;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .chat-header.visible {
+            transform: translateY(0);
+        }
+        
+        .header-tabs {
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            overflow-x: auto;
+            width: calc(100% - 75px);
+            height: 100%;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* 隱藏 Webkit 瀏覽器的滾動條 */
+        .header-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* 隱藏滾動條 */
+        .header-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .header-controls {
+            position: absolute;
+            right: 3px; /* 再往右移一點 */
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1px;
+            justify-content: flex-end;
+            z-index: 1;
+            background-color: #5996F7;
+            padding-left: 4px;
+        }
+        
+        .spacer {
+            display: none; /* 移除不需要的元素 */
+        }
+        
+        .settings-icon-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            margin-right: 8px; /* 減少與關閉按鈕的間距 */
+        }
+        
+        .settings-icon-button:hover {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+        
+        .settings-icon-button svg {
+            width: 20px; /* 縮小圖標尺寸 */
+            height: 20px;
+        }
+        
+        .close-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px; /* 縮小字體大小 */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px; /* 縮小按鈕寬度 */
+            height: 24px; /* 縮小按鈕高度 */
+            padding: 0;
+        }
+        
+        .close-button:hover {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+        
+        .header-tab {
+            padding: 8px 8px; /* 減少左右內邊距 */
+            cursor: pointer;
+            font-weight: 500;
+            position: relative;
+            margin-right: 5px; /* 減少標籤間距 */
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        
+        .header-tab.active {
+            font-weight: 600;
+        }
+        
+        .header-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 8px; /* 與padding相同 */
+            right: 8px; /* 與padding相同 */
+            width: auto;
+            height: 3px;
+            background-color: white;
+        }
+        
+        .header-tab .tab-text {
+            margin-right: 5px;
+            position: relative;
+        }
+        
+        .header-tab .bell-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 5px; /* 增加與標籤文字的間距 */
+            opacity: 1; /* 確保鈴鐺圖標可見 */
+        }
+        
+        .header-tab .bell-icon svg {
+            width: 16px;
+            height: 16px;
+            opacity: 1; /* 確保SVG顯示 */
+        }
+        
+        .header-tab.muted .bell-icon svg {
+            opacity: 0.7;
+        }
+        
+        /* 搜索栏 */
+        .search-bar {
+            padding: 10px 15px;
+            background-color: #f0f0f0; /* 改为灰色背景 */
+            display: flex;
+            align-items: center;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .search-bar.visible {
+            transform: translateY(0);
+        }
+        
+        .search-container {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 20px;
+            padding: 0 10px;
+            height: 36px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-icon {
+            color: #999;
+            margin-right: 8px;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            background: transparent;
+        }
+        
+        .search-clear {
+            display: none;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 5px;
+        }
+        
+        .search-navigation {
+            display: none;
+            margin-left: 10px;
+        }
+        
+        .search-navigation button {
+            background-color: #5996F7;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .search-navigation button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .search-results {
+            display: none;
+            background-color: white;
+            padding: 5px 10px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        /* 聊天内容 */
+        .chat-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+        }
+
+        /* 自定義滾動條樣式 */
+        .chat-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .chat-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .chat-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* header-tabs 的滾動條仍然隱藏 */
+        .header-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .header-tabs {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* 系統信息容器樣式 */
+        #systemContent {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            will-change: transform;
+        }
+
+        /* 所有標籤頁的內容容器統一樣式 */
+        .chat-content {
+            padding-bottom: 30px; /* 統一底部間距 */
+        }
+
+        /* 消息容器樣式 */
+        #systemContent .message-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+            padding-bottom: 20px; /* 額外底部間距 */
+        }
+
+        /* 確保所有消息標籤頁的底部間距一致 */
+        #matchContent, #personalContent {
+            padding-bottom: 20px;
+        }
+
+        /* 確保消息容器內的元素正確顯示 */
+        .message {
+            width: 100%;
+            flex-shrink: 0;
+            margin-bottom: 15px;
+        }
+
+        .message:last-child {
+            margin-bottom: 0;
+        }
+
+        .date-separator {
+            flex-shrink: 0;
+        }
+        
+        /* 移除之前的樣式 */
+        #systemContent .message:first-child {
+            margin-top: 0;
+        }
+        
+        /* 日期分隔线 */
+        .date-separator {
+            text-align: center;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .date-separator span {
+            background-color: white;
+            padding: 0 10px;
+            color: #999;
+            font-size: 13px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .date-separator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #e0e0e0;
+            z-index: 0;
+        }
+        
+        /* 消息样式 */
+        .message {
+            margin-bottom: 15px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        /* 新消息动画 */
+        .message.new-message {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        /* 未讀消息樣式 */
+        .message.unread {
+            position: relative;
+        }
+
+        .message.unread::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            background-color: #5996F7;
+            border-radius: 50%;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .message.highlight {
+            animation: highlight-fade 1.5s ease-out;
+        }
+
+        @keyframes highlight-fade {
+            0% {
+                background-color: rgba(89, 150, 247, 0.1);
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
+        
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 15px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+            align-self: flex-start;
+            background-color: #E1F0FF;
+            color: #333;
+            border-top-left-radius: 4px;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+        
+        .message-info {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        .message-time {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+        
+        .message-time div {
+            margin-left: 5px;
+        }
+        
+        .action-button {
+            background: none;
+            border: none;
+            color: #5996F7;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 2px 5px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .action-button svg {
+            width: 14px;
+            height: 14px;
+            margin-right: 3px;
+        }
+        
+        .highlighted {
+            background-color: yellow;
+            color: black;
+        }
+        
+        /* 开发者按钮 */
+        .dev-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        /* 模态窗口 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: #252526;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+            color: #d4d4d4;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3d3d3d;
+        }
+        
+        .modal-title-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .modal-title-area h2 {
+            color: #d4d4d4;
+            font-size: 1.5em;
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #d4d4d4;
+            transition: color 0.2s ease;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        
+        .modal-close:hover {
+            color: #ffffff;
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border: 1px solid #2d2d2d;
+            border-radius: 5px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            white-space: pre;
+            line-height: 1.6;
+            font-size: 13px;
+            margin-bottom: 15px;
+            max-height: 70vh;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        .code-block::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .code-block::-webkit-scrollbar-track {
+            background: #2d2d2d;
+            border-radius: 4px;
+        }
+        
+        .code-block::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 4px;
+        }
+        
+        .code-block::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+        
+        /* 复制按钮 */
+        .copy-code-button {
+            background-color: #5996F7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        
+        .copy-code-button:hover {
+            background-color: #4785e6;
+        }
+        
+        .copy-code-button svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+        }
+        
+        /* 复制成功提示 */
+        .copy-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .copy-toast.show {
+            opacity: 1;
+        }
+        
+        /* 未读消息标记 */
+        .unread-indicator {
+            position: absolute;
+            top: 0;
+            right: -6px;
+            width: 8px;
+            height: 8px;
+            background-color: #ff4d4f;
+            border-radius: 50%;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        
+        .unread-indicator.fade-out {
+            opacity: 0;
+        }
+        
+        /* 設置按鈕樣式 */
+        .settings-button-container {
+            position: absolute;
+            right: 60px; /* 在關閉按鈕左側 */
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+        }
+        
+        .settings-icon-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-icon-button:hover {
+            opacity: 0.8;
+        }
+        
+        .settings-icon-button svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* 設置面板樣式 */
+        .settings-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: white;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .settings-header {
+            background-color: #5996F7;
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .settings-title {
+            font-size: 20px;
+            font-weight: 500;
+        }
+        
+        .settings-content {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .settings-section-title {
+            font-size: 17px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: center; /* 置中 */
+        }
+        
+        /* 修正問號圖標的可點擊區域 */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background-color: #f0f0f0;
+            color: #999;
+            border-radius: 50%;
+            font-size: 12px;
+            margin-left: 5px;
+            margin-right: 0;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+            user-select: none;
+            pointer-events: auto; /* 確保可點擊 */
+        }
+        
+        .tooltip {
+            display: none;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 3; /* 確保提示框在最上層 */
+            pointer-events: none; /* 防止提示框影響其他元素 */
+        }
+        
+        /* 同時支持懸浮和點擊顯示提示框 */
+        .info-icon:hover .tooltip,
+        .info-icon:focus .tooltip,
+        .info-icon.active .tooltip {
+            display: block !important; /* 強制顯示 */
+        }
+        
+        .settings-options {
+            padding: 0;
+            margin-top: 0; /* 確保沒有上邊距 */
+        }
+        
+        /* 開關按鈕樣式 */
+        /* 修正開關的可點擊區域 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-left: 0;
+            cursor: pointer;
+            pointer-events: auto; /* 確保可點擊 */
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ff4d4f;
+            transition: .4s;
+            border-radius: 24px;
+            width: 50px; /* 配合開關寬度 */
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #52c41a;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px); /* 調整滑塊移動距離 */
+        }
+        
+        .settings-option {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            position: relative;
+            gap: 5px;
+            width: 100%; /* 確保容器占滿寬度 */
+        }
+        
+        .settings-option:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-option label {
+            font-size: 15px;
+            color: #333;
+            flex: none;
+            min-width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* 文字靠右對齊 */
+        }
+        
+        .settings-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .settings-action-button {
+            padding: 8px 25px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-action-button.save {
+            background-color: #5996F7;
+            color: white;
+        }
+        
+        .settings-action-button.save:hover {
+            background-color: #4785e6;
+        }
+        
+        .settings-action-button.cancel {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+        
+        .settings-action-button.cancel:hover {
+            background-color: #e8e8e8;
+        }
+        
+        /* 創建一個包裝容器來確保整體置中 */
+        .settings-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 260px;
+            margin: 0 auto;
+            gap: 5px; /* 改回原始間距，減少寬度 */
+        }
+
+        /* 調整開關容器的樣式 */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* 開關靠左對齊 */
+            width: 50px; /* 與開關寬度一致 */
+            margin-left: 2px; /* 縮小左側間距 */
+            position: relative;
+        }
+        
+        /* 修改 settings-options 確保內容置中 */
+        .settings-options {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 0;
+        }
+        
+        /* 確保賽果通知的問號圖標和提示框始終在最上層 */
+        label[for="matchCancel"] .info-icon {
+            z-index: 20 !important;
+            position: relative;
+            pointer-events: auto !important;
+        }
+
+        label[for="matchCancel"] .tooltip {
+            z-index: 21 !important;
+            position: absolute;
+            pointer-events: none !important;
+        }
+
+        /* 調整赛果通知開關容器的點擊區域 */
+        #matchCancel + .slider {
+            pointer-events: auto !important;
+        }
+
+        /* 調整設置選項包裝器的樣式 */
+        .settings-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 260px;
+            margin: 0 auto;
+            position: relative;
+            gap: 5px; /* 保持原始間距 */
+        }
+
+        /* 調整開關容器的樣式 */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* 開關靠左對齊 */
+            width: 50px; /* 與開關寬度一致 */
+            margin-left: 2px; /* 添加左側間距 */
+            position: relative;
+        }
+
+        /* 確保問號圖標在文字旁邊而不與開關重疊 */
+        .settings-option label {
+            font-size: 15px;
+            color: #333;
+            flex: none;
+            min-width: 80px; /* 恢復原始寬度 */
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* 文字靠右對齊 */
+            margin-right: 0; /* 移除右側間距 */
+        }
+
+        /* 確保所有指針事件處理正確 */
+        .info-icon {
+            pointer-events: all !important;
+        }
+
+        .switch {
+            pointer-events: all !important;
+        }
+
+        /* 特別調整賽果通知的樣式 */
+        label[for="matchCancel"] {
+            min-width: 80px !important;
+            margin-right: 0 !important;
+            pointer-events: auto !important;
+        }
+
+        label[for="matchCancel"] .info-icon {
+            z-index: 4;
+            position: relative;
+            margin-left: 5px;
+            margin-right: 0;
+        }
+
+        /* 確保賽果通知開關容器樣式與其他一致 */
+        .settings-option:nth-child(4) .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 50px;
+            margin-left: 2px;
+            position: relative;
+            pointer-events: auto !important;
+        }
+
+        /* 確保賽果通知開關本身的樣式與其他一致 */
+        .settings-option:nth-child(4) .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-left: 0;
+            pointer-events: auto !important;
+            z-index: 10 !important;
+        }
+
+        /* 修正賽果通知開關的滑塊 */
+        .settings-option:nth-child(4) input:checked + .slider {
+            background-color: #52c41a;
+            pointer-events: auto !important;
+        }
+
+        .settings-option:nth-child(4) .slider {
+            pointer-events: auto !important;
+            z-index: 9 !important;
+        }
+
+        /* 強制設置賽果通知選項的間距 */
+        div.settings-option:has(label[for="matchCancel"]) {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            position: relative;
+            gap: 5px !important;
+            width: 100%;
+        }
+
+        div.settings-option:has(label[for="matchCancel"]) .settings-wrapper {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 260px !important;
+            margin: 0 auto !important;
+            position: relative !important;
+            gap: 5px !important;
+        }
+
+        /* 強制所有開關間距一致 */
+        .settings-wrapper {
+            gap: 5px !important;
+            justify-content: center !important;
+        }
+
+        /* 修正賽果通知設置選項包裝器的樣式 */
+        .settings-option:nth-child(4) .settings-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 260px;
+            margin: 0 auto;
+            position: relative;
+            gap: 5px;
+            pointer-events: auto !important;
+        }
+
+        /* 確保賽果通知wrapper內所有元素可點擊 */
+        .settings-option:has(label[for="matchCancel"]) .settings-wrapper * {
+            pointer-events: auto !important;
+        }
+    </style>
+
+
+    <script>
+    </script>
+</head>
+<body data-new-gr-c-s-check-loaded="14.1103.0" data-gr-ext-installed="">
+
+    
+    <div id="background-image"></div>
+    
+    <!-- iPhone风格小白点 -->
+    <div class="floating-button" id="chatButton">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <!-- 足球图标 SVG 路径 -->
+            <path fill="currentColor" d="M177.1 228.6L207.9 320h96.5l29.62-91.38L256 172.1L177.1 228.6zM255.1 0C114.6 0 .0001 114.6 .0001 256S114.6 512 256 512s255.1-114.6 255.1-255.1S397.4 0 255.1 0zM416.6 360.9l-85.4-1.297l-25.15 81.59C290.1 445.5 273.4 448 256 448s-34.09-2.523-50.09-6.859l-25.15-81.59l-85.4 1.297c-18.12-27.66-29.15-60.27-30.88-95.31L137.3 222.5L108.1 143.4C136.2 114.9 171.7 96 211.6 91.47l46.88 75.48h94.09l46.88-75.48c39.9 4.531 75.36 23.38 104.4 51.95l-28.85 79.06l72.78 42.95C545.8 300.6 534.8 333.3 416.6 360.9z"></path>
+        </svg>
+        <div class="notification-badge" id="notificationBadge" style="display: flex;">5</div>
+    </div>
+    
+    <!-- 聊天窗口 -->
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="header-tabs">
+                <div class="header-tab active" data-tab="system">
+                    <span class="tab-text">系統信息<span class="unread-indicator" id="systemUnread" style="display: block;"></span></span>
+                    <span class="bell-icon" title="靜音通知">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                    </span>
+                </div>
+                <div class="header-tab" data-tab="match">
+                    <span class="tab-text">賽事信息<span class="unread-indicator" id="matchUnread" style="display: block;"></span></span>
+                    <span class="bell-icon" title="靜音通知">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                    </span>
+                </div>
+                <div class="header-tab" data-tab="personal">
+                    <span class="tab-text">個人信息<span class="unread-indicator" id="personalUnread" style="display: block;"></span></span>
+                    <span class="bell-icon" title="靜音通知">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <div class="header-controls">
+                <button class="settings-icon-button" id="settingsButton" title="設置">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="19" cy="12" r="1"></circle>
+                        <circle cx="5" cy="12" r="1"></circle>
+                    </svg>
+                </button>
+                <button class="close-button" id="closeButton">×</button>
+            </div>
+        </div>
+        
+        <!-- 設置面板 -->
+        <div class="settings-container" id="settingsContainer">
+            <div class="settings-header">
+                <div class="settings-title">选项</div>
+            </div>
+            <div class="settings-content">
+                <div class="settings-section-title">赛事信息-消息接收开关</div>
+                <div class="settings-options">
+                    <div class="settings-option">
+                        <div class="settings-wrapper">
+                            <label for="oddsSale">进球通知
+                                <span class="info-icon" tabindex="0">?
+                                    <span class="tooltip">oox</span>
+                                </span>
+                            </label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="oddsSale">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 為每個選項添加相同的結構 -->
+                    <div class="settings-option">
+                        <div class="settings-wrapper">
+                            <label for="scoreChange">开赛通知
+                                <span class="info-icon" tabindex="0">?
+                                    <span class="tooltip">oox</span>
+                                </span>
+                            </label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="scoreChange">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-option">
+                        <div class="settings-wrapper">
+                            <label for="scheduleChange">赛事阶段
+                                <span class="info-icon" tabindex="0">?
+                                    <span class="tooltip">oox</span>
+                                </span>
+                            </label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="scheduleChange">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-option">
+                        <div class="settings-wrapper">
+                            <label for="matchCancel">赛果通知
+                                <span class="info-icon" tabindex="0">?
+                                    <span class="tooltip">oox</span>
+                                </span>
+                            </label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="matchCancel">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-option">
+                        <div class="settings-wrapper">
+                            <label for="resultNotification">赛事变动
+                                <span class="info-icon" tabindex="0">?
+                                    <span class="tooltip">oox</span>
+                                </span>
+                            </label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="resultNotification">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-option">
+                        <div class="settings-wrapper">
+                            <label for="groupBuyProgress">赛事取消
+                                <span class="info-icon" tabindex="0">?
+                                    <span class="tooltip">oox</span>
+                                </span>
+                            </label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="groupBuyProgress">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-option">
+                        <div class="settings-wrapper">
+                            <label for="matchStage">合买进度
+                                <span class="info-icon" tabindex="0">?
+                                    <span class="tooltip">oox</span>
+                                </span>
+                            </label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="matchStage">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-buttons">
+                <button class="settings-action-button cancel" id="settingsCancelButton">取消</button>
+                <button class="settings-action-button save" id="settingsSaveButton">保存</button>
+            </div>
+        </div>
+        
+        <div class="search-bar" id="searchBar">
+            <div class="search-container">
+                <span class="search-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </span>
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索...">
+                <button class="search-clear" id="searchClear">×</button>
+            </div>
+            <div class="search-navigation" id="searchNavigation">
+                <button id="prevResult" disabled="">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg>
+                </button>
+                <button id="nextResult">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="search-results" id="searchResults">
+            找到 <span id="resultCount">0</span> 个结果
+        </div>
+        
+        <div class="chat-content" id="systemContent">
+            <div class="message-container">
+                <div class="date-separator">
+                    <span>2023年5月10日</span>
+                </div>
+                
+                <div class="message">
+                    <div class="message-bubble">
+                        🔧系统维护通知🔧<br>
+                          亲爱的用户您好，为了提供更稳定的服务环境，我们预计于：<br>
+                            维护时间：2025/05/09（四）00:00 ～ 2025/05/09（四）06:00(GMT+8)<br>
+                            预估总时长：6 小時<br>
+                            在此期间，系统将暂停服务，造成不便请见谅。<br>
+                            🌙 别担心，工程师深夜也没打算睡，努力帮你修好每一行代码。感谢您的理解与支持！
+                    </div>
+                    <div class="message-info">
+                        <div class="message-time">2023/05/10 09:15</div>
+                    </div>
+                </div>
+                
+                <div class="date-separator">
+                    <span>昨天</span>
+                </div>
+                
+                <div class="message">
+                    <div class="message-bubble">
+                        系统维护已完成，感谢您的耐心等待！
+                    </div>
+                    <div class="message-info">
+                        <div class="message-time">15:45</div>
+                    </div>
+                </div>
+                
+                <div class="date-separator" id="systemTodaySeparator">
+                    <span>今天</span>
+                </div>
+                
+                <div class="message">
+                    <div class="message-bubble">
+                        🔧系统维护通知🔧<br>
+                          亲爱的用户您好，为了提供更稳定的服务环境，我们预计于：<br>
+                            维护时间：2025/05/10（四）09:00 ～ 2025/05/10（四）12:00(GMT+8)<br>
+                            预估总时长：3 小時<br>
+                            在此期间，系统将暂停服务，造成不便请见谅。<br>
+                            🧘 趁这段时间，放下屏幕去泡杯茶吧，回来一切都会更顺畅。感谢您的理解与支持！
+                    </div>
+                    <div class="message-info">
+                        <div class="message-time">10:30</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-content" id="matchContent" style="display: none;">
+            <div class="date-separator">
+                <span>昨天</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    您收藏的比赛 英超联赛 [利物浦 vs 曼城] 已结束，比分 3-2，要看看精彩回放嗎？
+                    <button class="action-button" data-match="liverpool-mancity">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
+                        前往赛事详情
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">23:05</div>
+                </div>
+            </div>
+            
+            <div class="date-separator" id="matchTodaySeparator">
+                <span>今天</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    您置顶的比赛 西班牙甲级联赛 [巴塞罗那 vs 皇家马德里] 将于今晚20:00(GMT+8)开始，请准时观看！
+                    <button class="action-button" data-match="barcelona-realmadrid">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
+                        前往赛事详情
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">09:30</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    比赛结果：巴塞罗那 2-1 皇家马德里，恭喜您的预测成功！
+                </div>
+                <div class="message-info">
+                    <div class="message-time">22:15</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    您收藏的赛事已开售，英超联赛 德国 vs 英国 开赛时间为09:00 GMT(+8)，赶快前往看看吧！
+                    <button class="action-button" data-match="germany-england">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
+                        前往赛事详情
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">22:30</div>
+                </div>
+            </div>
+        </div>
+		
+        <div class="chat-content" id="personalContent" style="display: none;">
+            <div class="date-separator">
+                <span>2023年5月10日</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    系统提醒：您已被人工扣款 1000，目前余额为 2000。若有任何疑问，请随时与我们联系，我们会一直在。
+                </div>
+                <div class="message-info">
+                    <div class="message-time">2023/05/10 09:30</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    合买赛果已出炉! 恭喜您获得2550，加上佣金450，目前余额为 5000
+                    <br>注单号: 5235679989162811
+                    <button class="action-button" data-order="5235679989162811">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        复制单号
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">2023/05/10 14:20</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    合买赛果已出炉! 恭喜您获得1245，已扣除佣金120，目前余额为 6245。
+                    <br>注单号: 5235679989162811
+                    <button class="action-button" data-order="5235679989162811">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        复制单号
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">2023/05/10 18:45</div>
+                </div>
+            </div>
+            
+            <div class="date-separator">
+                <span>昨天</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    很抱歉，您的预约下注失败，扣款金额将退还。
+                    <br>注单号: 5235679989162811
+                    <br>已恢复至余额 1760，请您放心！
+                    <button class="action-button" data-order="5235679989162811">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        复制单号
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">16:30</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    系统已为您人工加款 3000，目前余额为 5800。感谢您的耐心与支持～祝您投注顺利！
+                </div>
+                <div class="message-info">
+                    <div class="message-time">18:15</div>
+                </div>
+            </div>
+            
+            <div class="date-separator" id="personalTodaySeparator">
+                <span>今天</span>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    亲爱的用户您好～您已成功转入 1000 目前余额为 2200。感谢您一直以来的支持，我会在这里陪您每一步！
+                </div>
+                <div class="message-info">
+                    <div class="message-time">09:15</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    恭喜您获得彩金 500！系统已为您加值，现在余额为 3200。今天的您，光芒万丈！
+                </div>
+                <div class="message-info">
+                    <div class="message-time">10:30</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    您已成功下注 200，下注已提交！
+                    <br>注单号: 32132321312
+                    <br>目前余额为 1800，让我们期待这场赛事为您带来惊喜！
+                    <button class="action-button" data-order="32132321312">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        复制单号
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">11:45</div>
+                </div>
+            </div>
+            
+            <div class="message">
+                <div class="message-bubble">
+                    预约下注成功，扣款 300，您的余额为 1450。
+                    <br>注单号: 5235679989162811
+                    <br>感谢您的信任～我们会为您的预约投注持续关注！
+                    <button class="action-button" data-order="5235679989162811">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        复制单号
+                    </button>
+                </div>
+                <div class="message-info">
+                    <div class="message-time">13:20</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 复制成功提示 -->
+    <div class="copy-toast" id="copyToast">已复制单号</div>
+    
+    <!-- 开发者按钮 -->
+    <button class="dev-button" id="devButton">开发者信息</button>
+    
+    <!-- 开发者模态窗口 -->
+    <div class="modal" id="devModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-area">
+                    <h2>原生代碼 H5V01</h2>
+                    <button class="copy-code-button" id="copyCodeButton">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        複製代碼
+                    </button>
+                </div>
+                <button class="modal-close" id="modalClose">×</button>
+            </div>
+            <div class="code-block" id="codeBlock">
+                // 這裡將顯示當前頁面的完整代碼
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const chatButton = document.getElementById('chatButton');
+        const chatWindow = document.getElementById('chatWindow');
+        const closeButton = document.getElementById('closeButton');
+        const notificationBadge = document.getElementById('notificationBadge');
+        const headerTabs = document.querySelectorAll('.header-tab');
+        const bellIcons = document.querySelectorAll('.bell-icon');
+        const searchBar = document.getElementById('searchBar');
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const searchResults = document.getElementById('searchResults');
+        const resultCount = document.getElementById('resultCount');
+        const searchNavigation = document.getElementById('searchNavigation');
+        const prevResult = document.getElementById('prevResult');
+        const nextResult = document.getElementById('nextResult');
+        const systemContent = document.getElementById('systemContent');
+        const matchContent = document.getElementById('matchContent');
+        const personalContent = document.getElementById('personalContent');
+        const actionButtons = document.querySelectorAll('.action-button');
+        const devButton = document.getElementById('devButton');
+        const devModal = document.getElementById('devModal');
+        const modalClose = document.getElementById('modalClose');
+        const codeBlock = document.getElementById('codeBlock');
+        const copyToast = document.getElementById('copyToast');
+        const copyCodeButton = document.getElementById('copyCodeButton');
+        
+        // 未读指示器
+        const systemUnread = document.getElementById('systemUnread');
+        const matchUnread = document.getElementById('matchUnread');
+        const personalUnread = document.getElementById('personalUnread');
+        
+        // 初始化变量
+        let currentTab = 'system';
+        let searchMatches = [];
+        let currentMatchIndex = -1;
+        let mutedTabs = {
+            system: false,
+            match: false,
+            personal: false
+        };
+        
+        // 未读消息计数
+        let unreadCounts = {
+            system: 1,
+            match: 2,
+            personal: 2
+        };
+        
+        // 创建 Intersection Observer
+
+        
+        // 窗口状态
+        let isWindowOpen = false;
+        
+        // 拖动相关变量
+        let isDragging = false;
+        let startX, startY, initialTop, initialLeft;
+        let dragStartTime = 0; // 添加開始拖動時間記錄
+        let wasDragged = false; // 添加拖動標記
+        
+        // 随机消息模板
+        const personalMessageTemplates = [
+            "亲爱的用户您好～您已成功转入 {amount} 目前余额为 {balance}。感谢您一直以来的支持，我会在这里陪您每一步！",
+            "恭喜您获得彩金 {amount}！系统已为您加值，现在余额为 {balance}。今天的您，光芒万丈！",
+            "您已成功下注 {amount}，下注已提交！<br>注单号: {orderNumber}<br>目前余额为 {balance}，让我们期待这场赛事为您带来惊喜！",
+            "预约下注成功，扣款 {amount}，您的余额为 {balance}。<br>注单号: {orderNumber}<br>感谢您的信任～我们会为您的预约投注持续关注！",
+            "系统已为您人工加款 {amount}，目前余额为 {balance}。感谢您的耐心与支持～祝您投注顺利！",
+            "您的单号:{orderNumber} 比赛已结果，赛果为赢，已派彩{amount}彩金给您，现在馀额是{balance}，欢迎继续下注，我会与您一起共战双赢！",
+            "合买赛果已出炉! 恭喜您获得{amount}，加上佣金{commission}，目前余额为 {balance}<br>注单号: {orderNumber}"
+        ];
+        
+        // 生成随机数字
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        // 生成随机订单号
+        function generateOrderNumber() {
+            return Math.floor(Math.random() * 9000000000) + 1000000000;
+        }
+        
+        // 获取当前时间
+        function getCurrentTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+        
+        // 更新未读指示器显示
+        function updateUnreadIndicators() {
+            systemUnread.style.display = unreadCounts.system > 0 ? 'block' : 'none';
+            matchUnread.style.display = unreadCounts.match > 0 ? 'block' : 'none';
+            personalUnread.style.display = unreadCounts.personal > 0 ? 'block' : 'none';
+        }
+        
+        // 添加新消息
+        function addNewPersonalMessage() {
+            // 選擇随機消息模板
+            const templateIndex = Math.floor(Math.random() * personalMessageTemplates.length);
+            const template = personalMessageTemplates[templateIndex];
+            
+            // 生成随機数据
+            const amount = getRandomNumber(100, 5000);
+            const balance = getRandomNumber(1000, 10000);
+            const orderNumber = generateOrderNumber();
+            const commission = getRandomNumber(50, 500);
+            
+            // 替換模板中的变量
+            let messageText = template
+                .replace('{amount}', amount)
+                .replace('{balance}', balance)
+                .replace('{orderNumber}', orderNumber)
+                .replace('{commission}', commission);
+            
+            // 檢查是否需要添加按鈕
+            const needsButton = messageText.includes('注单号:') || messageText.includes('注单号：') || messageText.includes('单号:');
+            
+            // 創建消息元素
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message new-message';
+            
+            // 只有在不是當前標籤頁時才標記為未讀
+            if (currentTab !== 'personal') {
+                messageElement.classList.add('unread');
+            }
+            
+            // 創建消息氣泡
+            const bubbleElement = document.createElement('div');
+            bubbleElement.className = 'message-bubble';
+            
+            // 設置消息內容
+            if (needsButton) {
+                // 提取訂單號
+                let extractedOrderNumber = orderNumber;
+                if (messageText.includes('注单号:')) {
+                    const match = messageText.match(/注单号:\s*(\d+)/);
+                    if (match) extractedOrderNumber = match[1];
+                } else if (messageText.includes('单号:')) {
+                    const match = messageText.match(/单号:\s*(\d+)/);
+                    if (match) extractedOrderNumber = match[1];
+                }
+                
+                // 添加按鈕
+                bubbleElement.innerHTML = messageText;
+                if (!messageText.includes('<button')) {
+                    const buttonHTML = `
+                        <button class="action-button" data-order="${extractedOrderNumber}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            复制单号
+                        </button>
+                    `;
+                    bubbleElement.innerHTML += buttonHTML;
+                }
+            } else {
+                bubbleElement.innerHTML = messageText;
+            }
+            
+            // 創建消息信息
+            const infoElement = document.createElement('div');
+            infoElement.className = 'message-info';
+            
+            // 添加時間
+            const timeElement = document.createElement('div');
+            timeElement.className = 'message-time';
+            timeElement.textContent = getCurrentTime();
+            infoElement.appendChild(timeElement);
+            
+            // 組裝消息
+            messageElement.appendChild(bubbleElement);
+            messageElement.appendChild(infoElement);
+            
+            // 檢查是否需要添加今天的日期分隔線
+            const todaySeparator = document.getElementById('personalTodaySeparator');
+            if (!todaySeparator) {
+                // 如果沒有今天的分隔線，添加一個
+                const dateSeparator = document.createElement('div');
+                dateSeparator.className = 'date-separator';
+                dateSeparator.id = 'personalTodaySeparator';
+                dateSeparator.innerHTML = '<span>今天</span>';
+                personalContent.appendChild(dateSeparator);
+            }
+            
+            // 添加到個人信息標籤頁
+            personalContent.appendChild(messageElement);
+            
+            // 滾動到底部
+            personalContent.scrollTop = personalContent.scrollHeight;
+            
+            // 如果窗口未打開或當前不在個人信息標籤頁，才增加未讀消息計數
+            if (!isWindowOpen || currentTab !== 'personal') {
+                // 只增加個人信息的未讀計數
+                unreadCounts.personal++;
+                
+                // 只更新個人信息的未讀指示器
+                const indicator = document.getElementById('personalUnread');
+                if (indicator) {
+                    indicator.style.display = 'block';
+                }
+                
+                // 如果鈴鐺沒有靜音，更新通知徽章
+                if (!mutedTabs.personal) {
+                    updateNotificationCount();
+                }
+            }
+            
+            // 更新所有未讀指示器狀態
+            updateUnreadIndicators();
+            
+            // 添加動畫效果，延遲顯示消息
+            setTimeout(() => {
+                messageElement.classList.remove('new-message');
+            }, 10);
+            
+            return messageElement;
+        }
+        
+        // 更新未读消息数量
+        function updateNotificationCount() {
+            let totalUnread = 0;
+            
+            // 只計算未靜音標籤頁的未讀消息
+            if (!mutedTabs.system) totalUnread += unreadCounts.system;
+            if (!mutedTabs.match) totalUnread += unreadCounts.match;
+            if (!mutedTabs.personal) totalUnread += unreadCounts.personal;
+            
+            // 更新徽章
+            if (totalUnread === 0) {
+                notificationBadge.style.display = 'none';
+            } else {
+                notificationBadge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+                notificationBadge.style.display = 'flex';
+            }
+        }
+        
+        // 滾動到未讀消息
+        function scrollToUnreadMessages(contentElement) {
+            const unreadMessages = contentElement.querySelectorAll('.message.unread');
+            if (unreadMessages.length > 0) {
+                const firstUnread = unreadMessages[0];
+                const container = contentElement;
+                const containerRect = container.getBoundingClientRect();
+                
+                // 計算滾動位置，確保未讀消息在視窗上方留出空間
+                const scrollTop = firstUnread.offsetTop - containerRect.height * 0.3;
+                
+                // 標記所有可見的未讀消息
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const message = entry.target;
+                            message.classList.add('highlight');
+                            setTimeout(() => {
+                                message.classList.remove('highlight');
+                                message.classList.remove('unread');
+                            }, 1500);
+                            observer.unobserve(message);
+                        }
+                    });
+                }, {
+                    root: container,
+                    threshold: 0.5
+                });
+
+                // 觀察所有未讀消息
+                unreadMessages.forEach(message => {
+                    observer.observe(message);
+                });
+                
+                container.scrollTo({
+                    top: scrollTop,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // 切换标签页
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // 隱藏所有內容
+            systemContent.style.display = 'none';
+            matchContent.style.display = 'none';
+            personalContent.style.display = 'none';
+            
+            // 移除所有標籤的活動狀態
+            headerTabs.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.tab === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // 顯示選中的內容
+            const selectedContent = document.getElementById(`${tabName}Content`);
+            selectedContent.style.display = 'block';
+            
+            // 切換到標籤頁時，重置該標籤頁的未讀計數並隱藏紅點
+            unreadCounts[tabName] = 0;
+            
+            // 隱藏紅點
+            const indicator = document.getElementById(`${tabName}Unread`);
+            if (indicator) {
+                indicator.style.display = 'none';
+            }
+            
+            // 更新通知總數
+            updateNotificationCount();
+            
+            // 檢查是否有未讀消息並滾動
+            const unreadMessages = selectedContent.querySelectorAll('.message.unread');
+            if (unreadMessages.length > 0) {
+                // 標記所有消息為已讀
+                unreadMessages.forEach(message => {
+                    message.classList.add('highlight');
+                    setTimeout(() => {
+                        message.classList.remove('highlight');
+                        message.classList.remove('unread');
+                    }, 1500);
+                });
+                
+                // 滾動到第一條未讀消息
+                const firstUnread = unreadMessages[0];
+                const containerRect = selectedContent.getBoundingClientRect();
+                const scrollTop = firstUnread.offsetTop - containerRect.height * 0.3;
+                
+                selectedContent.scrollTo({
+                    top: scrollTop,
+                    behavior: 'smooth'
+                });
+            } else {
+                // 如果沒有未讀消息，滾動到底部
+                selectedContent.scrollTop = selectedContent.scrollHeight;
+            }
+            
+            // 清除搜索結果
+            clearSearch();
+        }
+        
+        // 切换静音状态
+        function toggleMute(tabName) {
+            mutedTabs[tabName] = !mutedTabs[tabName];
+            
+            // 更新UI
+            headerTabs.forEach(tab => {
+                const tabId = tab.getAttribute('data-tab');
+                if (tabId === tabName) {
+                    if (mutedTabs[tabName]) {
+                        tab.querySelector('.bell-icon').innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        `;
+                        tab.querySelector('.bell-icon').title = "取消静音";
+                        tab.querySelector('.bell-icon').classList.add('muted');
+                    } else {
+                        tab.querySelector('.bell-icon').innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                        `;
+                        tab.querySelector('.bell-icon').title = "静音通知";
+                        tab.querySelector('.bell-icon').classList.remove('muted');
+                    }
+                }
+            });
+            
+            // 更新未读消息数量
+            updateNotificationCount();
+        }
+        
+        // 搜索功能
+        function performSearch() {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            if (!searchTerm) {
+                clearSearch();
+                return;
+            }
+            
+            // 清除之前的高亮
+            clearHighlights();
+            
+            // 获取当前标签页的内容
+            const contentElement = document.getElementById(`${currentTab}Content`);
+            const messages = contentElement.querySelectorAll('.message-bubble');
+            
+            // 查找匹配项
+            searchMatches = [];
+            messages.forEach(message => {
+                const text = message.textContent.toLowerCase();
+                let startIndex = 0;
+                let index;
+                
+                while ((index = text.indexOf(searchTerm, startIndex)) > -1) {
+                    searchMatches.push({
+                        element: message,
+                        index: index
+                    });
+                    startIndex = index + searchTerm.length;
+                }
+            });
+            
+            // 更新搜索结果计数
+            resultCount.textContent = searchMatches.length;
+            searchResults.style.display = 'block';
+            
+            // 高亮匹配项
+            if (searchMatches.length > 0) {
+                searchNavigation.style.display = 'flex';
+                currentMatchIndex = 0;
+                highlightCurrentMatch();
+            } else {
+                searchNavigation.style.display = 'none';
+                currentMatchIndex = -1;
+            }
+            
+            // 更新导航按钮状态
+            updateNavigationButtons();
+        }
+        
+        // 清除搜索
+        function clearSearch() {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            searchResults.style.display = 'none';
+            searchNavigation.style.display = 'none';
+            clearHighlights();
+            searchMatches = [];
+            currentMatchIndex = -1;
+        }
+        
+        // 清除高亮
+        function clearHighlights() {
+            const contentElement = document.getElementById(`${currentTab}Content`);
+            const highlights = contentElement.querySelectorAll('.highlighted');
+            highlights.forEach(highlight => {
+                const parent = highlight.parentNode;
+                parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+                parent.normalize();
+            });
+        }
+        
+        // 高亮当前匹配项
+        function highlightCurrentMatch() {
+            if (currentMatchIndex < 0 || currentMatchIndex >= searchMatches.length) return;
+            
+            const match = searchMatches[currentMatchIndex];
+            const element = match.element;
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            
+            // 清除之前的高亮
+            clearHighlights();
+            
+            // 创建高亮文本
+            const text = element.textContent;
+            const lowerText = text.toLowerCase();
+            let startIndex = 0;
+            let index;
+            let newHtml = '';
+            
+            while ((index = lowerText.indexOf(searchTerm, startIndex)) > -1) {
+                newHtml += text.substring(startIndex, index);
+                newHtml += `<span class="highlighted">${text.substring(index, index + searchTerm.length)}</span>`;
+                startIndex = index + searchTerm.length;
+            }
+            newHtml += text.substring(startIndex);
+            
+            // 保存原始HTML中的按钮
+            const buttons = element.querySelectorAll('button');
+            const buttonHtml = Array.from(buttons).map(button => button.outerHTML);
+            
+            // 应用新HTML
+            element.innerHTML = newHtml;
+            
+            // 恢复按钮
+            if (buttonHtml.length > 0) {
+                buttonHtml.forEach(html => {
+                    element.innerHTML += html;
+                });
+            }
+            
+            // 滚动到当前匹配项
+            const highlight = element.querySelector('.highlighted');
+            if (highlight) {
+                highlight.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+        
+        // 更新导航按钮状态
+        function updateNavigationButtons() {
+            prevResult.disabled = currentMatchIndex <= 0;
+            nextResult.disabled = currentMatchIndex >= searchMatches.length - 1;
+        }
+        
+        // 显示复制成功提示
+        function showCopyToast(message) {
+            copyToast.textContent = message || '已复制单号';
+            copyToast.classList.add('show');
+            
+            setTimeout(() => {
+                copyToast.classList.remove('show');
+            }, 2000);
+        }
+        
+        // 复制注单号
+        function copyOrderNumber(orderNumber) {
+            // 创建一个临时文本区域
+            const textarea = document.createElement('textarea');
+            textarea.value = orderNumber;
+            textarea.style.position = 'fixed';  // 防止滚动到底部
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                // 执行复制命令
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopyToast(`已复制注单号: ${orderNumber}`);
+                } else {
+                    console.error('复制失败');
+                    showCopyToast('复制失败，请手动复制');
+                }
+            } catch (err) {
+                console.error('复制出错:', err);
+                showCopyToast('复制失败，请手动复制');
+            }
+            
+            // 移除临时文本区域
+            document.body.removeChild(textarea);
+        }
+        
+        // 复制代码
+        function copyCode() {
+            const codeText = codeBlock.textContent;
+            
+            // 创建一个临时文本区域
+            const textarea = document.createElement('textarea');
+            textarea.value = codeText;
+            textarea.style.position = 'fixed';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                // 执行复制命令
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopyToast('代码已复制到剪贴板');
+                } else {
+                    console.error('复制失败');
+                    showCopyToast('复制失败，请手动复制');
+                }
+            } catch (err) {
+                console.error('复制出错:', err);
+                showCopyToast('复制失败，请手动复制');
+            }
+            
+            // 移除临时文本区域
+            document.body.removeChild(textarea);
+        }
+        
+        // 前往赛事详情
+        function goToMatchDetail(matchId) {
+            alert(`正在前往赛事详情页: ${matchId}`);
+            // 这里可以添加实际的跳转逻辑
+        }
+        
+        // 处理按钮点击
+        function handleButtonClick(button) {
+            if (button.hasAttribute('data-order')) {
+                // 复制注单号
+                const orderNumber = button.getAttribute('data-order');
+                copyOrderNumber(orderNumber);
+            } else if (button.hasAttribute('data-match')) {
+                // 前往赛事详情
+                const matchId = button.getAttribute('data-match');
+                goToMatchDetail(matchId);
+            }
+        }
+        
+        // 显示原生代码
+        function showSourceCode() {
+            // 獲取當前文檔的HTML內容
+            const htmlCode = document.documentElement.outerHTML
+                .replace(/<script>\s*window\.__CF\$cv\$params.*?<\/script>/g, '') // 移除 Cloudflare 腳本
+                .replace(/<iframe.*?<\/iframe>/g, '') // 移除 iframe
+                .replace(/<script>\(function\(\)\{.*?\}\)\(\);<\/script>/g, '') // 移除其他自動生成的腳本
+                .replace(/<grammarly-desktop-integration.*?<\/grammarly-desktop-integration>/g, '') // 移除 Grammarly 相關代碼
+                .replace(/data-new-gr-c-s-check-loaded=".*?"/g, '') // 移除 Grammarly 屬性
+                .replace(/data-gr-ext-installed=""/g, '') // 移除 Grammarly 屬性
+                .replace(/<div class="modal-content">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/g, function(match) {
+                    // 保留模態窗口結構，但清理內部代碼塊的內容
+                    return match.replace(/<div class="code-block".*?>.*?<\/div>/g, '<div class="code-block" id="codeBlock"></div>');
+                });
+
+            // 添加賽果通知的問號圖標和開關修復代碼說明
+            let codeComments = `
+
+// ==== 賽果通知問號圖標和開關可點擊區域修復 ====
+// 問題描述：賽果通知的問號圖標和開關可點擊區域異常，只能在邊緣點擊才有反應
+// 修復方法：
+
+// 1. CSS修復部分
+// 增加特定的CSS選擇器，確保賽果通知的問號圖標和開關有正確的z-index和pointer-events
+label[for="matchCancel"] .info-icon {
+    z-index: 20 !important;
+    position: relative;
+    pointer-events: auto !important;
+}
+
+label[for="matchCancel"] .tooltip {
+    z-index: 21 !important;
+    position: absolute;
+    pointer-events: none !important;
+}
+
+#matchCancel + .slider {
+    pointer-events: auto !important;
+}
+
+div.settings-option:has(label[for="matchCancel"]) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    position: relative;
+    gap: 5px !important;
+    width: 100%;
+}
+
+// 2. JavaScript修復部分
+// 專門處理賽果通知選項的事件綁定
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        // 清理並重新綁定賽果通知的問號圖標事件
+        var matchCancelLabel = document.querySelector('label[for="matchCancel"]');
+        if (matchCancelLabel) {
+            var infoIcon = matchCancelLabel.querySelector('.info-icon');
+            if (infoIcon) {
+                // 移除所有已存在的事件監聽器
+                var newInfoIcon = infoIcon.cloneNode(true);
+                infoIcon.parentNode.replaceChild(newInfoIcon, infoIcon);
+                infoIcon = newInfoIcon;
+                
+                // 為新的問號圖標添加點擊事件
+                infoIcon.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    var tooltip = this.querySelector('.tooltip');
+                    if (tooltip) {
+                        if (getComputedStyle(tooltip).display === 'block') {
+                            tooltip.style.display = 'none';
+                        } else {
+                            tooltip.style.display = 'block';
+                        }
+                    }
+                });
+                
+                // 強制設置樣式確保問號圖標可點擊
+                infoIcon.style.pointerEvents = 'auto';
+                infoIcon.style.cursor = 'pointer';
+                infoIcon.style.zIndex = '50';
+            }
+        }
+        
+        // 重新綁定賽果通知的開關事件
+        var matchCancelSwitch = document.getElementById('matchCancel');
+        if (matchCancelSwitch) {
+            // 確保開關被設為開啟
+            matchCancelSwitch.checked = true;
+            
+            // 確保開關點擊正常
+            var switchLabel = matchCancelSwitch.closest('.switch');
+            if (switchLabel) {
+                switchLabel.style.pointerEvents = 'auto';
+            }
+        }
+    }, 500);
+});
+`;
+
+            // 格式化代碼
+            const formattedCode = htmlCode
+                .replace(/></g, '>\n<') // 在標籤之間添加換行
+                .replace(/\n\s*\n/g, '\n') // 移除多餘的空行
+                .replace(/^\s*[\r\n]/gm, '') // 移除空白行
+                .replace(/^(?!\s*$)/gm, '    ') // 添加縮進
+                .trim(); // 移除首尾空白
+
+            // 更新代碼塊內容
+            codeBlock.textContent = formattedCode + codeComments;
+            
+            // 顯示模態窗口
+            devModal.style.display = 'flex';
+        }
+        
+        // 拖动开始
+        function startDrag(e) {
+            if (e.target.closest('.action-button')) return;
+            
+            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+            
+            isDragging = true;
+            wasDragged = false; // 初始化拖動標記
+            dragStartTime = Date.now();
+            chatButton.classList.add('dragging');
+            
+            const rect = chatButton.getBoundingClientRect();
+            startX = clientX;
+            startY = clientY;
+            initialTop = rect.top;
+            initialLeft = rect.left;
+            
+                            e.preventDefault();
+        }
+
+        // 拖动中
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+            
+            // 只有當移動超過5像素，才標記為拖動
+            if (Math.abs(clientX - startX) > 5 || Math.abs(clientY - startY) > 5) {
+                wasDragged = true;
+            }
+            
+            const deltaX = clientX - startX;
+            const deltaY = clientY - startY;
+            
+            let newTop = initialTop + deltaY;
+            let newLeft = initialLeft + deltaX;
+            
+            // 獲取背景圖的範圍
+            const backgroundRect = document.getElementById('background-image').getBoundingClientRect();
+            const maxTop = backgroundRect.bottom - chatButton.offsetHeight;
+            const maxLeft = backgroundRect.right - chatButton.offsetWidth;
+            
+            // 限制在背景圖範圍內
+            if (newTop < backgroundRect.top) newTop = backgroundRect.top;
+            if (newTop > maxTop) newTop = maxTop;
+            if (newLeft < backgroundRect.left) newLeft = backgroundRect.left;
+            if (newLeft > maxLeft) newLeft = maxLeft;
+            
+            chatButton.style.transform = 'none';
+            chatButton.style.top = newTop + 'px';
+            chatButton.style.left = newLeft + 'px';
+            
+            e.preventDefault();
+        }
+
+        // 拖动结束
+        function endDrag(e) {
+            if (!isDragging) return;
+            
+            isDragging = false;
+            chatButton.classList.remove('dragging');
+            
+            // 获取背景图范围
+            const backgroundRect = document.getElementById('background-image').getBoundingClientRect();
+            
+            // 计算距离四个边的距离
+            const rect = chatButton.getBoundingClientRect();
+            const distanceToTop = rect.top - backgroundRect.top;
+            const distanceToBottom = backgroundRect.bottom - rect.bottom;
+            const distanceToLeft = rect.left - backgroundRect.left;
+            const distanceToRight = backgroundRect.right - rect.right;
+            
+            // 找到最近的边
+            const minDistance = Math.min(distanceToTop, distanceToBottom, distanceToLeft, distanceToRight);
+            
+            // 移除transform
+            chatButton.style.transform = 'none';
+            
+            // 吸附到最近的边（相对于背景图）
+            if (minDistance === distanceToTop) {
+                chatButton.style.top = backgroundRect.top + 'px';
+            } else if (minDistance === distanceToBottom) {
+                chatButton.style.top = (backgroundRect.bottom - chatButton.offsetHeight) + 'px';
+            } else if (minDistance === distanceToLeft) {
+                chatButton.style.left = backgroundRect.left + 'px';
+            } else if (minDistance === distanceToRight) {
+                chatButton.style.left = (backgroundRect.right - chatButton.offsetWidth) + 'px';
+            }
+            
+            // 延遲處理點擊事件
+            setTimeout(() => {
+                if (!wasDragged) {
+                    openChatWindow();
+                }
+                wasDragged = false;
+            }, 10);
+        }
+
+        // 打开聊天窗口
+        function openChatWindow() {
+            chatWindow.style.display = 'flex';
+            chatButton.style.display = 'none';
+            
+            // 使用 requestAnimationFrame 確保 display: flex 已經被應用
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    chatWindow.classList.add('visible');
+                    // 延遲顯示頂部欄和搜索欄
+                    setTimeout(() => {
+                        document.querySelector('.chat-header').classList.add('visible');
+                        searchBar.classList.add('visible');
+                        
+                        // 確保系統信息滾動到正確位置
+                        if (currentTab === 'system' && systemContent) {
+                            const unreadMessages = systemContent.querySelectorAll('.message.unread');
+                            if (unreadMessages.length > 0) {
+                                scrollToUnreadMessages(systemContent);
+                            } else {
+                                systemContent.scrollTop = systemContent.scrollHeight;
+                            }
+                        }
+                    }, 100);
+                });
+            });
+            
+            isWindowOpen = true;
+            
+            // 當前標籤頁的未讀消息重置為0
+            unreadCounts[currentTab] = 0;
+            const indicator = document.getElementById(`${currentTab}Unread`);
+            if (indicator) {
+                indicator.style.display = 'none';
+            }
+            
+            // 更新通知徽章
+            updateNotificationCount();
+            updateUnreadIndicators();
+            
+            // 標記當前標籤頁的所有消息為已讀
+            const currentContent = document.getElementById(`${currentTab}Content`);
+            const unreadMessages = currentContent.querySelectorAll('.message.unread');
+            unreadMessages.forEach(message => {
+                message.classList.add('highlight');
+                setTimeout(() => {
+                    message.classList.remove('highlight');
+                    message.classList.remove('unread');
+                }, 1500);
+            });
+        }
+
+        // 关闭聊天窗口
+        function closeChatWindow() {
+            document.querySelector('.chat-header').classList.remove('visible');
+            searchBar.classList.remove('visible');
+            chatWindow.classList.remove('visible');
+            
+            // 等待動畫完成後再隱藏窗口
+            setTimeout(() => {
+                chatWindow.style.display = 'none';
+                chatButton.style.display = 'flex';
+            }, 300);
+            
+            isWindowOpen = false;
+        }
+
+        // 处理聊天按钮点击
+        function handleChatButtonClick() {
+            if (chatWindow.style.display === 'flex') {
+                closeChatWindow();
+            } else {
+                openChatWindow();
+            }
+        }
+
+        // 点击聊天按钮
+        chatButton.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', endDrag);
+        
+        // 触摸设备
+        chatButton.addEventListener('touchstart', startDrag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('touchend', endDrag);
+        
+        // 点击关闭按钮
+        closeButton.addEventListener('click', () => {
+            closeChatWindow();
+        });
+        
+        // 标签页切换
+        headerTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                if (e.target.closest('.bell-icon')) return; // 如果点击的是铃铛图标，不切换标签
+                const tabName = tab.getAttribute('data-tab');
+                switchTab(tabName);
+            });
+        });
+        
+        // 静音按钮
+        bellIcons.forEach(bell => {
+            bell.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                const tabName = bell.closest('.header-tab').getAttribute('data-tab');
+                toggleMute(tabName);
+            });
+        });
+        
+        // 搜索输入
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value) {
+                searchClear.style.display = 'block';
+            } else {
+                searchClear.style.display = 'none';
+                searchResults.style.display = 'none';
+                searchNavigation.style.display = 'none';
+                clearHighlights();
+            }
+        });
+        
+        // 搜索框按Enter键
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // 清除搜索
+        searchClear.addEventListener('click', clearSearch);
+        
+        // 上一个搜索结果
+        prevResult.addEventListener('click', () => {
+            if (currentMatchIndex > 0) {
+                currentMatchIndex--;
+                highlightCurrentMatch();
+                updateNavigationButtons();
+            }
+        });
+        
+        // 下一个搜索结果
+        nextResult.addEventListener('click', () => {
+            if (currentMatchIndex < searchMatches.length - 1) {
+                currentMatchIndex++;
+                highlightCurrentMatch();
+                updateNavigationButtons();
+            }
+        });
+        
+        // 按钮点击事件
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('action-button') || e.target.closest('.action-button')) {
+                const button = e.target.classList.contains('action-button') ? e.target : e.target.closest('.action-button');
+                handleButtonClick(button);
+            }
+        });
+        
+        // 开发者按钮
+        devButton.addEventListener('click', showSourceCode);
+        
+        // 复制代码按钮
+        copyCodeButton.addEventListener('click', copyCode);
+        
+        // 关闭模态窗口
+        modalClose.addEventListener('click', () => {
+            devModal.style.display = 'none';
+        });
+        
+        // 点击模态窗口外部关闭
+        window.addEventListener('click', (e) => {
+            if (e.target === devModal) {
+                devModal.style.display = 'none';
+            }
+        });
+        
+        // 初始化
+        updateNotificationCount();
+        updateUnreadIndicators();
+        
+        // 確保系統信息初始位置在底部
+        setTimeout(() => {
+            systemContent.scrollTop = systemContent.scrollHeight;
+        }, 0);
+        
+        // 添加鍵盤事件監聽
+        document.addEventListener('keydown', function(e) {
+            if (e.key === '1') {
+                console.log("鍵盤按1，添加新消息到個人信息標籤頁");
+                
+                // 直接調用添加個人消息的函數
+                const messageElement = addNewPersonalMessage();
+                
+                // 如果當前不在個人信息標籤頁，才會標記為未讀並顯示紅點
+                if (currentTab !== 'personal') {
+                    // 只更新個人信息標籤的未讀指示器
+                    const indicator = document.getElementById('personalUnread');
+                    if (indicator) {
+                        indicator.style.display = 'block';
+                    }
+                }
+            }
+        });
+        
+        // 設置相關元素
+        const settingsButton = document.getElementById('settingsButton');
+        const settingsContainer = document.getElementById('settingsContainer');
+        const settingsSaveButton = document.getElementById('settingsSaveButton');
+        const settingsCancelButton = document.getElementById('settingsCancelButton');
+        
+        // 保存開關狀態
+        let switchStates = {
+            scoreChange: false,
+            oddsSale: false,
+            scheduleChange: false,
+            matchCancel: false
+        };
+        
+        // 顯示設置面板
+        function showSettings() {
+            // 隱藏搜索欄
+            searchBar.classList.remove('visible');
+            
+            // 顯示設置面板
+            settingsContainer.style.display = 'flex';
+            
+            // 恢復之前的開關狀態
+            Object.keys(switchStates).forEach(id => {
+                const checkbox = document.getElementById(id);
+                if (checkbox) {
+                    checkbox.checked = switchStates[id];
+                }
+            });
+        }
+        
+        // 隱藏設置面板
+        function hideSettings() {
+            // 顯示搜索欄
+            searchBar.classList.add('visible');
+            
+            // 隱藏設置面板
+            settingsContainer.style.display = 'none';
+        }
+        
+        // 保存設置
+        function saveSettings() {
+            // 保存所有開關的狀態
+            Object.keys(switchStates).forEach(id => {
+                const checkbox = document.getElementById(id);
+                if (checkbox) {
+                    switchStates[id] = checkbox.checked;
+                }
+            });
+            
+            // 隱藏設置面板
+            hideSettings();
+        }
+        
+        // 設置按鈕點擊事件
+        settingsButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showSettings();
+        });
+        
+        // 保存按鈕點擊事件
+        settingsSaveButton.addEventListener('click', () => {
+            saveSettings();
+        });
+        
+        // 取消按鈕點擊事件
+        settingsCancelButton.addEventListener('click', () => {
+            hideSettings();
+        });
+        
+        // 防止設置面板內的點擊事件冒泡
+        settingsContainer.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+        
+        // 创建 Intersection Observer
+        const messageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const messageElement = entry.target;
+                    if (messageElement.classList.contains('unread')) {
+                        // 添加高亮效果
+                        messageElement.classList.add('highlight');
+                        
+                        // 获取消息所属的标签页类型
+                        const tabType = messageElement.getAttribute('data-tab-type');
+                        
+                        // 如果窗口打开，则标记为已读
+                        if (isWindowOpen && tabType && unreadCounts[tabType] > 0) {
+                            // 检查是否在当前标签页
+                            const isCurrentTab = currentTab === tabType;
+                            
+                            // 延迟移除未读标记，配合动画效果
+                            setTimeout(() => {
+                                messageElement.classList.remove('unread');
+                                unreadCounts[tabType]--;
+                                updateNotificationCount();
+                                
+                                // 找到对应的未读指示器
+                                const indicator = document.getElementById(`${tabType}Unread`);
+                                if (indicator && (isCurrentTab || unreadCounts[tabType] === 0)) {
+                                    // 添加淡出效果
+                                    indicator.classList.add('fade-out');
+                                    // 等待动画完成后隐藏
+                                    setTimeout(() => {
+                                        if (unreadCounts[tabType] === 0) {
+                                            indicator.style.display = 'none';
+                                        }
+                                        indicator.classList.remove('fade-out');
+                                    }, 300);
+                                }
+                            }, 100);
+                            
+                            // 移除观察
+                            messageObserver.unobserve(messageElement);
+                        }
+                    }
+                }
+            });
+        }, {
+            // 降低触发门槛，使其更容易标记为已读
+            threshold: 0.5,
+            rootMargin: '-10px 0px'
+        });
+        
+        // 添加新消息
+        // 统一的消息添加函数
+        function addNewMessage(type, messageText) {
+            // 獲取當前標籤頁
+            const isCurrentTab = currentTab === type;
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${type} new-message`;
+            
+            // 只有在不是當前標籤頁且窗口已打開時，才標記為未讀
+            if (!isCurrentTab && isWindowOpen) {
+                messageElement.classList.add('unread');
+            }
+            
+            messageElement.setAttribute('data-tab-type', type);
+            
+            // 创建消息气泡
+            const bubbleElement = document.createElement('div');
+            bubbleElement.className = 'message-bubble';
+            bubbleElement.innerHTML = messageText;
+            
+            // 创建消息信息
+            const infoElement = document.createElement('div');
+            infoElement.className = 'message-info';
+            
+            // 添加时间
+            const timeElement = document.createElement('div');
+            timeElement.className = 'message-time';
+            timeElement.textContent = getCurrentTime();
+            infoElement.appendChild(timeElement);
+            
+            // 组装消息
+            messageElement.appendChild(bubbleElement);
+            messageElement.appendChild(infoElement);
+            
+            // 获取对应的内容区域
+            const contentElement = document.getElementById(`${type}Content`);
+            
+            // 确定容器
+            let container;
+            if (type === 'system') {
+                // 系統信息使用 message-container
+                container = contentElement.querySelector('.message-container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.className = 'message-container';
+                    contentElement.appendChild(container);
+                }
+            } else {
+                // 其他使用標籤頁本身作為容器
+                container = contentElement;
+            }
+            
+            // 添加消息到容器
+            container.appendChild(messageElement);
+            
+            // 只有在不是當前標籤頁時才顯示紅點
+            if (!isCurrentTab && isWindowOpen) {
+                // 更新未读指示器
+                const indicator = document.getElementById(`${type}Unread`);
+                if (indicator) {
+                    indicator.style.display = 'block';
+                }
+            }
+            
+            // 確保消息被添加後立即滾動到底部
+            setTimeout(() => {
+                // 添加动画效果
+                messageElement.classList.remove('new-message');
+                
+                // 滾動到底部
+                contentElement.scrollTop = contentElement.scrollHeight;
+            }, 10);
+            
+            // 計數器更新
+            if (!isCurrentTab && isWindowOpen) {
+                unreadCounts[type]++;
+                updateNotificationCount();
+                updateUnreadIndicators();
+            }
+            
+            return messageElement;
+        }
+        
+        function addPersonalMessage(messageText) {
+            addNewMessage('personal', messageText);
+            
+            // 开始观察新消息
+            messageObserver.observe(messageElement);
+            
+            // ... existing code ...
+        }
+        
+        // 添加系统消息
+        function addSystemMessage(messageText) {
+            addNewMessage('system', messageText);
+            
+            // 开始观察新消息
+            messageObserver.observe(messageElement);
+            
+            // ... existing code ...
+        }
+        
+        // 添加赛事消息
+        function addMatchMessage(messageText) {
+            addNewMessage('match', messageText);
+            
+            // 开始观察新消息
+            messageObserver.observe(messageElement);
+            
+            // ... existing code ...
+        }
+
+        // 初始化時確保系統消息在底部
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化
+            updateNotificationCount();
+            updateUnreadIndicators();
+            
+            // 確保系統信息初始位置在底部
+            const systemContent = document.getElementById('systemContent');
+            if (systemContent) {
+                systemContent.scrollTop = systemContent.scrollHeight;
+            }
+        });
+
+        // JavaScript 部分，添加以下代碼到腳本最後
+        // 修正問號圖標點擊事件處理
+        document.querySelectorAll('.info-icon').forEach(icon => {
+            // 移除點擊事件，改為只使用懸停
+            icon.removeEventListener('click', null);
+            
+            // 確保滑鼠離開時隱藏提示框
+            icon.addEventListener('mouseleave', (e) => {
+                const tooltip = icon.querySelector('.tooltip');
+                            if (tooltip) {
+                                    tooltip.style.display = 'none';
+                }
+            });
+        });
+
+        // 確保開關只在點擊開關時被觸發
+        document.querySelectorAll('.switch').forEach(switchElem => {
+            switchElem.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        });
+
+        // 讓每個選項區域的點擊不會影響其他元素
+        document.querySelectorAll('.settings-wrapper').forEach(wrapper => {
+            wrapper.addEventListener('click', (e) => {
+                if (e.target === wrapper) {
+                    e.stopPropagation();
+                }
+            });
+        });
+
+        // JavaScript 部分，簡化問號圖標的點擊事件處理
+document.querySelectorAll('.info-icon').forEach(icon => {
+    // 清除現有事件
+    const newIcon = icon.cloneNode(true);
+    icon.parentNode.replaceChild(newIcon, icon);
+    
+    // 添加點擊事件
+    newIcon.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // 切換 active 狀態
+        this.classList.toggle('active');
+                                    
+                                    // 關閉其他提示框
+        document.querySelectorAll('.info-icon').forEach(otherIcon => {
+            if (otherIcon !== this) {
+                otherIcon.classList.remove('active');
+            }
+        });
+    });
+});
+
+        // 點擊頁面任何地方關閉所有提示框
+document.addEventListener('click', () => {
+    document.querySelectorAll('.info-icon').forEach(icon => {
+        icon.classList.remove('active');
+    });
+});
+
+        // 確保開關可以點擊
+document.querySelectorAll('.switch').forEach(function(switchElem) {
+    // 確保開關本身可以接收點擊
+    switchElem.style.pointerEvents = "auto";
+    
+    // 確保點擊開關時不觸發其他事件
+    switchElem.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+});
+
+// 確保問號圖標可以點擊
+document.querySelectorAll('.info-icon').forEach(function(infoIcon) {
+    infoIcon.style.pointerEvents = "auto";
+});
+
+        // 確保所有開關默認為開啟的函數
+        function ensureAllSwitchesOn() {
+            const switches = [
+                'oddsSale', 'scoreChange', 'scheduleChange', 
+                'matchCancel', 'resultNotification', 'groupBuyProgress', 'matchStage'
+            ];
+            
+            switches.forEach(id => {
+                const checkbox = document.getElementById(id);
+                if (checkbox) {
+                    checkbox.checked = true;
+                                        }
+                                    });
+                                }
+
+        // 頁面載入時確保開關開啟
+document.addEventListener('DOMContentLoaded', () => {
+    // 初始化
+    updateNotificationCount();
+    updateUnreadIndicators();
+    
+    // 確保系統信息初始位置在底部
+    const systemContent = document.getElementById('systemContent');
+    if (systemContent) {
+        systemContent.scrollTop = systemContent.scrollHeight;
+    }
+    
+    // 確保所有開關默認為開啟
+    ensureAllSwitchesOn();
+    
+    // 為確保開關狀態，設置多個延遲檢查點，確保頁面各元素完全載入後開關狀態正確
+    setTimeout(ensureAllSwitchesOn, 100);
+    setTimeout(ensureAllSwitchesOn, 300);
+    setTimeout(ensureAllSwitchesOn, 500);
+    setTimeout(ensureAllSwitchesOn, 1000);
+    
+    // 每次打開設置面板時也確保開關狀態正確
+    const settingsButton = document.getElementById('settingsButton');
+    if (settingsButton) {
+        const originalClick = settingsButton.onclick;
+        settingsButton.addEventListener('click', function(e) {
+            // 等待設置面板顯示後再設置開關狀態
+            setTimeout(ensureAllSwitchesOn, 50);
+        });
+    }
+});
+
+        // 立即執行函數，確保所有開關默認為開啟
+(function() {
+    // 強制設置所有開關為開啟狀態，並添加日誌
+    function setAllSwitchesOn() {
+        console.log("設置所有開關為開啟狀態 - " + new Date().toLocaleTimeString());
+        var switchIds = [
+            'oddsSale', 'scoreChange', 'scheduleChange', 
+            'matchCancel', 'resultNotification', 'groupBuyProgress', 'matchStage'
+        ];
+        
+        switchIds.forEach(function(id) {
+            var checkbox = document.getElementById(id);
+            if (checkbox) {
+                if (!checkbox.checked) {
+                    checkbox.checked = true;
+                    console.log("開關 " + id + " 已從關閉狀態設置為開啟");
+                }
+            } else {
+                console.log("找不到開關 " + id);
+            }
+        });
+    }
+    
+    // 立即執行一次
+    setAllSwitchesOn();
+    
+    // 設置多個執行點，確保在不同時間點開關都處於開啟狀態
+    setTimeout(setAllSwitchesOn, 100);
+    setTimeout(setAllSwitchesOn, 300);
+    setTimeout(setAllSwitchesOn, 600);
+    
+    // 監聽設置面板顯示事件
+    var settingsContainer = document.getElementById('settingsContainer');
+    if (settingsContainer) {
+        // 使用 MutationObserver 監聽樣式變化
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'style' && 
+                    settingsContainer.style.display === 'flex') {
+                    // 設置面板顯示時，確保開關狀態
+                    setTimeout(setAllSwitchesOn, 50);
+                }
+            });
+        });
+        
+        observer.observe(settingsContainer, { attributes: true });
+    }
+})();
+
+        // 統一所有開關的感應區域
+        document.querySelectorAll('.switch-container').forEach(function(container) {
+            // 移除任何可能影響點擊的樣式
+            container.style.pointerEvents = "none";
+            
+            // 確保開關本身可以接收點擊
+            var switchElem = container.querySelector('.switch');
+            if (switchElem) {
+                switchElem.style.pointerEvents = "all";
+            }
+        });
+
+        // 特別處理賽果通知開關
+                var matchCancelSwitch = document.getElementById('matchCancel');
+                if (matchCancelSwitch) {
+    // 確保該開關被設為開啟
+                    matchCancelSwitch.checked = true;
+                    
+    // 確保開關點擊正常
+    var switchLabel = matchCancelSwitch.closest('.switch');
+                    if (switchLabel) {
+        switchLabel.style.pointerEvents = "auto";
+    }
+    
+    // 設置樣式但保留可點擊區域
+    var label = document.querySelector('label[for="matchCancel"]');
+    if (label) {
+        // 設置標籤樣式
+        label.style.minWidth = "80px";
+        
+        // 設置問號圖標樣式
+        var infoIcon = label.querySelector('.info-icon');
+        if (infoIcon) {
+            infoIcon.style.pointerEvents = "auto";
+            
+            // 確保點擊事件能夠正確觸發
+            infoIcon.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                var tooltip = this.querySelector('.tooltip');
+                if (tooltip) {
+                    if (tooltip.style.display === 'block') {
+                        tooltip.style.display = 'none';
+                    } else {
+                        tooltip.style.display = 'block';
+                        
+                        // 關閉其他提示框
+                        document.querySelectorAll('.info-icon').forEach(function(otherIcon) {
+                            if (otherIcon !== infoIcon) {
+                                var otherTooltip = otherIcon.querySelector('.tooltip');
+                                if (otherTooltip) {
+                                    otherTooltip.style.display = 'none';
+                                }
+                            }
+                        });
+                    }
+                }
+                                }, true);
+
+                            }
+                        }
+    
+    // 設置開關區域可點擊
+    var sliderElement = matchCancelSwitch.nextElementSibling;
+    if (sliderElement && sliderElement.classList.contains('slider')) {
+        sliderElement.style.pointerEvents = "auto";
+    }
+    
+    // 確保wrapper樣式正確
+    var wrapper = matchCancelSwitch.closest('.settings-wrapper');
+    if (wrapper) {
+        wrapper.style.pointerEvents = "auto";
+        wrapper.style.gap = "5px";
+        
+        // 確保wrapper內的所有元素都可點擊
+        wrapper.querySelectorAll('*').forEach(function(element) {
+            element.style.pointerEvents = "auto";
+        });
+    }
+}
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93cd3ad6961c49f7',t:'MTc0Njc1MjExMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+    
+</body><grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration></html>
+</body><grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration></html>
