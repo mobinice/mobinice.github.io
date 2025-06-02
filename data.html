@@ -1,0 +1,3277 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合买数据分析报表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.7/dayjs.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .filter-section {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+        .tab-active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+        .code-modal {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            z-index: 50;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            height: 60%;
+            transition: transform 0.3s ease-out;
+            transform: translateY(100%);
+        }
+        .code-modal.show {
+            display: block;
+            transform: translateY(0);
+        }
+        .code-content {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            border-radius: 0.375rem;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #475569;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background-color: #f8fafc;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            user-select: none;
+        }
+        th:hover {
+            background-color: #f1f5f9;
+        }
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        .pagination-btn {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            margin: 0 0.25rem;
+        }
+        .pagination-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .sort-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        .sort-icon.active {
+            color: #3b82f6;
+        }
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+        .leaderboard-rank {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+        .rank-1 {
+            background-color: #fcd34d;
+            color: #92400e;
+        }
+        .rank-2 {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+        .rank-3 {
+            background-color: #d97706;
+            color: #fef3c7;
+        }
+        .rank-other {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+        .leaderboard-tab {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+        }
+        .leaderboard-tab.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+        .leaderboard-content {
+            display: none;
+        }
+        .leaderboard-content.active {
+            display: block;
+        }
+        .progress-bar {
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            outline: none;
+        }
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+        .range-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+        .range-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.fixed{position:fixed}.bottom-6{bottom:1.5rem}.left-6{left:1.5rem}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.ml-2{margin-left:0.5rem}.mr-1{margin-right:0.25rem}.mr-2{margin-right:0.5rem}.mt-1{margin-top:0.25rem}.mt-4{margin-top:1rem}.mb-2{margin-bottom:0.5rem}.block{display:block}.flex{display:flex}.grid{display:grid}.h-80{height:20rem}.h-full{height:100%}.w-full{width:100%}.min-w-full{min-width:100%}.flex-1{flex:1 1 0%}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-4{gap:1rem}.overflow-auto{overflow:auto}.rounded-full{border-radius:9999px}.rounded-md{border-radius:0.375rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-amber-400{--tw-bg-opacity:1;background-color:rgb(251 191 36 / var(--tw-bg-opacity, 1))}.bg-amber-600{--tw-bg-opacity:1;background-color:rgb(217 119 6 / var(--tw-bg-opacity, 1))}.bg-blue-400{--tw-bg-opacity:1;background-color:rgb(96 165 250 / var(--tw-bg-opacity, 1))}.bg-gray-400{--tw-bg-opacity:1;background-color:rgb(156 163 175 / var(--tw-bg-opacity, 1))}.p-3{padding:0.75rem}.p-4{padding:1rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.pt-4{padding-top:1rem}.text-2xl{font-size:1.5rem;line-height:2rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-amber-600{--tw-text-opacity:1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-cyan-600{--tw-text-opacity:1;color:rgb(8 145 178 / var(--tw-text-opacity, 1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-500{--tw-text-opacity:1;color:rgb(34 197 94 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-orange-600{--tw-text-opacity:1;color:rgb(234 88 12 / var(--tw-text-opacity, 1))}.text-purple-600{--tw-text-opacity:1;color:rgb(147 51 234 / var(--tw-text-opacity, 1))}.text-red-500{--tw-text-opacity:1;color:rgb(239 68 68 / var(--tw-text-opacity, 1))}.text-rose-600{--tw-text-opacity:1;color:rgb(225 29 72 / var(--tw-text-opacity, 1))}.text-teal-600{--tw-text-opacity:1;color:rgb(13 148 136 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-red-600{--tw-text-opacity:1;color:rgb(220 38 38 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:bg-gray-700:hover{--tw-bg-opacity:1;background-color:rgb(55 65 81 / var(--tw-bg-opacity, 1))}.hover\:text-gray-700:hover{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-blue-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(59 130 246 / var(--tw-ring-opacity, 1))}@media (min-width: 768px){.md\:w-auto{width:auto}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-5{grid-template-columns:repeat(5, minmax(0, 1fr))}}@media (min-width: 1024px){.lg\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}}</style></head>
+<body data-new-gr-c-s-check-loaded="14.1105.0" data-gr-ext-installed="">
+    <div class="container mx-auto px-4 py-6">
+        <header class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">合买数据分析报表</h1>
+            <p class="text-gray-600">全面分析合买活动数据，优化业务决策</p>
+        </header>
+
+        <!-- 筛选条件 -->
+        <div class="filter-section p-4 mb-6">
+            <div class="flex flex-wrap items-center gap-4">
+                <div class="w-full md:w-auto">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">时间维度</label>
+                    <select id="timeGranularity" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="day">按天</option>
+                        <option value="week">按周</option>
+                        <option value="month">按月</option>
+                    </select>
+                </div>
+                <div class="w-full md:w-auto">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">日期范围</label>
+                    <div class="flex items-center gap-2">
+                        <input type="date" id="startDate" class="rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <span>至</span>
+                        <input type="date" id="endDate" class="rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="w-full md:w-auto">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">合买序号</label>
+                    <input type="text" id="planId" placeholder="输入序号或留空" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="w-full md:w-auto">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">发起人ID</label>
+                    <input type="text" id="initiatorId" placeholder="输入ID或留空" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="w-full md:w-auto">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">参与人ID</label>
+                    <input type="text" id="participantId" placeholder="输入ID或留空" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="w-full md:w-auto">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">合买状态</label>
+                    <select id="status" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="all">全部</option>
+                        <option value="success">成功</option>
+                        <option value="fail">失败</option>
+                        <option value="in_progress">进行中</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 新增的筛选条件 -->
+            <div class="mt-4 border-t pt-4">
+                <h3 class="text-sm font-medium text-gray-700 mb-3">高级筛选</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- 发起合买次数 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">发起合买次数</label>
+                        <div class="px-2">
+                            <input type="range" id="initiatedCountRange" class="range-slider" min="0" max="50" value="0">
+                            <div class="range-values">
+                                <span>0</span>
+                                <span id="initiatedCountValue">0+</span>
+                                <span>50+</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 参与合买次数 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">参与合买次数</label>
+                        <div class="px-2">
+                            <input type="range" id="participatedCountRange" class="range-slider" min="0" max="100" value="0">
+                            <div class="range-values">
+                                <span>0</span>
+                                <span id="participatedCountValue">0+</span>
+                                <span>100+</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 带单成功率 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">带单成功率</label>
+                        <div class="px-2">
+                            <input type="range" id="successRateRange" class="range-slider" min="0" max="100" value="0">
+                            <div class="range-values">
+                                <span>0%</span>
+                                <span id="successRateValue">0%+</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 平均带单金额 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">平均带单金额</label>
+                        <div class="px-2">
+                            <input type="range" id="avgAmountRange" class="range-slider" min="0" max="1000" value="0">
+                            <div class="range-values">
+                                <span>¥0</span>
+                                <span id="avgAmountValue">¥0+</span>
+                                <span>¥1000+</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="w-full mt-4">
+                <button id="filterBtn" class="btn-primary px-4 py-2 rounded-md">应用筛选</button>
+                <button id="resetBtn" class="btn-secondary px-4 py-2 rounded-md ml-2">重置</button>
+            </div>
+        </div>
+
+        <!-- 核心指标卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="card p-4">
+                <div class="stat-label">合买总发起次数</div>
+                <div class="stat-value text-blue-600" id="totalPlans">100</div>
+                <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+5.2%</span></div>
+            </div>
+            <div class="card p-4">
+                <div class="stat-label">合买成功次数</div>
+                <div class="stat-value text-green-600" id="successPlans">42</div>
+                <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+3.8%</span></div>
+            </div>
+            <div class="card p-4">
+                <div class="stat-label">合买总金额</div>
+                <div class="stat-value text-purple-600" id="totalAmount">¥57,997</div>
+                <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+7.1%</span></div>
+            </div>
+            <div class="card p-4">
+                <div class="stat-label">合买中奖率</div>
+                <div class="stat-value text-amber-600" id="winRate">42.0%</div>
+                <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-red-500">-1.2%</span></div>
+            </div>
+        </div>
+
+        <!-- 合买整体数据卡片 -->
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold mb-3">合买整体数据</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="card p-4">
+                    <div class="stat-label">合买参与总人次</div>
+                    <div class="stat-value text-indigo-600" id="totalParticipants">502</div>
+                    <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+4.3%</span></div>
+                </div>
+                <div class="card p-4">
+                    <div class="stat-label">合买平均发起金额</div>
+                    <div class="stat-value text-teal-600" id="avgInitAmount">¥580.0</div>
+                    <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+2.1%</span></div>
+                </div>
+                <div class="card p-4">
+                    <div class="stat-label">平均参与人数/单</div>
+                    <div class="stat-value text-cyan-600" id="avgParticipantsPerPlan">5.0</div>
+                    <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-red-500">-0.3%</span></div>
+                </div>
+                <div class="card p-4">
+                    <div class="stat-label">人均合买参与次数</div>
+                    <div class="stat-value text-emerald-600" id="avgParticipationTimes">1.0</div>
+                    <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+1.8%</span></div>
+                </div>
+                <div class="card p-4">
+                    <div class="stat-label">人均合买投入金额</div>
+                    <div class="stat-value text-rose-600" id="avgInvestAmount">¥115.5</div>
+                    <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+3.5%</span></div>
+                </div>
+                <div class="card p-4">
+                    <div class="stat-label">合买中奖金额总计</div>
+                    <div class="stat-value text-amber-600" id="totalWinAmount">¥33,885</div>
+                    <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+8.7%</span></div>
+                </div>
+                <div class="card p-4">
+                    <div class="stat-label">平均中奖金额/单</div>
+                    <div class="stat-value text-orange-600" id="avgWinAmount">¥806.8</div>
+                    <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+5.2%</span></div>
+                </div>
+                <div class="card p-4">
+                    <div class="stat-label">合买活跃用户数</div>
+                    <div class="stat-value text-blue-600" id="activeUsers">495</div>
+                    <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+2.9%</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="card p-4 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">趋势分析</h2>
+                <div class="flex">
+                    <button class="chart-tab tab-active px-3 py-1 text-sm" data-chart="plans">发起次数</button>
+                    <button class="chart-tab px-3 py-1 text-sm" data-chart="amount">金额</button>
+                    <button class="chart-tab px-3 py-1 text-sm" data-chart="participants">参与人数</button>
+                </div>
+            </div>
+            <div class="h-80">
+                <canvas id="trendChart" width="1094" height="287" style="display: block; box-sizing: border-box; height: 320px; width: 1216px;"></canvas>
+            </div>
+        </div>
+
+        <!-- 用户行为指标排行榜 -->
+        <div class="card p-4 mb-6">
+            <h2 class="text-lg font-semibold mb-4">用户行为指标 TOP5 排行榜</h2>
+            
+            <div class="border-b mb-4">
+                <div class="flex">
+                    <div class="leaderboard-tab active" data-tab="initiators">发起合买次数</div>
+                    <div class="leaderboard-tab" data-tab="participants">参与合买次数</div>
+                    <div class="leaderboard-tab" data-tab="success-rate">带单成功率</div>
+                    <div class="leaderboard-tab" data-tab="avg-amount">平均带单金额</div>
+                </div>
+            </div>
+            
+            <!-- 发起合买次数排行榜 -->
+            <div id="initiators-leaderboard" class="leaderboard-content active">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4"><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div>
+                            <div class="font-semibold">用户 10048</div>
+                            <div class="text-sm text-gray-500">50 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">count</span>
+                            <span class="text-sm font-semibold">50次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-400" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-2">2</div>
+                        <div>
+                            <div class="font-semibold">用户 10011</div>
+                            <div class="text-sm text-gray-500">49 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">count</span>
+                            <span class="text-sm font-semibold">49次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-gray-400" style="width: 98%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-3">3</div>
+                        <div>
+                            <div class="font-semibold">用户 10013</div>
+                            <div class="text-sm text-gray-500">47 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">count</span>
+                            <span class="text-sm font-semibold">47次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-600" style="width: 94%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-other">4</div>
+                        <div>
+                            <div class="font-semibold">用户 10038</div>
+                            <div class="text-sm text-gray-500">47 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">count</span>
+                            <span class="text-sm font-semibold">47次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 94%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-other">5</div>
+                        <div>
+                            <div class="font-semibold">用户 10005</div>
+                            <div class="text-sm text-gray-500">46 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">count</span>
+                            <span class="text-sm font-semibold">46次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 92%"></div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+            
+            <!-- 参与合买次数排行榜 -->
+            <div id="participants-leaderboard" class="leaderboard-content">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4"><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div>
+                            <div class="font-semibold">用户 10030</div>
+                            <div class="text-sm text-gray-500">100 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">count</span>
+                            <span class="text-sm font-semibold">100次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-400" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-2">2</div>
+                        <div>
+                            <div class="font-semibold">用户 10023</div>
+                            <div class="text-sm text-gray-500">98 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">count</span>
+                            <span class="text-sm font-semibold">98次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-gray-400" style="width: 98%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-3">3</div>
+                        <div>
+                            <div class="font-semibold">用户 10013</div>
+                            <div class="text-sm text-gray-500">97 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">count</span>
+                            <span class="text-sm font-semibold">97次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-600" style="width: 97%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-other">4</div>
+                        <div>
+                            <div class="font-semibold">用户 10003</div>
+                            <div class="text-sm text-gray-500">93 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">count</span>
+                            <span class="text-sm font-semibold">93次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 93%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-other">5</div>
+                        <div>
+                            <div class="font-semibold">用户 10015</div>
+                            <div class="text-sm text-gray-500">91 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">count</span>
+                            <span class="text-sm font-semibold">91次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 91%"></div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+            
+            <!-- 带单成功率排行榜 -->
+            <div id="success-rate-leaderboard" class="leaderboard-content">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4"><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div>
+                            <div class="font-semibold">用户 10005</div>
+                            <div class="text-sm text-gray-500">46 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">成功率</span>
+                            <span class="text-sm font-semibold">65.2%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-400" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-2">2</div>
+                        <div>
+                            <div class="font-semibold">用户 10013</div>
+                            <div class="text-sm text-gray-500">47 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">成功率</span>
+                            <span class="text-sm font-semibold">57.4%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-gray-400" style="width: 88%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-3">3</div>
+                        <div>
+                            <div class="font-semibold">用户 10038</div>
+                            <div class="text-sm text-gray-500">47 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">成功率</span>
+                            <span class="text-sm font-semibold">46.8%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-600" style="width: 72%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-other">4</div>
+                        <div>
+                            <div class="font-semibold">用户 10048</div>
+                            <div class="text-sm text-gray-500">50 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">成功率</span>
+                            <span class="text-sm font-semibold">46.0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 71%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-other">5</div>
+                        <div>
+                            <div class="font-semibold">用户 10011</div>
+                            <div class="text-sm text-gray-500">49 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">成功率</span>
+                            <span class="text-sm font-semibold">24.5%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 38%"></div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+            
+            <!-- 平均带单金额排行榜 -->
+            <div id="avg-amount-leaderboard" class="leaderboard-content">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4"><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div>
+                            <div class="font-semibold">用户 10011</div>
+                            <div class="text-sm text-gray-500">49 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">平均金额</span>
+                            <span class="text-sm font-semibold">758.4元</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-400" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-2">2</div>
+                        <div>
+                            <div class="font-semibold">用户 10005</div>
+                            <div class="text-sm text-gray-500">46 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">平均金额</span>
+                            <span class="text-sm font-semibold">638.0元</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-gray-400" style="width: 84%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-3">3</div>
+                        <div>
+                            <div class="font-semibold">用户 10013</div>
+                            <div class="text-sm text-gray-500">47 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">平均金额</span>
+                            <span class="text-sm font-semibold">449.9元</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-600" style="width: 59%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-other">4</div>
+                        <div>
+                            <div class="font-semibold">用户 10048</div>
+                            <div class="text-sm text-gray-500">50 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">平均金额</span>
+                            <span class="text-sm font-semibold">405.3元</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 53%"></div>
+                        </div>
+                    </div>
+                </div><div class="card p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank rank-other">5</div>
+                        <div>
+                            <div class="font-semibold">用户 10038</div>
+                            <div class="text-sm text-gray-500">47 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">平均金额</span>
+                            <span class="text-sm font-semibold">180.2元</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 24%"></div>
+                        </div>
+                    </div>
+                </div></div>
+            </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="card p-4 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center">
+                    <span class="text-sm text-gray-600 mr-2">每页显示:</span>
+                    <select id="itemsPerPageSelect" class="rounded-md border border-gray-300 px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="10">10条</option>
+                        <option value="30">30条</option>
+                        <option value="50">50条</option>
+                        <option value="100">100条</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="min-w-full">
+                    <thead>
+                        <tr>
+                            <th data-sort="date">
+                                日期
+                                <span class="sort-icon active"><i class="fas fa-sort-down"></i></span>
+                            </th>
+                            <th>合买序号</th>
+                            <th>发起人ID</th>
+                            <th data-sort="participants">
+                                参与人数
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th data-sort="amount">
+                                合买金额
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th>状态</th>
+                            <th data-sort="winAmount">
+                                中奖金额
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTable"><tr>
+                    <td>2025-06-02</td>
+                    <td>341830</td>
+                    <td>45756</td>
+                    <td>7</td>
+                    <td>¥553</td>
+                    <td class="text-red-600">失败</td>
+                    <td>¥0</td>
+                </tr><tr>
+                    <td>2025-06-01</td>
+                    <td>308561</td>
+                    <td>95207</td>
+                    <td>3</td>
+                    <td>¥599</td>
+                    <td class="text-green-600">成功</td>
+                    <td>¥784</td>
+                </tr><tr>
+                    <td>2025-06-01</td>
+                    <td>748594</td>
+                    <td>88723</td>
+                    <td>8</td>
+                    <td>¥469</td>
+                    <td class="text-red-600">失败</td>
+                    <td>¥0</td>
+                </tr><tr>
+                    <td>2025-06-01</td>
+                    <td>969003</td>
+                    <td>51314</td>
+                    <td>9</td>
+                    <td>¥594</td>
+                    <td class="text-red-600">失败</td>
+                    <td>¥0</td>
+                </tr><tr>
+                    <td>2025-05-31</td>
+                    <td>609395</td>
+                    <td>38638</td>
+                    <td>9</td>
+                    <td>¥190</td>
+                    <td class="text-red-600">失败</td>
+                    <td>¥0</td>
+                </tr><tr>
+                    <td>2025-05-31</td>
+                    <td>871169</td>
+                    <td>48605</td>
+                    <td>2</td>
+                    <td>¥612</td>
+                    <td class="text-red-600">失败</td>
+                    <td>¥0</td>
+                </tr><tr>
+                    <td>2025-05-31</td>
+                    <td>948235</td>
+                    <td>28664</td>
+                    <td>3</td>
+                    <td>¥954</td>
+                    <td class="text-red-600">失败</td>
+                    <td>¥0</td>
+                </tr><tr>
+                    <td>2025-05-31</td>
+                    <td>195167</td>
+                    <td>74797</td>
+                    <td>6</td>
+                    <td>¥1,085</td>
+                    <td class="text-amber-600">进行中</td>
+                    <td>¥0</td>
+                </tr><tr>
+                    <td>2025-05-31</td>
+                    <td>381732</td>
+                    <td>81067</td>
+                    <td>2</td>
+                    <td>¥371</td>
+                    <td class="text-amber-600">进行中</td>
+                    <td>¥0</td>
+                </tr><tr>
+                    <td>2025-05-31</td>
+                    <td>916890</td>
+                    <td>85819</td>
+                    <td>9</td>
+                    <td>¥971</td>
+                    <td class="text-green-600">成功</td>
+                    <td>¥1,045</td>
+                </tr></tbody>
+                </table>
+            </div>
+            <div class="flex justify-between items-center mt-4">
+                <div class="text-sm text-gray-600">
+                    显示 <span id="startRecord">1</span> 到 <span id="endRecord">10</span> 条，共 <span id="totalRecords">100</span> 条记录
+                </div>
+                <div class="flex items-center" id="pagination">
+                    <button class="pagination-btn btn-secondary" id="prevPage" disabled="">上一页</button>
+                    <div id="pageNumbers" class="flex"><button class="pagination-btn active">1</button><button class="pagination-btn btn-secondary">2</button><button class="pagination-btn btn-secondary">3</button><button class="pagination-btn btn-secondary">4</button><button class="pagination-btn btn-secondary">5</button></div>
+                    <button class="pagination-btn btn-secondary" id="nextPage">下一页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 开发者信息按钮 -->
+        <div class="fixed bottom-6 left-6">
+            <button id="devInfoBtn" class="bg-gray-800 text-white rounded-full p-3 shadow-lg hover:bg-gray-700 transition-all">
+                <i class="fas fa-code"></i>
+            </button>
+        </div>
+
+        <!-- 代码模态框 -->
+        <div id="codeModal" class="code-modal">
+            <div class="h-full flex flex-col">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">开发者信息 - 源代码</h3>
+                    <div class="flex items-center">
+                        <button id="copyCodeBtn" class="btn-primary px-4 py-2 rounded-md mr-2">
+                            <i class="fas fa-copy mr-1"></i> 复制代码
+                        </button>
+                        <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-auto p-4">
+                    <pre id="codeContent" class="code-content p-4 text-sm">&lt;html lang="zh-CN"&gt;&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;合买数据分析报表&lt;/title&gt;
+    &lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;
+    &lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;
+    &lt;script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.7/dayjs.min.js"&gt;&lt;/script&gt;
+    &lt;link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"&gt;
+    &lt;style&gt;
+        body {
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .filter-section {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+        .tab-active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+        .code-modal {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            z-index: 50;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            height: 60%;
+            transition: transform 0.3s ease-out;
+            transform: translateY(100%);
+        }
+        .code-modal.show {
+            display: block;
+            transform: translateY(0);
+        }
+        .code-content {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            border-radius: 0.375rem;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #475569;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background-color: #f8fafc;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            user-select: none;
+        }
+        th:hover {
+            background-color: #f1f5f9;
+        }
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        .pagination-btn {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            margin: 0 0.25rem;
+        }
+        .pagination-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .sort-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        .sort-icon.active {
+            color: #3b82f6;
+        }
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+        .leaderboard-rank {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+        .rank-1 {
+            background-color: #fcd34d;
+            color: #92400e;
+        }
+        .rank-2 {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+        .rank-3 {
+            background-color: #d97706;
+            color: #fef3c7;
+        }
+        .rank-other {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+        .leaderboard-tab {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+        }
+        .leaderboard-tab.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+        .leaderboard-content {
+            display: none;
+        }
+        .leaderboard-content.active {
+            display: block;
+        }
+        .progress-bar {
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            outline: none;
+        }
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+        .range-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+        .range-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+    &lt;/style&gt;
+&lt;style&gt;*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.fixed{position:fixed}.bottom-6{bottom:1.5rem}.left-6{left:1.5rem}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.ml-2{margin-left:0.5rem}.mr-1{margin-right:0.25rem}.mr-2{margin-right:0.5rem}.mt-1{margin-top:0.25rem}.mt-4{margin-top:1rem}.mb-2{margin-bottom:0.5rem}.block{display:block}.flex{display:flex}.grid{display:grid}.h-80{height:20rem}.h-full{height:100%}.w-full{width:100%}.min-w-full{min-width:100%}.flex-1{flex:1 1 0%}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-4{gap:1rem}.overflow-auto{overflow:auto}.rounded-full{border-radius:9999px}.rounded-md{border-radius:0.375rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-amber-400{--tw-bg-opacity:1;background-color:rgb(251 191 36 / var(--tw-bg-opacity, 1))}.bg-amber-600{--tw-bg-opacity:1;background-color:rgb(217 119 6 / var(--tw-bg-opacity, 1))}.bg-blue-400{--tw-bg-opacity:1;background-color:rgb(96 165 250 / var(--tw-bg-opacity, 1))}.bg-gray-400{--tw-bg-opacity:1;background-color:rgb(156 163 175 / var(--tw-bg-opacity, 1))}.p-3{padding:0.75rem}.p-4{padding:1rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.pt-4{padding-top:1rem}.text-2xl{font-size:1.5rem;line-height:2rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-amber-600{--tw-text-opacity:1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-cyan-600{--tw-text-opacity:1;color:rgb(8 145 178 / var(--tw-text-opacity, 1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-500{--tw-text-opacity:1;color:rgb(34 197 94 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-orange-600{--tw-text-opacity:1;color:rgb(234 88 12 / var(--tw-text-opacity, 1))}.text-purple-600{--tw-text-opacity:1;color:rgb(147 51 234 / var(--tw-text-opacity, 1))}.text-red-500{--tw-text-opacity:1;color:rgb(239 68 68 / var(--tw-text-opacity, 1))}.text-rose-600{--tw-text-opacity:1;color:rgb(225 29 72 / var(--tw-text-opacity, 1))}.text-teal-600{--tw-text-opacity:1;color:rgb(13 148 136 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-red-600{--tw-text-opacity:1;color:rgb(220 38 38 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:bg-gray-700:hover{--tw-bg-opacity:1;background-color:rgb(55 65 81 / var(--tw-bg-opacity, 1))}.hover\:text-gray-700:hover{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-blue-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(59 130 246 / var(--tw-ring-opacity, 1))}@media (min-width: 768px){.md\:w-auto{width:auto}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-5{grid-template-columns:repeat(5, minmax(0, 1fr))}}@media (min-width: 1024px){.lg\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}}&lt;/style&gt;&lt;/head&gt;
+&lt;body data-new-gr-c-s-check-loaded="14.1105.0" data-gr-ext-installed=""&gt;
+    &lt;div class="container mx-auto px-4 py-6"&gt;
+        &lt;header class="mb-6"&gt;
+            &lt;h1 class="text-2xl font-bold text-gray-800"&gt;合买数据分析报表&lt;/h1&gt;
+            &lt;p class="text-gray-600"&gt;全面分析合买活动数据，优化业务决策&lt;/p&gt;
+        &lt;/header&gt;
+
+        &lt;!-- 筛选条件 --&gt;
+        &lt;div class="filter-section p-4 mb-6"&gt;
+            &lt;div class="flex flex-wrap items-center gap-4"&gt;
+                &lt;div class="w-full md:w-auto"&gt;
+                    &lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;时间维度&lt;/label&gt;
+                    &lt;select id="timeGranularity" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"&gt;
+                        &lt;option value="day"&gt;按天&lt;/option&gt;
+                        &lt;option value="week"&gt;按周&lt;/option&gt;
+                        &lt;option value="month"&gt;按月&lt;/option&gt;
+                    &lt;/select&gt;
+                &lt;/div&gt;
+                &lt;div class="w-full md:w-auto"&gt;
+                    &lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;日期范围&lt;/label&gt;
+                    &lt;div class="flex items-center gap-2"&gt;
+                        &lt;input type="date" id="startDate" class="rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"&gt;
+                        &lt;span&gt;至&lt;/span&gt;
+                        &lt;input type="date" id="endDate" class="rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class="w-full md:w-auto"&gt;
+                    &lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;合买序号&lt;/label&gt;
+                    &lt;input type="text" id="planId" placeholder="输入序号或留空" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"&gt;
+                &lt;/div&gt;
+                &lt;div class="w-full md:w-auto"&gt;
+                    &lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;发起人ID&lt;/label&gt;
+                    &lt;input type="text" id="initiatorId" placeholder="输入ID或留空" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"&gt;
+                &lt;/div&gt;
+                &lt;div class="w-full md:w-auto"&gt;
+                    &lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;参与人ID&lt;/label&gt;
+                    &lt;input type="text" id="participantId" placeholder="输入ID或留空" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"&gt;
+                &lt;/div&gt;
+                &lt;div class="w-full md:w-auto"&gt;
+                    &lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;合买状态&lt;/label&gt;
+                    &lt;select id="status" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"&gt;
+                        &lt;option value="all"&gt;全部&lt;/option&gt;
+                        &lt;option value="success"&gt;成功&lt;/option&gt;
+                        &lt;option value="fail"&gt;失败&lt;/option&gt;
+                        &lt;option value="in_progress"&gt;进行中&lt;/option&gt;
+                    &lt;/select&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            
+            &lt;!-- 新增的筛选条件 --&gt;
+            &lt;div class="mt-4 border-t pt-4"&gt;
+                &lt;h3 class="text-sm font-medium text-gray-700 mb-3"&gt;高级筛选&lt;/h3&gt;
+                &lt;div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"&gt;
+                    &lt;!-- 发起合买次数 --&gt;
+                    &lt;div&gt;
+                        &lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;发起合买次数&lt;/label&gt;
+                        &lt;div class="px-2"&gt;
+                            &lt;input type="range" id="initiatedCountRange" class="range-slider" min="0" max="50" value="0"&gt;
+                            &lt;div class="range-values"&gt;
+                                &lt;span&gt;0&lt;/span&gt;
+                                &lt;span id="initiatedCountValue"&gt;0+&lt;/span&gt;
+                                &lt;span&gt;50+&lt;/span&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;!-- 参与合买次数 --&gt;
+                    &lt;div&gt;
+                        &lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;参与合买次数&lt;/label&gt;
+                        &lt;div class="px-2"&gt;
+                            &lt;input type="range" id="participatedCountRange" class="range-slider" min="0" max="100" value="0"&gt;
+                            &lt;div class="range-values"&gt;
+                                &lt;span&gt;0&lt;/span&gt;
+                                &lt;span id="participatedCountValue"&gt;0+&lt;/span&gt;
+                                &lt;span&gt;100+&lt;/span&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;!-- 带单成功率 --&gt;
+                    &lt;div&gt;
+                        &lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;带单成功率&lt;/label&gt;
+                        &lt;div class="px-2"&gt;
+                            &lt;input type="range" id="successRateRange" class="range-slider" min="0" max="100" value="0"&gt;
+                            &lt;div class="range-values"&gt;
+                                &lt;span&gt;0%&lt;/span&gt;
+                                &lt;span id="successRateValue"&gt;0%+&lt;/span&gt;
+                                &lt;span&gt;100%&lt;/span&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;!-- 平均带单金额 --&gt;
+                    &lt;div&gt;
+                        &lt;label class="block text-sm font-medium text-gray-700 mb-1"&gt;平均带单金额&lt;/label&gt;
+                        &lt;div class="px-2"&gt;
+                            &lt;input type="range" id="avgAmountRange" class="range-slider" min="0" max="1000" value="0"&gt;
+                            &lt;div class="range-values"&gt;
+                                &lt;span&gt;¥0&lt;/span&gt;
+                                &lt;span id="avgAmountValue"&gt;¥0+&lt;/span&gt;
+                                &lt;span&gt;¥1000+&lt;/span&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            
+            &lt;div class="w-full mt-4"&gt;
+                &lt;button id="filterBtn" class="btn-primary px-4 py-2 rounded-md"&gt;应用筛选&lt;/button&gt;
+                &lt;button id="resetBtn" class="btn-secondary px-4 py-2 rounded-md ml-2"&gt;重置&lt;/button&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 核心指标卡片 --&gt;
+        &lt;div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"&gt;
+            &lt;div class="card p-4"&gt;
+                &lt;div class="stat-label"&gt;合买总发起次数&lt;/div&gt;
+                &lt;div class="stat-value text-blue-600" id="totalPlans"&gt;100&lt;/div&gt;
+                &lt;div class="text-xs text-gray-500 mt-1"&gt;较上期 &lt;span class="text-green-500"&gt;+5.2%&lt;/span&gt;&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="card p-4"&gt;
+                &lt;div class="stat-label"&gt;合买成功次数&lt;/div&gt;
+                &lt;div class="stat-value text-green-600" id="successPlans"&gt;42&lt;/div&gt;
+                &lt;div class="text-xs text-gray-500 mt-1"&gt;较上期 &lt;span class="text-green-500"&gt;+3.8%&lt;/span&gt;&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="card p-4"&gt;
+                &lt;div class="stat-label"&gt;合买总金额&lt;/div&gt;
+                &lt;div class="stat-value text-purple-600" id="totalAmount"&gt;¥57,997&lt;/div&gt;
+                &lt;div class="text-xs text-gray-500 mt-1"&gt;较上期 &lt;span class="text-green-500"&gt;+7.1%&lt;/span&gt;&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="card p-4"&gt;
+                &lt;div class="stat-label"&gt;合买中奖率&lt;/div&gt;
+                &lt;div class="stat-value text-amber-600" id="winRate"&gt;42.0%&lt;/div&gt;
+                &lt;div class="text-xs text-gray-500 mt-1"&gt;较上期 &lt;span class="text-red-500"&gt;-1.2%&lt;/span&gt;&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 合买整体数据卡片 --&gt;
+        &lt;div class="mb-6"&gt;
+            &lt;h2 class="text-lg font-semibold mb-3"&gt;合买整体数据&lt;/h2&gt;
+            &lt;div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"&gt;
+                &lt;div class="card p-4"&gt;
+                    &lt;div class="stat-label"&gt;合买参与总人次&lt;/div&gt;
+                    &lt;div class="stat-value text-indigo-600" id="totalParticipants"&gt;502&lt;/div&gt;
+                    &lt;div class="text-xs text-gray-500 mt-1"&gt;较上期 &lt;span class="text-green-500"&gt;+4.3%&lt;/span&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class="card p-4"&gt;
+                    &lt;div class="stat-label"&gt;合买平均发起金额&lt;/div&gt;
+                    &lt;div class="stat-value text-teal-600" id="avgInitAmount"&gt;¥580.0&lt;/div&gt;
+                    &lt;div class="text-xs text-gray-500 mt-1"&gt;较上期 &lt;span class="text-green-500"&gt;+2.1%&lt;/span&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class="card p-4"&gt;
+                    &lt;div class="stat-label"&gt;平均参与人数/单&lt;/div&gt;
+                    &lt;div class="stat-value text-cyan-600" id="avgParticipantsPerPlan"&gt;5.0&lt;/div&gt;
+                    &lt;div class="text-xs text-gray-500 mt-1"&gt;较上期 &lt;span class="text-red-500"&gt;-0.3%&lt;/span&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class="card p-4"&gt;
+                    &lt;div class="stat-label"&gt;人均合买参与次数&lt;/div&gt;
+                    &lt;div class="stat-value text-emerald-600" id="avgParticipationTimes"&gt;1.0&lt;/div&gt;
+                    &lt;div class="text-xs text-gray-500 mt-1"&gt;较上期 &lt;span class="text-green-500"&gt;+1.8%&lt;/span&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class="card p-4"&gt;
+                    &lt;div class="stat-label"&gt;人均合买投入金额&lt;/div&gt;
+                    &lt;div class="stat-value text-rose-600" id="avgInvestAmount"&gt;¥115.5&lt;/div&gt;
+                    &lt;div class="text-xs text-gray-500 mt-1"&gt;较上期 &lt;span class="text-green-500"&gt;+3.5%&lt;/span&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class="card p-4"&gt;
+                    &lt;div class="stat-label"&gt;合买中奖金额总计&lt;/div&gt;
+                    &lt;div class="stat-value text-amber-600" id="totalWinAmount"&gt;¥33,885&lt;/div&gt;
+                    &lt;div class="text-xs text-gray-500 mt-1"&gt;较上期 &lt;span class="text-green-500"&gt;+8.7%&lt;/span&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class="card p-4"&gt;
+                    &lt;div class="stat-label"&gt;平均中奖金额/单&lt;/div&gt;
+                    &lt;div class="stat-value text-orange-600" id="avgWinAmount"&gt;¥806.8&lt;/div&gt;
+                    &lt;div class="text-xs text-gray-500 mt-1"&gt;较上期 &lt;span class="text-green-500"&gt;+5.2%&lt;/span&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class="card p-4"&gt;
+                    &lt;div class="stat-label"&gt;合买活跃用户数&lt;/div&gt;
+                    &lt;div class="stat-value text-blue-600" id="activeUsers"&gt;495&lt;/div&gt;
+                    &lt;div class="text-xs text-gray-500 mt-1"&gt;较上期 &lt;span class="text-green-500"&gt;+2.9%&lt;/span&gt;&lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 图表区域 --&gt;
+        &lt;div class="card p-4 mb-6"&gt;
+            &lt;div class="flex justify-between items-center mb-4"&gt;
+                &lt;h2 class="text-lg font-semibold"&gt;趋势分析&lt;/h2&gt;
+                &lt;div class="flex"&gt;
+                    &lt;button class="chart-tab tab-active px-3 py-1 text-sm" data-chart="plans"&gt;发起次数&lt;/button&gt;
+                    &lt;button class="chart-tab px-3 py-1 text-sm" data-chart="amount"&gt;金额&lt;/button&gt;
+                    &lt;button class="chart-tab px-3 py-1 text-sm" data-chart="participants"&gt;参与人数&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="h-80"&gt;
+                &lt;canvas id="trendChart" width="1094" height="287" style="display: block; box-sizing: border-box; height: 320px; width: 1216px;"&gt;&lt;/canvas&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 用户行为指标排行榜 --&gt;
+        &lt;div class="card p-4 mb-6"&gt;
+            &lt;h2 class="text-lg font-semibold mb-4"&gt;用户行为指标 TOP5 排行榜&lt;/h2&gt;
+            
+            &lt;div class="border-b mb-4"&gt;
+                &lt;div class="flex"&gt;
+                    &lt;div class="leaderboard-tab active" data-tab="initiators"&gt;发起合买次数&lt;/div&gt;
+                    &lt;div class="leaderboard-tab" data-tab="participants"&gt;参与合买次数&lt;/div&gt;
+                    &lt;div class="leaderboard-tab" data-tab="success-rate"&gt;带单成功率&lt;/div&gt;
+                    &lt;div class="leaderboard-tab" data-tab="avg-amount"&gt;平均带单金额&lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            
+            &lt;!-- 发起合买次数排行榜 --&gt;
+            &lt;div id="initiators-leaderboard" class="leaderboard-content active"&gt;
+                &lt;div class="grid grid-cols-1 md:grid-cols-5 gap-4"&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-1"&gt;1&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10048&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;50 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;count&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;50次&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-amber-400" style="width: 100%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-2"&gt;2&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10011&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;49 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;count&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;49次&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-gray-400" style="width: 98%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-3"&gt;3&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10013&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;47 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;count&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;47次&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-amber-600" style="width: 94%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-other"&gt;4&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10038&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;47 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;count&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;47次&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-blue-400" style="width: 94%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-other"&gt;5&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10005&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;46 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;count&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;46次&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-blue-400" style="width: 92%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;/div&gt;
+            &lt;/div&gt;
+            
+            &lt;!-- 参与合买次数排行榜 --&gt;
+            &lt;div id="participants-leaderboard" class="leaderboard-content"&gt;
+                &lt;div class="grid grid-cols-1 md:grid-cols-5 gap-4"&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-1"&gt;1&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10030&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;100 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;count&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;100次&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-amber-400" style="width: 100%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-2"&gt;2&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10023&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;98 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;count&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;98次&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-gray-400" style="width: 98%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-3"&gt;3&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10013&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;97 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;count&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;97次&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-amber-600" style="width: 97%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-other"&gt;4&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10003&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;93 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;count&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;93次&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-blue-400" style="width: 93%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-other"&gt;5&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10015&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;91 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;count&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;91次&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-blue-400" style="width: 91%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;/div&gt;
+            &lt;/div&gt;
+            
+            &lt;!-- 带单成功率排行榜 --&gt;
+            &lt;div id="success-rate-leaderboard" class="leaderboard-content"&gt;
+                &lt;div class="grid grid-cols-1 md:grid-cols-5 gap-4"&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-1"&gt;1&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10005&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;46 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;成功率&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;65.2%&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-amber-400" style="width: 100%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-2"&gt;2&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10013&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;47 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;成功率&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;57.4%&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-gray-400" style="width: 88%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-3"&gt;3&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10038&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;47 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;成功率&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;46.8%&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-amber-600" style="width: 72%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-other"&gt;4&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10048&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;50 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;成功率&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;46.0%&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-blue-400" style="width: 71%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-other"&gt;5&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10011&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;49 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;成功率&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;24.5%&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-blue-400" style="width: 38%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;/div&gt;
+            &lt;/div&gt;
+            
+            &lt;!-- 平均带单金额排行榜 --&gt;
+            &lt;div id="avg-amount-leaderboard" class="leaderboard-content"&gt;
+                &lt;div class="grid grid-cols-1 md:grid-cols-5 gap-4"&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-1"&gt;1&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10011&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;49 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;平均金额&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;758.4元&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-amber-400" style="width: 100%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-2"&gt;2&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10005&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;46 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;平均金额&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;638.0元&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-gray-400" style="width: 84%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-3"&gt;3&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10013&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;47 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;平均金额&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;449.9元&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-amber-600" style="width: 59%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-other"&gt;4&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10048&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;50 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;平均金额&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;405.3元&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-blue-400" style="width: 53%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;div class="card p-4"&gt;
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank rank-other"&gt;5&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 10038&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;47 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;平均金额&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;180.2元&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill bg-blue-400" style="width: 24%"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 数据表格 --&gt;
+        &lt;div class="card p-4 mb-6"&gt;
+            &lt;div class="flex justify-between items-center mb-4"&gt;
+                &lt;div class="flex items-center"&gt;
+                    &lt;span class="text-sm text-gray-600 mr-2"&gt;每页显示:&lt;/span&gt;
+                    &lt;select id="itemsPerPageSelect" class="rounded-md border border-gray-300 px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"&gt;
+                        &lt;option value="10"&gt;10条&lt;/option&gt;
+                        &lt;option value="30"&gt;30条&lt;/option&gt;
+                        &lt;option value="50"&gt;50条&lt;/option&gt;
+                        &lt;option value="100"&gt;100条&lt;/option&gt;
+                    &lt;/select&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="table-container"&gt;
+                &lt;table class="min-w-full"&gt;
+                    &lt;thead&gt;
+                        &lt;tr&gt;
+                            &lt;th data-sort="date"&gt;
+                                日期
+                                &lt;span class="sort-icon active"&gt;&lt;i class="fas fa-sort-down"&gt;&lt;/i&gt;&lt;/span&gt;
+                            &lt;/th&gt;
+                            &lt;th&gt;合买序号&lt;/th&gt;
+                            &lt;th&gt;发起人ID&lt;/th&gt;
+                            &lt;th data-sort="participants"&gt;
+                                参与人数
+                                &lt;span class="sort-icon"&gt;&lt;i class="fas fa-sort"&gt;&lt;/i&gt;&lt;/span&gt;
+                            &lt;/th&gt;
+                            &lt;th data-sort="amount"&gt;
+                                合买金额
+                                &lt;span class="sort-icon"&gt;&lt;i class="fas fa-sort"&gt;&lt;/i&gt;&lt;/span&gt;
+                            &lt;/th&gt;
+                            &lt;th&gt;状态&lt;/th&gt;
+                            &lt;th data-sort="winAmount"&gt;
+                                中奖金额
+                                &lt;span class="sort-icon"&gt;&lt;i class="fas fa-sort"&gt;&lt;/i&gt;&lt;/span&gt;
+                            &lt;/th&gt;
+                        &lt;/tr&gt;
+                    &lt;/thead&gt;
+                    &lt;tbody id="dataTable"&gt;&lt;tr&gt;
+                    &lt;td&gt;2025-06-02&lt;/td&gt;
+                    &lt;td&gt;341830&lt;/td&gt;
+                    &lt;td&gt;45756&lt;/td&gt;
+                    &lt;td&gt;7&lt;/td&gt;
+                    &lt;td&gt;¥553&lt;/td&gt;
+                    &lt;td class="text-red-600"&gt;失败&lt;/td&gt;
+                    &lt;td&gt;¥0&lt;/td&gt;
+                &lt;/tr&gt;&lt;tr&gt;
+                    &lt;td&gt;2025-06-01&lt;/td&gt;
+                    &lt;td&gt;308561&lt;/td&gt;
+                    &lt;td&gt;95207&lt;/td&gt;
+                    &lt;td&gt;3&lt;/td&gt;
+                    &lt;td&gt;¥599&lt;/td&gt;
+                    &lt;td class="text-green-600"&gt;成功&lt;/td&gt;
+                    &lt;td&gt;¥784&lt;/td&gt;
+                &lt;/tr&gt;&lt;tr&gt;
+                    &lt;td&gt;2025-06-01&lt;/td&gt;
+                    &lt;td&gt;748594&lt;/td&gt;
+                    &lt;td&gt;88723&lt;/td&gt;
+                    &lt;td&gt;8&lt;/td&gt;
+                    &lt;td&gt;¥469&lt;/td&gt;
+                    &lt;td class="text-red-600"&gt;失败&lt;/td&gt;
+                    &lt;td&gt;¥0&lt;/td&gt;
+                &lt;/tr&gt;&lt;tr&gt;
+                    &lt;td&gt;2025-06-01&lt;/td&gt;
+                    &lt;td&gt;969003&lt;/td&gt;
+                    &lt;td&gt;51314&lt;/td&gt;
+                    &lt;td&gt;9&lt;/td&gt;
+                    &lt;td&gt;¥594&lt;/td&gt;
+                    &lt;td class="text-red-600"&gt;失败&lt;/td&gt;
+                    &lt;td&gt;¥0&lt;/td&gt;
+                &lt;/tr&gt;&lt;tr&gt;
+                    &lt;td&gt;2025-05-31&lt;/td&gt;
+                    &lt;td&gt;609395&lt;/td&gt;
+                    &lt;td&gt;38638&lt;/td&gt;
+                    &lt;td&gt;9&lt;/td&gt;
+                    &lt;td&gt;¥190&lt;/td&gt;
+                    &lt;td class="text-red-600"&gt;失败&lt;/td&gt;
+                    &lt;td&gt;¥0&lt;/td&gt;
+                &lt;/tr&gt;&lt;tr&gt;
+                    &lt;td&gt;2025-05-31&lt;/td&gt;
+                    &lt;td&gt;871169&lt;/td&gt;
+                    &lt;td&gt;48605&lt;/td&gt;
+                    &lt;td&gt;2&lt;/td&gt;
+                    &lt;td&gt;¥612&lt;/td&gt;
+                    &lt;td class="text-red-600"&gt;失败&lt;/td&gt;
+                    &lt;td&gt;¥0&lt;/td&gt;
+                &lt;/tr&gt;&lt;tr&gt;
+                    &lt;td&gt;2025-05-31&lt;/td&gt;
+                    &lt;td&gt;948235&lt;/td&gt;
+                    &lt;td&gt;28664&lt;/td&gt;
+                    &lt;td&gt;3&lt;/td&gt;
+                    &lt;td&gt;¥954&lt;/td&gt;
+                    &lt;td class="text-red-600"&gt;失败&lt;/td&gt;
+                    &lt;td&gt;¥0&lt;/td&gt;
+                &lt;/tr&gt;&lt;tr&gt;
+                    &lt;td&gt;2025-05-31&lt;/td&gt;
+                    &lt;td&gt;195167&lt;/td&gt;
+                    &lt;td&gt;74797&lt;/td&gt;
+                    &lt;td&gt;6&lt;/td&gt;
+                    &lt;td&gt;¥1,085&lt;/td&gt;
+                    &lt;td class="text-amber-600"&gt;进行中&lt;/td&gt;
+                    &lt;td&gt;¥0&lt;/td&gt;
+                &lt;/tr&gt;&lt;tr&gt;
+                    &lt;td&gt;2025-05-31&lt;/td&gt;
+                    &lt;td&gt;381732&lt;/td&gt;
+                    &lt;td&gt;81067&lt;/td&gt;
+                    &lt;td&gt;2&lt;/td&gt;
+                    &lt;td&gt;¥371&lt;/td&gt;
+                    &lt;td class="text-amber-600"&gt;进行中&lt;/td&gt;
+                    &lt;td&gt;¥0&lt;/td&gt;
+                &lt;/tr&gt;&lt;tr&gt;
+                    &lt;td&gt;2025-05-31&lt;/td&gt;
+                    &lt;td&gt;916890&lt;/td&gt;
+                    &lt;td&gt;85819&lt;/td&gt;
+                    &lt;td&gt;9&lt;/td&gt;
+                    &lt;td&gt;¥971&lt;/td&gt;
+                    &lt;td class="text-green-600"&gt;成功&lt;/td&gt;
+                    &lt;td&gt;¥1,045&lt;/td&gt;
+                &lt;/tr&gt;&lt;/tbody&gt;
+                &lt;/table&gt;
+            &lt;/div&gt;
+            &lt;div class="flex justify-between items-center mt-4"&gt;
+                &lt;div class="text-sm text-gray-600"&gt;
+                    显示 &lt;span id="startRecord"&gt;1&lt;/span&gt; 到 &lt;span id="endRecord"&gt;10&lt;/span&gt; 条，共 &lt;span id="totalRecords"&gt;100&lt;/span&gt; 条记录
+                &lt;/div&gt;
+                &lt;div class="flex items-center" id="pagination"&gt;
+                    &lt;button class="pagination-btn btn-secondary" id="prevPage" disabled=""&gt;上一页&lt;/button&gt;
+                    &lt;div id="pageNumbers" class="flex"&gt;&lt;button class="pagination-btn active"&gt;1&lt;/button&gt;&lt;button class="pagination-btn btn-secondary"&gt;2&lt;/button&gt;&lt;button class="pagination-btn btn-secondary"&gt;3&lt;/button&gt;&lt;button class="pagination-btn btn-secondary"&gt;4&lt;/button&gt;&lt;button class="pagination-btn btn-secondary"&gt;5&lt;/button&gt;&lt;/div&gt;
+                    &lt;button class="pagination-btn btn-secondary" id="nextPage"&gt;下一页&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 开发者信息按钮 --&gt;
+        &lt;div class="fixed bottom-6 left-6"&gt;
+            &lt;button id="devInfoBtn" class="bg-gray-800 text-white rounded-full p-3 shadow-lg hover:bg-gray-700 transition-all"&gt;
+                &lt;i class="fas fa-code"&gt;&lt;/i&gt;
+            &lt;/button&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 代码模态框 --&gt;
+        &lt;div id="codeModal" class="code-modal"&gt;
+            &lt;div class="h-full flex flex-col"&gt;
+                &lt;div class="p-4 border-b flex justify-between items-center"&gt;
+                    &lt;h3 class="text-lg font-semibold"&gt;开发者信息 - 源代码&lt;/h3&gt;
+                    &lt;div class="flex items-center"&gt;
+                        &lt;button id="copyCodeBtn" class="btn-primary px-4 py-2 rounded-md mr-2"&gt;
+                            &lt;i class="fas fa-copy mr-1"&gt;&lt;/i&gt; 复制代码
+                        &lt;/button&gt;
+                        &lt;button id="closeModalBtn" class="text-gray-500 hover:text-gray-700"&gt;
+                            &lt;i class="fas fa-times text-xl"&gt;&lt;/i&gt;
+                        &lt;/button&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class="flex-1 overflow-auto p-4"&gt;
+                    &lt;pre id="codeContent" class="code-content p-4 text-sm"&gt;&lt;/pre&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;script&gt;
+        // 初始化日期选择器
+        const today = new Date();
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+        
+        document.getElementById('startDate').valueAsDate = thirtyDaysAgo;
+        document.getElementById('endDate').valueAsDate = today;
+
+        // 初始化滑块值显示
+        function initRangeSliders() {
+            const sliders = [
+                { id: 'initiatedCountRange', valueId: 'initiatedCountValue', suffix: '+' },
+                { id: 'participatedCountRange', valueId: 'participatedCountValue', suffix: '+' },
+                { id: 'successRateRange', valueId: 'successRateValue', suffix: '%+' },
+                { id: 'avgAmountRange', valueId: 'avgAmountValue', prefix: '¥', suffix: '+' }
+            ];
+            
+            sliders.forEach(slider =&gt; {
+                const rangeElement = document.getElementById(slider.id);
+                const valueElement = document.getElementById(slider.valueId);
+                
+                rangeElement.addEventListener('input', function() {
+                    const prefix = slider.prefix || '';
+                    const suffix = slider.suffix || '';
+                    valueElement.textContent = `${prefix}${this.value}${suffix}`;
+                });
+            });
+        }
+
+        // 模拟数据生成函数
+        function generateMockData(days = 30) {
+            const data = [];
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - days);
+            
+            for (let i = 0; i &lt; days; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                
+                const dateStr = currentDate.toISOString().split('T')[0];
+                const plansCount = Math.floor(Math.random() * 20) + 30;
+                const successPlans = Math.floor(plansCount * (0.7 + Math.random() * 0.2));
+                const failPlans = plansCount - successPlans;
+                const amount = Math.floor((Math.random() * 2000) + 1000);
+                const participants = Math.floor((Math.random() * 100) + 50);
+                const winAmount = Math.floor(amount * (0.3 + Math.random() * 0.4));
+                
+                data.push({
+                    date: dateStr,
+                    plansCount,
+                    successPlans,
+                    failPlans,
+                    amount,
+                    participants,
+                    winAmount
+                });
+            }
+            
+            return data;
+        }
+
+        // 生成详细数据表格的数据
+        function generateTableData(count = 100) {
+            const data = [];
+            const statuses = ['success', 'fail', 'in_progress'];
+            const statusLabels = {
+                'success': '成功',
+                'fail': '失败',
+                'in_progress': '进行中'
+            };
+            
+            for (let i = 0; i &lt; count; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - Math.floor(Math.random() * 30));
+                const dateStr = date.toISOString().split('T')[0];
+                
+                const planId = Math.floor(Math.random() * 900000) + 100000;
+                const initiatorId = Math.floor(Math.random() * 90000) + 10000;
+                const participants = Math.floor(Math.random() * 10) + 1;
+                const amount = Math.floor((Math.random() * 1000) + 100);
+                const status = statuses[Math.floor(Math.random() * statuses.length)];
+                const winAmount = status === 'success' ? Math.floor(amount * (1 + Math.random())) : 0;
+                
+                // 为每个发起人添加额外的统计数据
+                const initiatedCount = Math.floor(Math.random() * 50) + 1;
+                const participatedCount = Math.floor(Math.random() * 100) + 1;
+                const successCount = Math.floor(Math.random() * initiatedCount) + 1;
+                const successRate = (successCount / initiatedCount * 100).toFixed(1);
+                const totalAmount = Math.floor((Math.random() * 50000) + 5000);
+                const avgAmount = (totalAmount / initiatedCount).toFixed(1);
+                
+                data.push({
+                    date: dateStr,
+                    planId,
+                    initiatorId,
+                    participants,
+                    amount,
+                    status,
+                    statusLabel: statusLabels[status],
+                    winAmount,
+                    // 新增字段
+                    initiatedCount,
+                    participatedCount,
+                    successRate,
+                    avgAmount
+                });
+            }
+            
+            return data;
+        }
+
+        // 生成用户行为数据
+        function generateUserBehaviorData() {
+            // 生成用户ID池
+            const userIds = [];
+            for (let i = 0; i &lt; 50; i++) {
+                userIds.push(10000 + i);
+            }
+            
+            // 发起合买次数数据
+            const initiatorData = userIds.map(userId =&gt; {
+                return {
+                    userId,
+                    count: Math.floor(Math.random() * 50) + 1,
+                    totalAmount: Math.floor((Math.random() * 50000) + 5000),
+                    successCount: Math.floor(Math.random() * 30) + 1
+                };
+            }).sort((a, b) =&gt; b.count - a.count).slice(0, 5);
+            
+            // 参与合买次数数据
+            const participantData = userIds.map(userId =&gt; {
+                return {
+                    userId,
+                    count: Math.floor(Math.random() * 100) + 1
+                };
+            }).sort((a, b) =&gt; b.count - a.count).slice(0, 5);
+            
+            // 计算带单成功率
+            const successRateData = initiatorData.map(item =&gt; {
+                return {
+                    userId: item.userId,
+                    successRate: (item.successCount / item.count * 100).toFixed(1),
+                    count: item.count
+                };
+            }).sort((a, b) =&gt; parseFloat(b.successRate) - parseFloat(a.successRate)).slice(0, 5);
+            
+            // 计算平均带单金额
+            const avgAmountData = initiatorData.map(item =&gt; {
+                return {
+                    userId: item.userId,
+                    avgAmount: (item.totalAmount / item.count).toFixed(1),
+                    count: item.count
+                };
+            }).sort((a, b) =&gt; parseFloat(b.avgAmount) - parseFloat(a.avgAmount)).slice(0, 5);
+            
+            return {
+                initiatorData,
+                participantData,
+                successRateData,
+                avgAmountData
+            };
+        }
+
+        // 图表初始化
+        let trendChart;
+        const chartData = generateMockData();
+        const tableData = generateTableData();
+        const userBehaviorData = generateUserBehaviorData();
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let filteredTableData = [...tableData];
+        let currentChartType = 'plans';
+        let currentSortField = 'date';
+        let currentSortDirection = 'desc'; // 默认降序排序
+
+        function initChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            const labels = chartData.map(item =&gt; item.date);
+            const plansData = chartData.map(item =&gt; item.plansCount);
+            
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '合买发起次数',
+                        data: plansData,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(type) {
+            currentChartType = type;
+            let label, data, color;
+            
+            switch(type) {
+                case 'plans':
+                    label = '合买发起次数';
+                    data = chartData.map(item =&gt; item.plansCount);
+                    color = '#3b82f6'; // 蓝色
+                    break;
+                case 'amount':
+                    label = '合买金额';
+                    data = chartData.map(item =&gt; item.amount);
+                    color = '#8b5cf6'; // 紫色
+                    break;
+                case 'participants':
+                    label = '参与人数';
+                    data = chartData.map(item =&gt; item.participants);
+                    color = '#10b981'; // 绿色
+                    break;
+            }
+            
+            trendChart.data.datasets[0].label = label;
+            trendChart.data.datasets[0].data = data;
+            trendChart.data.datasets[0].borderColor = color;
+            trendChart.data.datasets[0].backgroundColor = `${color}1A`; // 10% 透明度
+            trendChart.update();
+            
+            // 更新标签样式
+            document.querySelectorAll('.chart-tab').forEach(tab =&gt; {
+                tab.classList.remove('tab-active');
+            });
+            document.querySelector(`.chart-tab[data-chart="${type}"]`).classList.add('tab-active');
+        }
+
+        // 排序数据
+        function sortData(field, direction) {
+            filteredTableData.sort((a, b) =&gt; {
+                if (direction === 'asc') {
+                    return a[field] &gt; b[field] ? 1 : -1;
+                } else {
+                    return a[field] &lt; b[field] ? 1 : -1;
+                }
+            });
+        }
+
+        // 更新排序图标
+        function updateSortIcons(field, direction) {
+            // 重置所有排序图标
+            document.querySelectorAll('.sort-icon').forEach(icon =&gt; {
+                icon.innerHTML = '&lt;i class="fas fa-sort"&gt;&lt;/i&gt;';
+                icon.classList.remove('active');
+            });
+            
+            // 设置当前排序图标
+            const currentIcon = document.querySelector(`th[data-sort="${field}"] .sort-icon`);
+            if (currentIcon) {
+                currentIcon.innerHTML = direction === 'asc' 
+                    ? '&lt;i class="fas fa-sort-up"&gt;&lt;/i&gt;' 
+                    : '&lt;i class="fas fa-sort-down"&gt;&lt;/i&gt;';
+                currentIcon.classList.add('active');
+            }
+        }
+
+        // 表格数据渲染
+        function renderTable() {
+            const tableBody = document.getElementById('dataTable');
+            tableBody.innerHTML = '';
+            
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredTableData.length);
+            
+            for (let i = startIndex; i &lt; endIndex; i++) {
+                const item = filteredTableData[i];
+                const row = document.createElement('tr');
+                
+                let statusClass = '';
+                if (item.status === 'success') statusClass = 'text-green-600';
+                else if (item.status === 'fail') statusClass = 'text-red-600';
+                else statusClass = 'text-amber-600';
+                
+                row.innerHTML = `
+                    &lt;td&gt;${item.date}&lt;/td&gt;
+                    &lt;td&gt;${item.planId}&lt;/td&gt;
+                    &lt;td&gt;${item.initiatorId}&lt;/td&gt;
+                    &lt;td&gt;${item.participants}&lt;/td&gt;
+                    &lt;td&gt;¥${item.amount.toLocaleString()}&lt;/td&gt;
+                    &lt;td class="${statusClass}"&gt;${item.statusLabel}&lt;/td&gt;
+                    &lt;td&gt;¥${item.winAmount.toLocaleString()}&lt;/td&gt;
+                `;
+                
+                tableBody.appendChild(row);
+            }
+            
+            // 更新分页信息
+            document.getElementById('startRecord').textContent = filteredTableData.length &gt; 0 ? startIndex + 1 : 0;
+            document.getElementById('endRecord').textContent = endIndex;
+            document.getElementById('totalRecords').textContent = filteredTableData.length;
+            
+            renderPagination();
+        }
+
+        // 渲染分页
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredTableData.length / itemsPerPage);
+            const pageNumbers = document.getElementById('pageNumbers');
+            pageNumbers.innerHTML = '';
+            
+            // 显示最多5个页码
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            
+            if (endPage - startPage &lt; 4) {
+                startPage = Math.max(1, endPage - 4);
+            }
+            
+            for (let i = startPage; i &lt;= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `pagination-btn ${i === currentPage ? 'active' : 'btn-secondary'}`;
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () =&gt; {
+                    currentPage = i;
+                    renderTable();
+                });
+                pageNumbers.appendChild(pageBtn);
+            }
+            
+            // 禁用/启用上一页/下一页按钮
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+        }
+
+        // 渲染用户行为排行榜
+        function renderLeaderboards() {
+            // 渲染发起合买次数排行榜
+            renderLeaderboard('initiators', userBehaviorData.initiatorData, 'count', '次');
+            
+            // 渲染参与合买次数排行榜
+            renderLeaderboard('participants', userBehaviorData.participantData, 'count', '次');
+            
+            // 渲染带单成功率排行榜
+            renderLeaderboard('success-rate', userBehaviorData.successRateData, 'successRate', '%', '成功率');
+            
+            // 渲染平均带单金额排行榜
+            renderLeaderboard('avg-amount', userBehaviorData.avgAmountData, 'avgAmount', '元', '平均金额');
+        }
+
+        // 渲染单个排行榜
+        function renderLeaderboard(id, data, valueField, unit, labelOverride) {
+            const container = document.getElementById(`${id}-leaderboard`).querySelector('.grid');
+            container.innerHTML = '';
+            
+            // 找出最大值用于进度条
+            const maxValue = Math.max(...data.map(item =&gt; parseFloat(item[valueField])));
+            
+            data.forEach((item, index) =&gt; {
+                const card = document.createElement('div');
+                card.className = 'card p-4';
+                
+                // 确定排名样式
+                let rankClass = 'rank-other';
+                if (index === 0) rankClass = 'rank-1';
+                else if (index === 1) rankClass = 'rank-2';
+                else if (index === 2) rankClass = 'rank-3';
+                
+                // 确定进度条颜色
+                let progressColor = '';
+                if (index === 0) progressColor = 'bg-amber-400';
+                else if (index === 1) progressColor = 'bg-gray-400';
+                else if (index === 2) progressColor = 'bg-amber-600';
+                else progressColor = 'bg-blue-400';
+                
+                // 计算进度条宽度
+                const progressWidth = (parseFloat(item[valueField]) / maxValue * 100).toFixed(0) + '%';
+                
+                // 确定显示的标签
+                const label = labelOverride || valueField;
+                
+                card.innerHTML = `
+                    &lt;div class="flex items-center mb-3"&gt;
+                        &lt;div class="leaderboard-rank ${rankClass}"&gt;${index + 1}&lt;/div&gt;
+                        &lt;div&gt;
+                            &lt;div class="font-semibold"&gt;用户 ${item.userId}&lt;/div&gt;
+                            &lt;div class="text-sm text-gray-500"&gt;${item.count || '-'} 次合买&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class="mb-2"&gt;
+                        &lt;div class="flex justify-between mb-1"&gt;
+                            &lt;span class="text-sm font-medium"&gt;${label}&lt;/span&gt;
+                            &lt;span class="text-sm font-semibold"&gt;${item[valueField]}${unit}&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class="progress-bar"&gt;
+                            &lt;div class="progress-fill ${progressColor}" style="width: ${progressWidth}"&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // 筛选功能
+        function applyFilters() {
+            const timeGranularity = document.getElementById('timeGranularity').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const planId = document.getElementById('planId').value.trim();
+            const initiatorId = document.getElementById('initiatorId').value.trim();
+            const participantId = document.getElementById('participantId').value.trim();
+            const status = document.getElementById('status').value;
+            
+            // 获取新增的高级筛选条件值
+            const initiatedCount = parseInt(document.getElementById('initiatedCountRange').value);
+            const participatedCount = parseInt(document.getElementById('participatedCountRange').value);
+            const successRate = parseInt(document.getElementById('successRateRange').value);
+            const avgAmount = parseInt(document.getElementById('avgAmountRange').value);
+            
+            filteredTableData = tableData.filter(item =&gt; {
+                // 日期筛选
+                if (startDate &amp;&amp; item.date &lt; startDate) return false;
+                if (endDate &amp;&amp; item.date &gt; endDate) return false;
+                
+                // 方案ID筛选
+                if (planId &amp;&amp; item.planId.toString() !== planId) return false;
+                
+                // 发起人ID筛选
+                if (initiatorId &amp;&amp; item.initiatorId.toString() !== initiatorId) return false;
+                
+                // 参与人ID筛选 (模拟，实际应该检查参与人列表)
+                if (participantId) {
+                    // 这里简化处理，实际应该检查参与人列表
+                    const hasParticipant = Math.random() &gt; 0.5;
+                    if (!hasParticipant) return false;
+                }
+                
+                // 状态筛选
+                if (status !== 'all' &amp;&amp; item.status !== status) return false;
+                
+                // 新增的高级筛选条件
+                if (initiatedCount &gt; 0 &amp;&amp; item.initiatedCount &lt; initiatedCount) return false;
+                if (participatedCount &gt; 0 &amp;&amp; item.participatedCount &lt; participatedCount) return false;
+                if (successRate &gt; 0 &amp;&amp; parseFloat(item.successRate) &lt; successRate) return false;
+                if (avgAmount &gt; 0 &amp;&amp; parseFloat(item.avgAmount) &lt; avgAmount) return false;
+                
+                return true;
+            });
+            
+            // 应用当前排序
+            sortData(currentSortField, currentSortDirection);
+            
+            currentPage = 1;
+            renderTable();
+            
+            // 更新统计数据
+            updateStats();
+        }
+
+        // 更新统计数据
+        function updateStats() {
+            // 这里根据筛选结果更新统计数据
+            const totalPlans = filteredTableData.length;
+            const successPlans = filteredTableData.filter(item =&gt; item.status === 'success').length;
+            const totalAmount = filteredTableData.reduce((sum, item) =&gt; sum + item.amount, 0);
+            const winRate = totalPlans &gt; 0 ? (successPlans / totalPlans * 100) : 0;
+            
+            document.getElementById('totalPlans').textContent = totalPlans.toLocaleString();
+            document.getElementById('successPlans').textContent = successPlans.toLocaleString();
+            document.getElementById('totalAmount').textContent = `¥${totalAmount.toLocaleString()}`;
+            document.getElementById('winRate').textContent = `${winRate.toFixed(1)}%`;
+            
+            // 更新其他统计数据
+            const totalParticipants = filteredTableData.reduce((sum, item) =&gt; sum + item.participants, 0);
+            const avgInitAmount = totalPlans &gt; 0 ? (totalAmount / totalPlans) : 0;
+            const avgParticipantsPerPlan = totalPlans &gt; 0 ? (totalParticipants / totalPlans) : 0;
+            const totalWinAmount = filteredTableData.reduce((sum, item) =&gt; sum + item.winAmount, 0);
+            const avgWinAmount = successPlans &gt; 0 ? (totalWinAmount / successPlans) : 0;
+            const uniqueUsers = new Set();
+            filteredTableData.forEach(item =&gt; {
+                uniqueUsers.add(item.initiatorId);
+                // 假设每个参与者都有一个唯一ID，这里简化处理
+                for (let i = 0; i &lt; item.participants; i++) {
+                    uniqueUsers.add(`participant-${Math.floor(Math.random() * 1000)}`);
+                }
+            });
+            const activeUsers = uniqueUsers.size;
+            const avgParticipationTimes = activeUsers &gt; 0 ? (totalParticipants / activeUsers) : 0;
+            const avgInvestAmount = totalParticipants &gt; 0 ? (totalAmount / totalParticipants) : 0;
+            
+            document.getElementById('totalParticipants').textContent = totalParticipants.toLocaleString();
+            document.getElementById('avgInitAmount').textContent = `¥${avgInitAmount.toFixed(1)}`;
+            document.getElementById('avgParticipantsPerPlan').textContent = avgParticipantsPerPlan.toFixed(1);
+            document.getElementById('avgParticipationTimes').textContent = avgParticipationTimes.toFixed(1);
+            document.getElementById('avgInvestAmount').textContent = `¥${avgInvestAmount.toFixed(1)}`;
+            document.getElementById('totalWinAmount').textContent = `¥${totalWinAmount.toLocaleString()}`;
+            document.getElementById('avgWinAmount').textContent = `¥${avgWinAmount.toFixed(1)}`;
+            document.getElementById('activeUsers').textContent = activeUsers.toLocaleString();
+        }
+
+        // 开发者信息模态框
+        const devInfoBtn = document.getElementById('devInfoBtn');
+        const codeModal = document.getElementById('codeModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const copyCodeBtn = document.getElementById('copyCodeBtn');
+        const codeContent = document.getElementById('codeContent');
+
+        devInfoBtn.addEventListener('click', () =&gt; {
+            // 获取当前页面的完整HTML代码
+            const htmlCode = document.documentElement.outerHTML
+                .replace(/&amp;/g, '&amp;amp;')
+                .replace(/&lt;/g, '&amp;lt;')
+                .replace(/&gt;/g, '&amp;gt;');
+            
+            codeContent.innerHTML = htmlCode;
+            codeModal.classList.add('show');
+        });
+
+        closeModalBtn.addEventListener('click', () =&gt; {
+            codeModal.classList.remove('show');
+        });
+
+        copyCodeBtn.addEventListener('click', () =&gt; {
+            // 获取原始HTML代码（未转义的版本）
+            const code = document.documentElement.outerHTML;
+            
+            navigator.clipboard.writeText(code).then(() =&gt; {
+                const originalText = copyCodeBtn.innerHTML;
+                copyCodeBtn.innerHTML = '&lt;i class="fas fa-check mr-1"&gt;&lt;/i&gt; 已复制';
+                setTimeout(() =&gt; {
+                    copyCodeBtn.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+
+        // 排行榜标签切换
+        document.querySelectorAll('.leaderboard-tab').forEach(tab =&gt; {
+            tab.addEventListener('click', () =&gt; {
+                // 移除所有标签的活动状态
+                document.querySelectorAll('.leaderboard-tab').forEach(t =&gt; {
+                    t.classList.remove('active');
+                });
+                
+                // 隐藏所有排行榜内容
+                document.querySelectorAll('.leaderboard-content').forEach(content =&gt; {
+                    content.classList.remove('active');
+                });
+                
+                // 激活当前标签和内容
+                tab.classList.add('active');
+                const tabId = tab.dataset.tab;
+                document.getElementById(`${tabId}-leaderboard`).classList.add('active');
+            });
+        });
+
+        // 重置筛选条件
+        function resetFilters() {
+            // 重置基本筛选条件
+            document.getElementById('timeGranularity').value = 'day';
+            document.getElementById('planId').value = '';
+            document.getElementById('initiatorId').value = '';
+            document.getElementById('participantId').value = '';
+            document.getElementById('status').value = 'all';
+            
+            // 重置日期为最近30天
+            document.getElementById('startDate').valueAsDate = thirtyDaysAgo;
+            document.getElementById('endDate').valueAsDate = today;
+            
+            // 重置高级筛选条件
+            document.getElementById('initiatedCountRange').value = 0;
+            document.getElementById('participatedCountRange').value = 0;
+            document.getElementById('successRateRange').value = 0;
+            document.getElementById('avgAmountRange').value = 0;
+            
+            // 更新滑块值显示
+            document.getElementById('initiatedCountValue').textContent = '0+';
+            document.getElementById('participatedCountValue').textContent = '0+';
+            document.getElementById('successRateValue').textContent = '0%+';
+            document.getElementById('avgAmountValue').textContent = '¥0+';
+            
+            filteredTableData = [...tableData];
+            
+            // 应用默认排序（日期降序）
+            currentSortField = 'date';
+            currentSortDirection = 'desc';
+            sortData(currentSortField, currentSortDirection);
+            updateSortIcons(currentSortField, currentSortDirection);
+            
+            currentPage = 1;
+            renderTable();
+            updateStats();
+        }
+
+        // 事件监听
+        document.getElementById('filterBtn').addEventListener('click', applyFilters);
+        document.getElementById('resetBtn').addEventListener('click', resetFilters);
+
+        document.getElementById('prevPage').addEventListener('click', () =&gt; {
+            if (currentPage &gt; 1) {
+                currentPage--;
+                renderTable();
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () =&gt; {
+            const totalPages = Math.ceil(filteredTableData.length / itemsPerPage);
+            if (currentPage &lt; totalPages) {
+                currentPage++;
+                renderTable();
+            }
+        });
+
+        document.querySelectorAll('.chart-tab').forEach(tab =&gt; {
+            tab.addEventListener('click', () =&gt; {
+                updateChart(tab.dataset.chart);
+            });
+        });
+
+        // 排序功能
+        document.querySelectorAll('th[data-sort]').forEach(th =&gt; {
+            th.addEventListener('click', () =&gt; {
+                const field = th.dataset.sort;
+                
+                // 如果点击的是当前排序字段，则切换排序方向
+                if (field === currentSortField) {
+                    currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSortField = field;
+                    currentSortDirection = 'desc'; // 默认降序
+                }
+                
+                sortData(currentSortField, currentSortDirection);
+                updateSortIcons(currentSortField, currentSortDirection);
+                renderTable();
+            });
+        });
+
+        // 每页显示条数选择
+        document.getElementById('itemsPerPageSelect').addEventListener('change', function() {
+            itemsPerPage = parseInt(this.value);
+            currentPage = 1;
+            renderTable();
+        });
+
+        // 初始化
+        window.addEventListener('DOMContentLoaded', () =&gt; {
+            initChart();
+            initRangeSliders();
+            filteredTableData = [...tableData];
+            
+            // 默认按日期降序排序
+            sortData('date', 'desc');
+            updateSortIcons('date', 'desc');
+            
+            renderTable();
+            renderLeaderboards();
+            updateStats();
+        });
+    &lt;/script&gt;
+&lt;script&gt;(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9495c37e64446a84',t:'MTc0ODg1NDg2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&amp;&amp;(document.onreadystatechange=e,c())}}}})();&lt;/script&gt;&lt;iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"&gt;&lt;/iframe&gt;
+
+&lt;/body&gt;&lt;grammarly-desktop-integration data-grammarly-shadow-root="true"&gt;&lt;/grammarly-desktop-integration&gt;&lt;/html&gt;</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化日期选择器
+        const today = new Date();
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+        
+        document.getElementById('startDate').valueAsDate = thirtyDaysAgo;
+        document.getElementById('endDate').valueAsDate = today;
+
+        // 初始化滑块值显示
+        function initRangeSliders() {
+            const sliders = [
+                { id: 'initiatedCountRange', valueId: 'initiatedCountValue', suffix: '+' },
+                { id: 'participatedCountRange', valueId: 'participatedCountValue', suffix: '+' },
+                { id: 'successRateRange', valueId: 'successRateValue', suffix: '%+' },
+                { id: 'avgAmountRange', valueId: 'avgAmountValue', prefix: '¥', suffix: '+' }
+            ];
+            
+            sliders.forEach(slider => {
+                const rangeElement = document.getElementById(slider.id);
+                const valueElement = document.getElementById(slider.valueId);
+                
+                rangeElement.addEventListener('input', function() {
+                    const prefix = slider.prefix || '';
+                    const suffix = slider.suffix || '';
+                    valueElement.textContent = `${prefix}${this.value}${suffix}`;
+                });
+            });
+        }
+
+        // 模拟数据生成函数
+        function generateMockData(days = 30) {
+            const data = [];
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - days);
+            
+            for (let i = 0; i < days; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                
+                const dateStr = currentDate.toISOString().split('T')[0];
+                const plansCount = Math.floor(Math.random() * 20) + 30;
+                const successPlans = Math.floor(plansCount * (0.7 + Math.random() * 0.2));
+                const failPlans = plansCount - successPlans;
+                const amount = Math.floor((Math.random() * 2000) + 1000);
+                const participants = Math.floor((Math.random() * 100) + 50);
+                const winAmount = Math.floor(amount * (0.3 + Math.random() * 0.4));
+                
+                data.push({
+                    date: dateStr,
+                    plansCount,
+                    successPlans,
+                    failPlans,
+                    amount,
+                    participants,
+                    winAmount
+                });
+            }
+            
+            return data;
+        }
+
+        // 生成详细数据表格的数据
+        function generateTableData(count = 100) {
+            const data = [];
+            const statuses = ['success', 'fail', 'in_progress'];
+            const statusLabels = {
+                'success': '成功',
+                'fail': '失败',
+                'in_progress': '进行中'
+            };
+            
+            for (let i = 0; i < count; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - Math.floor(Math.random() * 30));
+                const dateStr = date.toISOString().split('T')[0];
+                
+                const planId = Math.floor(Math.random() * 900000) + 100000;
+                const initiatorId = Math.floor(Math.random() * 90000) + 10000;
+                const participants = Math.floor(Math.random() * 10) + 1;
+                const amount = Math.floor((Math.random() * 1000) + 100);
+                const status = statuses[Math.floor(Math.random() * statuses.length)];
+                const winAmount = status === 'success' ? Math.floor(amount * (1 + Math.random())) : 0;
+                
+                // 为每个发起人添加额外的统计数据
+                const initiatedCount = Math.floor(Math.random() * 50) + 1;
+                const participatedCount = Math.floor(Math.random() * 100) + 1;
+                const successCount = Math.floor(Math.random() * initiatedCount) + 1;
+                const successRate = (successCount / initiatedCount * 100).toFixed(1);
+                const totalAmount = Math.floor((Math.random() * 50000) + 5000);
+                const avgAmount = (totalAmount / initiatedCount).toFixed(1);
+                
+                data.push({
+                    date: dateStr,
+                    planId,
+                    initiatorId,
+                    participants,
+                    amount,
+                    status,
+                    statusLabel: statusLabels[status],
+                    winAmount,
+                    // 新增字段
+                    initiatedCount,
+                    participatedCount,
+                    successRate,
+                    avgAmount
+                });
+            }
+            
+            return data;
+        }
+
+        // 生成用户行为数据
+        function generateUserBehaviorData() {
+            // 生成用户ID池
+            const userIds = [];
+            for (let i = 0; i < 50; i++) {
+                userIds.push(10000 + i);
+            }
+            
+            // 发起合买次数数据
+            const initiatorData = userIds.map(userId => {
+                return {
+                    userId,
+                    count: Math.floor(Math.random() * 50) + 1,
+                    totalAmount: Math.floor((Math.random() * 50000) + 5000),
+                    successCount: Math.floor(Math.random() * 30) + 1
+                };
+            }).sort((a, b) => b.count - a.count).slice(0, 5);
+            
+            // 参与合买次数数据
+            const participantData = userIds.map(userId => {
+                return {
+                    userId,
+                    count: Math.floor(Math.random() * 100) + 1
+                };
+            }).sort((a, b) => b.count - a.count).slice(0, 5);
+            
+            // 计算带单成功率
+            const successRateData = initiatorData.map(item => {
+                return {
+                    userId: item.userId,
+                    successRate: (item.successCount / item.count * 100).toFixed(1),
+                    count: item.count
+                };
+            }).sort((a, b) => parseFloat(b.successRate) - parseFloat(a.successRate)).slice(0, 5);
+            
+            // 计算平均带单金额
+            const avgAmountData = initiatorData.map(item => {
+                return {
+                    userId: item.userId,
+                    avgAmount: (item.totalAmount / item.count).toFixed(1),
+                    count: item.count
+                };
+            }).sort((a, b) => parseFloat(b.avgAmount) - parseFloat(a.avgAmount)).slice(0, 5);
+            
+            return {
+                initiatorData,
+                participantData,
+                successRateData,
+                avgAmountData
+            };
+        }
+
+        // 图表初始化
+        let trendChart;
+        const chartData = generateMockData();
+        const tableData = generateTableData();
+        const userBehaviorData = generateUserBehaviorData();
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let filteredTableData = [...tableData];
+        let currentChartType = 'plans';
+        let currentSortField = 'date';
+        let currentSortDirection = 'desc'; // 默认降序排序
+
+        function initChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            const labels = chartData.map(item => item.date);
+            const plansData = chartData.map(item => item.plansCount);
+            
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '合买发起次数',
+                        data: plansData,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(type) {
+            currentChartType = type;
+            let label, data, color;
+            
+            switch(type) {
+                case 'plans':
+                    label = '合买发起次数';
+                    data = chartData.map(item => item.plansCount);
+                    color = '#3b82f6'; // 蓝色
+                    break;
+                case 'amount':
+                    label = '合买金额';
+                    data = chartData.map(item => item.amount);
+                    color = '#8b5cf6'; // 紫色
+                    break;
+                case 'participants':
+                    label = '参与人数';
+                    data = chartData.map(item => item.participants);
+                    color = '#10b981'; // 绿色
+                    break;
+            }
+            
+            trendChart.data.datasets[0].label = label;
+            trendChart.data.datasets[0].data = data;
+            trendChart.data.datasets[0].borderColor = color;
+            trendChart.data.datasets[0].backgroundColor = `${color}1A`; // 10% 透明度
+            trendChart.update();
+            
+            // 更新标签样式
+            document.querySelectorAll('.chart-tab').forEach(tab => {
+                tab.classList.remove('tab-active');
+            });
+            document.querySelector(`.chart-tab[data-chart="${type}"]`).classList.add('tab-active');
+        }
+
+        // 排序数据
+        function sortData(field, direction) {
+            filteredTableData.sort((a, b) => {
+                if (direction === 'asc') {
+                    return a[field] > b[field] ? 1 : -1;
+                } else {
+                    return a[field] < b[field] ? 1 : -1;
+                }
+            });
+        }
+
+        // 更新排序图标
+        function updateSortIcons(field, direction) {
+            // 重置所有排序图标
+            document.querySelectorAll('.sort-icon').forEach(icon => {
+                icon.innerHTML = '<i class="fas fa-sort"></i>';
+                icon.classList.remove('active');
+            });
+            
+            // 设置当前排序图标
+            const currentIcon = document.querySelector(`th[data-sort="${field}"] .sort-icon`);
+            if (currentIcon) {
+                currentIcon.innerHTML = direction === 'asc' 
+                    ? '<i class="fas fa-sort-up"></i>' 
+                    : '<i class="fas fa-sort-down"></i>';
+                currentIcon.classList.add('active');
+            }
+        }
+
+        // 表格数据渲染
+        function renderTable() {
+            const tableBody = document.getElementById('dataTable');
+            tableBody.innerHTML = '';
+            
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredTableData.length);
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                const item = filteredTableData[i];
+                const row = document.createElement('tr');
+                
+                let statusClass = '';
+                if (item.status === 'success') statusClass = 'text-green-600';
+                else if (item.status === 'fail') statusClass = 'text-red-600';
+                else statusClass = 'text-amber-600';
+                
+                row.innerHTML = `
+                    <td>${item.date}</td>
+                    <td>${item.planId}</td>
+                    <td>${item.initiatorId}</td>
+                    <td>${item.participants}</td>
+                    <td>¥${item.amount.toLocaleString()}</td>
+                    <td class="${statusClass}">${item.statusLabel}</td>
+                    <td>¥${item.winAmount.toLocaleString()}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            }
+            
+            // 更新分页信息
+            document.getElementById('startRecord').textContent = filteredTableData.length > 0 ? startIndex + 1 : 0;
+            document.getElementById('endRecord').textContent = endIndex;
+            document.getElementById('totalRecords').textContent = filteredTableData.length;
+            
+            renderPagination();
+        }
+
+        // 渲染分页
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredTableData.length / itemsPerPage);
+            const pageNumbers = document.getElementById('pageNumbers');
+            pageNumbers.innerHTML = '';
+            
+            // 显示最多5个页码
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            
+            if (endPage - startPage < 4) {
+                startPage = Math.max(1, endPage - 4);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `pagination-btn ${i === currentPage ? 'active' : 'btn-secondary'}`;
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => {
+                    currentPage = i;
+                    renderTable();
+                });
+                pageNumbers.appendChild(pageBtn);
+            }
+            
+            // 禁用/启用上一页/下一页按钮
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+        }
+
+        // 渲染用户行为排行榜
+        function renderLeaderboards() {
+            // 渲染发起合买次数排行榜
+            renderLeaderboard('initiators', userBehaviorData.initiatorData, 'count', '次');
+            
+            // 渲染参与合买次数排行榜
+            renderLeaderboard('participants', userBehaviorData.participantData, 'count', '次');
+            
+            // 渲染带单成功率排行榜
+            renderLeaderboard('success-rate', userBehaviorData.successRateData, 'successRate', '%', '成功率');
+            
+            // 渲染平均带单金额排行榜
+            renderLeaderboard('avg-amount', userBehaviorData.avgAmountData, 'avgAmount', '元', '平均金额');
+        }
+
+        // 渲染单个排行榜
+        function renderLeaderboard(id, data, valueField, unit, labelOverride) {
+            const container = document.getElementById(`${id}-leaderboard`).querySelector('.grid');
+            container.innerHTML = '';
+            
+            // 找出最大值用于进度条
+            const maxValue = Math.max(...data.map(item => parseFloat(item[valueField])));
+            
+            data.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'card p-4';
+                
+                // 确定排名样式
+                let rankClass = 'rank-other';
+                if (index === 0) rankClass = 'rank-1';
+                else if (index === 1) rankClass = 'rank-2';
+                else if (index === 2) rankClass = 'rank-3';
+                
+                // 确定进度条颜色
+                let progressColor = '';
+                if (index === 0) progressColor = 'bg-amber-400';
+                else if (index === 1) progressColor = 'bg-gray-400';
+                else if (index === 2) progressColor = 'bg-amber-600';
+                else progressColor = 'bg-blue-400';
+                
+                // 计算进度条宽度
+                const progressWidth = (parseFloat(item[valueField]) / maxValue * 100).toFixed(0) + '%';
+                
+                // 确定显示的标签
+                const label = labelOverride || valueField;
+                
+                card.innerHTML = `
+                    <div class="flex items-center mb-3">
+                        <div class="leaderboard-rank ${rankClass}">${index + 1}</div>
+                        <div>
+                            <div class="font-semibold">用户 ${item.userId}</div>
+                            <div class="text-sm text-gray-500">${item.count || '-'} 次合买</div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">${label}</span>
+                            <span class="text-sm font-semibold">${item[valueField]}${unit}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${progressColor}" style="width: ${progressWidth}"></div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // 筛选功能
+        function applyFilters() {
+            const timeGranularity = document.getElementById('timeGranularity').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const planId = document.getElementById('planId').value.trim();
+            const initiatorId = document.getElementById('initiatorId').value.trim();
+            const participantId = document.getElementById('participantId').value.trim();
+            const status = document.getElementById('status').value;
+            
+            // 获取新增的高级筛选条件值
+            const initiatedCount = parseInt(document.getElementById('initiatedCountRange').value);
+            const participatedCount = parseInt(document.getElementById('participatedCountRange').value);
+            const successRate = parseInt(document.getElementById('successRateRange').value);
+            const avgAmount = parseInt(document.getElementById('avgAmountRange').value);
+            
+            filteredTableData = tableData.filter(item => {
+                // 日期筛选
+                if (startDate && item.date < startDate) return false;
+                if (endDate && item.date > endDate) return false;
+                
+                // 方案ID筛选
+                if (planId && item.planId.toString() !== planId) return false;
+                
+                // 发起人ID筛选
+                if (initiatorId && item.initiatorId.toString() !== initiatorId) return false;
+                
+                // 参与人ID筛选 (模拟，实际应该检查参与人列表)
+                if (participantId) {
+                    // 这里简化处理，实际应该检查参与人列表
+                    const hasParticipant = Math.random() > 0.5;
+                    if (!hasParticipant) return false;
+                }
+                
+                // 状态筛选
+                if (status !== 'all' && item.status !== status) return false;
+                
+                // 新增的高级筛选条件
+                if (initiatedCount > 0 && item.initiatedCount < initiatedCount) return false;
+                if (participatedCount > 0 && item.participatedCount < participatedCount) return false;
+                if (successRate > 0 && parseFloat(item.successRate) < successRate) return false;
+                if (avgAmount > 0 && parseFloat(item.avgAmount) < avgAmount) return false;
+                
+                return true;
+            });
+            
+            // 应用当前排序
+            sortData(currentSortField, currentSortDirection);
+            
+            currentPage = 1;
+            renderTable();
+            
+            // 更新统计数据
+            updateStats();
+        }
+
+        // 更新统计数据
+        function updateStats() {
+            // 这里根据筛选结果更新统计数据
+            const totalPlans = filteredTableData.length;
+            const successPlans = filteredTableData.filter(item => item.status === 'success').length;
+            const totalAmount = filteredTableData.reduce((sum, item) => sum + item.amount, 0);
+            const winRate = totalPlans > 0 ? (successPlans / totalPlans * 100) : 0;
+            
+            document.getElementById('totalPlans').textContent = totalPlans.toLocaleString();
+            document.getElementById('successPlans').textContent = successPlans.toLocaleString();
+            document.getElementById('totalAmount').textContent = `¥${totalAmount.toLocaleString()}`;
+            document.getElementById('winRate').textContent = `${winRate.toFixed(1)}%`;
+            
+            // 更新其他统计数据
+            const totalParticipants = filteredTableData.reduce((sum, item) => sum + item.participants, 0);
+            const avgInitAmount = totalPlans > 0 ? (totalAmount / totalPlans) : 0;
+            const avgParticipantsPerPlan = totalPlans > 0 ? (totalParticipants / totalPlans) : 0;
+            const totalWinAmount = filteredTableData.reduce((sum, item) => sum + item.winAmount, 0);
+            const avgWinAmount = successPlans > 0 ? (totalWinAmount / successPlans) : 0;
+            const uniqueUsers = new Set();
+            filteredTableData.forEach(item => {
+                uniqueUsers.add(item.initiatorId);
+                // 假设每个参与者都有一个唯一ID，这里简化处理
+                for (let i = 0; i < item.participants; i++) {
+                    uniqueUsers.add(`participant-${Math.floor(Math.random() * 1000)}`);
+                }
+            });
+            const activeUsers = uniqueUsers.size;
+            const avgParticipationTimes = activeUsers > 0 ? (totalParticipants / activeUsers) : 0;
+            const avgInvestAmount = totalParticipants > 0 ? (totalAmount / totalParticipants) : 0;
+            
+            document.getElementById('totalParticipants').textContent = totalParticipants.toLocaleString();
+            document.getElementById('avgInitAmount').textContent = `¥${avgInitAmount.toFixed(1)}`;
+            document.getElementById('avgParticipantsPerPlan').textContent = avgParticipantsPerPlan.toFixed(1);
+            document.getElementById('avgParticipationTimes').textContent = avgParticipationTimes.toFixed(1);
+            document.getElementById('avgInvestAmount').textContent = `¥${avgInvestAmount.toFixed(1)}`;
+            document.getElementById('totalWinAmount').textContent = `¥${totalWinAmount.toLocaleString()}`;
+            document.getElementById('avgWinAmount').textContent = `¥${avgWinAmount.toFixed(1)}`;
+            document.getElementById('activeUsers').textContent = activeUsers.toLocaleString();
+        }
+
+        // 开发者信息模态框
+        const devInfoBtn = document.getElementById('devInfoBtn');
+        const codeModal = document.getElementById('codeModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const copyCodeBtn = document.getElementById('copyCodeBtn');
+        const codeContent = document.getElementById('codeContent');
+
+        devInfoBtn.addEventListener('click', () => {
+            // 获取当前页面的完整HTML代码
+            const htmlCode = document.documentElement.outerHTML
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            
+            codeContent.innerHTML = htmlCode;
+            codeModal.classList.add('show');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            codeModal.classList.remove('show');
+        });
+
+        copyCodeBtn.addEventListener('click', () => {
+            // 获取原始HTML代码（未转义的版本）
+            const code = document.documentElement.outerHTML;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = copyCodeBtn.innerHTML;
+                copyCodeBtn.innerHTML = '<i class="fas fa-check mr-1"></i> 已复制';
+                setTimeout(() => {
+                    copyCodeBtn.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+
+        // 排行榜标签切换
+        document.querySelectorAll('.leaderboard-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有标签的活动状态
+                document.querySelectorAll('.leaderboard-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // 隐藏所有排行榜内容
+                document.querySelectorAll('.leaderboard-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // 激活当前标签和内容
+                tab.classList.add('active');
+                const tabId = tab.dataset.tab;
+                document.getElementById(`${tabId}-leaderboard`).classList.add('active');
+            });
+        });
+
+        // 重置筛选条件
+        function resetFilters() {
+            // 重置基本筛选条件
+            document.getElementById('timeGranularity').value = 'day';
+            document.getElementById('planId').value = '';
+            document.getElementById('initiatorId').value = '';
+            document.getElementById('participantId').value = '';
+            document.getElementById('status').value = 'all';
+            
+            // 重置日期为最近30天
+            document.getElementById('startDate').valueAsDate = thirtyDaysAgo;
+            document.getElementById('endDate').valueAsDate = today;
+            
+            // 重置高级筛选条件
+            document.getElementById('initiatedCountRange').value = 0;
+            document.getElementById('participatedCountRange').value = 0;
+            document.getElementById('successRateRange').value = 0;
+            document.getElementById('avgAmountRange').value = 0;
+            
+            // 更新滑块值显示
+            document.getElementById('initiatedCountValue').textContent = '0+';
+            document.getElementById('participatedCountValue').textContent = '0+';
+            document.getElementById('successRateValue').textContent = '0%+';
+            document.getElementById('avgAmountValue').textContent = '¥0+';
+            
+            filteredTableData = [...tableData];
+            
+            // 应用默认排序（日期降序）
+            currentSortField = 'date';
+            currentSortDirection = 'desc';
+            sortData(currentSortField, currentSortDirection);
+            updateSortIcons(currentSortField, currentSortDirection);
+            
+            currentPage = 1;
+            renderTable();
+            updateStats();
+        }
+
+        // 事件监听
+        document.getElementById('filterBtn').addEventListener('click', applyFilters);
+        document.getElementById('resetBtn').addEventListener('click', resetFilters);
+
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredTableData.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+            }
+        });
+
+        document.querySelectorAll('.chart-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                updateChart(tab.dataset.chart);
+            });
+        });
+
+        // 排序功能
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const field = th.dataset.sort;
+                
+                // 如果点击的是当前排序字段，则切换排序方向
+                if (field === currentSortField) {
+                    currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSortField = field;
+                    currentSortDirection = 'desc'; // 默认降序
+                }
+                
+                sortData(currentSortField, currentSortDirection);
+                updateSortIcons(currentSortField, currentSortDirection);
+                renderTable();
+            });
+        });
+
+        // 每页显示条数选择
+        document.getElementById('itemsPerPageSelect').addEventListener('change', function() {
+            itemsPerPage = parseInt(this.value);
+            currentPage = 1;
+            renderTable();
+        });
+
+        // 初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            initRangeSliders();
+            filteredTableData = [...tableData];
+            
+            // 默认按日期降序排序
+            sortData('date', 'desc');
+            updateSortIcons('date', 'desc');
+            
+            renderTable();
+            renderLeaderboards();
+            updateStats();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9495c37e64446a84',t:'MTc0ODg1NDg2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+</body><grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration></html>
