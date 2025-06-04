@@ -1,0 +1,2257 @@
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合买数据分析报表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.7/dayjs.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f0f4f8;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            max-width: 1900px;
+            margin: 0 auto;
+        }
+        body.dark {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+        
+        /* 表單元素的深色模式樣式 */
+        input, select, button, label, .text-gray-600, .text-gray-700, .text-gray-500, .text-xs {
+            transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        body.dark input, 
+        body.dark select, 
+        body.dark label, 
+        body.dark .text-gray-600, 
+        body.dark .text-gray-700,
+        body.dark .text-gray-500 {
+            color: #e2e8f0;
+        }
+        
+        body.dark input, 
+        body.dark select {
+            background-color: #2d3748;
+            border-color: #4a5568;
+        }
+        
+        body.dark input::placeholder {
+            color: #a0aec0;
+        }
+        
+        /* Chart.js 相關的深色模式樣式 */
+        body.dark .chartjs-render-monitor {
+            color: #e2e8f0 !important;
+        }
+        
+        /* 分頁和數據詳情區域的深色模式樣式 */
+        body.dark #pagination,
+        body.dark #pageNumbers,
+        body.dark #itemsPerPageSelect,
+        body.dark .pagination-btn {
+            color: #e2e8f0;
+        }
+        
+        .filter-section {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        body.dark .filter-section {
+            background-color: #2d3748;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body.dark .card {
+            background-color: #2d3748;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        body.dark .card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            transition: color 0.3s ease;
+        }
+        body.dark .stat-label {
+            color: #a0aec0;
+        }
+        .tab-active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+        body.dark .tab-active {
+            color: #60a5fa;
+        }
+        .code-modal {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            z-index: 50;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            height: 70%;
+            max-width: 1900px;
+            margin: 0 auto;
+            transition: transform 0.3s ease-out;
+            transform: translateY(100%);
+        }
+        .code-modal.show {
+            display: block;
+            transform: translateY(0);
+        }
+        .code-content {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            border-radius: 0.375rem;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        body.dark .btn-primary {
+            background-color: #4f46e5;
+        }
+        body.dark .btn-primary:hover {
+            background-color: #4338ca;
+        }
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #475569;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+        }
+        body.dark .btn-secondary {
+            background-color: #4a5568;
+            color: #e2e8f0;
+        }
+        body.dark .btn-secondary:hover {
+            background-color: #64748b;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* 固定表格布局 */
+        }
+        th {
+            background-color: #f8fafc;
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        /* 不同欄位寬度設置 */
+        th:nth-child(1) { width: 9%; }  /* 日期 */
+        th:nth-child(2) { width: 8%; }  /* 商戶ID */
+        th:nth-child(3) { width: 9%; }  /* 合買序號 */
+        th:nth-child(4) { width: 9%; }  /* 發起人ID */
+        th:nth-child(5) { width: 8%; }  /* 參與人數 */
+        th:nth-child(6) { width: 11%; } /* 合買總金額 */
+        th:nth-child(7) { width: 8%; }  /* 合買狀態 */
+        th:nth-child(8) { width: 11%; } /* 中獎金額 */
+        
+        body.dark th {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            border-bottom: 1px solid #4a5568;
+        }
+        th:hover {
+            background-color: #f1f5f9;
+        }
+        body.dark th:hover {
+            background-color: #2d3748;
+        }
+        td {
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: border-color 0.3s ease;
+        }
+        body.dark td {
+            border-bottom: 1px solid #4a5568;
+        }
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        body.dark tr:hover {
+            background-color: #2d3748;
+        }
+        .pagination-btn {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            margin: 0 0.25rem;
+        }
+        .pagination-btn.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .sort-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        .sort-icon.active {
+            color: #3b82f6;
+        }
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+        .leaderboard-rank {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+        .rank-1 {
+            background-color: #fcd34d;
+            color: #92400e;
+        }
+        .rank-2 {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+        .rank-3 {
+            background-color: #d97706;
+            color: #fef3c7;
+        }
+        .rank-other {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+        .leaderboard-tab {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+        }
+        .leaderboard-tab.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+            position: relative;
+            z-index: 10;
+        }
+        
+        body.dark .leaderboard-tab.active {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+        .leaderboard-content {
+            display: none;
+        }
+        .leaderboard-content.active {
+            display: block;
+        }
+        .progress-bar {
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+            outline: none;
+            transition: background-color 0.3s ease;
+        }
+        
+        body.dark .range-slider {
+            background: #4a5568;
+        }
+        
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        body.dark .range-slider::-webkit-slider-thumb {
+            background: #60a5fa;
+        }
+        
+        .range-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        body.dark .range-slider::-moz-range-thumb {
+            background: #60a5fa;
+        }
+        
+        .range-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        
+        /* 新增的折疊/展開功能和精簡視圖樣式 */
+        .collapsible {
+            cursor: pointer;
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .collapsible-content.expanded {
+            max-height: 1000px;
+        }
+        .compact-card {
+            padding: 0.5rem 0.75rem;
+        }
+        .compact-value {
+            font-size: 1.1rem;
+        }
+        .compact-grid {
+            gap: 0.5rem !important;
+        }
+        .compact-table td, .compact-table th {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        .compact-section {
+            margin-bottom: 0.75rem;
+        }
+        
+        /* 主題切換相關樣式 */
+        #themeToggle .theme-light {
+            display: block;
+            z-index: 10;
+        }
+        #themeToggle .theme-dark {
+            display: none;
+            z-index: 10;
+        }
+        body.dark #themeToggle .theme-light {
+            display: none;
+        }
+        body.dark #themeToggle .theme-dark {
+            display: block;
+        }
+        #themeToggle {
+            cursor: pointer;
+            overflow: visible;
+        }
+        
+        #themeToggle .fa-moon {
+            color: #ffffff;
+        }
+        
+        /* 數據詳情區域文字顏色 */
+        .text-xs.text-gray-600 {
+            transition: color 0.3s ease;
+        }
+        
+        body.dark .text-xs.text-gray-600 {
+            color: #a0aec0;
+        }
+        
+        body.dark select option {
+            background-color: #2d3748;
+            color: #e2e8f0;
+        }
+        
+        /* 高級篩選分隔線 */
+        .border-custom {
+            border-top-color: #cbd5e1;
+            transition: border-color 0.3s ease;
+        }
+        
+        body.dark .border-custom {
+            border-top-color: #4a5568;
+        }
+        
+        /* 排行榜分隔線 */
+        .border-b {
+            border-bottom-color: #e2e8f0;
+            transition: border-color 0.3s ease;
+        }
+        
+        body.dark .border-b {
+            border-bottom-color: #4a5568;
+        }
+    </style>
+</head>
+<body data-new-gr-c-s-check-loaded="14.1105.0" data-gr-ext-installed="">
+    <div class="container mx-auto px-4 py-6">
+        <!-- 主題切換按鈕 -->
+        <div class="fixed top-6 right-6 z-50">
+            <button id="themeToggle" class="bg-gray-200 dark:bg-gray-700 rounded-full p-2 shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all flex items-center justify-center w-10 h-10 relative">
+                <i class="fas fa-sun text-xl text-yellow-500 theme-light absolute"></i>
+                <i class="fas fa-moon text-xl text-white theme-dark absolute"></i>
+            </button>
+        </div>
+
+        <!-- 筛选条件 -->
+        <div class="filter-section p-3 mb-4">
+            <div class="flex justify-between items-center mb-2 cursor-pointer collapsible" id="filterToggle">
+                <h3 class="text-sm font-medium text-gray-700">筛选条件</h3>
+                <i class="fas fa-chevron-down text-gray-500"></i>
+            </div>
+            <div class="collapsible-content" id="filterContent">
+                <div class="flex flex-wrap items-center gap-3">
+                <div class="w-full md:w-auto lg:w-1/8">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">时间维度</label>
+                        <select id="timeGranularity" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="day">按天</option>
+                        <option value="week">按周</option>
+                        <option value="month">按月</option>
+                    </select>
+                </div>
+                    <div class="w-full md:w-auto lg:w-1/4" id="dateRangeContainer">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">日期范围</label>
+                        <div class="flex items-center gap-1" id="daySelector">
+                            <input type="date" id="startDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <span>至</span>
+                            <input type="date" id="endDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="flex items-center gap-1 hidden" id="weekSelector">
+                            <input type="week" id="startWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <span>至</span>
+                            <input type="week" id="endWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="flex items-center gap-1 hidden" id="monthSelector">
+                            <input type="month" id="startMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <span>至</span>
+                            <input type="month" id="endMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="w-full md:w-auto lg:w-1/8">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">商户ID</label>
+                        <select id="merchantId" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="all">全部</option>
+                            <option value="13589">13589 - 星辰体育</option>
+                            <option value="24671">24671 - 极速赛车</option>
+                            <option value="37824">37824 - 财富彩票</option>
+                            <option value="45912">45912 - 金鹰彩店</option>
+                            <option value="58763">58763 - 幸运星彩</option>
+                        </select>
+                </div>
+                <div class="w-full md:w-auto lg:w-1/8">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">合买序号</label>
+                        <input type="text" id="planId" placeholder="输入序号或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="w-full md:w-auto lg:w-1/8">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">发起人ID</label>
+                        <input type="text" id="initiatorId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="w-full md:w-auto lg:w-1/8">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">参与人ID</label>
+                        <input type="text" id="participantId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="w-full md:w-auto lg:w-1/6">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">合买状态</label>
+                        <div class="flex items-center">
+                            <select id="status" class="rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="all">全部</option>
+                        <option value="success">成功</option>
+                        <option value="fail">失败</option>
+                        <option value="in_progress">进行中</option>
+                    </select>
+                            <button id="advFilterBtn" class="btn-secondary px-3 py-1 text-sm rounded-md ml-2">
+                                高级筛选 <i class="fas fa-caret-down ml-1"></i>
+                            </button>
+                            <button id="filterBtn" class="btn-primary px-3 py-1 text-sm rounded-md ml-2">搜索</button>
+                            <button id="resetBtn" class="btn-secondary px-3 py-1 text-sm rounded-md ml-2">重置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 高级筛选条件 -->
+            <div class="mt-3 border-t border-custom pt-3 hidden" id="advFilterContent">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3">
+                    <!-- 发起合买次数 -->
+                    <div class="lg:col-span-2">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">发起合买次数</label>
+                        <div class="px-2">
+                            <input type="range" id="initiatedCountRange" class="range-slider" min="0" max="50" value="0">
+                            <div class="range-values">
+                                <span>0</span>
+                                <span id="initiatedCountValue">0+</span>
+                                <span>50+</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 参与合买次数 -->
+                    <div class="lg:col-span-2">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">参与合买次数</label>
+                        <div class="px-2">
+                            <input type="range" id="participatedCountRange" class="range-slider" min="0" max="100" value="0">
+                            <div class="range-values">
+                                <span>0</span>
+                                <span id="participatedCountValue">0+</span>
+                                <span>100+</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 带单成功率 -->
+                    <div class="lg:col-span-2">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">带单成功率</label>
+                        <div class="px-2">
+                            <input type="range" id="successRateRange" class="range-slider" min="0" max="100" value="0">
+                            <div class="range-values">
+                                <span>0%</span>
+                                <span id="successRateValue">0%+</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 平均带单金额 -->
+                    <div class="lg:col-span-2">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">平均带单金额</label>
+                        <div class="px-2">
+                            <input type="range" id="avgAmountRange" class="range-slider" min="0" max="1000" value="0">
+                            <div class="range-values">
+                                <span>¥0</span>
+                                <span id="avgAmountValue">¥0+</span>
+                                <span>¥1000+</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心指标卡片 -->
+        <div class="mb-4">
+            <div class="flex justify-between items-center mb-2 cursor-pointer collapsible" id="coreMetricsToggle">
+                <h2 class="text-sm font-semibold">核心指标</h2>
+                <i class="fas fa-chevron-down text-gray-500"></i>
+            </div>
+            <div class="collapsible-content expanded" id="coreMetricsContent">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2">
+                    <div class="card p-3">
+                        <div class="stat-label text-xs">合买总发起次数</div>
+                        <div class="stat-value text-blue-600 text-lg font-semibold" id="totalPlans">100</div>
+                        <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+5.2%</span></div>
+                    </div>
+                    <div class="card p-3">
+                        <div class="stat-label text-xs">合买成功次数</div>
+                        <div class="stat-value text-green-600 text-lg font-semibold" id="successPlans">42</div>
+                        <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+3.8%</span></div>
+                    </div>
+                    <div class="card p-3">
+                        <div class="stat-label text-xs">合买总金额</div>
+                        <div class="stat-value text-purple-600 text-lg font-semibold" id="totalAmount">57,997</div>
+                        <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+7.1%</span></div>
+                    </div>
+                    <div class="card p-3">
+                        <div class="stat-label text-xs">合买中奖率</div>
+                        <div class="stat-value text-amber-600 text-lg font-semibold" id="winRate">42.0%</div>
+                        <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-red-500">-1.2%</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 合买整体数据卡片 -->
+        <div class="mb-4">
+            <div class="flex justify-between items-center mb-2 cursor-pointer collapsible" id="overallDataToggle">
+                <h2 class="text-sm font-semibold">合买整体数据</h2>
+                <i class="fas fa-chevron-down text-gray-500"></i>
+            </div>
+            <div class="collapsible-content expanded" id="overallDataContent">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2">
+                    <div class="card p-3">
+                        <div class="stat-label text-xs">合买参与总人次</div>
+                        <div class="stat-value text-indigo-600 text-lg font-semibold" id="totalParticipants">502</div>
+                        <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+4.3%</span></div>
+                    </div>
+                    <div class="card p-3">
+                        <div class="stat-label text-xs">合买平均发起金额</div>
+                        <div class="stat-value text-teal-600 text-lg font-semibold" id="avgInitAmount">580.0</div>
+                        <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+2.1%</span></div>
+                    </div>
+                    <div class="card p-3">
+                        <div class="stat-label text-xs">平均参与人数/单</div>
+                        <div class="stat-value text-cyan-600 text-lg font-semibold" id="avgParticipantsPerPlan">5.0</div>
+                        <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-red-500">-0.3%</span></div>
+                    </div>
+                    <div class="card p-3">
+                        <div class="stat-label text-xs">人均合买参与次数</div>
+                        <div class="stat-value text-emerald-600 text-lg font-semibold" id="avgParticipationTimes">1.0</div>
+                        <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+1.8%</span></div>
+                    </div>
+                    <div class="card p-3">
+                        <div class="stat-label text-xs">人均合买投入金额</div>
+                        <div class="stat-value text-rose-600 text-lg font-semibold" id="avgInvestAmount">115.5</div>
+                        <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+3.5%</span></div>
+                    </div>
+                    <div class="card p-3">
+                        <div class="stat-label text-xs">合买中奖金额总计</div>
+                        <div class="stat-value text-amber-600 text-lg font-semibold" id="totalWinAmount">33,885</div>
+                        <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+8.7%</span></div>
+                    </div>
+                    <div class="card p-3">
+                        <div class="stat-label text-xs">平均中奖金额/单</div>
+                        <div class="stat-value text-orange-600 text-lg font-semibold" id="avgWinAmount">806.8</div>
+                        <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+5.2%</span></div>
+                    </div>
+                    <div class="card p-3">
+                        <div class="stat-label text-xs">合买活跃用户数</div>
+                        <div class="stat-value text-blue-600 text-lg font-semibold" id="activeUsers">495</div>
+                        <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+2.9%</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="card p-3 mb-4">
+            <div class="flex justify-between items-center mb-2 cursor-pointer" id="chartToggle">
+                <h2 class="text-sm font-semibold">趋势分析</h2>
+                <div class="flex items-center">
+                    <button class="chart-tab tab-active px-2 py-1 text-xs" data-chart="plans">发起次数</button>
+                    <button class="chart-tab px-2 py-1 text-xs" data-chart="amount">金额</button>
+                    <button class="chart-tab px-2 py-1 text-xs" data-chart="participants">参与人数</button>
+                </div>
+            </div>
+            <div class="collapsible-content expanded" id="chartContent">
+                <div style="height: 350px; width: 100%;">
+                    <canvas id="trendChart" width="800" height="350"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户行为指标排行榜 -->
+        <div class="card p-3 mb-4 compact-section">
+            <div class="flex justify-between items-center mb-2 cursor-pointer collapsible" id="leaderboardToggle">
+                <h2 class="text-sm font-semibold">用户行为指标 TOP5 排行榜</h2>
+                <i class="fas fa-chevron-down text-gray-500"></i>
+            </div>
+            
+            <div class="collapsible-content expanded" id="leaderboardContent">
+                <div class="border-b mb-2">
+                <div class="flex">
+                    <div class="leaderboard-tab active" data-tab="initiators">发起合买次数</div>
+                    <div class="leaderboard-tab" data-tab="participants">参与合买次数</div>
+                    <div class="leaderboard-tab" data-tab="success-rate">带单成功率</div>
+                    <div class="leaderboard-tab" data-tab="avg-amount">平均带单金额</div>
+                </div>
+            </div>
+            
+            <!-- 发起合买次数排行榜 -->
+            <div id="initiators-leaderboard" class="leaderboard-content active">
+                    <div class="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-2 compact-grid">
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10048</div>
+                                    <div class="text-xs text-gray-500">50 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">count</span>
+                                    <span class="text-xs font-semibold">50次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-400" style="width: 100%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-2">2</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10011</div>
+                                    <div class="text-xs text-gray-500">49 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">count</span>
+                                    <span class="text-xs font-semibold">49次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-gray-400" style="width: 98%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-3">3</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10013</div>
+                                    <div class="text-xs text-gray-500">47 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">count</span>
+                                    <span class="text-xs font-semibold">47次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-600" style="width: 94%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-other">4</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10038</div>
+                                    <div class="text-xs text-gray-500">47 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">count</span>
+                                    <span class="text-xs font-semibold">47次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 94%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-other">5</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10005</div>
+                                    <div class="text-xs text-gray-500">46 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">count</span>
+                                    <span class="text-xs font-semibold">46次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 92%"></div>
+                        </div>
+                    </div>
+                        </div>
+                    </div>
+            </div>
+            
+            <!-- 参与合买次数排行榜 -->
+            <div id="participants-leaderboard" class="leaderboard-content">
+                    <div class="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-2 compact-grid">
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10030</div>
+                                    <div class="text-xs text-gray-500">100 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">count</span>
+                                    <span class="text-xs font-semibold">100次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-400" style="width: 100%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-2">2</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10023</div>
+                                    <div class="text-xs text-gray-500">98 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">count</span>
+                                    <span class="text-xs font-semibold">98次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-gray-400" style="width: 98%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-3">3</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10013</div>
+                                    <div class="text-xs text-gray-500">97 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">count</span>
+                                    <span class="text-xs font-semibold">97次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-600" style="width: 97%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-other">4</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10003</div>
+                                    <div class="text-xs text-gray-500">93 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">count</span>
+                                    <span class="text-xs font-semibold">93次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 93%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-other">5</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10015</div>
+                                    <div class="text-xs text-gray-500">91 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">count</span>
+                                    <span class="text-xs font-semibold">91次</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 91%"></div>
+                        </div>
+                    </div>
+                        </div>
+                    </div>
+            </div>
+            
+            <!-- 带单成功率排行榜 -->
+            <div id="success-rate-leaderboard" class="leaderboard-content">
+                    <div class="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-2 compact-grid">
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10005</div>
+                                    <div class="text-xs text-gray-500">46 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">成功率</span>
+                                    <span class="text-xs font-semibold">65.2%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-400" style="width: 100%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-2">2</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10013</div>
+                                    <div class="text-xs text-gray-500">47 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">成功率</span>
+                                    <span class="text-xs font-semibold">57.4%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-gray-400" style="width: 88%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-3">3</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10038</div>
+                                    <div class="text-xs text-gray-500">47 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">成功率</span>
+                                    <span class="text-xs font-semibold">46.8%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-600" style="width: 72%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-other">4</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10048</div>
+                                    <div class="text-xs text-gray-500">50 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">成功率</span>
+                                    <span class="text-xs font-semibold">46.0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 71%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-other">5</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10011</div>
+                                    <div class="text-xs text-gray-500">49 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">成功率</span>
+                                    <span class="text-xs font-semibold">24.5%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 38%"></div>
+                        </div>
+                    </div>
+                        </div>
+                    </div>
+            </div>
+            
+            <!-- 平均带单金额排行榜 -->
+            <div id="avg-amount-leaderboard" class="leaderboard-content">
+                    <div class="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-2 compact-grid">
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10011</div>
+                                    <div class="text-xs text-gray-500">49 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">平均金额</span>
+                                    <span class="text-xs font-semibold">758.4元</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-400" style="width: 100%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-2">2</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10005</div>
+                                    <div class="text-xs text-gray-500">46 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">平均金额</span>
+                                    <span class="text-xs font-semibold">638.0元</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-gray-400" style="width: 84%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-3">3</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10013</div>
+                                    <div class="text-xs text-gray-500">47 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">平均金额</span>
+                                    <span class="text-xs font-semibold">449.9元</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-amber-600" style="width: 59%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-other">4</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10048</div>
+                                    <div class="text-xs text-gray-500">50 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">平均金额</span>
+                                    <span class="text-xs font-semibold">405.3元</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 53%"></div>
+                        </div>
+                    </div>
+                        </div>
+                        <div class="card compact-card">
+                            <div class="flex items-center mb-2">
+                        <div class="leaderboard-rank rank-other">5</div>
+                        <div>
+                                    <div class="font-semibold text-sm">用户 10038</div>
+                                    <div class="text-xs text-gray-500">47 次合买</div>
+                        </div>
+                    </div>
+                            <div class="mb-1">
+                        <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium">平均金额</span>
+                                    <span class="text-xs font-semibold">180.2元</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-blue-400" style="width: 24%"></div>
+                        </div>
+                    </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="card p-3 mb-4">
+            <div class="flex justify-between items-center mb-2 cursor-pointer collapsible" id="tableToggle">
+                <h2 class="text-sm font-semibold">数据详情</h2>
+                <i class="fas fa-chevron-down text-gray-500"></i>
+            </div>
+            <div class="collapsible-content expanded" id="tableContent">
+                <div class="flex justify-between items-center mb-2">
+                <div class="flex items-center">
+                        <span class="text-xs text-gray-600 mr-2">每页显示:</span>
+                        <select id="itemsPerPageSelect" class="rounded-md border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="10">10条</option>
+                        <option value="30" selected>30条</option>
+                        <option value="50">50条</option>
+                        <option value="100">100条</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-container" style="max-height: 600px; overflow-y: auto;">
+                    <table class="min-w-full compact-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="date">
+                                日期
+                                <span class="sort-icon active"><i class="fas fa-sort-down"></i></span>
+                            </th>
+                                <th>商户ID</th>
+                            <th>合买序号</th>
+                            <th>发起人ID</th>
+                            <th data-sort="participants">
+                                参与人数
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th data-sort="amount">
+                                合买总金额
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                                <th>合买状态</th>
+                            <th data-sort="winAmount">
+                                中奖金额
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                        </tr>
+                    </thead>
+                        <tbody id="dataTable">
+                            <!-- 动态生成的数据将在这里显示 -->
+                        </tbody>
+                </table>
+            </div>
+                <div class="flex justify-between items-center mt-2">
+                    <div class="text-xs text-gray-600">
+                    显示 <span id="startRecord">1</span> 到 <span id="endRecord">10</span> 条，共 <span id="totalRecords">100</span> 条记录
+                </div>
+                <div class="flex items-center" id="pagination">
+                        <button class="pagination-btn btn-secondary text-xs py-1" id="prevPage" disabled>上一页</button>
+                        <div id="pageNumbers" class="flex">
+                            <button class="pagination-btn active text-xs py-1">1</button>
+                            <button class="pagination-btn btn-secondary text-xs py-1">2</button>
+                            <button class="pagination-btn btn-secondary text-xs py-1">3</button>
+                            <button class="pagination-btn btn-secondary text-xs py-1">4</button>
+                            <button class="pagination-btn btn-secondary text-xs py-1">5</button>
+                        </div>
+                        <button class="pagination-btn btn-secondary text-xs py-1" id="nextPage">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 开发者信息按钮 -->
+        <div class="fixed bottom-8 left-8">
+            <button id="devInfoBtn" class="bg-gray-800 text-white rounded-full p-3 shadow-lg hover:bg-gray-700 transition-all">
+                <i class="fas fa-code"></i>
+            </button>
+        </div>
+
+        <!-- 代码模态框 -->
+        <div id="codeModal" class="code-modal">
+            <div class="h-full flex flex-col">
+                <div class="p-3 border-b flex justify-between items-center">
+                    <h3 class="text-sm font-semibold">开发者信息 - 源代码</h3>
+                    <div class="flex items-center">
+                        <button id="copyCodeBtn" class="btn-primary px-3 py-1 text-sm rounded-md mr-2">
+                            <i class="fas fa-copy mr-1"></i> 复制代码
+                        </button>
+                        <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-auto p-3">
+                    <pre id="codeContent" class="code-content p-3 text-sm">&lt;html lang="zh-CN"&gt;...代码内容...&lt;/html&gt;</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加 JavaScript 代码 -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // 初始化主題
+                initTheme();
+                
+                // 初始化折疊面板
+                initCollapsibleSections();
+                
+                // 設置默認日期
+                setupDefaultDates();
+                
+                // 生成隨機數據
+                generateRandomData(200);
+                
+                // 初始化表格分頁和排序
+                initTablePagination();
+                initTableSorting();
+                
+                // 時間維度切換
+                document.getElementById('timeGranularity').addEventListener('change', function() {
+                    const granularity = this.value;
+                    updateDateSelector(granularity);
+                });
+                
+                // 設置默認日期和格式化日期顯示
+                function setupDefaultDates() {
+                    // 獲取當前日期
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    const day = String(now.getDate()).padStart(2, '0');
+                    
+                    // 格式化為 yyyy-MM-dd 
+                    const today = `${year}-${month}-${day}`;
+                    
+                    // 設置默認的天日期選擇器
+                    document.getElementById('startDate').value = today;
+                    document.getElementById('endDate').value = today;
+                    
+                    // 設置默認的週選擇器
+                    // 注意：週選擇器格式為 yyyy-Www，其中 ww 是週數
+                    const weekNumber = getWeekNumber(now);
+                    const weekString = `${year}-W${String(weekNumber).padStart(2, '0')}`;
+                    document.getElementById('startWeek').value = weekString;
+                    document.getElementById('endWeek').value = weekString;
+                    
+                    // 設置默認的月選擇器
+                    const monthString = `${year}-${month}`;
+                    document.getElementById('startMonth').value = monthString;
+                    document.getElementById('endMonth').value = monthString;
+                }
+                
+                // 根據日期獲取週數
+                function getWeekNumber(date) {
+                    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+                    const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+                    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+                }
+                
+                // 更新日期選擇器
+                function updateDateSelector(granularity) {
+                    const daySelector = document.getElementById('daySelector');
+                    const weekSelector = document.getElementById('weekSelector');
+                    const monthSelector = document.getElementById('monthSelector');
+                    
+                    // 隱藏所有選擇器
+                    daySelector.classList.add('hidden');
+                    weekSelector.classList.add('hidden');
+                    monthSelector.classList.add('hidden');
+                    
+                    // 根據選擇的時間維度顯示對應選擇器
+                    if (granularity === 'day') {
+                        daySelector.classList.remove('hidden');
+                    } else if (granularity === 'week') {
+                        weekSelector.classList.remove('hidden');
+                    } else if (granularity === 'month') {
+                        monthSelector.classList.remove('hidden');
+                    }
+                }
+                
+                // 高級篩選按鈕點擊事件
+                document.getElementById('advFilterBtn').addEventListener('click', function() {
+                    const advFilterContent = document.getElementById('advFilterContent');
+                    const icon = this.querySelector('i.fas');
+                    
+                    // 切換顯示/隱藏
+                    if (advFilterContent.classList.contains('hidden')) {
+                        advFilterContent.classList.remove('hidden');
+                        icon.classList.remove('fa-caret-down');
+                        icon.classList.add('fa-caret-up');
+                    } else {
+                        advFilterContent.classList.add('hidden');
+                        icon.classList.remove('fa-caret-up');
+                        icon.classList.add('fa-caret-down');
+                    }
+                });
+                
+                // 篩選按鈕點擊事件
+                document.getElementById('filterBtn').addEventListener('click', function() {
+                    // 獲取時間維度和日期範圍
+                    const timeGranularity = document.getElementById('timeGranularity').value;
+                    let startDate, endDate;
+                    
+                    // 根據時間維度獲取對應的日期值
+                    if (timeGranularity === 'day') {
+                        startDate = document.getElementById('startDate').value;
+                        endDate = document.getElementById('endDate').value;
+                    } else if (timeGranularity === 'week') {
+                        startDate = document.getElementById('startWeek').value;
+                        endDate = document.getElementById('endWeek').value;
+                    } else if (timeGranularity === 'month') {
+                        startDate = document.getElementById('startMonth').value;
+                        endDate = document.getElementById('endMonth').value;
+                    }
+                    
+                    // 獲取其他篩選條件
+                    const merchantId = document.getElementById('merchantId').value;
+                    const planId = document.getElementById('planId').value;
+                    const status = document.getElementById('status').value;
+                    const initiatorId = document.getElementById('initiatorId').value;
+                    const participantId = document.getElementById('participantId').value;
+                    
+                    console.log(`篩選時間範圍: ${timeGranularity} - ${startDate} 至 ${endDate}`);
+                    
+                    // 篩選表格數據
+                    filterTableData(merchantId, planId, status, initiatorId, participantId, timeGranularity, startDate, endDate);
+                });
+                
+                // 重置按鈕點擊事件
+                document.getElementById('resetBtn').addEventListener('click', function() {
+                    // 重置所有篩選條件
+                    document.getElementById('timeGranularity').value = 'day';
+                    document.getElementById('merchantId').value = 'all';
+                    document.getElementById('planId').value = '';
+                    document.getElementById('status').value = 'all';
+                    document.getElementById('initiatorId').value = '';
+                    document.getElementById('participantId').value = '';
+                    
+                    // 重置日期為默認值
+                    setupDefaultDates();
+                    
+                    // 顯示日期選擇器
+                    updateDateSelector('day');
+                    
+                    // 重置高級篩選
+                    document.querySelectorAll('.range-slider').forEach(function(slider) {
+                        slider.value = slider.min;
+                        const valueId = slider.id.replace('Range', 'Value');
+                        const valueEl = document.getElementById(valueId);
+                        
+                        if (valueEl) {
+                            if (slider.id === 'successRateRange') {
+                                valueEl.textContent = slider.min + '%+';
+                            } else if (slider.id === 'avgAmountRange') {
+                                valueEl.textContent = '¥' + slider.min + '+';
+                            } else {
+                                valueEl.textContent = slider.min + '+';
+                            }
+                        }
+                    });
+                    
+                    // 顯示所有表格數據
+                    const tableRows = document.querySelectorAll('#dataTable tr');
+                    tableRows.forEach(function(row) {
+                        row.style.display = '';
+                    });
+                    
+                    // 更新分頁信息
+                    updatePaginationInfo();
+                });
+                
+                // 篩選表格數據的函數
+                function filterTableData(merchantId, planId, status, initiatorId, participantId, timeGranularity, startDate, endDate) {
+                    const tableRows = document.querySelectorAll('#dataTable tr');
+                    
+                    tableRows.forEach(function(row) {
+                        let display = true;
+                        
+                        // 檢查日期範圍 (如果提供)
+                        if (startDate && endDate && display) {
+                            const dateCell = row.querySelector('td:nth-child(1)');
+                            if (dateCell) {
+                                const rowDate = dateCell.textContent.trim();
+                                
+                                // 根據時間維度檢查日期
+                                if (timeGranularity === 'day') {
+                                    // 直接比較日期字符串 (格式: YYYY-MM-DD)
+                                    if (rowDate < startDate || rowDate > endDate) {
+                                        display = false;
+                                    }
+                                } else if (timeGranularity === 'week') {
+                                    // 週格式處理較複雜，這裡簡化處理
+                                    // 實際應用中可能需要更精確的週期比較
+                                    const rowDateObj = new Date(rowDate);
+                                    const rowYear = rowDateObj.getFullYear();
+                                    const rowWeek = getWeekNumber(rowDateObj);
+                                    const rowWeekStr = `${rowYear}-W${String(rowWeek).padStart(2, '0')}`;
+                                    
+                                    if (rowWeekStr < startDate || rowWeekStr > endDate) {
+                                        display = false;
+                                    }
+                                } else if (timeGranularity === 'month') {
+                                    // 提取行中日期的年和月
+                                    const rowDateParts = rowDate.split('-');
+                                    const rowYearMonth = `${rowDateParts[0]}-${rowDateParts[1]}`;
+                                    
+                                    if (rowYearMonth < startDate || rowYearMonth > endDate) {
+                                        display = false;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // 檢查商戶ID
+                        if (merchantId !== 'all' && display) {
+                            const merchantIdCell = row.querySelector('td:nth-child(2)');
+                            if (merchantIdCell && merchantIdCell.textContent.trim() !== merchantId) {
+                                display = false;
+                            }
+                        }
+                        
+                        // 檢查合買序號
+                        if (planId && display) {
+                            const planIdCell = row.querySelector('td:nth-child(3)');
+                            if (planIdCell && !planIdCell.textContent.includes(planId)) {
+                                display = false;
+                            }
+                        }
+                        
+                        // 檢查發起人ID
+                        if (initiatorId && display) {
+                            const initiatorIdCell = row.querySelector('td:nth-child(4)');
+                            if (initiatorIdCell && !initiatorIdCell.textContent.includes(initiatorId)) {
+                                display = false;
+                            }
+                        }
+                        
+                        // 檢查狀態
+                        if (status !== 'all' && display) {
+                            const statusCell = row.querySelector('td:nth-child(7)');
+                            if (statusCell) {
+                                const cellStatus = statusCell.textContent.trim();
+                                if ((status === 'success' && cellStatus !== '成功') ||
+                                    (status === 'fail' && cellStatus !== '失败') ||
+                                    (status === 'in_progress' && cellStatus !== '进行中')) {
+                                    display = false;
+                                }
+                            }
+                        }
+                        
+                        // 設置顯示狀態
+                        row.style.display = display ? '' : 'none';
+                    });
+                    
+                    // 更新分頁信息
+                    updatePaginationInfo();
+                }
+                
+                // 更新分頁信息
+                function updatePaginationInfo() {
+                    const visibleRows = document.querySelectorAll('#dataTable tr[style=""]').length;
+                    const startRecord = document.getElementById('startRecord');
+                    const endRecord = document.getElementById('endRecord');
+                    const totalRecords = document.getElementById('totalRecords');
+                    
+                    if (startRecord && endRecord && totalRecords) {
+                        if (visibleRows === 0) {
+                            startRecord.textContent = '0';
+                            endRecord.textContent = '0';
+                        } else {
+                            startRecord.textContent = '1';
+                            endRecord.textContent = Math.min(visibleRows, 10);
+                        }
+                        totalRecords.textContent = visibleRows;
+                    }
+                }
+                
+                // 初始化趨勢圖
+                function initTrendChart() {
+                    const ctx = document.getElementById('trendChart').getContext('2d');
+                    
+                    // 檢查當前主題
+                    const isDarkMode = document.body.classList.contains('dark');
+                    
+                    // 創建圖表
+                    const myChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: [], // 初始為空，後續更新
+                            datasets: [{
+                                label: '發起次數',
+                                data: [],
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    labels: {
+                                        color: isDarkMode ? '#e2e8f0' : '#1e293b'
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: isDarkMode ? '#e2e8f0' : '#475569'
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+                                    }
+                                },
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: '日期',
+                                        color: isDarkMode ? '#e2e8f0' : '#475569'
+                                    },
+                                    ticks: {
+                                        color: isDarkMode ? '#e2e8f0' : '#475569'
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    // 監聽主題變化，更新圖表樣式
+                    document.getElementById('themeToggle').addEventListener('click', function() {
+                        const isDarkMode = document.body.classList.contains('dark');
+                        
+                        // 更新圖表字體顏色
+                        myChart.options.plugins.legend.labels.color = isDarkMode ? '#e2e8f0' : '#1e293b';
+                        myChart.options.scales.x.title.color = isDarkMode ? '#e2e8f0' : '#475569';
+                        myChart.options.scales.x.ticks.color = isDarkMode ? '#e2e8f0' : '#475569';
+                        myChart.options.scales.y.ticks.color = isDarkMode ? '#e2e8f0' : '#475569';
+                        myChart.options.scales.x.grid.color = isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+                        myChart.options.scales.y.grid.color = isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+                        
+                        // 更新圖表
+                        myChart.update();
+                    });
+                    
+                    // 更新圖表數據
+                    updateChartByTimeGranularity('day');
+                    
+                    // 添加時間維度切換監聽器
+                    document.getElementById('timeGranularity').addEventListener('change', function() {
+                        const granularity = this.value;
+                        updateChartByTimeGranularity(granularity);
+                    });
+                    
+                    // 切換圖表類型
+                    document.querySelectorAll('.chart-tab').forEach(function(tab) {
+                        tab.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            
+                            // 移除所有標籤的激活狀態
+                            document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('tab-active'));
+                            
+                            // 激活當前標籤
+                            this.classList.add('tab-active');
+                            
+                            const chartType = this.getAttribute('data-chart');
+                            const timeGranularity = document.getElementById('timeGranularity').value;
+                            
+                            // 更新圖表數據
+                            updateChartData(chartType, timeGranularity);
+                        });
+                    });
+                    
+                    // 更新圖表數據
+                    function updateChartData(chartType, timeGranularity) {
+                        // 獲取活躍的數據類型
+                        let label, color, bgColor;
+                        
+                        if (chartType === 'plans') {
+                            label = '發起次數';
+                            color = '#3b82f6';
+                            bgColor = 'rgba(59, 130, 246, 0.1)';
+                        } else if (chartType === 'amount') {
+                            label = '金額';
+                            color = '#8b5cf6';
+                            bgColor = 'rgba(139, 92, 246, 0.1)';
+                        } else if (chartType === 'participants') {
+                            label = '參與人數';
+                            color = '#10b981';
+                            bgColor = 'rgba(16, 185, 129, 0.1)';
+                        }
+                        
+                        // 獲取對應的數據
+                        const data = generateChartData(chartType, timeGranularity);
+                        
+                        // 更新圖表
+                        myChart.data.datasets[0].label = label;
+                        myChart.data.datasets[0].data = data.values;
+                        myChart.data.labels = data.labels;
+                        myChart.data.datasets[0].borderColor = color;
+                        myChart.data.datasets[0].backgroundColor = bgColor;
+                        
+                        // 更新X軸標題
+                        myChart.options.scales.x.title.text = getXAxisTitle(timeGranularity);
+                        
+                        myChart.update();
+                    }
+                    
+                    // 根據時間維度更新圖表
+                    function updateChartByTimeGranularity(granularity) {
+                        const activeTab = document.querySelector('.chart-tab.tab-active');
+                        const chartType = activeTab ? activeTab.getAttribute('data-chart') : 'plans';
+                        
+                        updateChartData(chartType, granularity);
+                    }
+                    
+                    // 生成圖表數據
+                    function generateChartData(chartType, timeGranularity) {
+                        // 獲取表格中的所有數據行
+                        const rows = Array.from(document.querySelectorAll('#dataTable tr'));
+                        
+                        // 準備數據結構
+                        const dataMap = new Map();
+                        
+                        // 設定日期索引和數據索引
+                        const dateIndex = 0;
+                        let valueIndex;
+                        
+                        if (chartType === 'plans') {
+                            // 僅計數不同日期的記錄數
+                            valueIndex = null;
+                        } else if (chartType === 'amount') {
+                            valueIndex = 5; // 金額列索引
+                        } else if (chartType === 'participants') {
+                            valueIndex = 4; // 參與人數列索引
+                        }
+                        
+                        // 處理每一行數據
+                        rows.forEach(row => {
+                            const cells = row.querySelectorAll('td');
+                            if (cells.length > 0) {
+                                // 獲取日期
+                                const fullDate = cells[dateIndex].textContent.trim();
+                                
+                                // 根據時間維度處理日期
+                                let timeKey;
+                                if (timeGranularity === 'day') {
+                                    timeKey = fullDate;
+                                } else if (timeGranularity === 'week') {
+                                    const dateObj = new Date(fullDate);
+                                    const year = dateObj.getFullYear();
+                                    const weekNumber = getWeekNumber(dateObj);
+                                    timeKey = `${year}-W${String(weekNumber).padStart(2, '0')}`;
+                                } else if (timeGranularity === 'month') {
+                                    timeKey = fullDate.substring(0, 7); // YYYY-MM
+                                }
+                                
+                                // 初始化或增加計數
+                                if (!dataMap.has(timeKey)) {
+                                    dataMap.set(timeKey, valueIndex === null ? 1 : parseFloat(cells[valueIndex].textContent.replace(',', '')));
+                                } else {
+                                    if (valueIndex === null) {
+                                        // 計數模式
+                                        dataMap.set(timeKey, dataMap.get(timeKey) + 1);
+                                    } else {
+                                        // 累加模式
+                                        dataMap.set(timeKey, dataMap.get(timeKey) + parseFloat(cells[valueIndex].textContent.replace(',', '')));
+                                    }
+                                }
+                            }
+                        });
+                        
+                        // 排序鍵（日期）
+                        const sortedKeys = Array.from(dataMap.keys()).sort();
+                        
+                        // 格式化標籤
+                        const formattedLabels = sortedKeys.map(key => formatLabel(key, timeGranularity));
+                        
+                        // 獲取對應的值
+                        const values = sortedKeys.map(key => dataMap.get(key));
+                        
+                        return {
+                            labels: formattedLabels,
+                            values: values
+                        };
+                    }
+                    
+                    // 格式化標籤
+                    function formatLabel(key, timeGranularity) {
+                        if (timeGranularity === 'day') {
+                            // 日期格式：MM/DD
+                            const parts = key.split('-');
+                            return `${parts[1]}/${parts[2]}`;
+                        } else if (timeGranularity === 'week') {
+                            // 週格式：Week WW
+                            const weekNumber = key.split('-W')[1];
+                            return `第${weekNumber}週`;
+                        } else if (timeGranularity === 'month') {
+                            // 月份格式：YYYY/MM
+                            const parts = key.split('-');
+                            return `${parts[0]}/${parts[1]}`;
+                        }
+                        return key;
+                    }
+                    
+                    // 獲取X軸標題
+                    function getXAxisTitle(timeGranularity) {
+                        if (timeGranularity === 'day') {
+                            return '日期 (月/日)';
+                        } else if (timeGranularity === 'week') {
+                            return '週數';
+                        } else if (timeGranularity === 'month') {
+                            return '月份 (年/月)';
+                        }
+                        return '日期';
+                    }
+                }
+                
+                // 排行榜標籤切換
+                const leaderboardTabs = document.querySelectorAll('.leaderboard-tab');
+                leaderboardTabs.forEach(function(tab) {
+                    tab.addEventListener('click', function() {
+                        // 移除所有標籤的激活狀態
+                        leaderboardTabs.forEach(t => t.classList.remove('active'));
+                        
+                        // 激活當前標籤
+                        this.classList.add('active');
+                        
+                        // 隱藏所有內容
+                        const contents = document.querySelectorAll('.leaderboard-content');
+                        contents.forEach(c => c.classList.remove('active'));
+                        
+                        // 顯示對應內容
+                        const targetId = this.getAttribute('data-tab') + '-leaderboard';
+                        document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+                // 圖表標籤切換
+                const chartTabs = document.querySelectorAll('.chart-tab');
+                chartTabs.forEach(function(tab) {
+                    tab.addEventListener('click', function(e) {
+                        e.stopPropagation(); // 防止觸發折疊面板
+                        
+                        // 移除所有標籤的激活狀態
+                        chartTabs.forEach(t => t.classList.remove('tab-active'));
+                        
+                        // 激活當前標籤
+                        this.classList.add('tab-active');
+            });
+        });
+
+                // 模態框控制
+                document.getElementById('devInfoBtn').addEventListener('click', function() {
+                    document.getElementById('codeModal').classList.add('show');
+                    
+                    // 更新代碼內容為當前HTML
+                    const htmlContent = document.documentElement.outerHTML;
+                    document.getElementById('codeContent').textContent = htmlContent;
+                });
+                
+                document.getElementById('closeModalBtn').addEventListener('click', function() {
+                    document.getElementById('codeModal').classList.remove('show');
+                });
+                
+                // 複製代碼功能
+                document.getElementById('copyCodeBtn').addEventListener('click', function() {
+                    const codeContent = document.getElementById('codeContent').textContent;
+                    navigator.clipboard.writeText(codeContent).then(function() {
+                        // 複製成功
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '<i class="fas fa-check mr-1"></i> 已複製';
+                        
+                        // 3秒後恢復原文本
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                        }, 3000);
+                    }.bind(this)).catch(function(err) {
+                        // 複製失敗
+                        console.error('複製失敗: ', err);
+                    });
+                });
+
+                // 初始化主題功能
+                function initTheme() {
+                    // 檢查本地存儲中是否有主題偏好
+                    const savedTheme = localStorage.getItem('theme');
+                    if (savedTheme === 'dark') {
+                        document.body.classList.add('dark');
+                    } else {
+                        // 默認設為日間模式
+                        document.body.classList.remove('dark');
+                        localStorage.setItem('theme', 'light');
+                    }
+                    
+                    // 監聽主題切換按鈕點擊
+                    document.getElementById('themeToggle').addEventListener('click', function() {
+                        // 切換深色模式類
+                        document.body.classList.toggle('dark');
+                        
+                        // 保存主題偏好到本地存儲
+                        const isDark = document.body.classList.contains('dark');
+                        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    });
+                }
+
+                // 初始化時添加商戶ID下拉選單的變更事件
+                document.getElementById('merchantId').addEventListener('change', function() {
+                    // 獲取時間維度和日期範圍
+                    const timeGranularity = document.getElementById('timeGranularity').value;
+                    let startDate, endDate;
+                    
+                    // 根據時間維度獲取對應的日期值
+                    if (timeGranularity === 'day') {
+                        startDate = document.getElementById('startDate').value;
+                        endDate = document.getElementById('endDate').value;
+                    } else if (timeGranularity === 'week') {
+                        startDate = document.getElementById('startWeek').value;
+                        endDate = document.getElementById('endWeek').value;
+                    } else if (timeGranularity === 'month') {
+                        startDate = document.getElementById('startMonth').value;
+                        endDate = document.getElementById('endMonth').value;
+                    }
+                    
+                    const merchantId = this.value;
+                    const planId = document.getElementById('planId').value;
+                    const status = document.getElementById('status').value;
+                    const initiatorId = document.getElementById('initiatorId').value;
+                    const participantId = document.getElementById('participantId').value;
+                    
+                    // 篩選表格數據
+                    filterTableData(merchantId, planId, status, initiatorId, participantId, timeGranularity, startDate, endDate);
+                });
+                
+                // 初始化趨勢圖
+                initTrendChart();
+                
+                // 初始化折疊面板功能
+                function initCollapsibleSections() {
+                    const collapsibles = document.querySelectorAll('.collapsible');
+                    
+                    collapsibles.forEach(function(item) {
+                        item.addEventListener('click', function() {
+                            const contentId = this.id.replace('Toggle', 'Content');
+                            const content = document.getElementById(contentId);
+                            
+                            if (content) {
+                                content.classList.toggle('expanded');
+                                const icon = this.querySelector('i.fas');
+                                if (icon) {
+                                    icon.classList.toggle('fa-chevron-down');
+                                    icon.classList.toggle('fa-chevron-up');
+                                }
+                            }
+                        });
+                    });
+                    
+                    // 預設狀態：篩選條件折疊，其他展開
+                    document.querySelectorAll('.collapsible-content').forEach(function(content) {
+                        if (content.id === 'filterContent') {
+                            // 篩選條件預設折疊
+                        } else {
+                            // 其他面板預設展開
+                            content.classList.add('expanded');
+                        }
+                    });
+                }
+
+                // 表格分頁功能
+                function initTablePagination() {
+                    // 獲取分頁元素
+                    const prevPageBtn = document.getElementById('prevPage');
+                    const nextPageBtn = document.getElementById('nextPage');
+                    const pageNumbers = document.getElementById('pageNumbers');
+                    const itemsPerPageSelect = document.getElementById('itemsPerPageSelect');
+                    
+                    // 分頁狀態
+                    let currentPage = 1;
+                    let itemsPerPage = parseInt(itemsPerPageSelect.value);
+                    let totalPages = 1;
+                    
+                    // 更新分頁顯示
+                    function updatePagination() {
+                        // 獲取可見行
+                        const visibleRows = Array.from(document.querySelectorAll('#dataTable tr'))
+                            .filter(row => row.style.display !== 'none');
+                        const totalItems = visibleRows.length;
+                        
+                        // 計算總頁數
+                        totalPages = Math.ceil(totalItems / itemsPerPage);
+                        if (totalPages === 0) totalPages = 1;
+                        
+                        // 確保當前頁在有效範圍內
+                        if (currentPage > totalPages) {
+                            currentPage = totalPages;
+                        }
+                        
+                        // 更新分頁按鈕
+                        prevPageBtn.disabled = currentPage === 1;
+                        nextPageBtn.disabled = currentPage === totalPages;
+                        
+                        // 生成頁碼按鈕
+            pageNumbers.innerHTML = '';
+            
+                        // 決定要顯示的頁碼範圍
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            
+                        // 調整起始頁以確保顯示5個頁碼（如果有這麼多頁）
+            if (endPage - startPage < 4) {
+                startPage = Math.max(1, endPage - 4);
+            }
+            
+                        // 創建頁碼按鈕
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                            pageBtn.className = `pagination-btn ${i === currentPage ? 'active' : 'btn-secondary'} text-xs py-1`;
+                pageBtn.textContent = i;
+                            pageBtn.onclick = function() {
+                    currentPage = i;
+                                showCurrentPage();
+                            };
+                pageNumbers.appendChild(pageBtn);
+            }
+            
+                        // 更新顯示的記錄範圍
+                        const startRecord = document.getElementById('startRecord');
+                        const endRecord = document.getElementById('endRecord');
+                        const totalRecords = document.getElementById('totalRecords');
+                        
+                        if (totalItems === 0) {
+                            startRecord.textContent = '0';
+                            endRecord.textContent = '0';
+                        } else {
+                            const start = (currentPage - 1) * itemsPerPage + 1;
+                            const end = Math.min(start + itemsPerPage - 1, totalItems);
+                            startRecord.textContent = start;
+                            endRecord.textContent = end;
+                        }
+                        totalRecords.textContent = totalItems;
+                    }
+                    
+                    // 顯示當前頁的數據
+                    function showCurrentPage() {
+                        // 獲取可見行
+                        const visibleRows = Array.from(document.querySelectorAll('#dataTable tr'))
+                            .filter(row => row.style.display !== 'none');
+                        
+                        // 計算當前頁的開始和結束索引
+                        const startIndex = (currentPage - 1) * itemsPerPage;
+                        const endIndex = startIndex + itemsPerPage;
+                        
+                        // 隱藏所有行
+                        visibleRows.forEach(row => {
+                            row.classList.add('hidden');
+                        });
+                        
+                        // 顯示當前頁的行
+                        for (let i = startIndex; i < endIndex && i < visibleRows.length; i++) {
+                            visibleRows[i].classList.remove('hidden');
+                        }
+                        
+                        // 更新分頁顯示
+                        updatePagination();
+                    }
+                    
+                    // 上一頁按鈕點擊事件
+                    prevPageBtn.addEventListener('click', function() {
+                        if (currentPage > 1) {
+                            currentPage--;
+                            showCurrentPage();
+                        }
+                    });
+                    
+                    // 下一頁按鈕點擊事件
+                    nextPageBtn.addEventListener('click', function() {
+                        if (currentPage < totalPages) {
+                            currentPage++;
+                            showCurrentPage();
+                        }
+                    });
+                    
+                    // 每頁顯示數量變更事件
+                    itemsPerPageSelect.addEventListener('change', function() {
+                        itemsPerPage = parseInt(this.value);
+                        currentPage = 1; // 重置為第一頁
+                        showCurrentPage();
+                    });
+                    
+                    // 初始化顯示第一頁
+                    showCurrentPage();
+                    
+                    // 重寫更新分頁信息函數，以適配分頁功能
+                    window.updatePaginationInfo = function() {
+                        // 獲取實際可見行數（不包括被篩選掉的行）
+                        const visibleRows = Array.from(document.querySelectorAll('#dataTable tr'))
+                            .filter(row => row.style.display !== 'none');
+                        
+                        // 更新總記錄數
+                        document.getElementById('totalRecords').textContent = visibleRows.length;
+                        
+                        // 重置為第一頁
+                        currentPage = 1;
+                        showCurrentPage();
+                    };
+                }
+                
+                // 表格排序功能
+                function initTableSorting() {
+                    const table = document.querySelector('table');
+                    const headers = table.querySelectorAll('th');
+                    const tableBody = document.getElementById('dataTable');
+                    
+                    // 排序方向（1: 升序，-1: 降序）
+                    let sortDirection = 1;
+                    let lastSortedColumn = 'date'; // 默認按日期排序
+                    
+                    // 為每個表頭添加點擊事件
+                    headers.forEach(header => {
+                        if (header.getAttribute('data-sort')) {
+                            header.addEventListener('click', function() {
+                                const column = this.getAttribute('data-sort');
+                                
+                                // 如果點擊的是當前排序列，則切換排序方向
+                                if (column === lastSortedColumn) {
+                                    sortDirection *= -1;
+                                } else {
+                                    sortDirection = 1; // 新列默認升序
+                                    lastSortedColumn = column;
+                                }
+                                
+                                // 更新排序圖標
+                                headers.forEach(h => {
+                                    const icon = h.querySelector('.sort-icon');
+                                    if (icon) {
+                                        icon.classList.remove('active');
+                                        icon.innerHTML = '<i class="fas fa-sort"></i>';
+                                    }
+                                });
+                                
+                                const icon = this.querySelector('.sort-icon');
+                                if (icon) {
+                                    icon.classList.add('active');
+                                    icon.innerHTML = sortDirection === 1 
+                                        ? '<i class="fas fa-sort-up"></i>'
+                                        : '<i class="fas fa-sort-down"></i>';
+                                }
+                                
+                                // 執行排序
+                                sortTable(column, sortDirection);
+                            });
+                        }
+                    });
+                    
+                    // 排序表格
+                    function sortTable(column, direction) {
+                        // 保存當前篩選狀態和分頁信息
+                        const filterStatus = [];
+                        const rows = Array.from(tableBody.querySelectorAll('tr'));
+                        
+                        // 記錄每行的當前顯示狀態
+                        rows.forEach(row => {
+                            filterStatus.push({
+                                row: row,
+                                display: row.style.display,
+                                hidden: row.classList.contains('hidden')
+                            });
+                        });
+                        
+                        // 確定列索引
+                        let columnIndex;
+                        switch (column) {
+                            case 'date': columnIndex = 0; break;
+                            case 'participants': columnIndex = 4; break;
+                            case 'amount': columnIndex = 5; break;
+                            case 'winAmount': columnIndex = 7; break;
+                            default: columnIndex = 0;
+                        }
+                        
+                        // 排序行
+                        const sortedRows = rows.sort((a, b) => {
+                            let aValue = a.querySelectorAll('td')[columnIndex].textContent.trim();
+                            let bValue = b.querySelectorAll('td')[columnIndex].textContent.trim();
+                            
+                            // 處理數字和金額格式
+                            if (column === 'participants') {
+                                // 參與人數是整數
+                                aValue = parseInt(aValue);
+                                bValue = parseInt(bValue);
+                            } else if (column === 'amount' || column === 'winAmount') {
+                                // 金額格式（去除逗號）
+                                aValue = parseFloat(aValue.replace(',', ''));
+                                bValue = parseFloat(bValue.replace(',', ''));
+                            }
+                            
+                            // 比較值
+                            if (aValue < bValue) return -1 * direction;
+                            if (aValue > bValue) return 1 * direction;
+                            return 0;
+                        });
+                        
+                        // 重新排列表格行
+                        tableBody.innerHTML = '';
+                        
+                        // 恢復每行的顯示狀態
+                        sortedRows.forEach((row, index) => {
+                            const status = filterStatus.find(s => s.row === row);
+                            if (status) {
+                                row.style.display = status.display;
+                                if (status.hidden) {
+                                    row.classList.add('hidden');
+                                } else {
+                                    row.classList.remove('hidden');
+                                }
+                            }
+                            tableBody.appendChild(row);
+                        });
+                        
+                        // 確保分頁資訊更新但不重置頁面
+                        const visibleRows = Array.from(document.querySelectorAll('#dataTable tr'))
+                            .filter(row => row.style.display !== 'none');
+                        document.getElementById('totalRecords').textContent = visibleRows.length;
+                        
+                        // 刷新當前頁面顯示
+                        const pagination = document.getElementById('pagination');
+                        if (pagination) {
+                            const currentPageElement = pagination.querySelector('.pagination-btn.active');
+                            if (currentPageElement) {
+                                const pageNumber = parseInt(currentPageElement.textContent);
+                                const startRecord = document.getElementById('startRecord');
+                                const endRecord = document.getElementById('endRecord');
+                                const itemsPerPage = parseInt(document.getElementById('itemsPerPageSelect').value);
+                                
+                                const start = (pageNumber - 1) * itemsPerPage + 1;
+                                const end = Math.min(start + itemsPerPage - 1, visibleRows.length);
+                                
+                                if (visibleRows.length === 0) {
+                                    startRecord.textContent = '0';
+                                    endRecord.textContent = '0';
+                                } else {
+                                    startRecord.textContent = start;
+                                    endRecord.textContent = end;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // 生成隨機數據函數
+                function generateRandomData(count) {
+                    const tableBody = document.getElementById('dataTable');
+                    const merchantIds = ['13589', '24671', '37824', '45912', '58763'];
+                    const merchantNames = ['星辰体育', '极速赛车', '财富彩票', '金鹰彩店', '幸运星彩'];
+                    const statuses = [
+                        '<td class="text-green-600">成功</td>',
+                        '<td class="text-red-600">失败</td>',
+                        '<td class="text-amber-600">进行中</td>'
+                    ];
+                    
+                    // 清空現有數據
+                    tableBody.innerHTML = '';
+                    
+                    // 生成隨機日期（過去30天內）
+                    function randomDate() {
+                        const today = new Date();
+                        const pastDay = new Date(today);
+                        pastDay.setDate(today.getDate() - Math.floor(Math.random() * 30));
+                        
+                        const year = pastDay.getFullYear();
+                        const month = String(pastDay.getMonth() + 1).padStart(2, '0');
+                        const day = String(pastDay.getDate()).padStart(2, '0');
+                        
+                        return `${year}-${month}-${day}`;
+                    }
+                    
+                    // 生成6位數的隨機序號
+                    function randomPlanId() {
+                        return Math.floor(100000 + Math.random() * 900000);
+                    }
+                    
+                    // 生成5位數的隨機用戶ID
+                    function randomUserId() {
+                        return Math.floor(10000 + Math.random() * 90000);
+                    }
+                    
+                    // 生成隨機金額（100-2000）
+                    function randomAmount() {
+                        const amount = Math.floor(100 + Math.random() * 1900);
+                        return amount > 999 
+                            ? `${Math.floor(amount/1000)},${String(amount % 1000).padStart(3, '0')}`
+                            : `${amount}`;
+                    }
+                    
+                    // 生成隨機中獎金額（失敗為0，成功為投入金額的0.8-1.5倍）
+                    function randomWinAmount(status, amount) {
+                        if (status === 0) { // 成功狀態索引為0
+                            const originalAmount = parseFloat(amount.replace(',', ''));
+                            const multiplier = 0.8 + Math.random() * 0.7;
+                            const winAmount = Math.floor(originalAmount * multiplier);
+                            
+                            return winAmount > 999 
+                                ? `${Math.floor(winAmount/1000)},${String(winAmount % 1000).padStart(3, '0')}`
+                                : `${winAmount}`;
+                        } else {
+                            return '0';
+                        }
+                    }
+                    
+                    // 生成行數據
+                    for (let i = 0; i < count; i++) {
+                        const date = randomDate();
+                        const merchantIndex = Math.floor(Math.random() * merchantIds.length);
+                        const merchantId = merchantIds[merchantIndex];
+                        const planId = randomPlanId();
+                        const initiatorId = randomUserId();
+                        const participants = Math.floor(2 + Math.random() * 8); // 2-9人
+                        const amount = randomAmount();
+                        const statusIndex = Math.floor(Math.random() * statuses.length);
+                        const winAmount = statusIndex === 0 ? randomWinAmount(statusIndex, amount) : '0'; // 只有成功狀態才有中獎金額
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${date}</td>
+                            <td>${merchantId}</td>
+                            <td>${planId}</td>
+                            <td>${initiatorId}</td>
+                            <td>${participants}</td>
+                            <td>${amount}</td>
+                            ${statuses[statusIndex]}
+                            <td>${winAmount}</td>
+                        `;
+                        
+                        tableBody.appendChild(row);
+                    }
+                }
+                
+                // 範圍滑塊值顯示
+                const rangeSliders = document.querySelectorAll('.range-slider');
+                rangeSliders.forEach(function(slider) {
+                    slider.addEventListener('input', function() {
+                        const valueId = this.id.replace('Range', 'Value');
+                        const valueEl = document.getElementById(valueId);
+                        
+                        if (valueEl) {
+                            if (this.id === 'successRateRange') {
+                                valueEl.textContent = this.value + '%+';
+                            } else if (this.id === 'avgAmountRange') {
+                                valueEl.textContent = '¥' + this.value + '+';
+                            } else {
+                                valueEl.textContent = this.value + '+';
+                            }
+                        }
+                    });
+                });
+        });
+    </script>
+    </div>
+</body>
+</html>
