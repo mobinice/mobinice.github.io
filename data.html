@@ -17,6 +17,59 @@
             color: #e2e8f0;
         }
         
+        /* 確保在大屏幕上篩選區域不換行 */
+        @media (min-width: 1600px) {
+            .filter-container {
+                flex-wrap: nowrap !important;
+            }
+            
+            .filter-item {
+                flex-shrink: 1;
+                flex-grow: 0;
+            }
+        }
+        
+        /* 特別針對1912x1461尺寸優化 */
+        @media (min-width: 1900px) and (max-width: 1920px) {
+            .filter-container {
+                flex-wrap: nowrap !important;
+                gap: 2px !important;
+            }
+            
+            .filter-item {
+                flex-shrink: 1;
+                padding: 0 1px;
+            }
+            
+            /* 調整日期範圍容器寬度 */
+            #dateRangeContainer {
+                max-width: 290px;
+            }
+            
+            /* 商戶ID選擇器縮小一點 */
+            .merchant-selector {
+                max-width: 150px;
+            }
+            
+            /* 序號、發起人和參與人ID欄位寬度調整 */
+            .id-field {
+                max-width: 110px;
+                min-width: 90px;
+            }
+            
+            /* 按鈕區域寬度控制 */
+            .buttons-container {
+                min-width: 390px;
+            }
+            
+            /* 減少按鈕間距 */
+            .filter-button {
+                margin-left: 3px !important;
+                padding-left: 6px !important;
+                padding-right: 6px !important;
+            }
+        }
+        
         /* 表單元素的深色模式樣式 */
         input, select, button, label, .text-gray-600, .text-gray-700, .text-gray-500, .text-xs {
             transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
@@ -448,8 +501,8 @@
                 <i class="fas fa-chevron-down text-gray-500"></i>
             </div>
             <div class="collapsible-content" id="filterContent">
-                <div class="flex flex-wrap items-center gap-3">
-                <div class="w-full md:w-auto">
+                <div class="flex flex-wrap md:flex-wrap items-center gap-3 filter-container">
+                <div class="w-full md:w-auto filter-item" style="min-width: 110px; max-width: 130px;">
                         <label class="block text-xs font-medium text-gray-700 mb-1">时间维度</label>
                         <select id="timeGranularity" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="day">按天</option>
@@ -457,27 +510,27 @@
                         <option value="month">按月</option>
                     </select>
                 </div>
-                    <div class="w-full md:w-auto" id="dateRangeContainer">
+                    <div class="w-full md:w-auto flex-grow filter-item" id="dateRangeContainer" style="max-width: 310px; min-width: 270px;">
                         <label class="block text-xs font-medium text-gray-700 mb-1">日期范围</label>
                         <div class="flex items-center gap-1" id="daySelector">
-                            <input type="date" id="startDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="date" id="startDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
                         <span>至</span>
-                            <input type="date" id="endDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="date" id="endDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
                         </div>
                         <div class="flex items-center gap-1 hidden" id="weekSelector">
-                            <input type="week" id="startWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="week" id="startWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
                             <span>至</span>
-                            <input type="week" id="endWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="week" id="endWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
                         </div>
                         <div class="flex items-center gap-1 hidden" id="monthSelector">
-                            <input type="month" id="startMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="month" id="startMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
                             <span>至</span>
-                            <input type="month" id="endMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="month" id="endMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
                     </div>
                 </div>
-                <div class="w-full md:w-auto">
+                <div class="w-full md:w-auto filter-item" style="min-width: 150px; max-width: 160px;">
                         <label class="block text-xs font-medium text-gray-700 mb-1">商户ID</label>
-                        <select id="merchantId" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select id="merchantId" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-ellipsis merchant-selector">
                             <option value="all">全部</option>
                             <option value="13589">13589 - 星辰体育</option>
                             <option value="24671">24671 - 极速赛车</option>
@@ -486,32 +539,35 @@
                             <option value="58763">58763 - 幸运星彩</option>
                         </select>
                 </div>
-                <div class="w-full md:w-auto">
+                <div class="w-full md:w-auto filter-item" style="min-width: 120px; max-width: 140px;">
                         <label class="block text-xs font-medium text-gray-700 mb-1">合买序号</label>
-                        <input type="text" id="planId" placeholder="输入序号或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="planId" placeholder="输入序号或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
                 </div>
-                <div class="w-full md:w-auto">
+                <div class="w-full md:w-auto filter-item" style="min-width: 100px; max-width: 120px;">
                         <label class="block text-xs font-medium text-gray-700 mb-1">发起人ID</label>
-                        <input type="text" id="initiatorId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="initiatorId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
                 </div>
-                <div class="w-full md:w-auto">
+                <div class="w-full md:w-auto filter-item" style="min-width: 100px; max-width: 120px;">
                         <label class="block text-xs font-medium text-gray-700 mb-1">参与人ID</label>
-                        <input type="text" id="participantId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="participantId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
                     </div>
-                    <div class="w-full md:w-auto">
+                    <div class="w-full md:w-auto md:flex-shrink-0 md:flex-grow-0 flex-nowrap whitespace-nowrap filter-item buttons-container" style="min-width: 370px;">
                         <label class="block text-xs font-medium text-gray-700 mb-1">合买状态</label>
-                        <div class="flex items-center">
-                            <select id="status" class="rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div class="flex items-center flex-nowrap">
+                            <select id="status" class="w-28 rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="all">全部</option>
                         <option value="success">成功</option>
                         <option value="fail">失败</option>
                         <option value="in_progress">进行中</option>
                     </select>
-                            <button id="advFilterBtn" class="btn-secondary px-3 py-1 text-sm rounded-md ml-2">
+                            <button id="advFilterBtn" class="btn-secondary px-2 py-1 text-sm rounded-md ml-1 whitespace-nowrap filter-button" style="width: 82px;">
                                 高级筛选 <i class="fas fa-caret-down ml-1"></i>
                             </button>
-                            <button id="filterBtn" class="btn-primary px-3 py-1 text-sm rounded-md ml-2">搜索</button>
-                            <button id="resetBtn" class="btn-secondary px-3 py-1 text-sm rounded-md ml-2">重置</button>
+                            <button id="filterBtn" class="btn-primary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">搜索</button>
+                            <button id="resetBtn" class="btn-secondary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">重置</button>
+                            <button id="exportBtn" class="px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button bg-green-500 hover:bg-green-600 text-white transition" style="width: 56px;">
+                                <i class="fas fa-download mr-1"></i>导出
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1301,6 +1357,52 @@
                     
                     // 篩選表格數據
                     filterTableData(merchantId, planId, status, initiatorId, participantId, timeGranularity, startDate, endDate);
+                });
+                
+                // 匯出按鈕點擊事件
+                document.getElementById('exportBtn').addEventListener('click', function() {
+                    // 取得目前篩選後的可見行
+                    const visibleRows = Array.from(document.querySelectorAll('#dataTable tr'))
+                        .filter(row => row.style.display !== 'none');
+                    
+                    if (visibleRows.length === 0) {
+                        alert('沒有數據可匯出');
+                        return;
+                    }
+                    
+                    // 準備CSV數據
+                    let csvContent = '日期,商户ID,合买序号,发起人ID,参与人数,合买总金额,合买状态,中奖金额\n';
+                    
+                    visibleRows.forEach(function(row) {
+                        const cells = row.querySelectorAll('td');
+                        let rowData = [];
+                        
+                        cells.forEach(function(cell) {
+                            // 移除千分位逗號 (如數字格式)，並清理HTML標籤
+                            let cellText = cell.textContent.trim().replace(/,/g, '');
+                            // 對於包含HTML的單元格 (如狀態欄) 特別處理
+                            if (cell.innerHTML.includes('class="text-')) {
+                                cellText = cell.textContent.trim();
+                            }
+                            rowData.push(`"${cellText}"`);
+                        });
+                        
+                        csvContent += rowData.join(',') + '\n';
+                    });
+                    
+                    // 創建Blob對象並下載
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const link = document.createElement('a');
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', `合买数据_${timestamp}.csv`);
+                    link.style.visibility = 'hidden';
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                 });
                 
                 // 重置按鈕點擊事件
