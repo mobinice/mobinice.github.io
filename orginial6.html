@@ -631,17 +631,24 @@
         .tooltip {
             display: none;
             position: absolute;
-            top: 20px;
+            top: 20px; /* 調回原來的位置 */
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%); /* 水平居中 */
             background-color: #333;
             color: white;
             padding: 5px 10px;
             border-radius: 4px;
             font-size: 12px;
             white-space: nowrap;
-            z-index: 3; /* 確保提示框在最上層 */
+            z-index: 9999; /* 保持高層級 */
             pointer-events: none; /* 防止提示框影響其他元素 */
+            width: max-content; /* 保留自適應內容寬度 */
+            max-width: 300px; /* 保留最大寬度 */
+        }
+        
+        /* 移除箭頭樣式 */
+        .tooltip::after {
+            display: none;
         }
         
         /* 同時支持懸浮和點擊顯示提示框 */
@@ -862,7 +869,7 @@
                         <div class="settings-wrapper">
                             <label for="oddsSale">进球通知
                                 <span class="info-icon" tabindex="0">?
-                                    <span class="tooltip">oox</span>
+                                    <span class="tooltip">若已有该赛事的注单，一旦出现比分变化就会进行通知</span>
                                 </span>
                             </label>
                             <div class="switch-container">
@@ -878,7 +885,7 @@
                         <div class="settings-wrapper">
                             <label for="scoreChange">开赛通知
                                 <span class="info-icon" tabindex="0">?
-                                    <span class="tooltip">oox</span>
+                                    <span class="tooltip">若已有该赛事的注单或是收藏置顶的赛事<br>（包含置顶联赛），一旦比赛开赛后会进行通知</span>
                                 </span>
                             </label>
                             <div class="switch-container">
@@ -891,39 +898,9 @@
                     </div>
                     <div class="settings-option">
                         <div class="settings-wrapper">
-                            <label for="scheduleChange">赛事阶段
-                                <span class="info-icon" tabindex="0">?
-                                    <span class="tooltip">oox</span>
-                                </span>
-                            </label>
-                            <div class="switch-container">
-                                <label class="switch">
-                                    <input type="checkbox" id="scheduleChange">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="settings-option">
-                        <div class="settings-wrapper">
-                            <label for="matchCancel">赛果通知
-                                <span class="info-icon" tabindex="0">?
-                                    <span class="tooltip">oox</span>
-                                </span>
-                            </label>
-                            <div class="switch-container">
-                                <label class="switch">
-                                    <input type="checkbox" id="matchCancel">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="settings-option">
-                        <div class="settings-wrapper">
                             <label for="resultNotification">赛事变动
                                 <span class="info-icon" tabindex="0">?
-                                    <span class="tooltip">oox</span>
+                                    <span class="tooltip">已有注单的赛事，提前或是延迟比赛就会进行通知</span>
                                 </span>
                             </label>
                             <div class="switch-container">
@@ -938,7 +915,7 @@
                         <div class="settings-wrapper">
                             <label for="groupBuyProgress">赛事取消
                                 <span class="info-icon" tabindex="0">?
-                                    <span class="tooltip">oox</span>
+                                    <span class="tooltip">已有注单的赛事，中途腰斩、赛事取消、<br>退赛等会进行通知</span>
                                 </span>
                             </label>
                             <div class="switch-container">
@@ -953,7 +930,7 @@
                         <div class="settings-wrapper">
                             <label for="matchStage">合买进度
                                 <span class="info-icon" tabindex="0">?
-                                    <span class="tooltip">oox</span>
+                                    <span class="tooltip">已有注单的赛事，合买成功或是合买失败会进行通知</span>
                                 </span>
                             </label>
                             <div class="switch-container">
@@ -1016,7 +993,7 @@
                         🌙 别担心，工程师深夜也没打算睡，努力帮你修好每一行代码。感谢您的理解与支持！
                 </div>
                 <div class="message-info">
-                    <div class="message-time">2023/05/10 09:15</div>
+                    <div class="message-time">2023/05/10 09:15 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1029,7 +1006,7 @@
                     系统维护已完成，感谢您的耐心等待！
                 </div>
                 <div class="message-info">
-                    <div class="message-time">15:45</div>
+                    <div class="message-time">15:45 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1047,7 +1024,7 @@
                         🧘 趁这段时间，放下屏幕去泡杯茶吧，回来一切都会更顺畅。感谢您的理解与支持！
                 </div>
                 <div class="message-info">
-                    <div class="message-time">10:30</div>
+                    <div class="message-time">10:30 (GMT+8)</div>
                 </div>
             </div>
         </div>
@@ -1070,7 +1047,7 @@
                     </button>
                 </div>
                 <div class="message-info">
-                    <div class="message-time">23:05</div>
+                    <div class="message-time">23:05 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1091,7 +1068,7 @@
                     </button>
                 </div>
                 <div class="message-info">
-                    <div class="message-time">09:30</div>
+                    <div class="message-time">09:30 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1100,7 +1077,7 @@
                     比赛结果：巴塞罗那 2-1 皇家马德里，恭喜您的预测成功！
                 </div>
                 <div class="message-info">
-                    <div class="message-time">22:15</div>
+                    <div class="message-time">22:15 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1117,7 +1094,7 @@
                     </button>
                 </div>
                 <div class="message-info">
-                    <div class="message-time">22:30</div>
+                    <div class="message-time">22:30 (GMT+8)</div>
                 </div>
             </div>
         </div>
@@ -1132,7 +1109,7 @@
                     系统提醒：您已被人工扣款 1000，目前余额为 2000。若有任何疑问，请随时与我们联系，我们会一直在。
                 </div>
                 <div class="message-info">
-                    <div class="message-time">2023/05/10 09:30</div>
+                    <div class="message-time">2023/05/10 09:30 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1149,7 +1126,7 @@
                     </button>
                 </div>
                 <div class="message-info">
-                    <div class="message-time">2023/05/10 14:20</div>
+                    <div class="message-time">2023/05/10 14:20 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1166,7 +1143,7 @@
                     </button>
                 </div>
                 <div class="message-info">
-                    <div class="message-time">2023/05/10 18:45</div>
+                    <div class="message-time">2023/05/10 18:45 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1188,7 +1165,7 @@
                     </button>
                 </div>
                 <div class="message-info">
-                    <div class="message-time">16:30</div>
+                    <div class="message-time">16:30 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1197,7 +1174,7 @@
                     系统已为您人工加款 3000，目前余额为 5800。感谢您的耐心与支持～祝您投注顺利！
                 </div>
                 <div class="message-info">
-                    <div class="message-time">18:15</div>
+                    <div class="message-time">18:15 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1210,7 +1187,7 @@
                     亲爱的用户您好～您已成功转入 1000 目前余额为 2200。感谢您一直以来的支持，我会在这里陪您每一步！
                 </div>
                 <div class="message-info">
-                    <div class="message-time">09:15</div>
+                    <div class="message-time">09:15 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1219,7 +1196,7 @@
                     恭喜您获得彩金 500！系统已为您加值，现在余额为 3200。今天的您，光芒万丈！
                 </div>
                 <div class="message-info">
-                    <div class="message-time">10:30</div>
+                    <div class="message-time">10:30 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1237,7 +1214,7 @@
                     </button>
                 </div>
                 <div class="message-info">
-                    <div class="message-time">11:45</div>
+                    <div class="message-time">11:45 (GMT+8)</div>
                 </div>
             </div>
             
@@ -1255,7 +1232,7 @@
                     </button>
                 </div>
                 <div class="message-info">
-                    <div class="message-time">13:20</div>
+                    <div class="message-time">13:20 (GMT+8)</div>
                 </div>
             </div>
         </div>
@@ -1374,7 +1351,7 @@
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
-            return `${hours}:${minutes}`;
+            return `${hours}:${minutes} (GMT+8)`;
         }
         
         // 更新未读指示器显示
@@ -2124,8 +2101,6 @@ document.addEventListener('DOMContentLoaded', function() {
         let switchStates = {
             scoreChange: true,
             oddsSale: true,
-            scheduleChange: true,
-            matchCancel: true,
             resultNotification: true,
             groupBuyProgress: true,
             matchStage: true
