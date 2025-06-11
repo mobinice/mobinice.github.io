@@ -156,19 +156,31 @@
         .code-modal {
             display: none;
             position: fixed;
-            bottom: 0;
+            top: 0;
             left: 0;
             right: 0;
-            background-color: #ffffff;
-            z-index: 50;
-            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
-            height: 60%;
-            transition: transform 0.3s ease-out;
-            transform: translateY(100%);
+            bottom: 0;
+            z-index: 100;
+            background-color: rgba(0, 0, 0, 0.5);
         }
         .code-modal.show {
-            display: block;
-            transform: translateY(0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .code-modal-content {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            width: 50%;
+            max-height: 80vh;
+            max-width: 800px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        body.dark .code-modal-content {
+            background-color: #1e293b;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
         }
         .code-content {
             background-color: #1e293b;
@@ -754,25 +766,27 @@
 
         <!-- 代码模态框 -->
         <div id="codeModal" class="code-modal">
-            <div class="h-full flex flex-col">
-                <div class="p-3 border-b flex justify-between items-center">
-                    <h3 class="text-sm font-semibold">开发者信息 - 源代码 V1.0</h3>
-                    <div class="flex items-center">
-                        <button id="copyCodeBtn" class="btn-primary px-3 py-1 text-sm rounded-md mr-2">
-                            <i class="fas fa-copy mr-1"></i> 复制代码
-                        </button>
-                        <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700">
-                            <i class="fas fa-times text-xl"></i>
-                        </button>
+            <div class="code-modal-content">
+                <div class="flex flex-col h-full">
+                    <div class="p-3 border-b flex justify-between items-center">
+                        <h3 class="text-sm font-semibold">开发者信息 - 源代码 V1.0</h3>
+                        <div class="flex items-center">
+                            <button id="copyCodeBtn" class="btn-primary px-3 py-1 text-sm rounded-md mr-2">
+                                <i class="fas fa-copy mr-1"></i> 复制代码
+                            </button>
+                            <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div class="flex-1 overflow-auto p-3">
-                    <pre id="codeContent" class="code-content p-3 text-sm">/**
+                    <div class="overflow-auto p-3" style="max-height: calc(80vh - 60px);">
+                        <pre id="codeContent" class="code-content p-3 text-sm">/**
  * 合買數據分析報表 V1.0
  * 更新日期: 2024-06-11
  * 支持功能: 數據篩選、排序、導出、暗黑模式、圖表分析
  */
 &lt;html lang="zh-CN"&gt;...代码内容...&lt;/html&gt;</pre>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1647,6 +1661,14 @@
                 
                 document.getElementById('closeModalBtn').addEventListener('click', function() {
                     document.getElementById('codeModal').classList.remove('show');
+                });
+                
+                // 點擊蒙層關閉模態窗
+                document.getElementById('codeModal').addEventListener('click', function(e) {
+                    // 確保點擊的是蒙層本身，而不是模態框內容
+                    if (e.target === this) {
+                        this.classList.remove('show');
+                    }
                 });
                 
                 // 複製代碼功能
