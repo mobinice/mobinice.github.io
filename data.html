@@ -487,7 +487,7 @@
 <body data-new-gr-c-s-check-loaded="14.1105.0" data-gr-ext-installed="">
     <div class="container mx-auto px-3 py-4">
         <!-- 主題切換按鈕 -->
-        <div class="fixed top-4 right-4 z-50">
+        <div class="fixed top-4 right-16 z-50">
             <button id="themeToggle" class="bg-gray-200 dark:bg-gray-700 rounded-full p-2 shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all flex items-center justify-center w-10 h-10 relative">
                 <i class="fas fa-sun text-xl text-yellow-500 theme-light absolute"></i>
                 <i class="fas fa-moon text-xl text-white theme-dark absolute"></i>
@@ -560,9 +560,6 @@
                         <option value="fail">失败</option>
                         <option value="in_progress">进行中</option>
                     </select>
-                            <button id="advFilterBtn" class="btn-secondary px-2 py-1 text-sm rounded-md ml-1 whitespace-nowrap filter-button" style="width: 82px;">
-                                高级筛选 <i class="fas fa-caret-down ml-1"></i>
-                            </button>
                             <button id="filterBtn" class="btn-primary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">搜索</button>
                             <button id="resetBtn" class="btn-secondary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">重置</button>
                             <button id="exportBtn" class="px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button bg-green-500 hover:bg-green-600 text-white transition" style="width: 56px;">
@@ -572,63 +569,7 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- 高级筛选条件 -->
-            <div class="mt-3 border-t border-custom pt-3 hidden" id="advFilterContent">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <!-- 发起合买次数 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">发起合买次数</label>
-                        <div class="px-2">
-                            <input type="range" id="initiatedCountRange" class="range-slider" min="0" max="50" value="0">
-                            <div class="range-values">
-                                <span>0</span>
-                                <span id="initiatedCountValue">0+</span>
-                                <span>50+</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 参与合买次数 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">参与合买次数</label>
-                        <div class="px-2">
-                            <input type="range" id="participatedCountRange" class="range-slider" min="0" max="100" value="0">
-                            <div class="range-values">
-                                <span>0</span>
-                                <span id="participatedCountValue">0+</span>
-                                <span>100+</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 带单成功率 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">带单成功率</label>
-                        <div class="px-2">
-                            <input type="range" id="successRateRange" class="range-slider" min="0" max="100" value="0">
-                            <div class="range-values">
-                                <span>0%</span>
-                                <span id="successRateValue">0%+</span>
-                                <span>100%</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 平均带单金额 -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">平均带单金额</label>
-                        <div class="px-2">
-                            <input type="range" id="avgAmountRange" class="range-slider" min="0" max="1000" value="0">
-                            <div class="range-values">
-                                <span>¥0</span>
-                                <span id="avgAmountValue">¥0+</span>
-                                <span>¥1000+</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </div>
 
         <!-- 核心指标卡片 -->
@@ -732,408 +673,7 @@
             </div>
         </div>
 
-        <!-- 用户行为指标排行榜 -->
-        <div class="card p-3 mb-4 compact-section">
-            <div class="flex justify-between items-center mb-2 cursor-pointer collapsible" id="leaderboardToggle">
-                <h2 class="text-sm font-semibold">用户行为指标 TOP5 排行榜</h2>
-                <i class="fas fa-chevron-down text-gray-500"></i>
-            </div>
-            
-            <div class="collapsible-content expanded" id="leaderboardContent">
-                <div class="border-b mb-2">
-                <div class="flex">
-                    <div class="leaderboard-tab active" data-tab="initiators">发起合买次数</div>
-                    <div class="leaderboard-tab" data-tab="participants">参与合买次数</div>
-                    <div class="leaderboard-tab" data-tab="success-rate">带单成功率</div>
-                    <div class="leaderboard-tab" data-tab="avg-amount">平均带单金额</div>
-                </div>
-            </div>
-            
-            <!-- 发起合买次数排行榜 -->
-            <div id="initiators-leaderboard" class="leaderboard-content active">
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 compact-grid">
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-1">1</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10048</div>
-                                    <div class="text-xs text-gray-500">50 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">count</span>
-                                    <span class="text-xs font-semibold">50次</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-amber-400" style="width: 100%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-2">2</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10011</div>
-                                    <div class="text-xs text-gray-500">49 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">count</span>
-                                    <span class="text-xs font-semibold">49次</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-gray-400" style="width: 98%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-3">3</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10013</div>
-                                    <div class="text-xs text-gray-500">47 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">count</span>
-                                    <span class="text-xs font-semibold">47次</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-amber-600" style="width: 94%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-other">4</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10038</div>
-                                    <div class="text-xs text-gray-500">47 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">count</span>
-                                    <span class="text-xs font-semibold">47次</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-blue-400" style="width: 94%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-other">5</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10005</div>
-                                    <div class="text-xs text-gray-500">46 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">count</span>
-                                    <span class="text-xs font-semibold">46次</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-blue-400" style="width: 92%"></div>
-                        </div>
-                    </div>
-                        </div>
-                    </div>
-            </div>
-            
-            <!-- 参与合买次数排行榜 -->
-            <div id="participants-leaderboard" class="leaderboard-content">
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 compact-grid">
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-1">1</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10030</div>
-                                    <div class="text-xs text-gray-500">100 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">count</span>
-                                    <span class="text-xs font-semibold">100次</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-amber-400" style="width: 100%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-2">2</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10023</div>
-                                    <div class="text-xs text-gray-500">98 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">count</span>
-                                    <span class="text-xs font-semibold">98次</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-gray-400" style="width: 98%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-3">3</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10013</div>
-                                    <div class="text-xs text-gray-500">97 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">count</span>
-                                    <span class="text-xs font-semibold">97次</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-amber-600" style="width: 97%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-other">4</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10003</div>
-                                    <div class="text-xs text-gray-500">93 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">count</span>
-                                    <span class="text-xs font-semibold">93次</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-blue-400" style="width: 93%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-other">5</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10015</div>
-                                    <div class="text-xs text-gray-500">91 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">count</span>
-                                    <span class="text-xs font-semibold">91次</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-blue-400" style="width: 91%"></div>
-                        </div>
-                    </div>
-                        </div>
-                    </div>
-            </div>
-            
-            <!-- 带单成功率排行榜 -->
-            <div id="success-rate-leaderboard" class="leaderboard-content">
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 compact-grid">
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-1">1</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10005</div>
-                                    <div class="text-xs text-gray-500">46 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">成功率</span>
-                                    <span class="text-xs font-semibold">65.2%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-amber-400" style="width: 100%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-2">2</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10013</div>
-                                    <div class="text-xs text-gray-500">47 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">成功率</span>
-                                    <span class="text-xs font-semibold">57.4%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-gray-400" style="width: 88%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-3">3</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10038</div>
-                                    <div class="text-xs text-gray-500">47 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">成功率</span>
-                                    <span class="text-xs font-semibold">46.8%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-amber-600" style="width: 72%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-other">4</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10048</div>
-                                    <div class="text-xs text-gray-500">50 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">成功率</span>
-                                    <span class="text-xs font-semibold">46.0%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-blue-400" style="width: 71%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-other">5</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10011</div>
-                                    <div class="text-xs text-gray-500">49 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">成功率</span>
-                                    <span class="text-xs font-semibold">24.5%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-blue-400" style="width: 38%"></div>
-                        </div>
-                    </div>
-                        </div>
-                    </div>
-            </div>
-            
-            <!-- 平均带单金额排行榜 -->
-            <div id="avg-amount-leaderboard" class="leaderboard-content">
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 compact-grid">
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-1">1</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10011</div>
-                                    <div class="text-xs text-gray-500">49 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">平均金额</span>
-                                    <span class="text-xs font-semibold">758.4元</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-amber-400" style="width: 100%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-2">2</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10005</div>
-                                    <div class="text-xs text-gray-500">46 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">平均金额</span>
-                                    <span class="text-xs font-semibold">638.0元</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-gray-400" style="width: 84%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-3">3</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10013</div>
-                                    <div class="text-xs text-gray-500">47 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">平均金额</span>
-                                    <span class="text-xs font-semibold">449.9元</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-amber-600" style="width: 59%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-other">4</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10048</div>
-                                    <div class="text-xs text-gray-500">50 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">平均金额</span>
-                                    <span class="text-xs font-semibold">405.3元</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-blue-400" style="width: 53%"></div>
-                        </div>
-                    </div>
-                        </div>
-                        <div class="card compact-card">
-                            <div class="flex items-center mb-2">
-                        <div class="leaderboard-rank rank-other">5</div>
-                        <div>
-                                    <div class="font-semibold text-sm">用户 10038</div>
-                                    <div class="text-xs text-gray-500">47 次合买</div>
-                        </div>
-                    </div>
-                            <div class="mb-1">
-                        <div class="flex justify-between mb-1">
-                                    <span class="text-xs font-medium">平均金额</span>
-                                    <span class="text-xs font-semibold">180.2元</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill bg-blue-400" style="width: 24%"></div>
-                        </div>
-                    </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
         <!-- 数据表格 -->
         <div class="card p-3 mb-4">
@@ -1161,7 +701,7 @@
                                 日期
                                 <span class="sort-icon active"><i class="fas fa-sort-down"></i></span>
                             </th>
-                                <th>商户ID</th>
+                            <th>商户ID</th>
                             <th>合买序号</th>
                             <th>发起人ID</th>
                             <th data-sort="participants">
@@ -1172,7 +712,7 @@
                                 合买总金额
                                 <span class="sort-icon"><i class="fas fa-sort"></i></span>
                             </th>
-                                <th>合买状态</th>
+                            <th>合买状态</th>
                             <th data-sort="winAmount">
                                 中奖金额
                                 <span class="sort-icon"><i class="fas fa-sort"></i></span>
@@ -1311,22 +851,7 @@
                     }
                 }
                 
-                // 高級篩選按鈕點擊事件
-                document.getElementById('advFilterBtn').addEventListener('click', function() {
-                    const advFilterContent = document.getElementById('advFilterContent');
-                    const icon = this.querySelector('i.fas');
-                    
-                    // 切換顯示/隱藏
-                    if (advFilterContent.classList.contains('hidden')) {
-                        advFilterContent.classList.remove('hidden');
-                        icon.classList.remove('fa-caret-down');
-                        icon.classList.add('fa-caret-up');
-                    } else {
-                        advFilterContent.classList.add('hidden');
-                        icon.classList.remove('fa-caret-up');
-                        icon.classList.add('fa-caret-down');
-                    }
-                });
+
                 
                 // 篩選按鈕點擊事件
                 document.getElementById('filterBtn').addEventListener('click', function() {
@@ -1421,22 +946,7 @@
                     // 顯示日期選擇器
                     updateDateSelector('day');
                     
-                    // 重置高級篩選
-                    document.querySelectorAll('.range-slider').forEach(function(slider) {
-                        slider.value = slider.min;
-                        const valueId = slider.id.replace('Range', 'Value');
-                        const valueEl = document.getElementById(valueId);
-                        
-                        if (valueEl) {
-                            if (slider.id === 'successRateRange') {
-                                valueEl.textContent = slider.min + '%+';
-                            } else if (slider.id === 'avgAmountRange') {
-                                valueEl.textContent = '¥' + slider.min + '+';
-                            } else {
-                                valueEl.textContent = slider.min + '+';
-                            }
-                        }
-                    });
+
                     
                     // 顯示所有表格數據
                     const tableRows = document.querySelectorAll('#dataTable tr');
@@ -1802,25 +1312,308 @@
                     }
                 }
                 
-                // 排行榜標籤切換
-                const leaderboardTabs = document.querySelectorAll('.leaderboard-tab');
-                leaderboardTabs.forEach(function(tab) {
-                    tab.addEventListener('click', function() {
-                        // 移除所有標籤的激活狀態
-                        leaderboardTabs.forEach(t => t.classList.remove('active'));
+
+
+                // 更新表格數據
+                function updateTableData(tabType) {
+                    const tableBody = document.getElementById('dataTable');
+                    // 清空原有表格數據，以便重新生成
+                    tableBody.innerHTML = '';
+                    
+                    // 生成新數據
+                    const topUsers = getTopUsers(tabType, 5);
+                    
+                    // 存儲所有行，以便後續排序
+                    const allRows = [];
+                    
+                    // 根據排行榜類型確定要顯示的數據
+                    topUsers.forEach(user => {
+                        const row = document.createElement('tr');
                         
-                        // 激活當前標籤
-                        this.classList.add('active');
+                        // 生成隨機日期（過去7天內）
+                        const randomDate = generateRandomDate(7);
+                        const formattedDate = formatDate(randomDate);
                         
-                        // 隱藏所有內容
-                        const contents = document.querySelectorAll('.leaderboard-content');
-                        contents.forEach(c => c.classList.remove('active'));
+                        // 隨機商戶ID
+                        const merchantIds = ['13589', '24671', '37824', '45912', '58763'];
+                        const randomMerchantId = merchantIds[Math.floor(Math.random() * merchantIds.length)];
                         
-                        // 顯示對應內容
-                        const targetId = this.getAttribute('data-tab') + '-leaderboard';
-                        document.getElementById(targetId).classList.add('active');
-            });
-        });
+                        // 隨機合買序號（6位數）
+                        const randomPlanId = Math.floor(100000 + Math.random() * 900000);
+                        
+                        // 參與人數（根據topUsers數據）
+                        const participants = tabType === 'participants' ? user.value : Math.floor(2 + Math.random() * 8);
+                        
+                        // 合買總金額
+                        const amount = tabType === 'avg-amount' ? user.value : Math.floor(100 + Math.random() * 1900);
+                        const formattedAmount = formatNumber(amount);
+                        
+                        // 合買狀態
+                        let status;
+                        if (tabType === 'success-rate') {
+                            // 根據成功率設置狀態
+                            const successRate = user.value / 100;
+                            if (Math.random() < successRate) {
+                                status = '<td class="text-green-600">成功</td>';
+                            } else if (Math.random() < 0.5) {
+                                status = '<td class="text-red-600">失败</td>';
+                            } else {
+                                status = '<td class="text-amber-600">进行中</td>';
+                            }
+                        } else {
+                            // 隨機狀態
+                            const statuses = [
+                                '<td class="text-green-600">成功</td>',
+                                '<td class="text-red-600">失败</td>',
+                                '<td class="text-amber-600">进行中</td>'
+                            ];
+                            status = statuses[Math.floor(Math.random() * statuses.length)];
+                        }
+                        
+                        // 中獎金額（隨機，大約是合買金額的0.8-1.5倍）
+                        const winAmount = status.includes('成功') ? 
+                            Math.floor(amount * (0.8 + Math.random() * 0.7)) : 0;
+                        const formattedWinAmount = formatNumber(winAmount);
+                        
+                        // 統計欄位的值
+                        let countValue;
+                        switch(tabType) {
+                            case 'initiators':
+                                countValue = user.value;
+                                break;
+                            case 'participants':
+                                countValue = user.value;
+                                break;
+                            case 'success-rate':
+                                countValue = user.value + '%';
+                                break;
+                            case 'avg-amount':
+                                countValue = formatNumber(user.value);
+                                break;
+                            default:
+                                countValue = 0;
+                        }
+                        
+                        // 填充行數據
+                        row.innerHTML = `
+                            <td>${formattedDate}</td>
+                            <td>${randomMerchantId}</td>
+                            <td>${randomPlanId}</td>
+                            <td>${user.id}</td>
+                            <td class="count-cell">${countValue}</td>
+                            <td>${participants}</td>
+                            <td>${formattedAmount}</td>
+                            ${status}
+                            <td>${formattedWinAmount}</td>
+                        `;
+                        
+                        // 將行添加到數組
+                        row.setAttribute('data-date', randomDate.getTime());
+                        allRows.push(row);
+                    });
+                    
+                    // 添加更多隨機數據（總共顯示20條）
+                    const totalRows = 20;
+                    const remainingRows = totalRows - topUsers.length;
+                    
+                    for (let i = 0; i < remainingRows; i++) {
+                        const row = document.createElement('tr');
+                        
+                        // 生成隨機日期（過去30天內）
+                        const randomDate = generateRandomDate(30);
+                        const formattedDate = formatDate(randomDate);
+                        
+                        // 隨機商戶ID
+                        const merchantIds = ['13589', '24671', '37824', '45912', '58763'];
+                        const randomMerchantId = merchantIds[Math.floor(Math.random() * merchantIds.length)];
+                        
+                        // 隨機合買序號
+                        const randomPlanId = Math.floor(100000 + Math.random() * 900000);
+                        
+                        // 隨機用戶ID
+                        const randomUserId = Math.floor(10000 + Math.random() * 90000);
+                        
+                        // 隨機參與人數
+                        const participants = Math.floor(2 + Math.random() * 8);
+                        
+                        // 隨機合買金額
+                        const amount = Math.floor(100 + Math.random() * 1900);
+                        const formattedAmount = formatNumber(amount);
+                        
+                        // 隨機狀態
+                        const statuses = [
+                            '<td class="text-green-600">成功</td>',
+                            '<td class="text-red-600">失败</td>',
+                            '<td class="text-amber-600">进行中</td>'
+                        ];
+                        const status = statuses[Math.floor(Math.random() * statuses.length)];
+                        
+                        // 中獎金額
+                        const winAmount = status.includes('成功') ? 
+                            Math.floor(amount * (0.8 + Math.random() * 0.7)) : 0;
+                        const formattedWinAmount = formatNumber(winAmount);
+                        
+                        // 統計欄位
+                        let countValue;
+                        switch(tabType) {
+                            case 'initiators':
+                                countValue = Math.floor(1 + Math.random() * 10);
+                                break;
+                            case 'participants':
+                                countValue = Math.floor(1 + Math.random() * 20);
+                                break;
+                            case 'success-rate':
+                                countValue = (Math.random() * 50).toFixed(1) + '%';
+                                break;
+                            case 'avg-amount':
+                                countValue = formatNumber(Math.floor(50 + Math.random() * 300));
+                                break;
+                            default:
+                                countValue = 0;
+                        }
+                        
+                        // 填充行數據
+                        row.innerHTML = `
+                            <td>${formattedDate}</td>
+                            <td>${randomMerchantId}</td>
+                            <td>${randomPlanId}</td>
+                            <td>${randomUserId}</td>
+                            <td class="count-cell">${countValue}</td>
+                            <td>${participants}</td>
+                            <td>${formattedAmount}</td>
+                            ${status}
+                            <td>${formattedWinAmount}</td>
+                        `;
+                        
+                        // 將行添加到數組
+                        row.setAttribute('data-date', randomDate.getTime());
+                        allRows.push(row);
+                    }
+                    
+                    // 按日期降序排序所有行（最新日期優先）
+                    allRows.sort((a, b) => {
+                        const dateA = parseInt(a.getAttribute('data-date'));
+                        const dateB = parseInt(b.getAttribute('data-date'));
+                        return dateB - dateA;
+                    });
+                    
+                    // 將排序後的行添加到表格
+                    allRows.forEach(row => {
+                        tableBody.appendChild(row);
+                    });
+                    
+                    // 更新分頁信息
+                    updatePaginationInfo();
+                }
+
+                // 獲取排行榜前N名用戶
+                function getTopUsers(tabType, count) {
+                    // 獲取對應排行榜的用戶數據
+                    let leaderboardData = [];
+                    
+                    // 根據排行榜類型獲取對應數據
+                    switch(tabType) {
+                        case 'initiators':
+                            leaderboardData = [
+                                { id: '10048', value: 50 },
+                                { id: '10011', value: 49 },
+                                { id: '10013', value: 47 },
+                                { id: '10038', value: 47 },
+                                { id: '10005', value: 46 }
+                            ];
+                            break;
+                        case 'participants':
+                            leaderboardData = [
+                                { id: '10030', value: 100 },
+                                { id: '10023', value: 98 },
+                                { id: '10013', value: 97 },
+                                { id: '10003', value: 93 },
+                                { id: '10015', value: 91 }
+                            ];
+                            break;
+                        case 'success-rate':
+                            leaderboardData = [
+                                { id: '10005', value: 65.2 },
+                                { id: '10013', value: 57.4 },
+                                { id: '10038', value: 46.8 },
+                                { id: '10048', value: 46.0 },
+                                { id: '10011', value: 24.5 }
+                            ];
+                            break;
+                        case 'avg-amount':
+                            leaderboardData = [
+                                { id: '10011', value: 758.4 },
+                                { id: '10005', value: 638.0 },
+                                { id: '10013', value: 449.9 },
+                                { id: '10048', value: 405.3 },
+                                { id: '10038', value: 180.2 }
+                            ];
+                            break;
+                        default:
+                            return [];
+                    }
+                    
+                    // 取前N名
+                    return leaderboardData.slice(0, count);
+                }
+
+                // 生成隨機日期
+                function generateRandomDate(daysRange) {
+                    const today = new Date();
+                    const pastDay = new Date(today);
+                    pastDay.setDate(today.getDate() - Math.floor(Math.random() * daysRange));
+                    return pastDay;
+                }
+
+                // 格式化日期
+                function formatDate(date) {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+
+                // 格式化數字（添加千分位）
+                function formatNumber(num) {
+                    if (num >= 1000) {
+                        return `${Math.floor(num/1000)},${String(num % 1000).padStart(3, '0')}`;
+                    }
+                    return String(num);
+                }
+
+                // 計算統計數據
+                function calculateStats(data, tabType) {
+                    const stats = {};
+                    
+                    data.forEach(row => {
+                        if (!stats[row.userId]) {
+                            stats[row.userId] = {
+                                count: 0,
+                                participantCount: 0,
+                                totalAmount: 0,
+                                successCount: 0,
+                                totalCount: 0
+                            };
+                        }
+                        
+                        const userStats = stats[row.userId];
+                        userStats.count++;
+                        userStats.participantCount += row.participants;
+                        userStats.totalAmount += row.amount;
+                        userStats.totalCount++;
+                        if (row.status === '成功') {
+                            userStats.successCount++;
+                        }
+                    });
+                    
+                    // 計算平均值和比率
+                    Object.values(stats).forEach(stat => {
+                        stat.successRate = stat.successCount / stat.totalCount;
+                        stat.avgAmount = stat.totalAmount / stat.totalCount;
+                    });
+                    
+                    return stats;
+                }
 
                 // 圖表標籤切換
                 const chartTabs = document.querySelectorAll('.chart-tab');
@@ -2157,9 +1950,10 @@
                         let columnIndex;
                         switch (column) {
                             case 'date': columnIndex = 0; break;
-                            case 'participants': columnIndex = 4; break;
-                            case 'amount': columnIndex = 5; break;
-                            case 'winAmount': columnIndex = 7; break;
+                            case 'count': columnIndex = 4; break;
+                            case 'participants': columnIndex = 5; break;
+                            case 'amount': columnIndex = 6; break;
+                            case 'winAmount': columnIndex = 8; break;
                             default: columnIndex = 0;
                         }
                         
@@ -2177,6 +1971,15 @@
                                 // 金額格式（去除逗號）
                                 aValue = parseFloat(aValue.replace(',', ''));
                                 bValue = parseFloat(bValue.replace(',', ''));
+                            } else if (column === 'count') {
+                                // 處理百分比和一般數字
+                                if (aValue.includes('%')) {
+                                    aValue = parseFloat(aValue);
+                                    bValue = parseFloat(bValue);
+                                } else {
+                                    aValue = parseFloat(aValue.replace(',', ''));
+                                    bValue = parseFloat(bValue.replace(',', ''));
+                                }
                             }
                             
                             // 比較值
@@ -2246,6 +2049,9 @@
                     // 清空現有數據
                     tableBody.innerHTML = '';
                     
+                    // 創建一個數組來存儲所有生成的行
+                    const allRows = [];
+                    
                     // 生成隨機日期（過去30天內）
                     function randomDate() {
                         const today = new Date();
@@ -2256,7 +2062,10 @@
                         const month = String(pastDay.getMonth() + 1).padStart(2, '0');
                         const day = String(pastDay.getDate()).padStart(2, '0');
                         
-                        return `${year}-${month}-${day}`;
+                        return {
+                            dateObj: pastDay,
+                            dateStr: `${year}-${month}-${day}`
+                        };
                     }
                     
                     // 生成6位數的隨機序號
@@ -2294,7 +2103,7 @@
                     
                     // 生成行數據
                     for (let i = 0; i < count; i++) {
-                        const date = randomDate();
+                        const dateInfo = randomDate();
                         const merchantIndex = Math.floor(Math.random() * merchantIds.length);
                         const merchantId = merchantIds[merchantIndex];
                         const planId = randomPlanId();
@@ -2306,7 +2115,7 @@
                         
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${date}</td>
+                            <td>${dateInfo.dateStr}</td>
                             <td>${merchantId}</td>
                             <td>${planId}</td>
                             <td>${initiatorId}</td>
@@ -2316,28 +2125,27 @@
                             <td>${winAmount}</td>
                         `;
                         
-                        tableBody.appendChild(row);
+                        // 添加日期數據以便排序
+                        row.setAttribute('data-date', dateInfo.dateObj.getTime());
+                        allRows.push(row);
                     }
+                    
+                    // 按日期降序排序（最新的日期優先）
+                    allRows.sort((a, b) => {
+                        const dateA = parseInt(a.getAttribute('data-date'));
+                        const dateB = parseInt(b.getAttribute('data-date'));
+                        return dateB - dateA;
+                    });
+                    
+                    // 將排序後的行添加到表格
+                    allRows.forEach(row => {
+                        tableBody.appendChild(row);
+                    });
                 }
                 
-                // 範圍滑塊值顯示
-                const rangeSliders = document.querySelectorAll('.range-slider');
-                rangeSliders.forEach(function(slider) {
-                    slider.addEventListener('input', function() {
-                        const valueId = this.id.replace('Range', 'Value');
-                        const valueEl = document.getElementById(valueId);
-                        
-                        if (valueEl) {
-                            if (this.id === 'successRateRange') {
-                                valueEl.textContent = this.value + '%+';
-                            } else if (this.id === 'avgAmountRange') {
-                                valueEl.textContent = '¥' + this.value + '+';
-                            } else {
-                                valueEl.textContent = this.value + '+';
-                            }
-                        }
-                    });
-                });
+
+
+
         });
     </script>
     </div>
