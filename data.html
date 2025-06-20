@@ -3,15 +3,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>合买数据分析报表</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.7/dayjs.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+    <!-- 更新FontAwesome到最新穩定版本，添加多個CDN備用 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- 備用CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" onerror="this.onerror=null;this.href='https://unpkg.com/@fortawesome/fontawesome-free@6.5.1/css/all.min.css';">
+    
     <style>
+        /* 確保字體在Mac上正確顯示 */
         body {
-            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
             background-color: #f0f4f8;
             transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
+        
+        /* 中文字體優化 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', SimSun, sans-serif;
+        }
+        
+        /* 圖標備用方案 */
+        .icon-fallback {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            text-align: center;
+            line-height: 1;
+        }
+        
+        /* 當FontAwesome未加載時的備用圖標 */
+        .fa-chevron-down::before,
+        .fas.fa-chevron-down::before {
+            content: "▼";
+            font-family: inherit;
+            font-size: 0.8em;
+        }
+        
+        .fa-chevron-up::before,
+        .fas.fa-chevron-up::before {
+            content: "▲";
+            font-family: inherit;
+            font-size: 0.8em;
+        }
+        
+        .fa-sun::before,
+        .fas.fa-sun::before {
+            content: "☀";
+            font-family: inherit;
+        }
+        
+        .fa-moon::before,
+        .fas.fa-moon::before {
+            content: "🌙";
+            font-family: inherit;
+        }
+        
+        .fa-code::before,
+        .fas.fa-code::before {
+            content: "</>";
+            font-family: inherit;
+            font-size: 0.9em;
+        }
+        
+        .fa-download::before,
+        .fas.fa-download::before {
+            content: "⬇";
+            font-family: inherit;
+        }
+        
+        .fa-sort::before,
+        .fas.fa-sort::before {
+            content: "↕";
+            font-family: inherit;
+        }
+        
+        .fa-sort-up::before,
+        .fas.fa-sort-up::before {
+            content: "↑";
+            font-family: inherit;
+        }
+        
+        .fa-sort-down::before,
+        .fas.fa-sort-down::before {
+            content: "↓";
+            font-family: inherit;
+        }
+        
+        .fa-copy::before,
+        .fas.fa-copy::before {
+            content: "📄";
+            font-family: inherit;
+        }
+        
+        .fa-times::before,
+        .fas.fa-times::before {
+            content: "✕";
+            font-family: inherit;
+        }
+        
+        .fa-check::before,
+        .fas.fa-check::before {
+            content: "✓";
+            font-family: inherit;
+        }
+        
+        /* 當FontAwesome加載成功時，隱藏備用內容 */
+        .fa:not(.icon-fallback)::before,
+        .fas:not(.icon-fallback)::before {
+            font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", FontAwesome;
+        }
+        
         body.dark {
             background-color: #1a202c;
             color: #e2e8f0;
@@ -68,6 +172,52 @@
                 padding-left: 6px !important;
                 padding-right: 6px !important;
             }
+        }
+        
+        /* Mac系統特定優化 */
+        @media screen and (-webkit-min-device-pixel-ratio: 2) {
+            body {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+        }
+        
+        /* Mac系統專用樣式 */
+        body.mac-system {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body.mac-system .card {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+        }
+        
+        body.mac-system .card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+        
+        /* Mac Safari 特定修復 */
+        @supports (-webkit-appearance: none) {
+            select {
+                -webkit-appearance: none;
+                background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 0.75rem center;
+                background-size: 16px 12px;
+                padding-right: 2.5rem;
+            }
+            
+            body.dark select {
+                background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+            }
+        }
+        
+        /* 當FontAwesome未加載時的備用樣式增強 */
+        body.fa-fallback .fas,
+        body.fa-fallback .fa {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: normal;
+            font-style: normal;
         }
         
         /* 表單元素的深色模式樣式 */
@@ -186,7 +336,7 @@
             background-color: #1e293b;
             color: #e2e8f0;
             border-radius: 0.375rem;
-            font-family: 'Courier New', monospace;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
             overflow-x: auto;
             white-space: pre;
         }
@@ -494,7 +644,67 @@
         body.dark .border-b {
             border-bottom-color: #4a5568;
         }
+        
+        /* TAB切換相關樣式 */
+        .tab-button {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .tab-button.active {
+            border-bottom-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        body.dark .tab-button.active {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* 用戶指標表格樣式 */
+        .user-table th {
+            width: 14.28%; /* 7列，每列平均寬度 */
+        }
+        
+        .user-table th.wide-column {
+            width: 16.67%; /* 6列，每列平均寬度 */
+        }
     </style>
+    
+    <!-- 添加字體加載檢測腳本 -->
+    <script>
+        // 檢測FontAwesome是否加載成功
+        function checkFontAwesome() {
+            const testElement = document.createElement('i');
+            testElement.className = 'fas fa-home';
+            testElement.style.position = 'absolute';
+            testElement.style.left = '-9999px';
+            document.body.appendChild(testElement);
+            
+            const computedStyle = window.getComputedStyle(testElement, ':before');
+            const isLoaded = computedStyle.getPropertyValue('font-family').indexOf('Font Awesome') !== -1;
+            
+            document.body.removeChild(testElement);
+            
+            if (!isLoaded) {
+                console.warn('FontAwesome未能正確加載，使用備用圖標');
+                document.body.classList.add('fa-fallback');
+            }
+        }
+        
+        // 頁面加載完成後檢測
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(checkFontAwesome, 1000);
+        });
+    </script>
 </head>
 <body data-new-gr-c-s-check-loaded="14.1105.0" data-gr-ext-installed="">
     <div class="container mx-auto px-3 py-4">
@@ -516,79 +726,144 @@
         <!-- 筛选条件 -->
         <div class="filter-section p-3 mb-4">
             <div class="flex justify-between items-center mb-2 cursor-pointer collapsible" id="filterToggle">
-                <h3 class="text-sm font-medium text-gray-700">筛选条件</h3>
+                <div class="flex items-center space-x-4">
+                    <button class="tab-button active px-3 py-1 text-sm font-medium border-b-2 border-blue-500 text-blue-600" data-tab="groupbuy">合买指标</button>
+                    <button class="tab-button px-3 py-1 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="user">用户指标</button>
+                </div>
                 <i class="fas fa-chevron-down text-gray-500"></i>
             </div>
-            <div class="collapsible-content" id="filterContent">
-                <div class="flex flex-wrap md:flex-wrap items-center gap-3 filter-container">
-                <div class="w-full md:w-auto filter-item" style="min-width: 110px; max-width: 130px;">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">时间维度</label>
-                        <select id="timeGranularity" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="day">按天</option>
-                        <option value="week">按周</option>
-                        <option value="month">按月</option>
-                    </select>
-                </div>
-                    <div class="w-full md:w-auto flex-grow filter-item" id="dateRangeContainer" style="max-width: 310px; min-width: 270px;">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">日期范围</label>
-                        <div class="flex items-center gap-1" id="daySelector">
-                            <input type="date" id="startDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
-                        <span>至</span>
-                            <input type="date" id="endDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+            <div class="collapsible-content expanded" id="filterContent">
+                <!-- 合买指标筛选 -->
+                <div class="tab-content active" id="groupbuy-filter">
+                    <div class="flex flex-wrap md:flex-wrap items-center gap-3 filter-container">
+                        <div class="w-full md:w-auto filter-item" style="min-width: 110px; max-width: 130px;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">时间维度</label>
+                            <select id="timeGranularity" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="day">按天</option>
+                                <option value="week">按周</option>
+                                <option value="month">按月</option>
+                            </select>
                         </div>
-                        <div class="flex items-center gap-1 hidden" id="weekSelector">
-                            <input type="week" id="startWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
-                            <span>至</span>
-                            <input type="week" id="endWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                        <div class="w-full md:w-auto flex-grow filter-item" id="dateRangeContainer" style="max-width: 310px; min-width: 270px;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">日期范围</label>
+                            <div class="flex items-center gap-1" id="daySelector">
+                                <input type="date" id="startDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                                <span>至</span>
+                                <input type="date" id="endDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                            </div>
+                            <div class="flex items-center gap-1 hidden" id="weekSelector">
+                                <input type="week" id="startWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                                <span>至</span>
+                                <input type="week" id="endWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                            </div>
+                            <div class="flex items-center gap-1 hidden" id="monthSelector">
+                                <input type="month" id="startMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                                <span>至</span>
+                                <input type="month" id="endMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                            </div>
                         </div>
-                        <div class="flex items-center gap-1 hidden" id="monthSelector">
-                            <input type="month" id="startMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
-                            <span>至</span>
-                            <input type="month" id="endMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                        <div class="w-full md:w-auto filter-item" style="min-width: 150px; max-width: 160px;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">商户ID</label>
+                            <select id="merchantId" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-ellipsis merchant-selector">
+                                <option value="all">全部</option>
+                                <option value="13589">13589 - 星辰体育</option>
+                                <option value="24671">24671 - 极速赛车</option>
+                                <option value="37824">37824 - 财富彩票</option>
+                                <option value="45912">45912 - 金鹰彩店</option>
+                                <option value="58763">58763 - 幸运星彩</option>
+                            </select>
+                        </div>
+                        <div class="w-full md:w-auto filter-item" style="min-width: 120px; max-width: 140px;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">合买序号</label>
+                            <input type="text" id="planId" placeholder="输入序号或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
+                        </div>
+                        <div class="w-full md:w-auto filter-item" style="min-width: 100px; max-width: 120px;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">发起人ID</label>
+                            <input type="text" id="initiatorId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
+                        </div>
+                        <div class="w-full md:w-auto filter-item" style="min-width: 100px; max-width: 120px;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">参与人ID</label>
+                            <input type="text" id="participantId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
+                        </div>
+                        <div class="w-full md:w-auto md:flex-shrink-0 md:flex-grow-0 flex-nowrap whitespace-nowrap filter-item buttons-container" style="min-width: 370px;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">合买状态</label>
+                            <div class="flex items-center flex-nowrap">
+                                <select id="status" class="w-28 rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="all">全部</option>
+                                    <option value="success">成功</option>
+                                    <option value="fail">失败</option>
+                                    <option value="in_progress">进行中</option>
+                                </select>
+                                <button id="filterBtn" class="btn-primary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">搜索</button>
+                                <button id="resetBtn" class="btn-secondary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">重置</button>
+                                <button id="exportBtn" class="px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button bg-green-500 hover:bg-green-600 text-white transition" style="width: 56px;">
+                                    <i class="fas fa-download mr-1"></i>导出
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="w-full md:w-auto filter-item" style="min-width: 150px; max-width: 160px;">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">商户ID</label>
-                        <select id="merchantId" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-ellipsis merchant-selector">
-                            <option value="all">全部</option>
-                            <option value="13589">13589 - 星辰体育</option>
-                            <option value="24671">24671 - 极速赛车</option>
-                            <option value="37824">37824 - 财富彩票</option>
-                            <option value="45912">45912 - 金鹰彩店</option>
-                            <option value="58763">58763 - 幸运星彩</option>
-                        </select>
-                </div>
-                <div class="w-full md:w-auto filter-item" style="min-width: 120px; max-width: 140px;">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">合买序号</label>
-                        <input type="text" id="planId" placeholder="输入序号或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
-                </div>
-                <div class="w-full md:w-auto filter-item" style="min-width: 100px; max-width: 120px;">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">发起人ID</label>
-                        <input type="text" id="initiatorId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
-                </div>
-                <div class="w-full md:w-auto filter-item" style="min-width: 100px; max-width: 120px;">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">参与人ID</label>
-                        <input type="text" id="participantId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
-                    </div>
-                    <div class="w-full md:w-auto md:flex-shrink-0 md:flex-grow-0 flex-nowrap whitespace-nowrap filter-item buttons-container" style="min-width: 370px;">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">合买状态</label>
-                        <div class="flex items-center flex-nowrap">
-                            <select id="status" class="w-28 rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="all">全部</option>
-                        <option value="success">成功</option>
-                        <option value="fail">失败</option>
-                        <option value="in_progress">进行中</option>
-                    </select>
-                            <button id="filterBtn" class="btn-primary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">搜索</button>
-                            <button id="resetBtn" class="btn-secondary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">重置</button>
-                            <button id="exportBtn" class="px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button bg-green-500 hover:bg-green-600 text-white transition" style="width: 56px;">
-                                <i class="fas fa-download mr-1"></i>导出
-                            </button>
+
+                <!-- 用户指标筛选 -->
+                <div class="tab-content hidden" id="user-filter">
+                    <div class="flex flex-wrap md:flex-wrap items-center gap-3 filter-container">
+                        <div class="w-full md:w-auto filter-item" style="min-width: 110px; max-width: 130px;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">时间维度</label>
+                            <select id="userTimeGranularity" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="day">按天</option>
+                                <option value="week">按周</option>
+                                <option value="month">按月</option>
+                            </select>
+                        </div>
+                        <div class="w-full md:w-auto flex-grow filter-item" id="userDateRangeContainer" style="max-width: 310px; min-width: 270px;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">日期范围</label>
+                            <div class="flex items-center gap-1" id="userDaySelector">
+                                <input type="date" id="userStartDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                                <span>至</span>
+                                <input type="date" id="userEndDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                            </div>
+                            <div class="flex items-center gap-1 hidden" id="userWeekSelector">
+                                <input type="week" id="userStartWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                                <span>至</span>
+                                <input type="week" id="userEndWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                            </div>
+                            <div class="flex items-center gap-1 hidden" id="userMonthSelector">
+                                <input type="month" id="userStartMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                                <span>至</span>
+                                <input type="month" id="userEndMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                            </div>
+                        </div>
+                        <div class="w-full md:w-auto filter-item" style="min-width: 150px; max-width: 160px;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">商户ID</label>
+                            <select id="userMerchantId" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-ellipsis merchant-selector">
+                                <option value="all">全部</option>
+                                <option value="13589">13589 - 星辰体育</option>
+                                <option value="24671">24671 - 极速赛车</option>
+                                <option value="37824">37824 - 财富彩票</option>
+                                <option value="45912">45912 - 金鹰彩店</option>
+                                <option value="58763">58763 - 幸运星彩</option>
+                            </select>
+                        </div>
+                        <div class="w-full md:w-auto filter-item" style="min-width: 180px; max-width: 200px;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">指标维度</label>
+                            <select id="userMetricType" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="initiate">发起合买次数</option>
+                                <option value="participate">参与合买次数</option>
+                            </select>
+                        </div>
+                        <div class="w-full md:w-auto md:flex-shrink-0 md:flex-grow-0 flex-nowrap whitespace-nowrap filter-item buttons-container" style="min-width: 370px;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">操作</label>
+                            <div class="flex items-center flex-nowrap">
+                                <button id="userFilterBtn" class="btn-primary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">搜索</button>
+                                <button id="userResetBtn" class="btn-secondary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">重置</button>
+                                <button id="userExportBtn" class="px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button bg-green-500 hover:bg-green-600 text-white transition" style="width: 56px;">
+                                    <i class="fas fa-download mr-1"></i>导出
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
 
         <!-- 核心指标卡片 -->
@@ -675,24 +950,20 @@
             </div>
         </div>
 
-        <!-- 图表区域 -->
-        <div class="card p-3 mb-4">
-            <div class="flex justify-between items-center mb-2 cursor-pointer" id="chartToggle">
+        <!-- 用户指标图表区域（仅在用户指标TAB时显示） -->
+        <div class="card p-3 mb-4 hidden" id="userChartArea">
+            <div class="flex justify-between items-center mb-2 cursor-pointer" id="userChartToggle">
                 <h2 class="text-sm font-semibold">趋势分析</h2>
-                <div class="flex items-center">
-                    <button class="chart-tab tab-active px-2 py-1 text-xs" data-chart="plans">发起次数</button>
-                    <button class="chart-tab px-2 py-1 text-xs" data-chart="amount">金额</button>
-                    <button class="chart-tab px-2 py-1 text-xs" data-chart="participants">参与人数</button>
+                <div class="flex items-center" id="chartDimensionTabs">
+                    <!-- 動態生成的圖表維度標籤 -->
                 </div>
             </div>
-            <div class="collapsible-content expanded" id="chartContent">
+            <div class="collapsible-content expanded" id="userChartContent">
                 <div style="height: 250px; width: 100%;">
                     <canvas id="trendChart" width="800" height="250"></canvas>
                 </div>
             </div>
         </div>
-
-
 
         <!-- 数据表格 -->
         <div class="card p-3 mb-4">
@@ -701,62 +972,102 @@
                 <i class="fas fa-chevron-down text-gray-500"></i>
             </div>
             <div class="collapsible-content expanded" id="tableContent">
-                <div class="flex justify-between items-center mb-2">
-                <div class="flex items-center">
-                        <span class="text-xs text-gray-600 mr-2">每页显示:</span>
-                        <select id="itemsPerPageSelect" class="rounded-md border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="10">10条</option>
-                        <option value="30">30条</option>
-                        <option value="50">50条</option>
-                        <option value="100">100条</option>
-                    </select>
-                </div>
-            </div>
-            <div class="table-container">
+                <!-- 合买指标表格 -->
+                <div class="table-container" id="groupbuy-table">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-600 mr-2">每页显示:</span>
+                            <select id="itemsPerPageSelect" class="rounded-md border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="10">10条</option>
+                                <option value="30">30条</option>
+                                <option value="50">50条</option>
+                                <option value="100">100条</option>
+                            </select>
+                        </div>
+                    </div>
                     <table class="min-w-full compact-table">
-                    <thead>
-                        <tr>
-                            <th data-sort="date">
-                                日期
-                                <span class="sort-icon active"><i class="fas fa-sort-down"></i></span>
-                            </th>
-                            <th>商户ID</th>
-                            <th>合买序号</th>
-                            <th>发起人ID</th>
-                            <th data-sort="participants">
-                                参与人数
-                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
-                            </th>
-                            <th data-sort="amount">
-                                合买总金额
-                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
-                            </th>
-                            <th>合买状态</th>
-                            <th data-sort="winAmount">
-                                中奖金额
-                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
-                            </th>
-                        </tr>
-                    </thead>
+                        <thead>
+                            <tr>
+                                <th data-sort="date">
+                                    日期
+                                    <span class="sort-icon active"><i class="fas fa-sort-down"></i></span>
+                                </th>
+                                <th>商户ID</th>
+                                <th>合买序号</th>
+                                <th>发起人ID</th>
+                                <th data-sort="participants">
+                                    参与人数
+                                    <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                                </th>
+                                <th data-sort="amount">
+                                    合买总金额
+                                    <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                                </th>
+                                <th>合买状态</th>
+                                <th data-sort="winAmount">
+                                    中奖金额
+                                    <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                                </th>
+                            </tr>
+                        </thead>
                         <tbody id="dataTable">
                             <!-- 动态生成的数据将在这里显示 -->
                         </tbody>
-                </table>
-            </div>
-                <div class="flex justify-between items-center mt-2">
-                    <div class="text-xs text-gray-600">
-                    显示 <span id="startRecord">1</span> 到 <span id="endRecord">10</span> 条，共 <span id="totalRecords">100</span> 条记录
-                </div>
-                <div class="flex items-center" id="pagination">
-                        <button class="pagination-btn btn-secondary text-xs py-1" id="prevPage" disabled>上一页</button>
-                        <div id="pageNumbers" class="flex">
-                            <button class="pagination-btn active text-xs py-1">1</button>
-                            <button class="pagination-btn btn-secondary text-xs py-1">2</button>
-                            <button class="pagination-btn btn-secondary text-xs py-1">3</button>
-                            <button class="pagination-btn btn-secondary text-xs py-1">4</button>
-                            <button class="pagination-btn btn-secondary text-xs py-1">5</button>
+                    </table>
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="text-xs text-gray-600">
+                            显示 <span id="startRecord">1</span> 到 <span id="endRecord">10</span> 条，共 <span id="totalRecords">100</span> 条记录
                         </div>
-                        <button class="pagination-btn btn-secondary text-xs py-1" id="nextPage">下一页</button>
+                        <div class="flex items-center" id="pagination">
+                            <button class="pagination-btn btn-secondary text-xs py-1" id="prevPage" disabled>上一页</button>
+                            <div id="pageNumbers" class="flex">
+                                <button class="pagination-btn active text-xs py-1">1</button>
+                                <button class="pagination-btn btn-secondary text-xs py-1">2</button>
+                                <button class="pagination-btn btn-secondary text-xs py-1">3</button>
+                                <button class="pagination-btn btn-secondary text-xs py-1">4</button>
+                                <button class="pagination-btn btn-secondary text-xs py-1">5</button>
+                            </div>
+                            <button class="pagination-btn btn-secondary text-xs py-1" id="nextPage">下一页</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 用户指标表格 -->
+                <div class="table-container hidden" id="user-table">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-600 mr-2">每页显示:</span>
+                            <select id="userItemsPerPageSelect" class="rounded-md border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="10">10条</option>
+                                <option value="30">30条</option>
+                                <option value="50">50条</option>
+                                <option value="100">100条</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table class="min-w-full compact-table user-table">
+                        <thead id="userTableHeader">
+                            <!-- 動態生成的表格標題 -->
+                        </thead>
+                        <tbody id="userDataTable">
+                            <!-- 动态生成的用户数据将在这里显示 -->
+                        </tbody>
+                    </table>
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="text-xs text-gray-600">
+                            显示 <span id="userStartRecord">1</span> 到 <span id="userEndRecord">10</span> 条，共 <span id="userTotalRecords">100</span> 条记录
+                        </div>
+                        <div class="flex items-center" id="userPagination">
+                            <button class="pagination-btn btn-secondary text-xs py-1" id="userPrevPage" disabled>上一页</button>
+                            <div id="userPageNumbers" class="flex">
+                                <button class="pagination-btn active text-xs py-1">1</button>
+                                <button class="pagination-btn btn-secondary text-xs py-1">2</button>
+                                <button class="pagination-btn btn-secondary text-xs py-1">3</button>
+                                <button class="pagination-btn btn-secondary text-xs py-1">4</button>
+                                <button class="pagination-btn btn-secondary text-xs py-1">5</button>
+                            </div>
+                            <button class="pagination-btn btn-secondary text-xs py-1" id="userNextPage">下一页</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -769,7 +1080,7 @@
             <div class="code-modal-content">
                 <div class="flex flex-col h-full">
                     <div class="p-3 border-b flex justify-between items-center">
-                        <h3 class="text-sm font-semibold">开发者信息 - 源代码 V1.0</h3>
+                        <h3 class="text-sm font-semibold">开发者信息 - 源代码 V2.0</h3>
                         <div class="flex items-center">
                             <button id="copyCodeBtn" class="btn-primary px-3 py-1 text-sm rounded-md mr-2">
                                 <i class="fas fa-copy mr-1"></i> 复制代码
@@ -781,11 +1092,24 @@
                     </div>
                     <div class="overflow-auto p-3" style="max-height: calc(80vh - 60px);">
                         <pre id="codeContent" class="code-content p-3 text-sm">/**
- * 合買數據分析報表 V1.0
- * 更新日期: 2024-06-11
- * 支持功能: 數據篩選、排序、導出、暗黑模式、圖表分析
+ * 合買數據分析報表 V2.0
+ * 更新日期: 2024-12-19
+ * 
+ * 更新內容：
+ * - 移除合買指標的趨勢分析圖表，保留用戶指標圖表功能
+ * - 修復合買指標表格排序功能，確保所有排序按鈕正常工作
+ * - 優化TAB切換邏輯，合買指標和用戶指標獨立管理
+ * - 改進表格分頁和篩選功能的兼容性
+ * - 增強Mac系統和深色模式的支持
+ * 
+ * 支持功能:
+ * - 合買指標：數據篩選、表格排序、分頁、導出功能
+ * - 用戶指標：完整圖表分析、數據篩選、表格排序、分頁、導出
+ * - 響應式設計、暗黑模式切換
+ * - Mac Safari兼容性優化
+ * - FontAwesome圖標備用方案
  */
-&lt;html lang="zh-CN"&gt;...代码内容...&lt;/html&gt;</pre>
+&lt;html lang="zh-CN"&gt;...完整代码内容...&lt;/html&gt;</pre>
                     </div>
                 </div>
             </div>
@@ -793,28 +1117,321 @@
 
         <!-- 添加 JavaScript 代码 -->
         <script>
+            // 全局函數定義
+            function getWeekNumber(date) {
+                const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+                const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+                return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+            }
+
+            // 格式化標籤
+            function formatLabel(key, timeGranularity) {
+                if (timeGranularity === 'day') {
+                    // 日期格式：MM/DD
+                    const parts = key.split('-');
+                    return `${parts[1]}/${parts[2]}`;
+                } else if (timeGranularity === 'week') {
+                    // 週格式：Week WW
+                    const weekNumber = key.split('-W')[1];
+                    return `第${weekNumber}週`;
+                } else if (timeGranularity === 'month') {
+                    // 月份格式：YYYY/MM
+                    const parts = key.split('-');
+                    return `${parts[0]}/${parts[1]}`;
+                }
+                return key;
+            }
+
+            // 獲取指標標籤
+            function getMetricLabel(metricType) {
+                switch(metricType) {
+                    case 'initiate': return '发起合买次数';
+                    case 'participate': return '参与合买次数';
+                    case 'success_rate': return '合买带单成功率';
+                    case 'avg_amount': return '合买平均带单金额';
+                    case 'initiate_count': return '发起合买次数';
+                    case 'participate_count': return '参与合买次数';
+                    case 'win_rate': return '发起的合买胜率';
+                    case 'participate_win_rate': return '参与合买胜率';
+                    case 'avg_bet_amount': return '平均合买投注金额';
+                    case 'avg_win_amount': return '平均合买中奖金额';
+                    case 'win_amount': return '中奖金额';
+                    default: return '指标';
+                }
+            }
+
+            // 全局用戶表格標題更新函數
+            function updateUserTableHeaders(metricType) {
+                const tableHeader = document.getElementById('userTableHeader');
+                let headerHTML = '';
+                
+                if (metricType === 'initiate') {
+                    // 发起合买次数栏位
+                    headerHTML = `
+                        <tr>
+                            <th data-sort="date">
+                                日期
+                                <span class="sort-icon active"><i class="fas fa-sort-down"></i></span>
+                            </th>
+                            <th>商户ID</th>
+                            <th>发起人ID</th>
+                            <th data-sort="count">
+                                发起合买次数
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th data-sort="rate">
+                                合买带单成功率
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th data-sort="amount">
+                                合买平均带单金额
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th data-sort="winRate">
+                                发起的合买胜率
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                        </tr>
+                    `;
+                } else if (metricType === 'participate') {
+                    // 参与合买次数栏位
+                    headerHTML = `
+                        <tr>
+                            <th data-sort="date">
+                                日期
+                                <span class="sort-icon active"><i class="fas fa-sort-down"></i></span>
+                            </th>
+                            <th>商户ID</th>
+                            <th>用户ID</th>
+                            <th data-sort="count">
+                                参与合买次数
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th data-sort="rate">
+                                参与合买胜率
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th data-sort="amount">
+                                平均合买投注金额
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th data-sort="avgWin">
+                                平均合买中奖金额
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                            <th data-sort="totalWin">
+                                总中奖金额
+                                <span class="sort-icon"><i class="fas fa-sort"></i></span>
+                            </th>
+                        </tr>
+                    `;
+                }
+                
+                tableHeader.innerHTML = headerHTML;
+                
+                // 重新初始化用戶表格排序，因為表格標題已重新生成
+                setTimeout(() => {
+                    initUserTableSorting();
+                }, 50);
+            }
+
+
+
+            // 獲取X軸標題
+            function getXAxisTitle(timeGranularity) {
+                if (timeGranularity === 'day') {
+                    return '日期 (月/日)';
+                } else if (timeGranularity === 'week') {
+                    return '週數';
+                } else if (timeGranularity === 'month') {
+                    return '月份 (年/月)';
+                }
+                return '日期';
+            }
+
+            // 徹底銷毀所有圖表實例
+            function destroyAllCharts() {
+                // 銷毀用戶指標圖表
+                if (window.userChart) {
+                    try {
+                        window.userChart.destroy();
+                    } catch (e) {
+                        console.warn('Error destroying user chart:', e);
+                    }
+                    window.userChart = null;
+                }
+                
+                // 清理Chart.js的內部註冊表（適用於Chart.js 3.x）
+                const canvas = document.getElementById('trendChart');
+                if (canvas && typeof Chart !== 'undefined') {
+                    try {
+                        // Chart.js 3.x 使用 Chart.getChart() 來獲取canvas上的圖表實例
+                        const existingChart = Chart.getChart(canvas);
+                        if (existingChart) {
+                            console.log('Found existing chart, destroying...');
+                            existingChart.destroy();
+                        }
+                    } catch (e) {
+                        console.warn('Error clearing Chart.js registry:', e);
+                    }
+                }
+                
+                console.log('All charts destroyed');
+            }
+
+
+
+            // 根據維度更新用戶圖表
+            function updateUserChartByDimension(chartType) {
+                if (typeof updateUserChart === 'function') {
+                    // 存儲當前選中的圖表維度
+                    window.currentUserChartType = chartType;
+                    updateUserChart();
+                } else {
+                    console.warn('updateUserChart function not available');
+                }
+            }
+
+            // 更新圖表維度標籤（僅用於用戶指標）
+            function updateChartDimensionTabs(tabType, metricType) {
+                const chartDimensionTabs = document.getElementById('chartDimensionTabs');
+                let tabsHTML = '';
+                
+                if (tabType === 'user') {
+                    if (metricType === 'initiate') {
+                        // 發起合買次數維度 - 參考合買指標模式，提供完整的維度選項
+                        tabsHTML = `
+                            <button class="chart-tab tab-active px-2 py-1 text-xs" data-chart="initiate_count">发起合买次数</button>
+                            <button class="chart-tab px-2 py-1 text-xs" data-chart="success_rate">合买带单成功率</button>
+                            <button class="chart-tab px-2 py-1 text-xs" data-chart="avg_amount">平均带单金额</button>
+                            <button class="chart-tab px-2 py-1 text-xs" data-chart="win_rate">发起的合买胜率</button>
+                        `;
+                    } else if (metricType === 'participate') {
+                        // 參與合買次數維度 - 參考合買指標模式，提供完整的維度選項
+                        tabsHTML = `
+                            <button class="chart-tab tab-active px-2 py-1 text-xs" data-chart="participate_count">参与合买次数</button>
+                            <button class="chart-tab px-2 py-1 text-xs" data-chart="participate_win_rate">参与合买胜率</button>
+                            <button class="chart-tab px-2 py-1 text-xs" data-chart="avg_bet_amount">平均合买投注金额</button>
+                            <button class="chart-tab px-2 py-1 text-xs" data-chart="avg_win_amount">平均合买中奖金额</button>
+                        `;
+                    }
+                    
+                    chartDimensionTabs.innerHTML = tabsHTML;
+                    
+                    // 為新生成的按鈕添加事件監聽器
+                    const chartTabs = chartDimensionTabs.querySelectorAll('.chart-tab');
+                    chartTabs.forEach(tab => {
+                        tab.addEventListener('click', function() {
+                            // 移除其他按鈕的active狀態
+                            chartTabs.forEach(t => t.classList.remove('tab-active'));
+                            // 為當前按鈕添加active狀態
+                            this.classList.add('tab-active');
+                            
+                            // 根據維度類型更新圖表
+                            const chartType = this.getAttribute('data-chart');
+                            const activeTab = document.querySelector('.tab-button.active');
+                            const tabType = activeTab ? activeTab.getAttribute('data-tab') : 'groupbuy';
+                            
+                            if (tabType === 'user') {
+                                updateUserChartByDimension(chartType);
+                            }
+                            // 移除了合買指標的圖表邏輯
+                        });
+                    });
+                }
+                // 不再需要處理合買指標的隱藏邏輯，由TAB切換邏輯統一處理
+            }
+
             document.addEventListener('DOMContentLoaded', function() {
+                // 檢查Chart.js是否已加載
+                if (typeof Chart === 'undefined') {
+                    console.error('Chart.js not loaded!');
+                    return;
+                }
+                
+                // 初始化Mac兼容性檢查
+                initMacCompatibility();
+                
                 // 初始化主題
                 initTheme();
                 
                 // 初始化折疊面板
                 initCollapsibleSections();
                 
+                // 初始化TAB切換功能
+                initTabSwitching();
+                
                 // 設置默認日期
                 setupDefaultDates();
+                
+                // 設置用戶指標默認日期
+                setupUserDefaultDates();
+                
+                // 確保表格區域是可見的
+                const tableContent = document.getElementById('tableContent');
+                if (tableContent && !tableContent.classList.contains('expanded')) {
+                    tableContent.classList.add('expanded');
+                }
                 
                 // 生成隨機數據
                 generateRandomData(200);
                 
+                // 設置初始表格標題（默認為合買指標）
+                // updateUserTableHeaders('initiate'); // 不需要初始化用戶表格標題
+                
+                // 不再需要設置初始圖表維度標籤，因為合買指標沒有圖表了
+                
                 // 初始化表格分頁和排序
                 initTablePagination();
-                initTableSorting();
+                initGroupbuyTableSorting();
+                
+                // 初始化用戶表格分頁和排序
+                initUserTablePagination();
+                initUserTableSorting();
+                
+                // 初始化用戶表格分頁信息
+                updateUserPaginationInfo();
+                
+                // 準備用戶圖表，當切換到用戶TAB時使用
+                window.currentUserChartType = 'initiate_count';
                 
                 // 時間維度切換
                 document.getElementById('timeGranularity').addEventListener('change', function() {
                     const granularity = this.value;
                     updateDateSelector(granularity);
+                    // 合買指標不再有圖表，移除了圖表更新邏輯
                 });
+                
+                // 用戶指標維度切換 - 什麼都不做，只有搜索時才根據選中的維度更新所有內容
+                document.getElementById('userMetricType').addEventListener('change', function() {
+                    // 下拉選單選中時不做任何操作
+                    // 只有點擊搜索按鈕時才會根據選中的指標維度更新表格標題、圖表維度標籤和數據
+                });
+                
+                // 用戶指標時間維度切換
+                document.getElementById('userTimeGranularity').addEventListener('change', function() {
+                    const granularity = this.value;
+                    updateUserDateSelector(granularity);
+                });
+                
+                // 更新用戶日期選擇器
+                function updateUserDateSelector(granularity) {
+                    const daySelector = document.getElementById('userDaySelector');
+                    const weekSelector = document.getElementById('userWeekSelector');
+                    const monthSelector = document.getElementById('userMonthSelector');
+                    
+                    daySelector.classList.add('hidden');
+                    weekSelector.classList.add('hidden');
+                    monthSelector.classList.add('hidden');
+                    
+                    if (granularity === 'day') {
+                        daySelector.classList.remove('hidden');
+                    } else if (granularity === 'week') {
+                        weekSelector.classList.remove('hidden');
+                    } else if (granularity === 'month') {
+                        monthSelector.classList.remove('hidden');
+                    }
+                }
                 
                 // 設置默認日期和格式化日期顯示
                 function setupDefaultDates() {
@@ -844,12 +1461,7 @@
                     document.getElementById('endMonth').value = monthString;
                 }
                 
-                // 根據日期獲取週數
-                function getWeekNumber(date) {
-                    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-                    const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
-                    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-                }
+                // getWeekNumber函數已移至全局作用域
                 
                 // 更新日期選擇器
                 function updateDateSelector(granularity) {
@@ -903,6 +1515,7 @@
                     
                     // 篩選表格數據
                     filterTableData(merchantId, planId, status, initiatorId, participantId, timeGranularity, startDate, endDate);
+                    // 合買指標不再有圖表，移除了圖表更新邏輯
                 });
                 
                 // 匯出按鈕點擊事件
@@ -977,6 +1590,7 @@
                     
                     // 更新分頁信息
                     updatePaginationInfo();
+                    // 合買指標不再有圖表，移除了圖表更新邏輯
                 });
                 
                 // 篩選表格數據的函數
@@ -1068,7 +1682,9 @@
                 
                 // 更新分頁信息
                 function updatePaginationInfo() {
-                    const visibleRows = document.querySelectorAll('#dataTable tr[style=""]').length;
+                    const allRows = document.querySelectorAll('#dataTable tr');
+                    const visibleRows = Array.from(allRows).filter(row => row.style.display !== 'none').length;
+                    console.log(`Pagination: ${allRows.length} total rows, ${visibleRows} visible rows`);
                     const startRecord = document.getElementById('startRecord');
                     const endRecord = document.getElementById('endRecord');
                     const totalRecords = document.getElementById('totalRecords');
@@ -1085,253 +1701,24 @@
                     }
                 }
                 
-                // 初始化趨勢圖
+                // 初始化趨勢圖（僅用於用戶指標）
                 function initTrendChart() {
-                    const ctx = document.getElementById('trendChart').getContext('2d');
+                    // 合買指標不再有圖表，此函數僅用於用戶指標
+                    const activeTab = document.querySelector('.tab-button.active');
+                    const tabType = activeTab ? activeTab.getAttribute('data-tab') : 'groupbuy';
                     
-                    // 檢查當前主題
-                    const isDarkMode = document.body.classList.contains('dark');
-                    
-                    // 創建圖表
-                    const myChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: [], // 初始為空，後續更新
-                            datasets: [{
-                                label: '發起次數',
-                                data: [],
-                                borderColor: '#3b82f6',
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                tension: 0.3,
-                                fill: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                    labels: {
-                                        color: isDarkMode ? '#e2e8f0' : '#1e293b'
-                                    }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        color: isDarkMode ? '#e2e8f0' : '#475569'
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-                                    }
-                                },
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: '日期',
-                                        color: isDarkMode ? '#e2e8f0' : '#475569'
-                                    },
-                                    ticks: {
-                                        color: isDarkMode ? '#e2e8f0' : '#475569'
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-                                    }
-                                }
-                            }
+                    // 延遲初始化確保DOM完全加載
+                    setTimeout(() => {
+                        if (tabType === 'user') {
+                            updateUserChart();
                         }
-                    });
-                    
-                    // 監聽主題變化，更新圖表樣式
-                    document.getElementById('themeToggle').addEventListener('click', function() {
-                        const isDarkMode = document.body.classList.contains('dark');
-                        
-                        // 更新圖表字體顏色
-                        myChart.options.plugins.legend.labels.color = isDarkMode ? '#e2e8f0' : '#1e293b';
-                        myChart.options.scales.x.title.color = isDarkMode ? '#e2e8f0' : '#475569';
-                        myChart.options.scales.x.ticks.color = isDarkMode ? '#e2e8f0' : '#475569';
-                        myChart.options.scales.y.ticks.color = isDarkMode ? '#e2e8f0' : '#475569';
-                        myChart.options.scales.x.grid.color = isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-                        myChart.options.scales.y.grid.color = isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-                        
-                        // 更新圖表
-                        myChart.update();
-                    });
-                    
-                    // 更新圖表數據
-                    updateChartByTimeGranularity('day');
-                    
-                    // 添加時間維度切換監聽器
-                    document.getElementById('timeGranularity').addEventListener('change', function() {
-                        const granularity = this.value;
-                        updateChartByTimeGranularity(granularity);
-                    });
-                    
-                    // 切換圖表類型
-                    document.querySelectorAll('.chart-tab').forEach(function(tab) {
-                        tab.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            
-                            // 移除所有標籤的激活狀態
-                            document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('tab-active'));
-                            
-                            // 激活當前標籤
-                            this.classList.add('tab-active');
-                            
-                            const chartType = this.getAttribute('data-chart');
-                            const timeGranularity = document.getElementById('timeGranularity').value;
-                            
-                            // 更新圖表數據
-                            updateChartData(chartType, timeGranularity);
-                        });
-                    });
-                    
-                    // 更新圖表數據
-                    function updateChartData(chartType, timeGranularity) {
-                        // 獲取活躍的數據類型
-                        let label, color, bgColor;
-                        
-                        if (chartType === 'plans') {
-                            label = '發起次數';
-                            color = '#3b82f6';
-                            bgColor = 'rgba(59, 130, 246, 0.1)';
-                        } else if (chartType === 'amount') {
-                            label = '金額';
-                            color = '#8b5cf6';
-                            bgColor = 'rgba(139, 92, 246, 0.1)';
-                        } else if (chartType === 'participants') {
-                            label = '參與人數';
-                            color = '#10b981';
-                            bgColor = 'rgba(16, 185, 129, 0.1)';
-                        }
-                        
-                        // 獲取對應的數據
-                        const data = generateChartData(chartType, timeGranularity);
-                        
-                        // 更新圖表
-                        myChart.data.datasets[0].label = label;
-                        myChart.data.datasets[0].data = data.values;
-                        myChart.data.labels = data.labels;
-                        myChart.data.datasets[0].borderColor = color;
-                        myChart.data.datasets[0].backgroundColor = bgColor;
-                        
-                        // 更新X軸標題
-                        myChart.options.scales.x.title.text = getXAxisTitle(timeGranularity);
-                        
-                        myChart.update();
-                    }
-                    
-                    // 根據時間維度更新圖表
-                    function updateChartByTimeGranularity(granularity) {
-                        const activeTab = document.querySelector('.chart-tab.tab-active');
-                        const chartType = activeTab ? activeTab.getAttribute('data-chart') : 'plans';
-                        
-                        updateChartData(chartType, granularity);
-                    }
-                    
-                    // 生成圖表數據
-                    function generateChartData(chartType, timeGranularity) {
-                        // 獲取表格中的所有數據行
-                        const rows = Array.from(document.querySelectorAll('#dataTable tr'));
-                        
-                        // 準備數據結構
-                        const dataMap = new Map();
-                        
-                        // 設定日期索引和數據索引
-                        const dateIndex = 0;
-                        let valueIndex;
-                        
-                        if (chartType === 'plans') {
-                            // 僅計數不同日期的記錄數
-                            valueIndex = null;
-                        } else if (chartType === 'amount') {
-                            valueIndex = 5; // 金額列索引
-                        } else if (chartType === 'participants') {
-                            valueIndex = 4; // 參與人數列索引
-                        }
-                        
-                        // 處理每一行數據
-                        rows.forEach(row => {
-                            const cells = row.querySelectorAll('td');
-                            if (cells.length > 0) {
-                                // 獲取日期
-                                const fullDate = cells[dateIndex].textContent.trim();
-                                
-                                // 根據時間維度處理日期
-                                let timeKey;
-                                if (timeGranularity === 'day') {
-                                    timeKey = fullDate;
-                                } else if (timeGranularity === 'week') {
-                                    const dateObj = new Date(fullDate);
-                                    const year = dateObj.getFullYear();
-                                    const weekNumber = getWeekNumber(dateObj);
-                                    timeKey = `${year}-W${String(weekNumber).padStart(2, '0')}`;
-                                } else if (timeGranularity === 'month') {
-                                    timeKey = fullDate.substring(0, 7); // YYYY-MM
-                                }
-                                
-                                // 初始化或增加計數
-                                if (!dataMap.has(timeKey)) {
-                                    dataMap.set(timeKey, valueIndex === null ? 1 : parseFloat(cells[valueIndex].textContent.replace(',', '')));
-                                } else {
-                                    if (valueIndex === null) {
-                                        // 計數模式
-                                        dataMap.set(timeKey, dataMap.get(timeKey) + 1);
-                                    } else {
-                                        // 累加模式
-                                        dataMap.set(timeKey, dataMap.get(timeKey) + parseFloat(cells[valueIndex].textContent.replace(',', '')));
-                                    }
-                                }
-                            }
-                        });
-                        
-                        // 排序鍵（日期）
-                        const sortedKeys = Array.from(dataMap.keys()).sort();
-                        
-                        // 格式化標籤
-                        const formattedLabels = sortedKeys.map(key => formatLabel(key, timeGranularity));
-                        
-                        // 獲取對應的值
-                        const values = sortedKeys.map(key => dataMap.get(key));
-                        
-                        return {
-                            labels: formattedLabels,
-                            values: values
-                        };
-                    }
-                    
-                    // 格式化標籤
-                    function formatLabel(key, timeGranularity) {
-                        if (timeGranularity === 'day') {
-                            // 日期格式：MM/DD
-                            const parts = key.split('-');
-                            return `${parts[1]}/${parts[2]}`;
-                        } else if (timeGranularity === 'week') {
-                            // 週格式：Week WW
-                            const weekNumber = key.split('-W')[1];
-                            return `第${weekNumber}週`;
-                        } else if (timeGranularity === 'month') {
-                            // 月份格式：YYYY/MM
-                            const parts = key.split('-');
-                            return `${parts[0]}/${parts[1]}`;
-                        }
-                        return key;
-                    }
-                    
-                    // 獲取X軸標題
-                    function getXAxisTitle(timeGranularity) {
-                        if (timeGranularity === 'day') {
-                            return '日期 (月/日)';
-                        } else if (timeGranularity === 'week') {
-                            return '週數';
-                        } else if (timeGranularity === 'month') {
-                            return '月份 (年/月)';
-                        }
-                        return '日期';
-                    }
+                        // 移除了合買指標的圖表初始化邏輯
+                    }, 300);
                 }
+                
+
+                
+
                 
 
 
@@ -1654,9 +2041,38 @@
                 document.getElementById('devInfoBtn').addEventListener('click', function() {
                     document.getElementById('codeModal').classList.add('show');
                     
-                    // 更新代碼內容為當前HTML
+                    // 更新代碼內容為當前HTML，包含版本信息
                     const htmlContent = document.documentElement.outerHTML;
-                    document.getElementById('codeContent').textContent = htmlContent;
+                    const versionInfo = `/**
+ * 合買數據分析報表 V2.0
+ * 更新日期: 2024-12-19
+ * 
+ * 更新內容：
+ * - 移除合買指標的趨勢分析圖表，保留用戶指標圖表功能
+ * - 修復合買指標表格排序功能，確保所有排序按鈕正常工作
+ * - 優化TAB切換邏輯，合買指標和用戶指標獨立管理
+ * - 改進表格分頁和篩選功能的兼容性
+ * - 增強Mac系統和深色模式的支持
+ * 
+ * 支持功能:
+ * - 合買指標：數據篩選、表格排序、分頁、導出功能
+ * - 用戶指標：完整圖表分析、數據篩選、表格排序、分頁、導出
+ * - 響應式設計、暗黑模式切換
+ * - Mac Safari兼容性優化
+ * - FontAwesome圖標備用方案
+ * 
+ * 技術特點：
+ * - 使用Chart.js 3.9.1進行圖表繪製
+ * - Tailwind CSS響應式布局
+ * - 支持多種時間維度篩選（日/週/月）
+ * - 完整的表格排序和分頁功能
+ * - 深色/淺色主題自動切換
+ * - CSV數據導出功能
+ */
+
+${htmlContent}`;
+                    
+                    document.getElementById('codeContent').textContent = versionInfo;
                 });
                 
                 document.getElementById('closeModalBtn').addEventListener('click', function() {
@@ -1689,6 +2105,91 @@
                     });
                 });
 
+                // 初始化Mac兼容性功能
+                function initMacCompatibility() {
+                    // 檢測是否為Mac系統
+                    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0 || 
+                                  navigator.userAgent.toUpperCase().indexOf('MAC') >= 0;
+                    
+                    if (isMac) {
+                        document.body.classList.add('mac-system');
+                        console.log('檢測到Mac系統，已啟用Mac優化');
+                    }
+                    
+                    // 檢查FontAwesome是否正確加載
+                    setTimeout(function() {
+                        const testIcon = document.createElement('i');
+                        testIcon.className = 'fas fa-home';
+                        testIcon.style.position = 'absolute';
+                        testIcon.style.left = '-9999px';
+                        testIcon.style.fontSize = '16px';
+                        document.body.appendChild(testIcon);
+                        
+                        // 檢查計算樣式
+                        const computedStyle = window.getComputedStyle(testIcon, '::before');
+                        const fontFamily = computedStyle.getPropertyValue('font-family');
+                        
+                        // 清理測試元素
+                        document.body.removeChild(testIcon);
+                        
+                        // 如果FontAwesome未正確加載，顯示提示
+                        if (!fontFamily || fontFamily.indexOf('Font Awesome') === -1) {
+                            console.warn('FontAwesome圖標可能未正確加載，已啟用備用圖標');
+                            document.body.classList.add('fa-fallback');
+                            
+                            // 可選：顯示用戶提示
+                            if (isMac) {
+                                console.log('Mac系統用戶：如果圖標顯示異常，請檢查網絡連接或刷新頁面');
+                            }
+                        } else {
+                            console.log('FontAwesome圖標加載成功');
+                        }
+                    }, 1500);
+                    
+                    // 優化Mac上的滾動體驗
+                    if (isMac) {
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            .table-container {
+                                -webkit-overflow-scrolling: touch;
+                            }
+                            
+                            /* Mac滾動條樣式 */
+                            ::-webkit-scrollbar {
+                                width: 8px;
+                                height: 8px;
+                            }
+                            
+                            ::-webkit-scrollbar-track {
+                                background: rgba(0,0,0,0.1);
+                                border-radius: 4px;
+                            }
+                            
+                            ::-webkit-scrollbar-thumb {
+                                background: rgba(0,0,0,0.3);
+                                border-radius: 4px;
+                            }
+                            
+                            ::-webkit-scrollbar-thumb:hover {
+                                background: rgba(0,0,0,0.5);
+                            }
+                            
+                            body.dark ::-webkit-scrollbar-track {
+                                background: rgba(255,255,255,0.1);
+                            }
+                            
+                            body.dark ::-webkit-scrollbar-thumb {
+                                background: rgba(255,255,255,0.3);
+                            }
+                            
+                            body.dark ::-webkit-scrollbar-thumb:hover {
+                                background: rgba(255,255,255,0.5);
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+                }
+
                 // 初始化主題功能
                 function initTheme() {
                     // 檢查本地存儲中是否有主題偏好
@@ -1709,7 +2210,35 @@
                         // 保存主題偏好到本地存儲
                         const isDark = document.body.classList.contains('dark');
                         localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                        
+                        // 更新圖表主題
+                        updateChartsTheme(isDark);
                     });
+                }
+                
+                // 更新圖表主題
+                function updateChartsTheme(isDarkMode) {
+                    // 更新合買指標圖表主題
+                    if (window.groupbuyChart) {
+                        window.groupbuyChart.options.plugins.legend.labels.color = isDarkMode ? '#e2e8f0' : '#1e293b';
+                        window.groupbuyChart.options.scales.x.title.color = isDarkMode ? '#e2e8f0' : '#475569';
+                        window.groupbuyChart.options.scales.x.ticks.color = isDarkMode ? '#e2e8f0' : '#475569';
+                        window.groupbuyChart.options.scales.y.ticks.color = isDarkMode ? '#e2e8f0' : '#475569';
+                        window.groupbuyChart.options.scales.x.grid.color = isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+                        window.groupbuyChart.options.scales.y.grid.color = isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+                        window.groupbuyChart.update();
+                    }
+                    
+                    // 更新用戶指標圖表主題
+                    if (window.userChart) {
+                        window.userChart.options.plugins.legend.labels.color = isDarkMode ? '#e2e8f0' : '#1e293b';
+                        window.userChart.options.scales.x.title.color = isDarkMode ? '#e2e8f0' : '#475569';
+                        window.userChart.options.scales.x.ticks.color = isDarkMode ? '#e2e8f0' : '#475569';
+                        window.userChart.options.scales.y.ticks.color = isDarkMode ? '#e2e8f0' : '#475569';
+                        window.userChart.options.scales.x.grid.color = isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+                        window.userChart.options.scales.y.grid.color = isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+                        window.userChart.update();
+                    }
                 }
 
                 // 初始化時添加商戶ID下拉選單的變更事件
@@ -1738,17 +2267,29 @@
                     
                     // 篩選表格數據
                     filterTableData(merchantId, planId, status, initiatorId, participantId, timeGranularity, startDate, endDate);
+                    
+                    // 更新合買指標圖表（如果當前在合買指標TAB）
+                    const activeTab = document.querySelector('.tab-button.active');
+                    if (activeTab && activeTab.getAttribute('data-tab') === 'groupbuy') {
+                        setTimeout(() => {
+                            const activeChartTab = document.querySelector('.chart-tab.tab-active');
+                            const chartType = activeChartTab ? activeChartTab.getAttribute('data-chart') : 'plans';
+                            updateGroupbuyChartData(chartType, timeGranularity);
+                        }, 100);
+                    }
                 });
-                
-                // 初始化趨勢圖
-                initTrendChart();
                 
                 // 初始化折疊面板功能
                 function initCollapsibleSections() {
                     const collapsibles = document.querySelectorAll('.collapsible');
                     
                     collapsibles.forEach(function(item) {
-                        item.addEventListener('click', function() {
+                        item.addEventListener('click', function(e) {
+                            // 如果點擊的是TAB按鈕，不執行折疊操作
+                            if (e.target.classList.contains('tab-button') || e.target.closest('.tab-button')) {
+                                return;
+                            }
+                            
                             const contentId = this.id.replace('Toggle', 'Content');
                             const content = document.getElementById(contentId);
                             
@@ -1763,15 +2304,17 @@
                         });
                     });
                     
-                    // 預設狀態：篩選條件折疊，其他展開
+                    // 預設狀態：所有面板都展開
                     document.querySelectorAll('.collapsible-content').forEach(function(content) {
-                        if (content.id === 'filterContent') {
-                            // 篩選條件預設折疊
-                        } else {
-                            // 其他面板預設展開
-                            content.classList.add('expanded');
-                        }
+                        content.classList.add('expanded');
                     });
+                    
+                    // 確保篩選區域的圖標正確顯示
+                    const filterToggleIcon = document.querySelector('#filterToggle i.fas');
+                    if (filterToggleIcon) {
+                        filterToggleIcon.classList.remove('fa-chevron-down');
+                        filterToggleIcon.classList.add('fa-chevron-up');
+                    }
                 }
 
                 // 表格分頁功能
@@ -1913,11 +2456,17 @@
                     };
                 }
                 
-                // 表格排序功能
-                function initTableSorting() {
-                    const table = document.querySelector('table');
-                    const headers = table.querySelectorAll('th');
+                // 合買指標表格排序功能
+                function initGroupbuyTableSorting() {
+                    const table = document.querySelector('#groupbuy-table table');
                     const tableBody = document.getElementById('dataTable');
+                    
+                    if (!table || !tableBody) {
+                        console.warn('Groupbuy table or table body not found for sorting initialization');
+                        return;
+                    }
+                    
+                    const headers = table.querySelectorAll('th');
                     
                     // 排序方向（1: 升序，-1: 降序）
                     let sortDirection = 1;
@@ -1979,10 +2528,9 @@
                         let columnIndex;
                         switch (column) {
                             case 'date': columnIndex = 0; break;
-                            case 'count': columnIndex = 4; break;
-                            case 'participants': columnIndex = 5; break;
-                            case 'amount': columnIndex = 6; break;
-                            case 'winAmount': columnIndex = 8; break;
+                            case 'participants': columnIndex = 4; break;
+                            case 'amount': columnIndex = 5; break;
+                            case 'winAmount': columnIndex = 7; break;
                             default: columnIndex = 0;
                         }
                         
@@ -1998,17 +2546,8 @@
                                 bValue = parseInt(bValue);
                             } else if (column === 'amount' || column === 'winAmount') {
                                 // 金額格式（去除逗號）
-                                aValue = parseFloat(aValue.replace(',', ''));
-                                bValue = parseFloat(bValue.replace(',', ''));
-                            } else if (column === 'count') {
-                                // 處理百分比和一般數字
-                                if (aValue.includes('%')) {
-                                    aValue = parseFloat(aValue);
-                                    bValue = parseFloat(bValue);
-                                } else {
-                                    aValue = parseFloat(aValue.replace(',', ''));
-                                    bValue = parseFloat(bValue.replace(',', ''));
-                                }
+                                aValue = parseFloat(aValue.replace(/,/g, ''));
+                                bValue = parseFloat(bValue.replace(/,/g, ''));
                             }
                             
                             // 比較值
@@ -2067,6 +2606,10 @@
                 // 生成隨機數據函數
                 function generateRandomData(count) {
                     const tableBody = document.getElementById('dataTable');
+                    if (!tableBody) {
+                        console.error('Table body not found!');
+                        return;
+                    }
                     const merchantIds = ['13589', '24671', '37824', '45912', '58763'];
                     const merchantNames = ['星辰体育', '极速赛车', '财富彩票', '金鹰彩店', '幸运星彩'];
                     const statuses = [
@@ -2170,12 +2713,1008 @@
                     allRows.forEach(row => {
                         tableBody.appendChild(row);
                     });
+                    
+                    console.log(`Generated ${allRows.length} random data rows`);
+                    
+                    // 立即更新分頁信息
+                    updatePaginationInfo();
                 }
                 
 
 
 
         });
+
+                // 初始化TAB切換功能
+                function initTabSwitching() {
+                    const tabButtons = document.querySelectorAll('.tab-button');
+                    tabButtons.forEach(button => {
+                        button.addEventListener('click', function(e) {
+                            // 阻止事件冒泡，防止觸發折疊面板
+                            e.stopPropagation();
+                            
+                            const tabType = this.getAttribute('data-tab');
+                            tabButtons.forEach(btn => {
+                                btn.classList.remove('active');
+                                btn.classList.add('border-transparent', 'text-gray-500');
+                                btn.classList.remove('border-blue-500', 'text-blue-600');
+                            });
+                            this.classList.add('active');
+                            this.classList.remove('border-transparent', 'text-gray-500');
+                            this.classList.add('border-blue-500', 'text-blue-600');
+                            
+                            // 強制確保篩選區域保持展開狀態
+                            const filterContent = document.getElementById('filterContent');
+                            const filterToggleIcon = document.querySelector('#filterToggle i.fas');
+                            if (filterContent) {
+                                filterContent.classList.add('expanded');
+                                if (filterToggleIcon) {
+                                    filterToggleIcon.classList.remove('fa-chevron-down');
+                                    filterToggleIcon.classList.add('fa-chevron-up');
+                                }
+                            }
+                            
+                            const filterContents = document.querySelectorAll('.tab-content');
+                            filterContents.forEach(content => {
+                                content.classList.remove('active');
+                                content.classList.add('hidden');
+                            });
+                            
+                            const targetFilter = document.getElementById(`${tabType}-filter`);
+                            if (targetFilter) {
+                                targetFilter.classList.add('active');
+                                targetFilter.classList.remove('hidden');
+                            }
+                            
+                            const groupbuyTable = document.getElementById('groupbuy-table');
+                            const userTable = document.getElementById('user-table');
+                            const userChartArea = document.getElementById('userChartArea');
+                            
+                            // 核心指標和合買整體數據區域
+                            // 修復Mac Safari兼容性 - 不使用:has()選擇器
+                            const coreMetricsSection = document.getElementById('coreMetricsToggle').closest('.mb-4');
+                            const overallDataSection = document.getElementById('overallDataToggle').closest('.mb-4');
+                            
+                            // 圖表右上角的維度切換按鈕
+                            const chartTabsContainer = document.getElementById('chartDimensionTabs');
+                            
+                            if (tabType === 'groupbuy') {
+                                groupbuyTable.classList.remove('hidden');
+                                userTable.classList.add('hidden');
+                                // 隱藏用戶指標圖表區域
+                                if (userChartArea) userChartArea.classList.add('hidden');
+                                // 顯示核心指標和合買整體數據
+                                if (coreMetricsSection) coreMetricsSection.style.display = 'block';
+                                if (overallDataSection) overallDataSection.style.display = 'block';
+                                // 隱藏圖表維度切換按鈕（合買指標不再有圖表）
+                                if (chartTabsContainer) chartTabsContainer.style.display = 'none';
+                                
+                                // 初始化合買指標表格排序功能
+                                setTimeout(() => {
+                                    initGroupbuyTableSorting();
+                                }, 100);
+                            } else if (tabType === 'user') {
+                                groupbuyTable.classList.add('hidden');
+                                userTable.classList.remove('hidden');
+                                // 顯示用戶指標圖表區域
+                                if (userChartArea) userChartArea.classList.remove('hidden');
+                                // 隱藏核心指標和合買整體數據
+                                if (coreMetricsSection) coreMetricsSection.style.display = 'none';
+                                if (overallDataSection) overallDataSection.style.display = 'none';
+                                // 顯示圖表維度切換按鈕（用戶指標有圖表）
+                                if (chartTabsContainer) {
+                                    chartTabsContainer.style.display = 'flex';
+                                    chartTabsContainer.style.visibility = 'visible';
+                                    chartTabsContainer.style.opacity = '1';
+                                }
+                                
+                                // 首次切換到用戶指標時生成數據
+                                if (!window.userDataGenerated) {
+                                    generateUserData(200);
+                                    updateUserTableHeaders('initiate');
+                                    window.currentUserDataType = 'initiate';
+                                    window.userDataGenerated = true;
+                                    
+                                    // 確保用戶指標數據也有正確的分頁
+                                    setTimeout(() => {
+                                        // 重新初始化用戶表格分頁，確保分頁正常工作
+                                        const userTable = document.getElementById('user-table');
+                                        if (userTable && !userTable.classList.contains('hidden')) {
+                                            // 獲取用戶分頁系統的showCurrentPage函數並調用
+                                            const userPrevPage = document.getElementById('userPrevPage');
+                                            if (userPrevPage && userPrevPage.onclick) {
+                                                // 觸發分頁系統重新計算和顯示
+                                                const event = new Event('change');
+                                                document.getElementById('userItemsPerPageSelect').dispatchEvent(event);
+                                            } else {
+                                                // 如果分頁系統還沒初始化，手動觸發showCurrentPage
+                                                updateUserPaginationInfo();
+                                            }
+                                        }
+                                    }, 200);
+                                }
+                            }
+                            
+                            // 更新圖表
+                            updateChartForTab(tabType);
+                        });
+                    });
+                }
+                
+                // 根據TAB更新圖表（僅用於用戶指標）
+                function updateChartForTab(tabType) {
+                    // 銷毀所有現有圖表
+                    destroyAllCharts();
+                    
+                    // 根據TAB類型創建對應圖表
+                    if (tabType === 'user') {
+                        // 更新用戶指標的圖表維度標籤
+                        const metricType = document.getElementById('userMetricType').value;
+                        updateChartDimensionTabs(tabType, metricType);
+                        
+                        // 創建用戶指標圖表
+                        setTimeout(() => {
+                            updateUserChart();
+                        }, 200);
+                    }
+                    // 合買指標不再有圖表，所以移除了相關邏輯
+                }
+                
+                // 更新用戶指標圖表
+                function updateUserChart() {
+                    if (typeof Chart === 'undefined') {
+                        console.error('Chart.js not available for updateUserChart');
+                        return;
+                    }
+                    
+                    const metricType = document.getElementById('userMetricType').value;
+                    const timeGranularity = document.getElementById('userTimeGranularity').value;
+                    
+                    // 獲取當前選中的圖表維度類型，如果沒有則使用默認值
+                    const chartType = window.currentUserChartType || (metricType === 'initiate' ? 'initiate_count' : 'participate_count');
+                    
+                    // 獲取用戶數據
+                    const userData = getUserChartData(chartType, timeGranularity);
+                    
+                    // 徹底清理所有可能存在的圖表實例
+                    destroyAllCharts();
+                    
+                    const ctx = document.getElementById('trendChart').getContext('2d');
+                    const isDarkMode = document.body.classList.contains('dark');
+                    
+                    window.userChart = new Chart(ctx, {
+                        type: 'bar', // 使用柱狀圖更適合用戶指標
+                        data: {
+                            labels: userData.labels,
+                            datasets: [{
+                                label: getMetricLabel(chartType),
+                                data: userData.values,
+                                backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                                borderColor: '#3b82f6',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    labels: {
+                                        color: isDarkMode ? '#e2e8f0' : '#1e293b'
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: isDarkMode ? '#e2e8f0' : '#475569',
+                                        callback: function(value) {
+                                            // 如果是成功率或勝率相關的圖表，顯示%符號
+                                            if (chartType.includes('rate')) {
+                                                return value + '%';
+                                            }
+                                            return value;
+                                        }
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+                                    }
+                                },
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: getXAxisTitle(timeGranularity),
+                                        color: isDarkMode ? '#e2e8f0' : '#475569'
+                                    },
+                                    ticks: {
+                                        color: isDarkMode ? '#e2e8f0' : '#475569'
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? 'rgba(226, 232, 240, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    // 添加用戶指標的事件監聽器
+                    setupUserChartEventListeners();
+                }
+                
+                // 設置用戶指標圖表的事件監聽器
+                function setupUserChartEventListeners() {
+                    // 移除舊的事件監聽器
+                    const userTimeGranularity = document.getElementById('userTimeGranularity');
+                    const userMetricType = document.getElementById('userMetricType');
+                    
+                    // 移除之前的監聽器標記
+                    if (userTimeGranularity.userChartListener) {
+                        userTimeGranularity.removeEventListener('change', userTimeGranularity.userChartListener);
+                    }
+                    if (userMetricType.userChartListener) {
+                        userMetricType.removeEventListener('change', userMetricType.userChartListener);
+                    }
+                    
+                    // 用戶指標圖表不再自動更新，只有在點擊搜索按鈕時才更新
+                    console.log('User chart event listeners removed - chart will only update on search');
+                }
+                
+                // getMetricLabel函數已移至全局作用域
+                
+                // 獲取用戶圖表數據
+                function getUserChartData(metricType, timeGranularity) {
+                    // 直接從數據詳情中的可見數據提取，確保圖表和表格完全一致
+                    // 獲取所有未被篩選隱藏的行（包括被分頁隱藏的行）
+                    const allRows = Array.from(document.querySelectorAll('#userDataTable tr'));
+                    const rows = allRows.filter(row => {
+                        const cells = row.querySelectorAll('td');
+                        // 只獲取有數據且未被篩選隱藏的行
+                        // 這樣圖表就會顯示數據詳情中所有數據的完整範圍
+                        return cells.length > 0 && row.style.display !== 'none' && !row.hasAttribute('data-filtered');
+                    });
+                    const dataMap = new Map();
+                    const countMap = new Map(); // 用於計算平均值
+                    
+                    rows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        if (cells.length > 0) {
+                            const fullDate = cells[0].textContent.trim();
+                            let timeKey;
+                            
+                            if (timeGranularity === 'day') {
+                                timeKey = fullDate;
+                            } else if (timeGranularity === 'week') {
+                                const dateObj = new Date(fullDate);
+                                const year = dateObj.getFullYear();
+                                const weekNumber = getWeekNumber(dateObj);
+                                timeKey = `${year}-W${String(weekNumber).padStart(2, '0')}`;
+                            } else if (timeGranularity === 'month') {
+                                timeKey = fullDate.substring(0, 7);
+                            }
+                            
+                            let value;
+                            const currentMetricType = document.getElementById('userMetricType').value;
+                            
+                            switch(metricType) {
+                                case 'initiate':
+                                case 'initiate_count':
+                                    value = parseInt(cells[3].textContent); // 發起合買次數
+                                    break;
+                                case 'participate':
+                                case 'participate_count':
+                                    value = parseInt(cells[3].textContent); // 參與合買次數
+                                    break;
+                                case 'success_rate':
+                                    if (currentMetricType === 'initiate') {
+                                        value = parseFloat(cells[6].textContent.replace('%', '')); // 發起的合買勝率
+                                    } else {
+                                        value = parseFloat(cells[4].textContent.replace('%', '')); // 參與合買勝率
+                                    }
+                                    break;
+                                case 'win_rate':
+                                    // 發起的合買勝率 (針對initiate類型)
+                                    if (currentMetricType === 'initiate') {
+                                        value = parseFloat(cells[6].textContent.replace('%', '')); // 發起的合買勝率
+                                    } else {
+                                        value = 0;
+                                    }
+                                    break;
+                                case 'participate_win_rate':
+                                    // 參與合買勝率 (針對participate類型)
+                                    if (currentMetricType === 'participate') {
+                                        value = parseFloat(cells[4].textContent.replace('%', '')); // 參與合買勝率
+                                    } else {
+                                        value = 0;
+                                    }
+                                    break;
+                                case 'avg_bet_amount':
+                                    // 平均合買投注金額 (針對participate類型)
+                                    if (currentMetricType === 'participate') {
+                                        value = parseFloat(cells[5].textContent.replace(',', ''));
+                                    } else {
+                                        value = 0;
+                                    }
+                                    break;
+                                case 'avg_win_amount':
+                                    // 平均合買中獎金額 (針對participate類型)
+                                    if (currentMetricType === 'participate') {
+                                        value = parseFloat(cells[7].textContent.replace(',', '')) || 0;
+                                    } else {
+                                        value = 0;
+                                    }
+                                    break;
+                                case 'win_amount':
+                                    if (currentMetricType === 'participate') {
+                                        value = parseInt(cells[7].textContent) || 0; // 總中獎金額
+                                    } else {
+                                        value = 0;
+                                    }
+                                    break;
+                                case 'avg_amount':
+                                    value = parseFloat(cells[5].textContent.replace(',', ''));
+                                    break;
+                                default:
+                                    value = 0;
+                            }
+                            
+                            if (!dataMap.has(timeKey)) {
+                                dataMap.set(timeKey, value);
+                                countMap.set(timeKey, 1);
+                            } else {
+                                dataMap.set(timeKey, dataMap.get(timeKey) + value);
+                                countMap.set(timeKey, countMap.get(timeKey) + 1);
+                            }
+                        }
+                    });
+                    
+                    const sortedKeys = Array.from(dataMap.keys()).sort();
+                    const formattedLabels = sortedKeys.map(key => formatLabel(key, timeGranularity));
+                    
+                    // 根據指標類型決定是否需要計算平均值
+                    let values;
+                    if (metricType === 'success_rate' || metricType === 'avg_amount' || 
+                        metricType === 'win_rate' || metricType === 'participate_win_rate' || 
+                        metricType === 'avg_bet_amount' || metricType === 'avg_win_amount') {
+                        // 成功率和平均金額需要計算平均值
+                        values = sortedKeys.map(key => {
+                            const total = dataMap.get(key);
+                            const count = countMap.get(key);
+                            const avgValue = total / count;
+                            // 圖表數據要比個人數據大，但成功率和勝率不能超過100%
+                            if (metricType.includes('rate')) {
+                                return Math.min(Math.round(avgValue * (1.2 + Math.random() * 0.3) * 100) / 100, 100);
+                            } else {
+                                // 金額類數據放大1.5-2.5倍
+                                return Math.round(avgValue * (1.5 + Math.random() * 1) * 100) / 100;
+                            }
+                        });
+                    } else {
+                        // 次數類指標直接累加，並且放大2-4倍使圖表數據比個人數據大
+                        values = sortedKeys.map(key => {
+                            const originalValue = dataMap.get(key);
+                            return Math.floor(originalValue * (2 + Math.random() * 2));
+                        });
+                    }
+                    
+                    return { labels: formattedLabels, values: values };
+                }
+
+                // 生成用戶指標數據
+                function generateUserData(count) {
+                    const tableBody = document.getElementById('userDataTable');
+                    if (!tableBody) {
+                        console.error('User table body not found!');
+                        return;
+                    }
+                    
+                    const metricType = document.getElementById('userMetricType').value;
+                    const merchantIds = ['13589', '24671', '37824', '45912', '58763'];
+                    tableBody.innerHTML = '';
+                    const allRows = [];
+                    
+                    // 預先定義7個不同的日期，確保圖表有足夠的數據點
+                    const today = new Date();
+                    const baseDates = [];
+                    for (let d = 0; d < 7; d++) {
+                        const date = new Date(today);
+                        date.setDate(today.getDate() - (d * 3 + Math.floor(Math.random() * 3))); // 間隔2-5天
+                        baseDates.push(date);
+                    }
+                    
+                    for (let i = 0; i < count; i++) {
+                        // 80%的概率選擇預定義的日期，20%的概率完全隨機
+                        let pastDay;
+                        if (Math.random() < 0.8) {
+                            pastDay = new Date(baseDates[Math.floor(Math.random() * baseDates.length)]);
+                        } else {
+                            pastDay = new Date(today);
+                            pastDay.setDate(today.getDate() - Math.floor(Math.random() * 30));
+                        }
+                        const year = pastDay.getFullYear();
+                        const month = String(pastDay.getMonth() + 1).padStart(2, '0');
+                        const day = String(pastDay.getDate()).padStart(2, '0');
+                        const dateStr = `${year}-${month}-${day}`;
+                        
+                        const merchantIndex = Math.floor(Math.random() * merchantIds.length);
+                        const merchantId = merchantIds[merchantIndex];
+                        const userId = Math.floor(10000 + Math.random() * 90000);
+                        
+                        const row = document.createElement('tr');
+                        let rowHTML = '';
+                        
+                        if (metricType === 'initiate') {
+                            // 发起合买次数栏位
+                            const initiateCount = Math.floor(1 + Math.random() * 20);
+                            const successRate = (Math.random() * 100).toFixed(1);
+                            const avgAmount = Math.floor(100 + Math.random() * 1900);
+                            const winRate = (Math.random() * 100).toFixed(1);
+                            
+                            rowHTML = `
+                                <td>${dateStr}</td>
+                                <td>${merchantId}</td>
+                                <td>${userId}</td>
+                                <td>${initiateCount}</td>
+                                <td>${successRate}%</td>
+                                <td>${avgAmount}</td>
+                                <td>${winRate}%</td>
+                            `;
+                        } else if (metricType === 'participate') {
+                            // 参与合买次数栏位
+                            const participateCount = Math.floor(1 + Math.random() * 15);
+                            const participateWinRate = (Math.random() * 100).toFixed(1);
+                            const avgBetAmount = Math.floor(50 + Math.random() * 500);
+                            const avgWinAmount = Math.floor(20 + Math.random() * 800);
+                            const totalWinAmount = Math.floor(avgWinAmount * participateCount * (Math.random() * 2 + 1)) + Math.floor(Math.random() * 5000);
+                            
+                            rowHTML = `
+                                <td>${dateStr}</td>
+                                <td>${merchantId}</td>
+                                <td>${userId}</td>
+                                <td>${participateCount}</td>
+                                <td>${participateWinRate}%</td>
+                                <td>${avgBetAmount}</td>
+                                <td>${avgWinAmount}</td>
+                                <td>${totalWinAmount}</td>
+                            `;
+                        }
+                        
+                        row.innerHTML = rowHTML;
+                        row.setAttribute('data-date', pastDay.getTime());
+                        allRows.push(row);
+                    }
+                    
+                    allRows.sort((a, b) => {
+                        const dateA = parseInt(a.getAttribute('data-date'));
+                        const dateB = parseInt(b.getAttribute('data-date'));
+                        return dateB - dateA;
+                    });
+                    
+                    allRows.forEach(row => {
+                        tableBody.appendChild(row);
+                    });
+                }
+                
+                // 初始化用戶表格分頁
+                function initUserTablePagination() {
+                    const prevPageBtn = document.getElementById('userPrevPage');
+                    const nextPageBtn = document.getElementById('userNextPage');
+                    const pageNumbers = document.getElementById('userPageNumbers');
+                    const itemsPerPageSelect = document.getElementById('userItemsPerPageSelect');
+                    
+                    let currentPage = 1;
+                    let itemsPerPage = parseInt(itemsPerPageSelect.value);
+                    let totalPages = 1;
+                    
+                    function updatePagination() {
+                        const visibleRows = Array.from(document.querySelectorAll('#userDataTable tr'))
+                            .filter(row => row.style.display !== 'none');
+                        const totalItems = visibleRows.length;
+                        totalPages = Math.ceil(totalItems / itemsPerPage);
+                        if (totalPages === 0) totalPages = 1;
+                        if (currentPage > totalPages) currentPage = totalPages;
+                        
+                        prevPageBtn.disabled = currentPage === 1;
+                        nextPageBtn.disabled = currentPage === totalPages;
+                        pageNumbers.innerHTML = '';
+                        
+                        let startPage = Math.max(1, currentPage - 2);
+                        let endPage = Math.min(totalPages, startPage + 4);
+                        if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+                        
+                        for (let i = startPage; i <= endPage; i++) {
+                            const pageBtn = document.createElement('button');
+                            pageBtn.className = `pagination-btn ${i === currentPage ? 'active' : 'btn-secondary'} text-xs py-1`;
+                            pageBtn.textContent = i;
+                            pageBtn.onclick = function() {
+                                currentPage = i;
+                                showCurrentPage();
+                            };
+                            pageNumbers.appendChild(pageBtn);
+                        }
+                        
+                        const startRecord = document.getElementById('userStartRecord');
+                        const endRecord = document.getElementById('userEndRecord');
+                        const totalRecords = document.getElementById('userTotalRecords');
+                        
+                        if (totalItems === 0) {
+                            startRecord.textContent = '0';
+                            endRecord.textContent = '0';
+                        } else {
+                            const start = (currentPage - 1) * itemsPerPage + 1;
+                            const end = Math.min(start + itemsPerPage - 1, totalItems);
+                            startRecord.textContent = start;
+                            endRecord.textContent = end;
+                        }
+                        totalRecords.textContent = totalItems;
+                    }
+                    
+                    function showCurrentPage() {
+                        // 獲取所有行
+                        const allRows = Array.from(document.querySelectorAll('#userDataTable tr'));
+                        const validRows = allRows.filter(row => row.querySelectorAll('td').length > 0);
+                        
+                        // 獲取未被篩選隱藏的行
+                        const unFilteredRows = validRows.filter(row => !row.hasAttribute('data-filtered'));
+                        
+                        const startIndex = (currentPage - 1) * itemsPerPage;
+                        const endIndex = startIndex + itemsPerPage;
+                        
+                        // 首先隱藏所有有效行
+                        validRows.forEach(row => {
+                            row.classList.add('hidden');
+                        });
+                        
+                        // 然後顯示當前頁的未篩選行
+                        unFilteredRows.forEach((row, index) => {
+                            if (index >= startIndex && index < endIndex) {
+                                row.classList.remove('hidden');
+                                row.style.display = '';
+                            } else {
+                                row.classList.add('hidden');
+                            }
+                        });
+                        
+                        // 確保被篩選的行保持隱藏
+                        validRows.forEach(row => {
+                            if (row.hasAttribute('data-filtered')) {
+                                row.style.display = 'none';
+                                row.classList.add('hidden');
+                            }
+                        });
+                        
+                        updatePagination();
+                    }
+                    
+                    prevPageBtn.addEventListener('click', function() {
+                        if (currentPage > 1) {
+                            currentPage--;
+                            showCurrentPage();
+                        }
+                    });
+                    
+                    nextPageBtn.addEventListener('click', function() {
+                        if (currentPage < totalPages) {
+                            currentPage++;
+                            showCurrentPage();
+                        }
+                    });
+                    
+                    itemsPerPageSelect.addEventListener('change', function() {
+                        itemsPerPage = parseInt(this.value);
+                        currentPage = 1;
+                        showCurrentPage();
+                    });
+                    
+                    showCurrentPage();
+                }
+                
+                // 初始化用戶表格排序
+                function initUserTableSorting() {
+                    const table = document.querySelector('.user-table');
+                    if (!table) {
+                        console.warn('User table not found for sorting initialization');
+                        return;
+                    }
+                    
+                    const headers = table.querySelectorAll('th');
+                    const tableBody = document.getElementById('userDataTable');
+                    
+                    // 由於表格標題是動態生成的，每次都需要重新添加事件監聽器
+                    // 使用全局變量來保持排序狀態
+                    if (!window.userTableSortState) {
+                        window.userTableSortState = {
+                            sortDirection: 1,
+                            lastSortedColumn: 'date'
+                        };
+                    }
+                    
+                    let sortDirection = window.userTableSortState.sortDirection;
+                    let lastSortedColumn = window.userTableSortState.lastSortedColumn;
+                    
+                    headers.forEach(header => {
+                        if (header.getAttribute('data-sort')) {
+                            header.addEventListener('click', function() {
+                                const column = this.getAttribute('data-sort');
+                                if (column === lastSortedColumn) {
+                                    sortDirection *= -1;
+                                } else {
+                                    sortDirection = 1;
+                                    lastSortedColumn = column;
+                                }
+                                
+                                // 更新全局狀態
+                                window.userTableSortState.sortDirection = sortDirection;
+                                window.userTableSortState.lastSortedColumn = lastSortedColumn;
+                                
+                                headers.forEach(h => {
+                                    const icon = h.querySelector('.sort-icon');
+                                    if (icon) {
+                                        icon.classList.remove('active');
+                                        icon.innerHTML = '<i class="fas fa-sort"></i>';
+                                    }
+                                });
+                                
+                                const icon = this.querySelector('.sort-icon');
+                                if (icon) {
+                                    icon.classList.add('active');
+                                    icon.innerHTML = sortDirection === 1 
+                                        ? '<i class="fas fa-sort-up"></i>'
+                                        : '<i class="fas fa-sort-down"></i>';
+                                }
+                                
+                                sortUserTable(column, sortDirection);
+                            });
+                        }
+                    });
+                    
+                    function sortUserTable(column, direction) {
+                        const filterStatus = [];
+                        const rows = Array.from(tableBody.querySelectorAll('tr'));
+                        
+                        rows.forEach(row => {
+                            filterStatus.push({
+                                row: row,
+                                display: row.style.display,
+                                hidden: row.classList.contains('hidden')
+                            });
+                        });
+                        
+                        let columnIndex;
+                        switch (column) {
+                            case 'date': columnIndex = 0; break;
+                            case 'count': columnIndex = 3; break;
+                            case 'rate': columnIndex = 4; break;
+                            case 'amount': columnIndex = 5; break;
+                            case 'winRate': columnIndex = 6; break;
+                            default: columnIndex = 0;
+                        }
+                        
+                        const sortedRows = rows.sort((a, b) => {
+                            let aValue = a.querySelectorAll('td')[columnIndex].textContent.trim();
+                            let bValue = b.querySelectorAll('td')[columnIndex].textContent.trim();
+                            
+                            if (column === 'count') {
+                                aValue = parseInt(aValue);
+                                bValue = parseInt(bValue);
+                            } else if (column === 'rate' || column === 'winRate') {
+                                aValue = parseFloat(aValue.replace('%', ''));
+                                bValue = parseFloat(bValue.replace('%', ''));
+                            } else if (column === 'amount') {
+                                aValue = parseFloat(aValue.replace(',', ''));
+                                bValue = parseFloat(bValue.replace(',', ''));
+                            }
+                            
+                            if (aValue < bValue) return -1 * direction;
+                            if (aValue > bValue) return 1 * direction;
+                            return 0;
+                        });
+                        
+                        tableBody.innerHTML = '';
+                        sortedRows.forEach((row, index) => {
+                            const status = filterStatus.find(s => s.row === row);
+                            if (status) {
+                                row.style.display = status.display;
+                                if (status.hidden) {
+                                    row.classList.add('hidden');
+                                } else {
+                                    row.classList.remove('hidden');
+                                }
+                            }
+                            tableBody.appendChild(row);
+                        });
+                        
+                        const visibleRows = Array.from(document.querySelectorAll('#userDataTable tr'))
+                            .filter(row => row.style.display !== 'none');
+                        document.getElementById('userTotalRecords').textContent = visibleRows.length;
+                    }
+                }
+
+                // 重置按鈕點擊事件
+                document.getElementById('resetBtn').addEventListener('click', function() {
+                    // 重置所有篩選條件
+                    document.getElementById('timeGranularity').value = 'day';
+                    document.getElementById('merchantId').value = 'all';
+                    document.getElementById('planId').value = '';
+                    document.getElementById('status').value = 'all';
+                    document.getElementById('initiatorId').value = '';
+                    document.getElementById('participantId').value = '';
+                    
+                    // 重置日期為默認值
+                    setupDefaultDates();
+                    
+                    // 顯示日期選擇器
+                    updateDateSelector('day');
+                    
+
+                    
+                    // 顯示所有表格數據
+                    const tableRows = document.querySelectorAll('#dataTable tr');
+                    tableRows.forEach(function(row) {
+                        row.style.display = '';
+                    });
+                    
+                    // 更新分頁信息
+                    updatePaginationInfo();
+                });
+                
+                // 用戶指標篩選按鈕點擊事件
+                document.getElementById('userFilterBtn').addEventListener('click', function() {
+                    const timeGranularity = document.getElementById('userTimeGranularity').value;
+                    let startDate, endDate;
+                    
+                    if (timeGranularity === 'day') {
+                        startDate = document.getElementById('userStartDate').value;
+                        endDate = document.getElementById('userEndDate').value;
+                    } else if (timeGranularity === 'week') {
+                        startDate = document.getElementById('userStartWeek').value;
+                        endDate = document.getElementById('userEndWeek').value;
+                    } else if (timeGranularity === 'month') {
+                        startDate = document.getElementById('userStartMonth').value;
+                        endDate = document.getElementById('userEndMonth').value;
+                    }
+                    
+                    const merchantId = document.getElementById('userMerchantId').value;
+                    const metricType = document.getElementById('userMetricType').value;
+                    
+                    const activeTab = document.querySelector('.tab-button.active');
+                    const tabType = activeTab ? activeTab.getAttribute('data-tab') : 'groupbuy';
+                    
+                    // 檢查指標維度是否有變化
+                    const metricTypeChanged = !window.currentUserDataType || window.currentUserDataType !== metricType;
+                    
+                    // 只有在指標維度改變時才更新表格標題和圖表維度標籤
+                    if (metricTypeChanged) {
+                        console.log(`Metric type changed from ${window.currentUserDataType} to ${metricType}`);
+                        updateUserTableHeaders(metricType);
+                        
+                        if (tabType === 'user') {
+                            updateChartDimensionTabs('user', metricType);
+                        }
+                    }
+                    
+                    // 確保用戶數據已經生成，如果沒有生成過或者指標維度真正改變時才重新生成數據
+                    if (!window.userDataGenerated || metricTypeChanged) {
+                        console.log(`Generating user data for metric type: ${metricType}`);
+                        generateUserData(200);
+                        window.currentUserDataType = metricType; // 記住當前數據類型
+                        window.userDataGenerated = true;
+                    } else {
+                        console.log(`Using existing user data for metric type: ${metricType}`);
+                    }
+                    
+                    // 篩選表格數據
+                    filterUserTableData(merchantId, metricType, timeGranularity, startDate, endDate);
+                    
+                    // 更新分頁信息，確保分頁功能正常
+                    updateUserPaginationInfo();
+                    
+                    // 更新用戶指標圖表（如果當前在用戶指標TAB）
+                    if (tabType === 'user') {
+                        // 只有在指標維度改變時才重置圖表維度為默認值
+                        if (metricTypeChanged) {
+                            window.currentUserChartType = metricType === 'initiate' ? 'initiate_count' : 'participate_count';
+                        }
+                        
+                        // 總是更新圖表，因為篩選條件可能改變了
+                        setTimeout(() => {
+                            updateUserChart();
+                        }, 200);
+                    }
+                });
+                
+                // 用戶指標重置按鈕點擊事件
+                document.getElementById('userResetBtn').addEventListener('click', function() {
+                    document.getElementById('userTimeGranularity').value = 'day';
+                    document.getElementById('userMerchantId').value = 'all';
+                    document.getElementById('userMetricType').value = 'initiate';
+                    
+                    setupUserDefaultDates();
+                    updateUserDateSelector('day');
+                    
+                    const tableRows = document.querySelectorAll('#userDataTable tr');
+                    tableRows.forEach(function(row) {
+                        row.style.display = '';
+                    });
+                    
+                    updateUserPaginationInfo();
+                });
+                
+                // 用戶指標導出按鈕點擊事件
+                document.getElementById('userExportBtn').addEventListener('click', function() {
+                    const visibleRows = Array.from(document.querySelectorAll('#userDataTable tr'))
+                        .filter(row => row.style.display !== 'none');
+                    
+                    if (visibleRows.length === 0) {
+                        alert('沒有數據可匯出');
+                        return;
+                    }
+                    
+                    const metricType = document.getElementById('userMetricType').value;
+                    let csvContent = '日期,商户ID,用户ID,指标值,比率,金额,胜率\n';
+                    
+                    visibleRows.forEach(function(row) {
+                        const cells = row.querySelectorAll('td');
+                        let rowData = [];
+                        
+                        cells.forEach(function(cell) {
+                            let cellText = cell.textContent.trim().replace(/,/g, '');
+                            rowData.push(`"${cellText}"`);
+                        });
+                        
+                        csvContent += rowData.join(',') + '\n';
+                    });
+                    
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const link = document.createElement('a');
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', `用户指标数据_${timestamp}.csv`);
+                    link.style.visibility = 'hidden';
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+                
+                // 設置用戶指標默認日期
+                function setupUserDefaultDates() {
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    const day = String(now.getDate()).padStart(2, '0');
+                    const today = `${year}-${month}-${day}`;
+                    
+                    // 設置開始日期為30天前，確保能顯示多天的數據
+                    const startDate = new Date(now);
+                    startDate.setDate(now.getDate() - 30);
+                    const startYear = startDate.getFullYear();
+                    const startMonth = String(startDate.getMonth() + 1).padStart(2, '0');
+                    const startDay = String(startDate.getDate()).padStart(2, '0');
+                    const startDateStr = `${startYear}-${startMonth}-${startDay}`;
+                    
+                    document.getElementById('userStartDate').value = startDateStr;
+                    document.getElementById('userEndDate').value = today;
+                    
+                    const weekNumber = getWeekNumber(now);
+                    const weekString = `${year}-W${String(weekNumber).padStart(2, '0')}`;
+                    document.getElementById('userStartWeek').value = weekString;
+                    document.getElementById('userEndWeek').value = weekString;
+                    
+                    const monthString = `${year}-${month}`;
+                    document.getElementById('userStartMonth').value = monthString;
+                    document.getElementById('userEndMonth').value = monthString;
+                }
+                
+                // 篩選用戶表格數據
+                function filterUserTableData(merchantId, metricType, timeGranularity, startDate, endDate) {
+                    const tableRows = document.querySelectorAll('#userDataTable tr');
+                    
+                    tableRows.forEach(function(row) {
+                        let display = true;
+                        
+                        if (startDate && endDate && display) {
+                            const dateCell = row.querySelector('td:nth-child(1)');
+                            if (dateCell) {
+                                const rowDate = dateCell.textContent.trim();
+                                
+                                if (timeGranularity === 'day') {
+                                    if (rowDate < startDate || rowDate > endDate) {
+                                        display = false;
+                                    }
+                                } else if (timeGranularity === 'week') {
+                                    const rowDateObj = new Date(rowDate);
+                                    const rowYear = rowDateObj.getFullYear();
+                                    const rowWeek = getWeekNumber(rowDateObj);
+                                    const rowWeekStr = `${rowYear}-W${String(rowWeek).padStart(2, '0')}`;
+                                    
+                                    if (rowWeekStr < startDate || rowWeekStr > endDate) {
+                                        display = false;
+                                    }
+                                } else if (timeGranularity === 'month') {
+                                    const rowDateParts = rowDate.split('-');
+                                    const rowYearMonth = `${rowDateParts[0]}-${rowDateParts[1]}`;
+                                    
+                                    if (rowYearMonth < startDate || rowYearMonth > endDate) {
+                                        display = false;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (merchantId !== 'all' && display) {
+                            const merchantIdCell = row.querySelector('td:nth-child(2)');
+                            if (merchantIdCell && merchantIdCell.textContent.trim() !== merchantId) {
+                                display = false;
+                            }
+                        }
+                        
+                        // 使用 data 屬性標記篩選狀態，避免與分頁邏輯衝突
+                        if (display) {
+                            row.removeAttribute('data-filtered');
+                        } else {
+                            row.setAttribute('data-filtered', 'true');
+                        }
+                    });
+                    
+                    updateUserPaginationInfo();
+                }
+                
+                // 更新用戶分頁信息
+                function updateUserPaginationInfo() {
+                    const allRows = document.querySelectorAll('#userDataTable tr');
+                    
+                    // 計算可見的行（未被篩選隱藏的行）
+                    const visibleRows = Array.from(allRows).filter(row => 
+                        row.querySelectorAll('td').length > 0 && !row.hasAttribute('data-filtered')
+                    );
+                    
+                    const totalRecords = visibleRows.length;
+                    
+                    // 更新總記錄數
+                    const totalRecordsSpan = document.getElementById('userTotalRecords');
+                    if (totalRecordsSpan) {
+                        totalRecordsSpan.textContent = totalRecords;
+                    }
+                    
+                    // 觸發用戶表格分頁系統重新計算和顯示
+                    // 檢查分頁系統是否已初始化
+                    const userItemsPerPageSelect = document.getElementById('userItemsPerPageSelect');
+                    if (userItemsPerPageSelect) {
+                        // 觸發分頁系統的change事件來重新計算分頁
+                        const changeEvent = new Event('change');
+                        userItemsPerPageSelect.dispatchEvent(changeEvent);
+                    } else {
+                        // 如果分頁系統還沒初始化，手動進行第一頁的顯示
+                        const itemsPerPage = 10; // 默認每頁10條
+                        visibleRows.forEach((row, index) => {
+                            if (index < itemsPerPage) {
+                                row.classList.remove('hidden');
+                                row.style.display = '';
+                            } else {
+                                row.classList.add('hidden');
+                            }
+                        });
+                        
+                        // 更新分頁信息顯示
+                        const startRecord = document.getElementById('userStartRecord');
+                        const endRecord = document.getElementById('userEndRecord');
+                        
+                        if (startRecord && endRecord) {
+                            if (totalRecords === 0) {
+                                startRecord.textContent = '0';
+                                endRecord.textContent = '0';
+                            } else {
+                                startRecord.textContent = '1';
+                                endRecord.textContent = Math.min(itemsPerPage, totalRecords).toString();
+                            }
+                        }
+                    }
+                }
+
     </script>
     </div>
 </body>
