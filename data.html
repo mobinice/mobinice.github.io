@@ -1168,7 +1168,7 @@
             <div class="code-modal-content">
                 <div class="flex flex-col h-full">
                     <div class="p-3 border-b flex justify-between items-center">
-                        <h3 class="text-sm font-semibold">开发者信息 - 源代码 V2.0</h3>
+                        <h3 class="text-sm font-semibold">开发者信息 - 源代码 V2.1</h3>
                         <div class="flex items-center">
                             <button id="copyCodeBtn" class="btn-primary px-3 py-1 text-sm rounded-md mr-2">
                                 <i class="fas fa-copy mr-1"></i> 复制代码
@@ -1180,7 +1180,7 @@
                     </div>
                     <div class="overflow-auto p-3" style="max-height: calc(80vh - 60px);">
                         <pre id="codeContent" class="code-content p-3 text-sm">/**
- * 合買數據分析報表 V2.0
+ * 合買數據分析報表 V2.1
  * 更新日期: 2024-12-19
  * 
  * 更新內容：
@@ -1189,6 +1189,10 @@
  * - 優化TAB切換邏輯，合買指標和用戶指標獨立管理
  * - 改進表格分頁和篩選功能的兼容性
  * - 增強Mac系統和深色模式的支持
+ * - 合買指標與數據詳情篩選互不干擾
+ * - 日期選擇器優化，週/月自動當前週/月
+ * - 核心指標與合買整體數據字段新增說明ICON
+ * - TIPS提示優化，跟隨ICON且自動消失
  * 
  * 支持功能:
  * - 合買指標：數據篩選、表格排序、分頁、導出功能
@@ -1196,6 +1200,8 @@
  * - 響應式設計、暗黑模式切換
  * - Mac Safari兼容性優化
  * - FontAwesome圖標備用方案
+ * 
+ * 版本號: V2.1
  */
 &lt;html lang="zh-CN"&gt;...完整代码内容...&lt;/html&gt;</pre>
                     </div>
@@ -2140,34 +2146,7 @@
                     
                     // 更新代碼內容為當前HTML，包含版本信息
                     const htmlContent = document.documentElement.outerHTML;
-                    const versionInfo = `/**
- * 合買數據分析報表 V2.0
- * 更新日期: 2024-12-19
- * 
- * 更新內容：
- * - 移除合買指標的趨勢分析圖表，保留用戶指標圖表功能
- * - 修復合買指標表格排序功能，確保所有排序按鈕正常工作
- * - 優化TAB切換邏輯，合買指標和用戶指標獨立管理
- * - 改進表格分頁和篩選功能的兼容性
- * - 增強Mac系統和深色模式的支持
- * 
- * 支持功能:
- * - 合買指標：數據篩選、表格排序、分頁、導出功能
- * - 用戶指標：完整圖表分析、數據篩選、表格排序、分頁、導出
- * - 響應式設計、暗黑模式切換
- * - Mac Safari兼容性優化
- * - FontAwesome圖標備用方案
- * 
- * 技術特點：
- * - 使用Chart.js 3.9.1進行圖表繪製
- * - Tailwind CSS響應式布局
- * - 支持多種時間維度篩選（日/週/月）
- * - 完整的表格排序和分頁功能
- * - 深色/淺色主題自動切換
- * - CSV數據導出功能
- */
-
-${htmlContent}`;
+                    const versionInfo = `/**\n * 合買數據分析報表 V2.1\n * 更新日期: 2024-12-19\n * \n * 更新內容：\n * - 移除合買指標的趨勢分析圖表，保留用戶指標圖表功能\n * - 修復合買指標表格排序功能，確保所有排序按鈕正常工作\n * - 優化TAB切換邏輯，合買指標和用戶指標獨立管理\n * - 改進表格分頁和篩選功能的兼容性\n * - 增強Mac系統和深色模式的支持\n * - 合買指標與數據詳情篩選互不干擾\n * - 日期選擇器優化，週/月自動當前週/月\n * - 核心指標與合買整體數據字段新增說明ICON\n * - TIPS提示優化，跟隨ICON且自動消失\n * \n * 支持功能:\n * - 合買指標：數據篩選、表格排序、分頁、導出功能\n * - 用戶指標：完整圖表分析、數據篩選、表格排序、分頁、導出\n * - 響應式設計、暗黑模式切換\n * - Mac Safari兼容性優化\n * - FontAwesome圖標備用方案\n *\n * 版本號: V2.1\n */\n\n${htmlContent}`;
                     
                     document.getElementById('codeContent').textContent = versionInfo;
                 });
