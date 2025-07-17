@@ -773,27 +773,9 @@
                                 <option value="58763">58763 - 幸运星彩</option>
                             </select>
                         </div>
-                        <div class="w-full md:w-auto filter-item" style="min-width: 120px; max-width: 140px;">
-                            <label class="block text-xs font-medium text-gray-700 mb-1">合买序号</label>
-                            <input type="text" id="planId" placeholder="输入序号或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
-                        </div>
-                        <div class="w-full md:w-auto filter-item" style="min-width: 100px; max-width: 120px;">
-                            <label class="block text-xs font-medium text-gray-700 mb-1">发起人ID</label>
-                            <input type="text" id="initiatorId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
-                        </div>
-                        <div class="w-full md:w-auto filter-item" style="min-width: 100px; max-width: 120px;">
-                            <label class="block text-xs font-medium text-gray-700 mb-1">参与人ID</label>
-                            <input type="text" id="participantId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
-                        </div>
                         <div class="w-full md:w-auto md:flex-shrink-0 md:flex-grow-0 flex-nowrap whitespace-nowrap filter-item buttons-container" style="min-width: 370px;">
-                            <label class="block text-xs font-medium text-gray-700 mb-1">合买状态</label>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">操作</label>
                             <div class="flex items-center flex-nowrap">
-                                <select id="status" class="w-28 rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="all">全部</option>
-                                    <option value="success">成功</option>
-                                    <option value="fail">失败</option>
-                                    <option value="in_progress">进行中</option>
-                                </select>
                                 <button id="filterBtn" class="btn-primary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">搜索</button>
                                 <button id="resetBtn" class="btn-secondary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">重置</button>
                                 <button id="exportBtn" class="px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button bg-green-500 hover:bg-green-600 text-white transition" style="width: 56px;">
@@ -847,9 +829,13 @@
                         <div class="w-full md:w-auto filter-item" style="min-width: 180px; max-width: 200px;">
                             <label class="block text-xs font-medium text-gray-700 mb-1">指标维度</label>
                             <select id="userMetricType" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="initiate">发起合买次数</option>
-                                <option value="participate">参与合买次数</option>
+                                <option value="initiate">发起合买</option>
+                                <option value="participate">参与合买</option>
                             </select>
+                        </div>
+                        <div class="w-full md:w-auto filter-item" style="min-width: 100px; max-width: 120px;" id="userIdFilterContainer">
+                            <label class="block text-xs font-medium text-gray-700 mb-1" id="userIdFilterLabel">发起人ID</label>
+                            <input type="text" id="userIdFilter" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
                         </div>
                         <div class="w-full md:w-auto md:flex-shrink-0 md:flex-grow-0 flex-nowrap whitespace-nowrap filter-item buttons-container" style="min-width: 370px;">
                             <label class="block text-xs font-medium text-gray-700 mb-1">操作</label>
@@ -974,8 +960,8 @@
             <div class="collapsible-content expanded" id="tableContent">
                 <!-- 合买指标表格 -->
                 <div class="table-container" id="groupbuy-table">
-                    <div class="flex justify-between items-center mb-2">
-                        <div class="flex items-center">
+                    <div class="flex justify-between items-center mb-2" style="align-items: center;">
+                        <div class="flex items-center" style="height: 40px;">
                             <span class="text-xs text-gray-600 mr-2">每页显示:</span>
                             <select id="itemsPerPageSelect" class="rounded-md border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="10">10条</option>
@@ -983,6 +969,60 @@
                                 <option value="50">50条</option>
                                 <option value="100">100条</option>
                             </select>
+                        </div>
+                        <div class="flex flex-wrap gap-2 items-center ml-6" id="groupbuy-table-filter" style="justify-content: flex-start; align-items: center; flex: 1; margin-top: 0; margin-bottom: 0; min-height: 40px;">
+                            <div class="filter-item" style="min-width: 110px; max-width: 130px;">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">时间维度</label>
+                                <select id="tableTimeGranularity" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="day">按天</option>
+                                    <option value="week">按周</option>
+                                    <option value="month">按月</option>
+                                </select>
+                            </div>
+                            <div class="filter-item" style="max-width: 310px; min-width: 170px;">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">日期范围</label>
+                                <div class="flex items-center gap-1" id="tableDaySelector">
+                                    <input type="date" id="tableStartDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                                    <span>至</span>
+                                    <input type="date" id="tableEndDate" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                                </div>
+                                <div class="flex items-center gap-1 hidden" id="tableWeekSelector">
+                                    <input type="week" id="tableStartWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                                    <span>至</span>
+                                    <input type="week" id="tableEndWeek" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                                </div>
+                                <div class="flex items-center gap-1 hidden" id="tableMonthSelector">
+                                    <input type="month" id="tableStartMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                                    <span>至</span>
+                                    <input type="month" id="tableEndMonth" class="text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500" style="width: 48%;">
+                                </div>
+                            </div>
+                            <div class="filter-item" style="min-width: 150px; max-width: 160px;">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">商户ID</label>
+                                <select id="tableMerchantId" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-ellipsis merchant-selector">
+                                    <option value="all">全部</option>
+                                    <option value="13589">13589 - 星辰体育</option>
+                                    <option value="24671">24671 - 极速赛车</option>
+                                    <option value="37824">37824 - 财富彩票</option>
+                                    <option value="45912">45912 - 金鹰彩店</option>
+                                    <option value="58763">58763 - 幸运星彩</option>
+                                </select>
+                            </div>
+                            <div class="filter-item" style="min-width: 120px; max-width: 140px;">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">合买序号</label>
+                                <input type="text" id="tablePlanId" placeholder="输入序号或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
+                            </div>
+                            <div class="filter-item" style="min-width: 100px; max-width: 120px;">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">发起人ID</label>
+                                <input type="text" id="tableInitiatorId" placeholder="输入ID或留空" class="w-full text-sm rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 id-field">
+                            </div>
+                            <div class="flex items-center flex-nowrap mt-6 md:mt-0 self-center" style="align-items: center; height: 40px; margin-top: 18px;">
+                                <button id="tableFilterBtn" class="btn-primary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">搜索</button>
+                                <button id="tableResetBtn" class="btn-secondary px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button" style="width: 56px;">重置</button>
+                                <button id="tableExportBtn" class="px-2 py-1 text-sm rounded-md ml-3 whitespace-nowrap filter-button bg-green-500 hover:bg-green-600 text-white transition" style="width: 56px;">
+                                    <i class="fas fa-download mr-1"></i>导出
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <table class="min-w-full compact-table">
@@ -1145,8 +1185,8 @@
             // 獲取指標標籤
             function getMetricLabel(metricType) {
                 switch(metricType) {
-                    case 'initiate': return '发起合买次数';
-                    case 'participate': return '参与合买次数';
+                    case 'initiate': return '发起合买';
+                    case 'participate': return '参与合买';
                     case 'success_rate': return '合买带单成功率';
                     case 'avg_amount': return '合买平均带单金额';
                     case 'initiate_count': return '发起合买次数';
@@ -1367,6 +1407,14 @@
                 // 設置用戶指標默認日期
                 setupUserDefaultDates();
                 
+                // 初始化用戶ID篩選框標籤（默認為發起合買）
+                const userIdFilterLabel = document.getElementById('userIdFilterLabel');
+                const userIdFilter = document.getElementById('userIdFilter');
+                if (userIdFilterLabel && userIdFilter) {
+                    userIdFilterLabel.textContent = '发起人ID';
+                    userIdFilter.placeholder = '输入发起人ID或留空';
+                }
+                
                 // 確保表格區域是可見的
                 const tableContent = document.getElementById('tableContent');
                 if (tableContent && !tableContent.classList.contains('expanded')) {
@@ -1402,10 +1450,23 @@
                     // 合買指標不再有圖表，移除了圖表更新邏輯
                 });
                 
-                // 用戶指標維度切換 - 什麼都不做，只有搜索時才根據選中的維度更新所有內容
+                // 用戶指標維度切換 - 動態更新ID篩選框標籤
                 document.getElementById('userMetricType').addEventListener('change', function() {
-                    // 下拉選單選中時不做任何操作
-                    // 只有點擊搜索按鈕時才會根據選中的指標維度更新表格標題、圖表維度標籤和數據
+                    const metricType = this.value;
+                    const userIdFilterLabel = document.getElementById('userIdFilterLabel');
+                    const userIdFilter = document.getElementById('userIdFilter');
+                    
+                    // 根據指標維度更新ID篩選框的標籤和佔位符
+                    if (metricType === 'initiate') {
+                        userIdFilterLabel.textContent = '发起人ID';
+                        userIdFilter.placeholder = '输入发起人ID或留空';
+                    } else if (metricType === 'participate') {
+                        userIdFilterLabel.textContent = '参与人ID';
+                        userIdFilter.placeholder = '输入参与人ID或留空';
+                    }
+                    
+                    // 清空當前輸入的ID值，因為維度已經改變
+                    userIdFilter.value = '';
                 });
                 
                 // 用戶指標時間維度切換
@@ -1509,56 +1570,45 @@
                     const planId = document.getElementById('planId').value;
                     const status = document.getElementById('status').value;
                     const initiatorId = document.getElementById('initiatorId').value;
-                    const participantId = document.getElementById('participantId').value;
                     
                     console.log(`篩選時間範圍: ${timeGranularity} - ${startDate} 至 ${endDate}`);
                     
                     // 篩選表格數據
-                    filterTableData(merchantId, planId, status, initiatorId, participantId, timeGranularity, startDate, endDate);
+                    filterTableData(merchantId, planId, status, initiatorId, timeGranularity, startDate, endDate);
                     // 合買指標不再有圖表，移除了圖表更新邏輯
                 });
                 
-                // 匯出按鈕點擊事件
+                // 最上方匯出按鈕：導出核心指標和合買整體數據
                 document.getElementById('exportBtn').addEventListener('click', function() {
-                    // 取得目前篩選後的可見行
-                    const visibleRows = Array.from(document.querySelectorAll('#dataTable tr'))
-                        .filter(row => row.style.display !== 'none');
-                    
-                    if (visibleRows.length === 0) {
-                        alert('沒有數據可匯出');
-                        return;
-                    }
-                    
-                    // 準備CSV數據
-                    let csvContent = '日期,商户ID,合买序号,发起人ID,参与人数,合买总金额,合买状态,中奖金额\n';
-                    
-                    visibleRows.forEach(function(row) {
-                        const cells = row.querySelectorAll('td');
-                        let rowData = [];
-                        
-                        cells.forEach(function(cell) {
-                            // 移除千分位逗號 (如數字格式)，並清理HTML標籤
-                            let cellText = cell.textContent.trim().replace(/,/g, '');
-                            // 對於包含HTML的單元格 (如狀態欄) 特別處理
-                            if (cell.innerHTML.includes('class="text-')) {
-                                cellText = cell.textContent.trim();
-                            }
-                            rowData.push(`"${cellText}"`);
-                        });
-                        
-                        csvContent += rowData.join(',') + '\n';
-                    });
-                    
-                    // 創建Blob對象並下載
+                    // 取得核心指標
+                    const totalPlans = document.getElementById('totalPlans').textContent;
+                    const successPlans = document.getElementById('successPlans').textContent;
+                    const totalAmount = document.getElementById('totalAmount').textContent;
+                    const winRate = document.getElementById('winRate').textContent;
+                    // 取得合買整體數據
+                    const totalParticipants = document.getElementById('totalParticipants').textContent;
+                    const avgInitAmount = document.getElementById('avgInitAmount').textContent;
+                    const avgParticipantsPerPlan = document.getElementById('avgParticipantsPerPlan').textContent;
+                    const avgParticipationTimes = document.getElementById('avgParticipationTimes').textContent;
+                    const avgInvestAmount = document.getElementById('avgInvestAmount').textContent;
+                    const totalWinAmount = document.getElementById('totalWinAmount').textContent;
+                    const avgWinAmount = document.getElementById('avgWinAmount').textContent;
+                    const activeUsers = document.getElementById('activeUsers').textContent;
+                    // 準備CSV內容
+                    let csvContent = '核心指標\n';
+                    csvContent += '合买总发起次数,合买成功次数,合买总金额,合买中奖率\n';
+                    csvContent += `${totalPlans},${successPlans},${totalAmount},${winRate}\n`;
+                    csvContent += '\n合买整体数据\n';
+                    csvContent += '合买参与总人次,合买平均发起金额,平均参与人数/单,人均合买参与次数,人均合买投入金额,合买中奖金额总计,平均中奖金额/单,合买活跃用户数\n';
+                    csvContent += `${totalParticipants},${avgInitAmount},${avgParticipantsPerPlan},${avgParticipationTimes},${avgInvestAmount},${totalWinAmount},${avgWinAmount},${activeUsers}\n`;
+                    // 下載
                     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                     const url = URL.createObjectURL(blob);
-                    
                     const link = document.createElement('a');
                     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
                     link.setAttribute('href', url);
-                    link.setAttribute('download', `合买数据_${timestamp}.csv`);
+                    link.setAttribute('download', `合買指標總覽_${timestamp}.csv`);
                     link.style.visibility = 'hidden';
-                    
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
@@ -1572,7 +1622,6 @@
                     document.getElementById('planId').value = '';
                     document.getElementById('status').value = 'all';
                     document.getElementById('initiatorId').value = '';
-                    document.getElementById('participantId').value = '';
                     
                     // 重置日期為默認值
                     setupDefaultDates();
@@ -1594,7 +1643,7 @@
                 });
                 
                 // 篩選表格數據的函數
-                function filterTableData(merchantId, planId, status, initiatorId, participantId, timeGranularity, startDate, endDate) {
+                function filterTableData(merchantId, planId, status, initiatorId, timeGranularity, startDate, endDate) {
                     const tableRows = document.querySelectorAll('#dataTable tr');
                     
                     tableRows.forEach(function(row) {
@@ -2263,10 +2312,9 @@ ${htmlContent}`;
                     const planId = document.getElementById('planId').value;
                     const status = document.getElementById('status').value;
                     const initiatorId = document.getElementById('initiatorId').value;
-                    const participantId = document.getElementById('participantId').value;
                     
                     // 篩選表格數據
-                    filterTableData(merchantId, planId, status, initiatorId, participantId, timeGranularity, startDate, endDate);
+                    filterTableData(merchantId, planId, status, initiatorId, timeGranularity, startDate, endDate);
                     
                     // 更新合買指標圖表（如果當前在合買指標TAB）
                     const activeTab = document.querySelector('.tab-button.active');
@@ -3439,7 +3487,6 @@ ${htmlContent}`;
                     document.getElementById('planId').value = '';
                     document.getElementById('status').value = 'all';
                     document.getElementById('initiatorId').value = '';
-                    document.getElementById('participantId').value = '';
                     
                     // 重置日期為默認值
                     setupDefaultDates();
@@ -3477,6 +3524,7 @@ ${htmlContent}`;
                     
                     const merchantId = document.getElementById('userMerchantId').value;
                     const metricType = document.getElementById('userMetricType').value;
+                    const userId = document.getElementById('userIdFilter').value;
                     
                     const activeTab = document.querySelector('.tab-button.active');
                     const tabType = activeTab ? activeTab.getAttribute('data-tab') : 'groupbuy';
@@ -3505,7 +3553,7 @@ ${htmlContent}`;
                     }
                     
                     // 篩選表格數據
-                    filterUserTableData(merchantId, metricType, timeGranularity, startDate, endDate);
+                    filterUserTableData(merchantId, metricType, userId, timeGranularity, startDate, endDate);
                     
                     // 更新分頁信息，確保分頁功能正常
                     updateUserPaginationInfo();
@@ -3529,6 +3577,11 @@ ${htmlContent}`;
                     document.getElementById('userTimeGranularity').value = 'day';
                     document.getElementById('userMerchantId').value = 'all';
                     document.getElementById('userMetricType').value = 'initiate';
+                    document.getElementById('userIdFilter').value = '';
+                    
+                    // 重置ID篩選框標籤為發起人ID
+                    document.getElementById('userIdFilterLabel').textContent = '发起人ID';
+                    document.getElementById('userIdFilter').placeholder = '输入发起人ID或留空';
                     
                     setupUserDefaultDates();
                     updateUserDateSelector('day');
@@ -3610,7 +3663,7 @@ ${htmlContent}`;
                 }
                 
                 // 篩選用戶表格數據
-                function filterUserTableData(merchantId, metricType, timeGranularity, startDate, endDate) {
+                function filterUserTableData(merchantId, metricType, userId, timeGranularity, startDate, endDate) {
                     const tableRows = document.querySelectorAll('#userDataTable tr');
                     
                     tableRows.forEach(function(row) {
@@ -3648,6 +3701,14 @@ ${htmlContent}`;
                         if (merchantId !== 'all' && display) {
                             const merchantIdCell = row.querySelector('td:nth-child(2)');
                             if (merchantIdCell && merchantIdCell.textContent.trim() !== merchantId) {
+                                display = false;
+                            }
+                        }
+                        
+                        // 檢查用戶ID（根據指標維度判斷是發起人ID還是參與人ID）
+                        if (userId && display) {
+                            const userIdCell = row.querySelector('td:nth-child(3)'); // 用戶ID在第3列
+                            if (userIdCell && !userIdCell.textContent.includes(userId)) {
                                 display = false;
                             }
                         }
@@ -3714,6 +3775,159 @@ ${htmlContent}`;
                         }
                     }
                 }
+
+                // 新增：數據詳情篩選控制表格
+                document.getElementById('tableFilterBtn').addEventListener('click', function() {
+                    // 取得篩選條件
+                    const timeGranularity = document.getElementById('tableTimeGranularity').value;
+                    let startDate, endDate;
+                    if (timeGranularity === 'day') {
+                        startDate = document.getElementById('tableStartDate').value;
+                        endDate = document.getElementById('tableEndDate').value;
+                    } else if (timeGranularity === 'week') {
+                        startDate = document.getElementById('tableStartWeek').value;
+                        endDate = document.getElementById('tableEndWeek').value;
+                    } else if (timeGranularity === 'month') {
+                        startDate = document.getElementById('tableStartMonth').value;
+                        endDate = document.getElementById('tableEndMonth').value;
+                    }
+                    const merchantId = document.getElementById('tableMerchantId').value;
+                    const planId = document.getElementById('tablePlanId').value;
+                    const initiatorId = document.getElementById('tableInitiatorId').value;
+                    // 只控制表格
+                    filterTableData(merchantId, planId, null, initiatorId, timeGranularity, startDate, endDate);
+                });
+                document.getElementById('tableResetBtn').addEventListener('click', function() {
+                    document.getElementById('tableTimeGranularity').value = 'day';
+                    document.getElementById('tableMerchantId').value = 'all';
+                    document.getElementById('tablePlanId').value = '';
+                    document.getElementById('tableInitiatorId').value = '';
+                    // 重置日期
+                    const today = '2025-01-01';
+                    document.getElementById('tableStartDate').value = today;
+                    document.getElementById('tableEndDate').value = today;
+                    const weekString = '2025-W01';
+                    document.getElementById('tableStartWeek').value = weekString;
+                    document.getElementById('tableEndWeek').value = weekString;
+                    const monthString = '2025-01';
+                    document.getElementById('tableStartMonth').value = monthString;
+                    document.getElementById('tableEndMonth').value = monthString;
+                    // 顯示所有表格數據
+                    const tableRows = document.querySelectorAll('#dataTable tr');
+                    tableRows.forEach(function(row) {
+                        row.style.display = '';
+                    });
+                    updatePaginationInfo();
+                    // 日期選擇器顯示正確
+                    updateTableDateSelector('day');
+                });
+                document.getElementById('tableExportBtn').addEventListener('click', function() {
+                    const visibleRows = Array.from(document.querySelectorAll('#dataTable tr'))
+                        .filter(row => row.style.display !== 'none');
+                    if (visibleRows.length === 0) {
+                        alert('沒有數據可匯出');
+                        return;
+                    }
+                    let csvContent = '日期,商户ID,合买序号,发起人ID,参与人数,合买总金额,合买状态,中奖金额\n';
+                    visibleRows.forEach(function(row) {
+                        const cells = row.querySelectorAll('td');
+                        let rowData = [];
+                        cells.forEach(function(cell) {
+                            let cellText = cell.textContent.trim().replace(/,/g, '');
+                            rowData.push(`"${cellText}"`);
+                        });
+                        csvContent += rowData.join(',') + '\n';
+                    });
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', `合买数据_${timestamp}.csv`);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+
+                // 下方數據詳情篩選區域的時間維度切換，對齊上方邏輯
+                function getCurrentWeekString() {
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    // 計算ISO週數
+                    const firstDayOfYear = new Date(year, 0, 1);
+                    const pastDaysOfYear = (now - firstDayOfYear) / 86400000;
+                    const week = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+                    return `${year}-W${String(week).padStart(2, '0')}`;
+                }
+                function getCurrentMonthString() {
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    return `${year}-${month}`;
+                }
+                function getCurrentDateString() {
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    const day = String(now.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+                function updateTableDateSelector(granularity) {
+                    const daySelector = document.getElementById('tableDaySelector');
+                    const weekSelector = document.getElementById('tableWeekSelector');
+                    const monthSelector = document.getElementById('tableMonthSelector');
+                    daySelector.classList.add('hidden');
+                    weekSelector.classList.add('hidden');
+                    monthSelector.classList.add('hidden');
+                    if (granularity === 'day') {
+                        daySelector.classList.remove('hidden');
+                        const today = getCurrentDateString();
+                        document.getElementById('tableStartDate').value = today;
+                        document.getElementById('tableEndDate').value = today;
+                    } else if (granularity === 'week') {
+                        weekSelector.classList.remove('hidden');
+                        const weekString = getCurrentWeekString();
+                        document.getElementById('tableStartWeek').value = weekString;
+                        document.getElementById('tableEndWeek').value = weekString;
+                    } else if (granularity === 'month') {
+                        monthSelector.classList.remove('hidden');
+                        const monthString = getCurrentMonthString();
+                        document.getElementById('tableStartMonth').value = monthString;
+                        document.getElementById('tableEndMonth').value = monthString;
+                    }
+                }
+                document.getElementById('tableTimeGranularity').addEventListener('change', function() {
+                    updateTableDateSelector(this.value);
+                });
+                // 初始化時根據預設值顯示正確的日期選擇器
+                updateTableDateSelector(document.getElementById('tableTimeGranularity').value);
+
+                // 修正重置時週/月預設為當前週/月
+                document.getElementById('tableResetBtn').addEventListener('click', function() {
+                    document.getElementById('tableTimeGranularity').value = 'day';
+                    document.getElementById('tableMerchantId').value = 'all';
+                    document.getElementById('tablePlanId').value = '';
+                    document.getElementById('tableInitiatorId').value = '';
+                    // 重置日期
+                    const today = getCurrentDateString();
+                    document.getElementById('tableStartDate').value = today;
+                    document.getElementById('tableEndDate').value = today;
+                    const weekString = getCurrentWeekString();
+                    document.getElementById('tableStartWeek').value = weekString;
+                    document.getElementById('tableEndWeek').value = weekString;
+                    const monthString = getCurrentMonthString();
+                    document.getElementById('tableStartMonth').value = monthString;
+                    document.getElementById('tableEndMonth').value = monthString;
+                    // 顯示所有表格數據
+                    const tableRows = document.querySelectorAll('#dataTable tr');
+                    tableRows.forEach(function(row) {
+                        row.style.display = '';
+                    });
+                    updatePaginationInfo();
+                    // 日期選擇器顯示正確
+                    updateTableDateSelector('day');
+                });
 
     </script>
     </div>
