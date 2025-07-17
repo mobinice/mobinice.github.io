@@ -861,22 +861,38 @@
             <div class="collapsible-content expanded" id="coreMetricsContent">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                     <div class="card p-3">
-                        <div class="stat-label text-xs">合买总发起次数</div>
+                        <div class="stat-label text-xs flex items-center">合买总发起次数
+                            <button class="ml-1 rounded-full bg-gray-200 text-gray-600 w-5 h-5 flex items-center justify-center text-xs focus:outline-none info-btn" data-info="统计所有合买发起人总发起合买次数" title="字段定义" style="margin-bottom:0;">
+                                <i class="fas fa-question"></i>
+                            </button>
+                        </div>
                         <div class="stat-value text-blue-600 text-lg font-semibold" id="totalPlans">100</div>
                         <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+5.2%</span></div>
                     </div>
                     <div class="card p-3">
-                        <div class="stat-label text-xs">合买成功次数</div>
+                        <div class="stat-label text-xs flex items-center">合买成功次数
+                            <button class="ml-1 rounded-full bg-gray-200 text-gray-600 w-5 h-5 flex items-center justify-center text-xs focus:outline-none info-btn" data-info="统计所有合买方案中总成功次数（合买方案截止时，有无达70%以上合买目标金额）" title="字段定义" style="margin-bottom:0;">
+                                <i class="fas fa-question"></i>
+                            </button>
+                        </div>
                         <div class="stat-value text-green-600 text-lg font-semibold" id="successPlans">42</div>
                         <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+3.8%</span></div>
                     </div>
                     <div class="card p-3">
-                        <div class="stat-label text-xs">合买总金额</div>
+                        <div class="stat-label text-xs flex items-center">合买总金额
+                            <button class="ml-1 rounded-full bg-gray-200 text-gray-600 w-5 h-5 flex items-center justify-center text-xs focus:outline-none info-btn" data-info="统计所有合买参与认购总金额" title="字段定义" style="margin-bottom:0;">
+                                <i class="fas fa-question"></i>
+                            </button>
+                        </div>
                         <div class="stat-value text-purple-600 text-lg font-semibold" id="totalAmount">57,997</div>
                         <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+7.1%</span></div>
                     </div>
                     <div class="card p-3">
-                        <div class="stat-label text-xs">合买中奖率</div>
+                        <div class="stat-label text-xs flex items-center">合买中奖率
+                            <button class="ml-1 rounded-full bg-gray-200 text-gray-600 w-5 h-5 flex items-center justify-center text-xs focus:outline-none info-btn" data-info="统计所有合买赛果为赢的机率（不包含赢半）" title="字段定义" style="margin-bottom:0;">
+                                <i class="fas fa-question"></i>
+                            </button>
+                        </div>
                         <div class="stat-value text-amber-600 text-lg font-semibold" id="winRate">42.0%</div>
                         <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-red-500">-1.2%</span></div>
                     </div>
@@ -893,42 +909,74 @@
             <div class="collapsible-content expanded" id="overallDataContent">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                     <div class="card p-3">
-                        <div class="stat-label text-xs">合买参与总人次</div>
+                        <div class="stat-label text-xs flex items-center">合买参与总人次
+                            <button class="ml-1 rounded-full bg-gray-200 text-gray-600 w-5 h-5 flex items-center justify-center text-xs focus:outline-none info-btn" data-info="统计所有合买方案，时间区间内去重用户数" title="字段定义" style="margin-bottom:0;">
+                                <i class="fas fa-question"></i>
+                            </button>
+                        </div>
                         <div class="stat-value text-indigo-600 text-lg font-semibold" id="totalParticipants">502</div>
                         <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+4.3%</span></div>
                     </div>
                     <div class="card p-3">
-                        <div class="stat-label text-xs">合买平均发起金额</div>
+                        <div class="stat-label text-xs flex items-center">合买平均发起金额
+                            <button class="ml-1 rounded-full bg-gray-200 text-gray-600 w-5 h-5 flex items-center justify-center text-xs focus:outline-none info-btn" data-info="统计所有合买方案，合买目标平均金额" title="字段定义" style="margin-bottom:0;">
+                                <i class="fas fa-question"></i>
+                            </button>
+                        </div>
                         <div class="stat-value text-teal-600 text-lg font-semibold" id="avgInitAmount">580.0</div>
                         <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+2.1%</span></div>
                     </div>
                     <div class="card p-3">
-                        <div class="stat-label text-xs">平均参与人数/单</div>
+                        <div class="stat-label text-xs flex items-center">发起人平均/单
+                            <button class="ml-1 rounded-full bg-gray-200 text-gray-600 w-5 h-5 flex items-center justify-center text-xs focus:outline-none info-btn" data-info="统计所有合买方案，发起人平均发起几单" title="字段定义" style="margin-bottom:0;">
+                                <i class="fas fa-question"></i>
+                            </button>
+                        </div>
                         <div class="stat-value text-cyan-600 text-lg font-semibold" id="avgParticipantsPerPlan">5.0</div>
                         <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-red-500">-0.3%</span></div>
                     </div>
                     <div class="card p-3">
-                        <div class="stat-label text-xs">人均合买参与次数</div>
+                        <div class="stat-label text-xs flex items-center">人均合买参与次数
+                            <button class="ml-1 rounded-full bg-gray-200 text-gray-600 w-5 h-5 flex items-center justify-center text-xs focus:outline-none info-btn" data-info="统计一个人平均参与几张合买单" title="字段定义" style="margin-bottom:0;">
+                                <i class="fas fa-question"></i>
+                            </button>
+                        </div>
                         <div class="stat-value text-emerald-600 text-lg font-semibold" id="avgParticipationTimes">1.0</div>
                         <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+1.8%</span></div>
                     </div>
                     <div class="card p-3">
-                        <div class="stat-label text-xs">人均合买投入金额</div>
+                        <div class="stat-label text-xs flex items-center">人均合买投入金额
+                            <button class="ml-1 rounded-full bg-gray-200 text-gray-600 w-5 h-5 flex items-center justify-center text-xs focus:outline-none info-btn" data-info="统计一个人平均认购多少合买金额" title="字段定义" style="margin-bottom:0;">
+                                <i class="fas fa-question"></i>
+                            </button>
+                        </div>
                         <div class="stat-value text-rose-600 text-lg font-semibold" id="avgInvestAmount">115.5</div>
                         <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+3.5%</span></div>
                     </div>
                     <div class="card p-3">
-                        <div class="stat-label text-xs">合买中奖金额总计</div>
+                        <div class="stat-label text-xs flex items-center">合买中奖金额总计
+                            <button class="ml-1 rounded-full bg-gray-200 text-gray-600 w-5 h-5 flex items-center justify-center text-xs focus:outline-none info-btn" data-info="统计所有合买方案赛果为胜（不包含赢半）所有的派彩金额（含佣金）" title="字段定义" style="margin-bottom:0;">
+                                <i class="fas fa-question"></i>
+                            </button>
+                        </div>
                         <div class="stat-value text-amber-600 text-lg font-semibold" id="totalWinAmount">33,885</div>
                         <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+8.7%</span></div>
                     </div>
                     <div class="card p-3">
-                        <div class="stat-label text-xs">平均中奖金额/单</div>
+                        <div class="stat-label text-xs flex items-center">平均中奖金额/单
+                            <button class="ml-1 rounded-full bg-gray-200 text-gray-600 w-5 h-5 flex items-center justify-center text-xs focus:outline-none info-btn" data-info="统计一个合买方案，平均可以派彩多少数额" title="字段定义" style="margin-bottom:0;">
+                                <i class="fas fa-question"></i>
+                            </button>
+                        </div>
                         <div class="stat-value text-orange-600 text-lg font-semibold" id="avgWinAmount">806.8</div>
                         <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+5.2%</span></div>
                     </div>
                     <div class="card p-3">
-                        <div class="stat-label text-xs">合买活跃用户数</div>
+                        <div class="stat-label text-xs flex items-center">合买活跃用户数
+                            <button class="ml-1 rounded-full bg-gray-200 text-gray-600 w-5 h-5 flex items-center justify-center text-xs focus:outline-none info-btn" data-info="一个人认购3单（含）以上的合买单，视为合买活跃用户" title="字段定义" style="margin-bottom:0;">
+                                <i class="fas fa-question"></i>
+                            </button>
+                        </div>
                         <div class="stat-value text-blue-600 text-lg font-semibold" id="activeUsers">495</div>
                         <div class="text-xs text-gray-500 mt-1">较上期 <span class="text-green-500">+2.9%</span></div>
                     </div>
@@ -3927,6 +3975,45 @@ ${htmlContent}`;
                     updatePaginationInfo();
                     // 日期選擇器顯示正確
                     updateTableDateSelector('day');
+                });
+
+                // 問號ICON提示彈窗
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.querySelectorAll('.info-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const info = this.getAttribute('data-info');
+                            // 若已存在提示，先移除
+                            document.querySelectorAll('.info-tooltip').forEach(tip => tip.remove());
+                            // 建立提示元素
+                            const tooltip = document.createElement('div');
+                            tooltip.className = 'info-tooltip absolute z-50 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-xs shadow-lg';
+                            tooltip.textContent = info;
+                            this.parentElement.appendChild(tooltip);
+                            tooltip.style.left = (this.offsetLeft + this.offsetWidth + 8) + 'px';
+                            tooltip.style.top = (this.offsetTop - 4) + 'px';
+                            tooltip.style.minWidth = '180px';
+                            tooltip.style.maxWidth = '260px';
+                            tooltip.style.pointerEvents = 'auto';
+                            // 滾動時tooltip跟隨icon
+                            let scrollHandler = () => {
+                                tooltip.style.left = (this.offsetLeft + this.offsetWidth + 8) + 'px';
+                                tooltip.style.top = (this.offsetTop - 4) + 'px';
+                            };
+                            window.addEventListener('scroll', scrollHandler, true);
+                            // 滑鼠移出TIPS自動消失
+                            tooltip.addEventListener('mouseleave', function() {
+                                tooltip.remove();
+                                window.removeEventListener('scroll', scrollHandler, true);
+                            });
+                            // 滑鼠移出ICON也自動消失
+                            this.addEventListener('mouseleave', function iconLeave() {
+                                tooltip.remove();
+                                window.removeEventListener('scroll', scrollHandler, true);
+                                this.removeEventListener('mouseleave', iconLeave);
+                            });
+                        });
+                    });
                 });
 
     </script>
