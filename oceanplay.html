@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="zh-TW">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>海釣場管理系統</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      box-sizing: border-box;
+      font-family: 'Noto Sans TC', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      width: 100%;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .wave-bg {
+      background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%);
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    
+    .fish-icon {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .card-ocean {
+      background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(240,249,255,0.95) 100%);
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn-ocean {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-ocean:hover {
+      background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.4);
+    }
+    
+    .btn-ocean:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+    
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    }
+    
+    .btn-success:hover {
+      background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+    }
+    
+    .timer-pulse {
+      animation: pulse 1s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    .bubble {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: rise 8s ease-in infinite;
+    }
+    
+    @keyframes rise {
+      0% { transform: translateY(100%) scale(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100%) scale(1); opacity: 0; }
+    }
+    
+    .tab-active {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: white;
+    }
+    
+    .input-ocean {
+      border: 2px solid #e0f2fe;
+      transition: all 0.3s ease;
+    }
+    
+    .input-ocean:focus {
+      border-color: #0ea5e9;
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+      outline: none;
+    }
+    
+    .status-waiting { background: #fef3c7; color: #92400e; }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-completed { background: #e0e7ff; color: #3730a3; }
+    
+    .scrollbar-ocean::-webkit-scrollbar {
+      width: 6px;
+    }
+    .scrollbar-ocean::-webkit-scrollbar-track {
+      background: #f0f9ff;
+      border-radius: 3px;
+    }
+    .scrollbar-ocean::-webkit-scrollbar-thumb {
+      background: #0ea5e9;
+      border-radius: 3px;
+    }
+    
+    .modal-backdrop {
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  </head>
+ <body style="overflow-x: hidden;">
+  <div id="app" class="wave-bg relative" style="overflow-x: hidden; overflow-y: auto;"><!-- Decorative Bubbles -->
+   <div class="bubble" style="width: 20px; height: 20px; left: 10%; animation-delay: 0s;"></div>
+   <div class="bubble" style="width: 30px; height: 30px; left: 20%; animation-delay: 2s;"></div>
+   <div class="bubble" style="width: 15px; height: 15px; left: 70%; animation-delay: 4s;"></div>
+   <div class="bubble" style="width: 25px; height: 25px; left: 85%; animation-delay: 1s;"></div>
+   <div class="bubble" style="width: 18px; height: 18px; left: 50%; animation-delay: 3s;"></div>
+   <div class="bubble" style="width: 22px; height: 22px; left: 35%; animation-delay: 5s;"></div><!-- Header -->
+   <header class="relative z-10 py-6 px-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+     <div class="flex items-center gap-3">
+      <div class="fish-icon text-5xl">
+       🐟
+      </div>
+      <div>
+       <h1 class="text-2xl md:text-3xl font-black text-white drop-shadow-lg">海釣場管理系統</h1>
+       <p class="text-sky-200 text-sm">歡迎來到快樂海釣場 🌊</p>
+      </div>
+     </div>
+     <div class="flex items-center gap-2"><span class="text-white text-2xl">🌊</span> <span class="text-white text-2xl">⚓</span> <span class="text-white text-2xl">🎣</span>
+     </div>
+    </div>
+   </header><!-- Navigation Tabs -->
+   <nav class="relative z-10 px-4 mb-6">
+    <div class="max-w-6xl mx-auto">
+     <div class="flex flex-wrap gap-2 bg-white/20 backdrop-blur-sm rounded-2xl p-2"><button onclick="switchTab('fish')" id="tab-fish" class="tab-btn flex-1 min-w-[120px] py-3 px-4 rounded-xl font-bold text-white transition-all tab-active"> 🐠 魚種管理 </button> <button onclick="switchTab('customers')" id="tab-customers" class="tab-btn flex-1 min-w-[120px] py-3 px-4 rounded-xl font-bold text-white/80 transition-all hover:bg-white/10"> 👥 客戶管理 </button> <button onclick="switchTab('orders')" id="tab-orders" class="tab-btn flex-1 min-w-[120px] py-3 px-4 rounded-xl font-bold text-white/80 transition-all hover:bg-white/10"> 📋 訂單管理 </button> <button onclick="switchTab('settlement')" id="tab-settlement" class="tab-btn flex-1 min-w-[120px] py-3 px-4 rounded-xl font-bold text-white/80 transition-all hover:bg-white/10"> 💰 餘額結算 </button>
+     </div>
+    </div>
+   </nav><!-- Main Content -->
+   <main class="relative z-10 px-4 pb-8">
+    <div class="max-w-6xl mx-auto"><!-- Fish Management Tab -->
+     <section id="panel-fish" class="tab-panel">
+      <div class="card-ocean rounded-3xl p-6 shadow-2xl">
+       <div class="flex items-center gap-3 mb-6"><span class="text-4xl">🐠</span>
+        <h2 class="text-2xl font-bold text-sky-900">魚種價格設定</h2>
+       </div><!-- Add Fish Form -->
+       <div class="bg-sky-50 rounded-2xl p-5 mb-6">
+        <h3 class="font-bold text-sky-800 mb-4">新增魚種</h3>
+        <div class="flex flex-col sm:flex-row gap-3">
+         <div class="flex-1"><label for="fish-name" class="block text-sm font-medium text-sky-700 mb-1">魚種名稱</label> <input type="text" id="fish-name" placeholder="例如：黑鯛、石斑、紅甘" class="input-ocean w-full px-4 py-3 rounded-xl">
+         </div>
+         <div class="flex-1"><label for="fish-price" class="block text-sm font-medium text-sky-700 mb-1">每隻價格 (元)</label> <input type="number" id="fish-price" placeholder="100" min="0" class="input-ocean w-full px-4 py-3 rounded-xl">
+         </div>
+         <div class="flex items-end"><button onclick="addFish()" id="add-fish-btn" class="btn-ocean w-full sm:w-auto px-6 py-3 rounded-xl text-white font-bold"> ➕ 新增 </button>
+         </div>
+        </div>
+       </div><!-- Fish List -->
+       <div id="fish-list" class="space-y-3 max-h-[400px] overflow-y-auto scrollbar-ocean">
+        <p class="text-center text-sky-400 py-8">尚無魚種資料，請新增魚種</p>
+       </div>
+      </div>
+     </section><!-- Customer Management Tab -->
+     <section id="panel-customers" class="tab-panel hidden">
+      <div class="card-ocean rounded-3xl p-6 shadow-2xl">
+       <div class="flex items-center gap-3 mb-6"><span class="text-4xl">👥</span>
+        <h2 class="text-2xl font-bold text-sky-900">客戶管理</h2>
+       </div><!-- Add Customer Form -->
+       <div class="bg-sky-50 rounded-2xl p-5 mb-6">
+        <h3 class="font-bold text-sky-800 mb-4">新增客戶</h3>
+        <div class="flex flex-col sm:flex-row gap-3">
+         <div class="flex-1"><label for="customer-name" class="block text-sm font-medium text-sky-700 mb-1">客戶名稱</label> <input type="text" id="customer-name" placeholder="請輸入客戶名稱" class="input-ocean w-full px-4 py-3 rounded-xl">
+         </div>
+         <div class="flex-1"><label for="customer-phone" class="block text-sm font-medium text-sky-700 mb-1">聯絡電話 (選填)</label> <input type="tel" id="customer-phone" placeholder="0912345678" class="input-ocean w-full px-4 py-3 rounded-xl">
+         </div>
+         <div class="flex items-end"><button onclick="addCustomer()" id="add-customer-btn" class="btn-ocean w-full sm:w-auto px-6 py-3 rounded-xl text-white font-bold"> ➕ 新增 </button>
+         </div>
+        </div>
+       </div><!-- Customer List -->
+       <div id="customer-list" class="space-y-3 max-h-[400px] overflow-y-auto scrollbar-ocean">
+        <p class="text-center text-sky-400 py-8">尚無客戶資料，請新增客戶</p>
+       </div>
+      </div>
+     </section><!-- Order Management Tab -->
+     <section id="panel-orders" class="tab-panel hidden">
+      <div class="card-ocean rounded-3xl p-6 shadow-2xl">
+       <div class="flex items-center gap-3 mb-6"><span class="text-4xl">📋</span>
+        <h2 class="text-2xl font-bold text-sky-900">訂單管理</h2>
+       </div><!-- Create Order Form -->
+       <div class="bg-sky-50 rounded-2xl p-5 mb-6">
+        <h3 class="font-bold text-sky-800 mb-4">開立新訂單</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+         <div><label for="order-fish" class="block text-sm font-medium text-sky-700 mb-1">選擇魚種</label> <select id="order-fish" class="input-ocean w-full px-4 py-3 rounded-xl bg-white"> <option value="">請選擇魚種</option> </select>
+         </div>
+         <div><label for="order-customer" class="block text-sm font-medium text-sky-700 mb-1">選擇客戶</label> <select id="order-customer" class="input-ocean w-full px-4 py-3 rounded-xl bg-white"> <option value="">請選擇客戶</option> </select>
+         </div>
+         <div><label for="order-duration" class="block text-sm font-medium text-sky-700 mb-1">釣魚時間 (分鐘)</label> <input type="number" id="order-duration" placeholder="60" min="1" value="60" class="input-ocean w-full px-4 py-3 rounded-xl">
+         </div>
+         <div class="flex items-end"><button onclick="createOrder()" id="create-order-btn" class="btn-ocean w-full px-6 py-3 rounded-xl text-white font-bold"> 📝 開立訂單 </button>
+         </div>
+        </div>
+       </div><!-- Active Orders -->
+       <div class="mb-6">
+        <h3 class="font-bold text-sky-800 mb-4 flex items-center gap-2"><span class="text-xl">⏱️</span> 進行中的訂單</h3>
+        <div id="active-orders" class="space-y-4">
+         <p class="text-center text-sky-400 py-4">目前沒有進行中的訂單</p>
+        </div>
+       </div><!-- Waiting Orders -->
+       <div class="mb-6">
+        <h3 class="font-bold text-sky-800 mb-4 flex items-center gap-2"><span class="text-xl">⏳</span> 等待中的訂單</h3>
+        <div id="waiting-orders" class="space-y-4">
+         <p class="text-center text-sky-400 py-4">目前沒有等待中的訂單</p>
+        </div>
+       </div><!-- Completed Orders -->
+       <div>
+        <h3 class="font-bold text-sky-800 mb-4 flex items-center gap-2"><span class="text-xl">✅</span> 已完成的訂單</h3>
+        <div id="completed-orders" class="space-y-3 max-h-[300px] overflow-y-auto scrollbar-ocean">
+         <p class="text-center text-sky-400 py-4">目前沒有已完成的訂單</p>
+        </div>
+       </div>
+      </div>
+     </section><!-- Settlement Tab -->
+     <section id="panel-settlement" class="tab-panel hidden">
+      <div class="card-ocean rounded-3xl p-6 shadow-2xl">
+       <div class="flex items-center gap-3 mb-6"><span class="text-4xl">💰</span>
+        <h2 class="text-2xl font-bold text-sky-900">客戶餘額結算</h2>
+       </div>
+       <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 mb-6">
+        <p class="text-amber-800"><strong>💡 說明：</strong>此處顯示所有有未結算餘額的客戶。點擊「結算」按鈕後，該客戶的累積消費將歸零。</p>
+       </div>
+       <div id="settlement-list" class="space-y-4">
+        <p class="text-center text-sky-400 py-8">目前沒有客戶有未結算餘額</p>
+       </div>
+      </div>
+     </section>
+    </div>
+   </main><!-- Checkout Modal -->
+   <div id="checkout-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+    <div class="card-ocean rounded-3xl p-6 w-full max-w-md shadow-2xl">
+     <div class="flex items-center gap-3 mb-6"><span class="text-4xl">🐟</span>
+      <h3 class="text-xl font-bold text-sky-900">結帳 - 計算漁獲</h3>
+     </div>
+     <div id="checkout-info" class="bg-sky-50 rounded-xl p-4 mb-4"><!-- Order info will be inserted here -->
+     </div>
+     <div class="mb-4"><label for="checkout-fish-count" class="block text-sm font-medium text-sky-700 mb-1">釣到幾隻魚？</label> <input type="number" id="checkout-fish-count" min="0" value="0" class="input-ocean w-full px-4 py-3 rounded-xl text-2xl font-bold text-center">
+     </div>
+     <div id="checkout-total" class="bg-gradient-to-r from-sky-500 to-cyan-500 rounded-xl p-4 mb-6 text-center">
+      <p class="text-white/80 text-sm">應付金額</p>
+      <p id="checkout-amount" class="text-white text-3xl font-black">$0</p>
+     </div>
+     <div class="flex gap-3"><button onclick="closeCheckoutModal()" class="flex-1 py-3 px-4 rounded-xl font-bold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all"> 取消 </button> <button onclick="confirmCheckout()" id="confirm-checkout-btn" class="flex-1 btn-success py-3 px-4 rounded-xl font-bold text-white"> ✓ 確認結帳 </button>
+     </div>
+    </div>
+   </div><!-- Delete Confirm Modal -->
+   <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+    <div class="card-ocean rounded-3xl p-6 w-full max-w-sm shadow-2xl">
+     <div class="text-center mb-6"><span class="text-5xl">⚠️</span>
+      <h3 class="text-xl font-bold text-sky-900 mt-4">確認刪除？</h3>
+      <p id="delete-message" class="text-sky-600 mt-2">確定要刪除這個項目嗎？</p>
+     </div>
+     <div class="flex gap-3"><button onclick="closeDeleteModal()" class="flex-1 py-3 px-4 rounded-xl font-bold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all"> 取消 </button> <button onclick="confirmDelete()" class="flex-1 btn-danger py-3 px-4 rounded-xl font-bold text-white"> 🗑️ 確認刪除 </button>
+     </div>
+    </div>
+   </div><!-- Toast Notification -->
+   <div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 hidden">
+    <div class="bg-gray-900 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2"><span id="toast-icon">✓</span> <span id="toast-message">操作成功</span>
+    </div>
+   </div>
+  </div>
+  <script>
+    // ============ Local Storage Keys ============
+    const STORAGE_KEYS = {
+      FISH: 'fishing_app_fish',
+      CUSTOMERS: 'fishing_app_customers',
+      ORDERS: 'fishing_app_orders'
+    };
+    
+    // ============ Application State ============
+    let fishTypes = [];
+    let customers = [];
+    let orders = [];
+    let activeTimers = {};
+    let currentCheckoutOrder = null;
+    let deleteCallback = null;
+    
+    // ============ Data Persistence ============
+    function loadData() {
+      try {
+        fishTypes = JSON.parse(localStorage.getItem(STORAGE_KEYS.FISH)) || [];
+        customers = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOMERS)) || [];
+        orders = JSON.parse(localStorage.getItem(STORAGE_KEYS.ORDERS)) || [];
+      } catch (e) {
+        console.error('Error loading data:', e);
+        fishTypes = [];
+        customers = [];
+        orders = [];
+      }
+    }
+    
+    function saveFish() {
+      localStorage.setItem(STORAGE_KEYS.FISH, JSON.stringify(fishTypes));
+    }
+    
+    function saveCustomers() {
+      localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(customers));
+    }
+    
+    function saveOrders() {
+      localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
+    }
+    
+    // ============ Initialize App ============
+    function initApp() {
+      loadData();
+      renderFishList();
+      renderCustomerList();
+      renderOrders();
+      renderSettlement();
+      updateSelects();
+      
+      // Restart timers for active orders
+      orders.filter(o => o.status === 'active').forEach(order => {
+        startTimer(order);
+      });
+    }
+    
+    // ============ Tab Navigation ============
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('tab-active');
+        b.classList.add('text-white/80');
+      });
+      
+      document.getElementById(`panel-${tabName}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabName}`);
+      activeBtn.classList.add('tab-active');
+      activeBtn.classList.remove('text-white/80');
+    }
+    
+    // ============ Toast Notification ============
+    function showToast(message, icon = '✓') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = message;
+      document.getElementById('toast-icon').textContent = icon;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+    
+    // ============ Delete Confirmation Modal ============
+    function showDeleteModal(message, callback) {
+      document.getElementById('delete-message').textContent = message;
+      deleteCallback = callback;
+      document.getElementById('delete-modal').classList.remove('hidden');
+      document.getElementById('delete-modal').classList.add('flex');
+    }
+    
+    function closeDeleteModal() {
+      document.getElementById('delete-modal').classList.add('hidden');
+      document.getElementById('delete-modal').classList.remove('flex');
+      deleteCallback = null;
+    }
+    
+    function confirmDelete() {
+      if (deleteCallback) {
+        deleteCallback();
+      }
+      closeDeleteModal();
+    }
+    
+    // ============ Fish Management ============
+    function addFish() {
+      const nameInput = document.getElementById('fish-name');
+      const priceInput = document.getElementById('fish-price');
+      const name = nameInput.value.trim();
+      const price = parseInt(priceInput.value) || 0;
+      
+      if (!name) {
+        showToast('請填寫魚種名稱', '⚠️');
+        return;
+      }
+      
+      if (price <= 0) {
+        showToast('請填寫有效的價格', '⚠️');
+        return;
+      }
+      
+      const newFish = {
+        id: 'fish_' + Date.now(),
+        name: name,
+        price: price,
+        createdAt: new Date().toISOString()
+      };
+      
+      fishTypes.push(newFish);
+      saveFish();
+      
+      nameInput.value = '';
+      priceInput.value = '';
+      
+      renderFishList();
+      updateSelects();
+      showToast(`已新增魚種：${name}`, '🐟');
+    }
+    
+    function deleteFish(fishId) {
+      const fish = fishTypes.find(f => f.id === fishId);
+      if (!fish) return;
+      
+      showDeleteModal(`確定要刪除魚種「${fish.name}」嗎？`, () => {
+        fishTypes = fishTypes.filter(f => f.id !== fishId);
+        saveFish();
+        renderFishList();
+        updateSelects();
+        showToast(`已刪除魚種：${fish.name}`, '🗑️');
+      });
+    }
+    
+    function renderFishList() {
+      const container = document.getElementById('fish-list');
+      
+      if (fishTypes.length === 0) {
+        container.innerHTML = '<p class="text-center text-sky-400 py-8">尚無魚種資料，請新增魚種</p>';
+        return;
+      }
+      
+      container.innerHTML = fishTypes.map(fish => `
+        <div class="flex items-center justify-between bg-gradient-to-r from-sky-50 to-cyan-50 rounded-xl p-4 border-2 border-sky-100">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">🐟</span>
+            <div>
+              <p class="font-bold text-sky-900">${escapeHtml(fish.name)}</p>
+              <p class="text-sky-600 font-medium">$${fish.price} / 隻</p>
+            </div>
+          </div>
+          <button onclick="deleteFish('${fish.id}')" class="btn-danger px-4 py-2 rounded-lg text-white font-medium text-sm transition-all">
+            🗑️ 刪除
+          </button>
+        </div>
+      `).join('');
+    }
+    
+    // ============ Customer Management ============
+    function addCustomer() {
+      const nameInput = document.getElementById('customer-name');
+      const phoneInput = document.getElementById('customer-phone');
+      const name = nameInput.value.trim();
+      const phone = phoneInput.value.trim();
+      
+      if (!name) {
+        showToast('請填寫客戶名稱', '⚠️');
+        return;
+      }
+      
+      const newCustomer = {
+        id: 'cust_' + Date.now(),
+        name: name,
+        phone: phone,
+        balance: 0,
+        createdAt: new Date().toISOString()
+      };
+      
+      customers.push(newCustomer);
+      saveCustomers();
+      
+      nameInput.value = '';
+      phoneInput.value = '';
+      
+      renderCustomerList();
+      renderSettlement();
+      updateSelects();
+      showToast(`已新增客戶：${name}`, '👤');
+    }
+    
+    function deleteCustomer(customerId) {
+      const customer = customers.find(c => c.id === customerId);
+      if (!customer) return;
+      
+      showDeleteModal(`確定要刪除客戶「${customer.name}」嗎？`, () => {
+        customers = customers.filter(c => c.id !== customerId);
+        saveCustomers();
+        renderCustomerList();
+        renderSettlement();
+        updateSelects();
+        showToast(`已刪除客戶：${customer.name}`, '🗑️');
+      });
+    }
+    
+    function renderCustomerList() {
+      const container = document.getElementById('customer-list');
+      
+      if (customers.length === 0) {
+        container.innerHTML = '<p class="text-center text-sky-400 py-8">尚無客戶資料，請新增客戶</p>';
+        return;
+      }
+      
+      container.innerHTML = customers.map(customer => `
+        <div class="flex items-center justify-between bg-gradient-to-r from-sky-50 to-cyan-50 rounded-xl p-4 border-2 border-sky-100">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">👤</span>
+            <div>
+              <p class="font-bold text-sky-900">${escapeHtml(customer.name)}</p>
+              <p class="text-sky-600 text-sm">${customer.phone || '未填寫電話'}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <p class="text-xs text-sky-500">累積消費</p>
+              <p class="font-bold text-lg ${customer.balance > 0 ? 'text-amber-600' : 'text-sky-700'}">$${customer.balance || 0}</p>
+            </div>
+            <button onclick="deleteCustomer('${customer.id}')" class="btn-danger px-4 py-2 rounded-lg text-white font-medium text-sm transition-all">
+              🗑️
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // ============ Order Management ============
+    function updateSelects() {
+      const fishSelect = document.getElementById('order-fish');
+      const customerSelect = document.getElementById('order-customer');
+      
+      fishSelect.innerHTML = '<option value="">請選擇魚種</option>' + 
+        fishTypes.map(f => `<option value="${f.id}">${escapeHtml(f.name)} ($${f.price}/隻)</option>`).join('');
+      
+      customerSelect.innerHTML = '<option value="">請選擇客戶</option>' + 
+        customers.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+    }
+    
+    function createOrder() {
+      const fishId = document.getElementById('order-fish').value;
+      const customerId = document.getElementById('order-customer').value;
+      const duration = parseInt(document.getElementById('order-duration').value) || 60;
+      
+      if (!fishId) {
+        showToast('請選擇魚種', '⚠️');
+        return;
+      }
+      
+      if (!customerId) {
+        showToast('請選擇客戶', '⚠️');
+        return;
+      }
+      
+      const fish = fishTypes.find(f => f.id === fishId);
+      const customer = customers.find(c => c.id === customerId);
+      
+      if (!fish || !customer) {
+        showToast('找不到選擇的魚種或客戶', '⚠️');
+        return;
+      }
+      
+      const orderId = 'ORD' + Date.now().toString(36).toUpperCase();
+      
+      const newOrder = {
+        id: 'order_' + Date.now(),
+        orderId: orderId,
+        fishId: fish.id,
+        fishName: fish.name,
+        fishPrice: fish.price,
+        customerId: customer.id,
+        customerName: customer.name,
+        duration: duration,
+        status: 'waiting',
+        startTime: null,
+        fishCount: 0,
+        totalAmount: 0,
+        createdAt: new Date().toISOString()
+      };
+      
+      orders.push(newOrder);
+      saveOrders();
+      
+      renderOrders();
+      showToast(`已為 ${customer.name} 開立訂單`, '📝');
+    }
+    
+    function startOrder(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+      
+      order.status = 'active';
+      order.startTime = new Date().toISOString();
+      saveOrders();
+      
+      startTimer(order);
+      renderOrders();
+      showToast('訂單已開始計時！', '⏱️');
+    }
+    
+    function startTimer(order) {
+      if (activeTimers[order.id]) {
+        clearInterval(activeTimers[order.id]);
+      }
+      
+      activeTimers[order.id] = setInterval(() => {
+        renderOrders();
+      }, 1000);
+    }
+    
+    function getTimeRemaining(order) {
+      if (!order.startTime) return order.duration * 60;
+      const startTime = new Date(order.startTime).getTime();
+      const endTime = startTime + (order.duration * 60 * 1000);
+      const now = Date.now();
+      return Math.max(0, Math.floor((endTime - now) / 1000));
+    }
+    
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    function openCheckoutModal(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+      
+      currentCheckoutOrder = order;
+      
+      document.getElementById('checkout-info').innerHTML = `
+        <p class="text-sky-700"><strong>訂單編號：</strong>${order.orderId}</p>
+        <p class="text-sky-700"><strong>客戶：</strong>${escapeHtml(order.customerName)}</p>
+        <p class="text-sky-700"><strong>魚種：</strong>${escapeHtml(order.fishName)}</p>
+        <p class="text-sky-700"><strong>單價：</strong>$${order.fishPrice} / 隻</p>
+      `;
+      
+      const countInput = document.getElementById('checkout-fish-count');
+      countInput.value = 0;
+      document.getElementById('checkout-amount').textContent = '$0';
+      
+      document.getElementById('checkout-modal').classList.remove('hidden');
+      document.getElementById('checkout-modal').classList.add('flex');
+      
+      countInput.oninput = function() {
+        const count = parseInt(this.value) || 0;
+        const total = count * (currentCheckoutOrder?.fishPrice || 0);
+        document.getElementById('checkout-amount').textContent = `$${total}`;
+      };
+    }
+    
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').classList.add('hidden');
+      document.getElementById('checkout-modal').classList.remove('flex');
+      currentCheckoutOrder = null;
+    }
+    
+    function confirmCheckout() {
+      if (!currentCheckoutOrder) return;
+      
+      const fishCount = parseInt(document.getElementById('checkout-fish-count').value) || 0;
+      const totalAmount = fishCount * currentCheckoutOrder.fishPrice;
+      
+      // Update order
+      currentCheckoutOrder.status = 'completed';
+      currentCheckoutOrder.fishCount = fishCount;
+      currentCheckoutOrder.totalAmount = totalAmount;
+      saveOrders();
+      
+      // Update customer balance
+      const customer = customers.find(c => c.id === currentCheckoutOrder.customerId);
+      if (customer) {
+        customer.balance = (customer.balance || 0) + totalAmount;
+        saveCustomers();
+      }
+      
+      // Clear timer
+      if (activeTimers[currentCheckoutOrder.id]) {
+        clearInterval(activeTimers[currentCheckoutOrder.id]);
+        delete activeTimers[currentCheckoutOrder.id];
+      }
+      
+      closeCheckoutModal();
+      renderOrders();
+      renderCustomerList();
+      renderSettlement();
+      showToast(`已結帳 $${totalAmount}，已累積至客戶帳戶`, '💰');
+    }
+    
+    function cancelOrder(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+      
+      showDeleteModal(`確定要取消訂單「${order.orderId}」嗎？`, () => {
+        if (activeTimers[orderId]) {
+          clearInterval(activeTimers[orderId]);
+          delete activeTimers[orderId];
+        }
+        
+        orders = orders.filter(o => o.id !== orderId);
+        saveOrders();
+        renderOrders();
+        showToast('訂單已取消', '🗑️');
+      });
+    }
+    
+    function renderOrders() {
+      const waitingContainer = document.getElementById('waiting-orders');
+      const activeContainer = document.getElementById('active-orders');
+      const completedContainer = document.getElementById('completed-orders');
+      
+      const waitingOrders = orders.filter(o => o.status === 'waiting');
+      const activeOrders = orders.filter(o => o.status === 'active');
+      const completedOrders = orders.filter(o => o.status === 'completed');
+      
+      // Waiting Orders
+      if (waitingOrders.length === 0) {
+        waitingContainer.innerHTML = '<p class="text-center text-sky-400 py-4">目前沒有等待中的訂單</p>';
+      } else {
+        waitingContainer.innerHTML = waitingOrders.map(order => `
+          <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center gap-4">
+                <div class="status-waiting px-3 py-1 rounded-full text-sm font-bold">等待中</div>
+                <div>
+                  <p class="font-bold text-sky-900">${order.orderId}</p>
+                  <p class="text-sky-600">👤 ${escapeHtml(order.customerName)} | 🐟 ${escapeHtml(order.fishName)} | ⏱️ ${order.duration}分鐘</p>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="startOrder('${order.id}')" class="btn-success px-4 py-2 rounded-lg text-white font-bold transition-all">
+                  ▶️ 開始
+                </button>
+                <button onclick="cancelOrder('${order.id}')" class="btn-danger px-4 py-2 rounded-lg text-white font-bold transition-all">
+                  ✕ 取消
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      // Active Orders
+      if (activeOrders.length === 0) {
+        activeContainer.innerHTML = '<p class="text-center text-sky-400 py-4">目前沒有進行中的訂單</p>';
+      } else {
+        activeContainer.innerHTML = activeOrders.map(order => {
+          const remaining = getTimeRemaining(order);
+          const isTimeUp = remaining <= 0;
+          
+          // Start timer if not already running
+          if (!activeTimers[order.id] && !isTimeUp) {
+            startTimer(order);
+          }
+          
+          return `
+            <div class="bg-gradient-to-r ${isTimeUp ? 'from-red-50 to-orange-50 border-red-300' : 'from-green-50 to-emerald-50 border-green-300'} border-2 rounded-2xl p-5">
+              <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="${isTimeUp ? 'bg-red-500 timer-pulse' : 'status-active'} px-3 py-1 rounded-full text-sm font-bold ${isTimeUp ? 'text-white' : ''}">
+                    ${isTimeUp ? '⏰ 時間到！' : '進行中'}
+                  </div>
+                  <div>
+                    <p class="font-bold text-sky-900">${order.orderId}</p>
+                    <p class="text-sky-600">👤 ${escapeHtml(order.customerName)} | 🐟 ${escapeHtml(order.fishName)}</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4">
+                  <div class="text-center">
+                    <p class="text-xs ${isTimeUp ? 'text-red-500' : 'text-green-600'}">剩餘時間</p>
+                    <p class="text-3xl font-black ${isTimeUp ? 'text-red-500 timer-pulse' : 'text-green-600'}">${formatTime(remaining)}</p>
+                  </div>
+                  <button onclick="openCheckoutModal('${order.id}')" class="btn-ocean px-5 py-3 rounded-xl text-white font-bold transition-all">
+                    💰 結帳
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      // Completed Orders
+      if (completedOrders.length === 0) {
+        completedContainer.innerHTML = '<p class="text-center text-sky-400 py-4">目前沒有已完成的訂單</p>';
+      } else {
+        completedContainer.innerHTML = completedOrders.slice(-20).reverse().map(order => `
+          <div class="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-3">
+                <div class="status-completed px-3 py-1 rounded-full text-sm font-bold">已完成</div>
+                <div>
+                  <p class="font-bold text-sky-900">${order.orderId}</p>
+                  <p class="text-sky-600 text-sm">👤 ${escapeHtml(order.customerName)} | 🐟 ${escapeHtml(order.fishName)} x ${order.fishCount}隻</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-xs text-indigo-500">消費金額</p>
+                <p class="font-bold text-lg text-indigo-700">$${order.totalAmount}</p>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+    
+    // ============ Settlement ============
+    function settleCustomer(customerId) {
+      const customer = customers.find(c => c.id === customerId);
+      if (!customer) return;
+      
+      const amount = customer.balance || 0;
+      
+      showDeleteModal(`確定要結算 ${customer.name} 的 $${amount} 嗎？結算後餘額將歸零。`, () => {
+        customer.balance = 0;
+        saveCustomers();
+        renderCustomerList();
+        renderSettlement();
+        showToast(`已結算 ${customer.name} 的 $${amount}`, '💵');
+      });
+    }
+    
+    function renderSettlement() {
+      const container = document.getElementById('settlement-list');
+      
+      const customersWithBalance = customers.filter(c => (c.balance || 0) > 0);
+      
+      if (customersWithBalance.length === 0) {
+        container.innerHTML = '<p class="text-center text-sky-400 py-8">目前沒有客戶有未結算餘額</p>';
+        return;
+      }
+      
+      container.innerHTML = customersWithBalance.map(customer => `
+        <div class="bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-2xl p-5">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 bg-amber-200 rounded-full flex items-center justify-center text-2xl">
+                👤
+              </div>
+              <div>
+                <p class="font-bold text-lg text-sky-900">${escapeHtml(customer.name)}</p>
+                <p class="text-sky-600">${customer.phone || '未填寫電話'}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="text-right">
+                <p class="text-xs text-amber-600">待結算金額</p>
+                <p class="text-3xl font-black text-amber-600">$${customer.balance}</p>
+              </div>
+              <button onclick="settleCustomer('${customer.id}')" class="btn-success px-6 py-3 rounded-xl text-white font-bold text-lg transition-all">
+                💵 結算
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // ============ Utility Functions ============
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // ============ Initialize on Load ============
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9af324fbe3096a9e',t:'MTc2NTk0MDE1Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
