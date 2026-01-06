@@ -9,13 +9,15 @@
   <script src="/_sdk/element_sdk.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet">
   <style>
-    body {
+    /* 核心佈局：鎖定視窗高度，確保導航欄固定 */
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
       box-sizing: border-box;
       font-family: 'Nunito', sans-serif;
     }
-    
 
-    
     .tab-active {
       color: #0c5832;
       border-bottom: 3px solid #0c5832;
@@ -31,25 +33,26 @@
       box-shadow: 0 8px 20px rgba(12, 88, 50, 0.3);
     }
     
-    .paw-button:active {
-      transform: scale(0.95);
-    }
+    .paw-button:active { transform: scale(0.95); }
     
+    /* 日曆樣式：移除邊框格線 */
+    .calendar-grid-no-border {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 12px;
+    }
+
     .calendar-day {
       transition: all 0.2s ease;
       position: relative;
+      background: transparent;
+      border: none;
+      height: 70px; /* 稍微撐高方便顯示堆疊 */
     }
     
-    .calendar-day:hover {
-      background: #e7f5ee;
-      transform: scale(1.05);
-    }
+    .calendar-day:hover { transform: scale(1.08); }
     
-    .calendar-day.has-entry {
-      padding: 4px;
-      position: relative;
-    }
-    
+    /* 照片堆疊效果 */
     .photo-stack {
       position: relative;
       width: 100%;
@@ -60,10 +63,11 @@
       position: absolute;
       width: 100%;
       height: 100%;
-      border-radius: 6px;
+      border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
       transition: transform 0.2s ease;
+      background: #eee;
     }
     
     .photo-stack-item img {
@@ -72,874 +76,392 @@
       object-fit: cover;
     }
     
-    /* Stacking effect - each photo slightly offset */
-    .photo-stack-item:nth-child(1) {
-      transform: translate(0, 0) rotate(0deg);
-      z-index: 3;
-    }
+    /* 堆疊參數 */
+    .photo-stack-item:nth-child(1) { transform: translate(0, 0) rotate(0deg); z-index: 3; }
+    .photo-stack-item:nth-child(2) { transform: translate(3px, 3px) rotate(4deg); z-index: 2; }
+    .photo-stack-item:nth-child(3) { transform: translate(6px, 6px) rotate(-4deg); z-index: 1; }
     
-    .photo-stack-item:nth-child(2) {
-      transform: translate(3px, 3px) rotate(3deg);
-      z-index: 2;
-    }
+    .calendar-day:hover .photo-stack-item:nth-child(1) { transform: translate(-2px, -2px) rotate(-3deg); }
     
-    .photo-stack-item:nth-child(3) {
-      transform: translate(6px, 6px) rotate(-3deg);
-      z-index: 1;
-    }
-    
-    .calendar-day:hover .photo-stack-item:nth-child(1) {
-      transform: translate(-2px, -2px) rotate(-2deg);
-    }
-    
-    .calendar-day:hover .photo-stack-item:nth-child(2) {
-      transform: translate(4px, 4px) rotate(5deg);
-    }
-    
-    .calendar-day:hover .photo-stack-item:nth-child(3) {
-      transform: translate(8px, 8px) rotate(-5deg);
-    }
-    
-    .calendar-day .day-number {
-      position: absolute;
-      bottom: 6px;
-      right: 6px;
-      font-size: 10px;
-      background: rgba(255,255,255,0.95);
-      padding: 3px 6px;
-      border-radius: 6px;
-      z-index: 10;
-      font-weight: 800;
+    /* 日期數字顏色：統一為綠色 */
+    .day-number {
+      position: absolute; 
+      bottom: 4px; 
+      right: 4px; 
+      font-size: 11px;
+      background: rgba(255,255,255,0.9); 
+      padding: 1px 5px;
+      border-radius: 4px; 
+      z-index: 10; 
+      font-weight: 800; 
       color: #0c5832;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
-    .fade-in {
-      animation: fadeIn 0.3s ease;
+    .no-photo-day {
+      color: #0c5832;
+      font-weight: 800;
+      font-size: 14px;
     }
+
+    /* 動畫 */
+    .fade-in { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .page-transition-out { animation: fadeOutScale 0.4s ease forwards; }
+    .page-transition-in { animation: fadeInScale 0.5s ease forwards; }
+    @keyframes fadeOutScale { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
+    @keyframes fadeInScale { from { opacity: 0; transform: scale(1.05); } to { opacity: 1; transform: scale(1); } }
     
-    .slide-up {
-      animation: slideUp 0.4s ease;
-    }
+    .scrollable { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .scrollable::-webkit-scrollbar { width: 4px; }
+    .scrollable::-webkit-scrollbar-thumb { background: #e5ad3f; border-radius: 4px; }
     
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(100%); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .page-transition-out {
-      animation: fadeOutScale 0.4s ease forwards;
-    }
-    
-    .page-transition-in {
-      animation: fadeInScale 0.5s ease forwards;
-    }
-    
-    @keyframes fadeOutScale {
-      from { opacity: 1; transform: scale(1); }
-      to { opacity: 0; transform: scale(0.95); }
-    }
-    
-    @keyframes fadeInScale {
-      from { opacity: 0; transform: scale(1.05); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    
-    .scrollable {
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    
-    .scrollable::-webkit-scrollbar {
-      width: 4px;
-    }
-    
-    .scrollable::-webkit-scrollbar-thumb {
-      background: #e5ad3f;
-      border-radius: 4px;
-    }
-    
-    .detail-page {
-      position: absolute;
-      inset: 0;
-      z-index: 50;
-    }
+    .detail-page { position: absolute; inset: 0; z-index: 50; }
     
     .paw-icon {
-      display: inline-block;
-      animation: pawBounce 2s ease-in-out infinite;
+      display: inline-block; animation: pawBounce 2s ease-in-out infinite;
       filter: sepia(100%) saturate(300%) hue-rotate(10deg) brightness(1.1);
     }
+    @keyframes pawBounce { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-5px) rotate(-5deg); } }
     
-    @keyframes pawBounce {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-5px) rotate(-5deg); }
-    }
-    
-    .login-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(12, 88, 50, 0.2);
-    }
-    
-    .input-field {
-      transition: all 0.3s ease;
-    }
-    
-    .input-field:focus {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(12, 88, 50, 0.15);
-    }
+    .login-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 24px; box-shadow: 0 20px 60px rgba(12, 88, 50, 0.2); }
+    .input-field { transition: all 0.3s ease; border-color: #c8e6d4; }
+    .input-field:focus { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(12, 88, 50, 0.15); border-color: #0c5832; }
     
     .toast {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      padding: 12px 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 1000;
-      animation: slideDown 0.3s ease;
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: #0c5832; color: white; padding: 12px 24px; border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; animation: slideDown 0.3s ease;
     }
-    
-    @keyframes slideDown {
-      from { opacity: 0; transform: translate(-50%, -20px); }
-      to { opacity: 1; transform: translate(-50%, 0); }
-    }
+    @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
     
     .demo-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #e5ad3f 0%, #d99e2f 100%);
-      color: white;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: bold;
-      margin-left: 8px;
+      display: inline-block; background: linear-gradient(135deg, #e5ad3f 0%, #d99e2f 100%);
+      color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-left: 8px;
     }
   </style>
-  <style>@view-transition { navigation: auto; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
- <body class="h-full bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100 overflow-auto">
-  <div class="w-full min-h-full bg-white flex flex-col relative"><!-- Login Screen -->
-   <div id="login-screen" class="h-full flex flex-col items-center justify-center p-8 relative overflow-hidden" style="background: linear-gradient(to bottom right, #e7f5ee, #d4ebe1, #c8e6d4);"><!-- Decorative paws -->
-    <div class="absolute top-10 left-10 text-6xl opacity-30 paw-icon">
-     🐾
-    </div>
-    <div class="absolute bottom-20 right-10 text-6xl opacity-30 paw-icon" style="animation-delay: 0.5s;">
-     🐾
-    </div>
-    <div class="absolute top-40 right-20 text-4xl opacity-20 paw-icon" style="animation-delay: 1s;">
-     🐾
-    </div>
-    <div class="login-card w-full max-w-sm p-8 relative z-10"><!-- Logo -->
+ <body class="bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100">
+  <div class="w-full h-full bg-white flex flex-col relative">
+   
+   <!-- Login Screen -->
+   <div id="login-screen" class="absolute inset-0 z-[60] flex flex-col items-center justify-center p-8 overflow-hidden" style="background: linear-gradient(to bottom right, #e7f5ee, #d4ebe1, #c8e6d4);">
+    <div class="absolute top-10 left-10 text-6xl opacity-30 paw-icon">🐾</div>
+    <div class="absolute bottom-20 right-10 text-6xl opacity-30 paw-icon" style="animation-delay: 0.5s;">🐾</div>
+    <div class="login-card w-full max-w-sm p-8 relative z-10">
      <div class="text-center mb-8">
-      <div class="text-6xl mb-4 paw-icon">
-       🐾
-      </div>
+      <div class="text-6xl mb-4 paw-icon">🐾</div>
       <h1 class="text-4xl font-extrabold mb-2" style="color: #0c5832;">Copaws</h1>
       <p class="text-gray-600 text-sm">記錄寶貝的每一刻 ❤️</p>
-     </div><!-- Login/Register Form -->
-     <div id="auth-step-1" class="space-y-4">
-      <div><label for="auth-input" class="block text-sm font-semibold text-gray-700 mb-2">Email 或手機號碼</label> <input type="text" id="auth-input" class="input-field w-full px-4 py-3 border-2 rounded-xl focus:outline-none" style="border-color: #c8e6d4;" placeholder="輸入 Email 或手機號碼">
-      </div><button id="auth-continue-btn" class="paw-button w-full text-white font-bold py-3 rounded-xl" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 繼續 </button>
-      <div class="text-center text-sm text-gray-500 my-4">
-       或
-      </div><button id="google-login-btn" class="w-full bg-white border-2 border-gray-300 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-2">
-       <svg class="w-5 h-5" viewbox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" /> <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" /> <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" /> <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-       </svg> 使用 Google 登入 </button>
-      <div class="mt-4 p-3 rounded-xl" style="background: linear-gradient(to right, #e7f5ee, #d4ebe1);">
-       <p class="text-sm text-center" style="color: #0c5832;"><strong>💡 示範模式</strong><br><span class="text-xs">點擊任意按鈕即可進入</span></p>
-      </div>
-     </div><!-- Registration Form -->
-     <div id="registration-form" class="hidden space-y-4">
-      <div class="text-center mb-4">
-       <h2 class="text-2xl font-bold" style="color: #0c5832;">建立帳號</h2>
-       <p class="text-sm text-gray-600">幫寶貝建立專屬日記</p>
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-       <div><label for="pet-type" class="block text-xs font-semibold text-gray-700 mb-1">寵物類別</label> <select id="pet-type" class="input-field w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm" style="border-color: #c8e6d4;"> <option value="">選擇</option> <option value="dog">🐶 狗狗</option> <option value="cat">🐱 貓咪</option> </select>
-       </div>
-       <div><label for="pet-gender" class="block text-xs font-semibold text-gray-700 mb-1">性別</label> <select id="pet-gender" class="input-field w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm" style="border-color: #c8e6d4;"> <option value="">選擇</option> <option value="male">♂ 公</option> <option value="female">♀ 母</option> </select>
-       </div>
-      </div>
-      <div><label for="pet-name" class="block text-xs font-semibold text-gray-700 mb-1">寵物名字</label> <input type="text" id="pet-name" class="input-field w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm" style="border-color: #c8e6d4;" placeholder="例如：Lucky">
-      </div>
-      <div><label for="pet-breed" class="block text-xs font-semibold text-gray-700 mb-1">品種</label> <input type="text" id="pet-breed" class="input-field w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm" style="border-color: #c8e6d4;" placeholder="例如：柴犬">
-      </div>
-      <div class="grid grid-cols-3 gap-3">
-       <div><label for="pet-age" class="block text-xs font-semibold text-gray-700 mb-1">年齡</label> <input type="number" id="pet-age" class="input-field w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm" style="border-color: #c8e6d4;" placeholder="歲">
-       </div>
-       <div><label for="pet-color" class="block text-xs font-semibold text-gray-700 mb-1">毛色</label> <input type="text" id="pet-color" class="input-field w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm" style="border-color: #c8e6d4;" placeholder="黃色">
-       </div>
-       <div><label for="pet-weight" class="block text-xs font-semibold text-gray-700 mb-1">體重</label> <input type="number" id="pet-weight" class="input-field w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm" style="border-color: #c8e6d4;" placeholder="kg">
-       </div>
-      </div><button id="register-submit-btn" class="paw-button w-full text-white font-bold py-3 rounded-xl mt-4" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 開始記錄 🐾 </button> <button id="back-to-login-btn" class="w-full text-gray-600 text-sm" style="hover:color: #0c5832;"> ← 返回 </button>
      </div>
-    </div>
-   </div><!-- Main App (Hidden initially) -->
-   <div id="main-app" class="h-full flex flex-col hidden"><!-- Status Bar -->
-    <header class="h-12 flex items-center justify-center px-6" style="background: linear-gradient(to right, #0c5832, #0a4528);">
-     <h1 id="app-title" class="text-white font-bold text-lg">🐾 Copaws</h1><span class="demo-badge">示範模式</span>
-    </header><!-- Main Content -->
-    <main class="flex-1 overflow-auto flex flex-col" style="background: linear-gradient(to bottom, #e7f5ee, #ffffff);"><!-- Upload Tab Content -->
-     <section id="upload-tab" class="flex-1 flex flex-col p-4 overflow-auto">
-      <div class="text-center mb-3">
-       <h2 class="text-xl font-bold mb-1" style="color: #0c5832;">上傳照片 📸</h2>
-       <p class="text-gray-600 text-xs">記錄毛孩的美好時光</p>
-      </div><!-- Demo Notice -->
-      <div class="mb-3 p-3 rounded-xl border-2" style="background: linear-gradient(to right, #e7f5ee, #d4ebe1); border-color: #c8e6d4;">
-       <p class="text-xs text-center font-semibold" style="color: #0c5832;">✨ 這是示範版本<br><span class="text-xs">請到「回憶」頁面查看範例照片</span></p>
-      </div><!-- Upload Button (Always visible) --> <label for="file-input" id="upload-btn" class="paw-button text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer mb-3" style="background: linear-gradient(to right, #e5ad3f, #d99e2f);"> <span class="text-2xl">📷</span> <span>選擇照片</span> </label> <input type="file" id="file-input" accept="image/*" class="hidden"> <!-- Image Preview & Upload Form -->
-      <div id="upload-form-container" class="hidden space-y-3 flex-1 flex flex-col"><!-- Image Preview -->
-       <div id="image-preview-container" class="relative rounded-xl overflow-hidden shadow-lg"><img id="image-preview" class="w-full object-contain max-h-40" alt="預覽圖片"> <button id="remove-image-btn" class="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 text-sm"> ✕ </button>
-       </div><!-- Note Input -->
-       <div class="flex-1 flex flex-col"><label for="photo-note" class="block text-xs font-bold mb-1" style="color: #0c5832;">寫下回憶</label> <textarea id="photo-note" class="input-field w-full px-3 py-2 border-2 rounded-xl focus:outline-none resize-none flex-1 text-sm" rows="3" style="border-color: #c8e6d4;" placeholder="今天發生了什麼有趣的事呢？ 😊"></textarea>
-       </div><!-- Date Selection -->
-       <div><label for="photo-date" class="block text-xs font-bold mb-1" style="color: #0c5832;">選擇日期</label> <input type="date" id="photo-date" class="input-field w-full px-3 py-2 border-2 rounded-xl focus:outline-none text-sm" style="border-color: #c8e6d4;">
-       </div><!-- Upload Button --> <button id="save-photo-btn" class="paw-button w-full text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 開始上傳 ✨ </button> <!-- Progress Bar (Hidden by default) -->
-       <div id="upload-progress-container" class="hidden">
-        <div class="mb-1 flex justify-between items-center"><span class="text-xs font-semibold" style="color: #0c5832;">上傳中...</span> <span id="upload-percentage" class="text-xs font-bold" style="color: #0c5832;">0%</span>
-        </div>
-        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-         <div id="upload-progress-bar" class="h-full transition-all duration-300" style="width: 0%; background: linear-gradient(to right, #0c5832, #10b981);"></div>
-        </div>
-       </div><!-- Success Message (Hidden by default) -->
-       <div id="upload-success" class="hidden p-3 rounded-xl border-2 text-center" style="background: linear-gradient(to right, #e7f5ee, #d4ebe1); border-color: #c8e6d4;">
-        <div class="text-3xl mb-1">
-         ✅
-        </div>
-        <p class="font-bold mb-2 text-sm" style="color: #0c5832;">上傳成功！</p><button id="upload-another-btn" class="paw-button w-full text-white font-semibold py-2.5 rounded-xl text-sm" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 繼續上傳另一張 </button>
-       </div>
+     
+     <div id="auth-step-1" class="space-y-4">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-2">Email 或手機號碼</label> <input type="text" id="auth-input" class="input-field w-full px-4 py-3 border-2 rounded-xl focus:outline-none" placeholder="輸入 Email 或手機號碼"></div>
+      <button id="auth-continue-btn" class="paw-button w-full text-white font-bold py-3 rounded-xl" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 繼續 </button>
+      <div class="text-center text-sm text-gray-500 my-4">或</div>
+      <button id="google-login-btn" class="w-full bg-white border-2 border-gray-300 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-50 flex items-center justify-center gap-2">
+       <svg class="w-5 h-5" viewbox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" /><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" /><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" /><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" /></svg> 使用 Google 登入
+      </button>
+     </div>
+
+     <div id="registration-form" class="hidden space-y-4">
+      <div class="text-center mb-4"><h2 class="text-2xl font-bold" style="color: #0c5832;">建立帳號</h2></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-semibold text-gray-700 mb-1">寵物類別</label> <select id="pet-type" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm"><option value="dog">🐶 狗狗</option><option value="cat">🐱 貓咪</option></select></div>
+        <div><label class="block text-xs font-semibold text-gray-700 mb-1">性別</label> <select id="pet-gender" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm"><option value="male">♂ 公</option><option value="female">♀ 母</option></select></div>
       </div>
-     </section><!-- Profile Tab Content -->
-     <section id="profile-tab" class="flex-1 flex flex-col p-5 overflow-hidden hidden"><!-- Avatar Upload -->
-      <div class="flex flex-col items-center mb-4">
-       <div class="relative mb-3">
-        <div id="pet-avatar-display" class="w-24 h-24 rounded-full flex items-center justify-center text-5xl overflow-hidden border-4 shadow-xl" style="background: linear-gradient(to bottom right, #c8e6d4, #e5ad3f); border-color: #0c5832;">
-         🐶
-        </div><label for="avatar-input" class="absolute bottom-0 right-0 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer shadow-lg" style="background: #0c5832;">
-         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-         </svg></label> <input type="file" id="avatar-input" accept="image/*" class="hidden">
-       </div>
-       <h3 id="profile-pet-name" class="text-xl font-bold text-gray-800 mb-1">Lucky</h3>
-       <p class="text-xs text-gray-500">我的毛孩 ❤️</p>
-      </div><!-- Pet Info Cards -->
-      <div class="space-y-2 mb-4">
-       <div class="rounded-lg p-2 border-2" style="background: linear-gradient(to right, #e7f5ee, #d4ebe1); border-color: #c8e6d4;"><label class="text-xs font-semibold mb-1 block" style="color: #0c5832;">年齡</label> <input type="number" id="profile-age" class="input-field w-full px-2 py-1 border-2 rounded-lg focus:outline-none bg-white text-sm" style="border-color: #c8e6d4;" placeholder="歲">
-       </div>
-       <div class="rounded-lg p-2 border-2" style="background: linear-gradient(to right, #e7f5ee, #d4ebe1); border-color: #c8e6d4;"><label class="text-xs font-semibold mb-1 block" style="color: #0c5832;">類別</label> <select id="profile-type" class="input-field w-full px-2 py-1 border-2 rounded-lg focus:outline-none bg-white text-sm" style="border-color: #c8e6d4;"> <option value="dog">🐶 狗狗</option> <option value="cat">🐱 貓咪</option> </select>
-       </div>
-       <div class="rounded-lg p-2 border-2" style="background: linear-gradient(to right, #e7f5ee, #d4ebe1); border-color: #c8e6d4;"><label class="text-xs font-semibold mb-1 block" style="color: #0c5832;">體重</label> <input type="number" id="profile-weight" class="input-field w-full px-2 py-1 border-2 rounded-lg focus:outline-none bg-white text-sm" style="border-color: #c8e6d4;" placeholder="kg">
-       </div>
-       <div class="rounded-lg p-2 border-2" style="background: linear-gradient(to right, #e7f5ee, #d4ebe1); border-color: #c8e6d4;"><label class="text-xs font-semibold mb-1 block" style="color: #0c5832;">品種</label> <input type="text" id="profile-breed" class="input-field w-full px-2 py-1 border-2 rounded-lg focus:outline-none bg-white text-sm" style="border-color: #c8e6d4;" placeholder="例如：柴犬">
-       </div>
-       <div class="rounded-lg p-2 border-2" style="background: linear-gradient(to right, #e7f5ee, #d4ebe1); border-color: #c8e6d4;"><label class="text-xs font-semibold mb-1 block" style="color: #0c5832;">毛色</label> <input type="text" id="profile-color" class="input-field w-full px-2 py-1 border-2 rounded-lg focus:outline-none bg-white text-sm" style="border-color: #c8e6d4;" placeholder="例如：黃色">
-       </div>
-      </div><!-- Save Button --> <button id="save-profile-btn" class="paw-button w-full text-white font-bold py-2.5 rounded-xl mb-2" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 儲存資料 ✨ </button> <!-- Logout Button --> <button id="logout-btn" class="w-full bg-gray-100 text-gray-700 font-semibold py-2 rounded-xl hover:bg-gray-200"> 登出 </button>
-     </section><!-- Calendar Tab Content -->
-     <section id="calendar-tab" class="flex-1 flex flex-col p-4 scrollable hidden"><!-- Calendar Header -->
-      <div class="flex items-center justify-between mb-4"><button id="prev-month" class="w-10 h-10 rounded-full flex items-center justify-center transition" style="background: #e7f5ee; color: #0c5832;">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg></button>
-       <h2 id="current-month" class="text-xl font-bold text-gray-800"></h2><button id="next-month" class="w-10 h-10 rounded-full flex items-center justify-center transition" style="background: #e7f5ee; color: #0c5832;">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg></button>
-      </div><!-- Weekday Headers -->
-      <div class="grid grid-cols-7 gap-1 mb-2">
-       <div class="text-center text-sm font-bold text-gray-500 py-2">
-        日
-       </div>
-       <div class="text-center text-sm font-bold text-gray-500 py-2">
-        一
-       </div>
-       <div class="text-center text-sm font-bold text-gray-500 py-2">
-        二
-       </div>
-       <div class="text-center text-sm font-bold text-gray-500 py-2">
-        三
-       </div>
-       <div class="text-center text-sm font-bold text-gray-500 py-2">
-        四
-       </div>
-       <div class="text-center text-sm font-bold text-gray-500 py-2">
-        五
-       </div>
-       <div class="text-center text-sm font-bold text-gray-500 py-2">
-        六
-       </div>
-      </div><!-- Calendar Grid -->
-      <div id="calendar-grid" class="grid grid-cols-7 gap-1 mb-4"></div><!-- Hint -->
-      <div class="mt-auto p-3 rounded-xl text-center" style="background: linear-gradient(to right, #e7f5ee, #d4ebe1);">
-       <p class="text-sm font-semibold" style="color: #0c5832;">💡 點擊日期查看毛孩的回憶</p>
+      <div><label class="block text-xs font-semibold text-gray-700 mb-1">寵物名字</label> <input type="text" id="pet-name" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm" placeholder="Lucky"></div>
+      <div><label class="block text-xs font-semibold text-gray-700 mb-1">品種</label> <input type="text" id="pet-breed" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm" placeholder="例如：柴犬"></div>
+      <div class="grid grid-cols-3 gap-3">
+        <div><label class="block text-xs font-semibold text-gray-700 mb-1">年齡</label> <input type="number" id="pet-age" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm" placeholder="歲"></div>
+        <div><label class="block text-xs font-semibold text-gray-700 mb-1">毛色</label> <input type="text" id="pet-color" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm" placeholder="黃色"></div>
+        <div><label class="block text-xs font-semibold text-gray-700 mb-1">體重</label> <input type="number" id="pet-weight" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm" placeholder="kg"></div>
       </div>
-     </section>
-    </main><!-- Bottom Navigation -->
-    <nav class="h-20 bg-white flex" style="border-top: 1px solid #c8e6d4; flex-shrink: 0;"><button id="nav-upload" class="flex-1 flex flex-col items-center justify-center tab-active transition">
-      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-      </svg><span class="text-xs font-bold">紀錄</span> </button> <button id="nav-calendar" class="flex-1 flex flex-col items-center justify-center text-gray-400 transition">
-      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-      </svg><span class="text-xs font-bold">回憶</span> </button> <button id="nav-profile" class="flex-1 flex flex-col items-center justify-center text-gray-400 transition">
-      <svg class="w-7 h-7 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="4" r="1.5" /> <circle cx="19" cy="8" r="1.5" /> <circle cx="5" cy="8" r="1.5" /> <path d="M19.5 13c-.83 0-1.5.67-1.5 1.5 0 .15.03.29.07.43C15.4 15.35 13.21 16 12 16c-1.21 0-3.4-.65-6.07-1.07.04-.14.07-.28.07-.43 0-.83-.67-1.5-1.5-1.5S3 13.67 3 14.5c0 .66.42 1.23 1.01 1.44C5.37 18.07 7.61 21 12 21s6.63-2.93 7.99-5.06c.59-.21 1.01-.78 1.01-1.44 0-.83-.67-1.5-1.5-1.5z" stroke-linecap="round" stroke-linejoin="round" />
-      </svg><span class="text-xs font-bold">寶貝</span> </button>
-    </nav>
-   </div><!-- Detail Page (Hidden by default) -->
-   <div id="detail-page" class="detail-page hidden">
-    <div class="h-full flex flex-col slide-up" style="background: linear-gradient(to bottom, #e7f5ee, #ffffff);"><!-- Detail Header -->
-     <header class="h-14 flex items-center px-4" style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #c8e6d4;"><button id="back-btn" class="w-10 h-10 rounded-full text-white flex items-center justify-center transition" style="background: #0c5832;">
-       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-       </svg></button>
-      <h2 id="detail-title" class="flex-1 text-center font-bold text-gray-800 pr-10"></h2>
-     </header><!-- Detail Content -->
-     <div id="detail-content" class="flex-1 p-4 scrollable"><!-- Photos will be inserted here -->
-     </div><!-- Next Date Hint -->
-     <div id="next-date-hint" class="p-4 bg-white text-center hidden" style="border-top: 1px solid #c8e6d4;">
-      <p class="text-sm font-semibold" style="color: #0c5832;">↓ 繼續向下滑動查看下一天 ↓</p>
+      <button id="register-submit-btn" class="paw-button w-full text-white font-bold py-3 rounded-xl mt-4" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 開始記錄 🐾 </button>
+      <button id="back-to-login-btn" class="w-full text-gray-600 text-sm"> ← 返回 </button>
      </div>
     </div>
    </div>
+
+   <!-- Main App -->
+   <div id="main-app" class="h-full flex flex-col hidden overflow-hidden">
+    <header class="h-12 flex-shrink-0 flex items-center justify-center px-6" style="background: linear-gradient(to right, #0c5832, #0a4528);">
+     <h1 id="app-title" class="text-white font-bold text-lg">🐾 Copaws</h1><span class="demo-badge">示範模式</span>
+    </header>
+
+    <main class="flex-1 overflow-hidden relative">
+      <div class="absolute inset-0 flex flex-col">
+        
+        <!-- Upload Tab -->
+        <section id="upload-tab" class="flex-1 h-full p-4 overflow-auto" style="background: linear-gradient(to bottom, #e7f5ee, #ffffff);">
+         <div class="text-center mb-3">
+          <h2 class="text-xl font-bold mb-1" style="color: #0c5832;">上傳照片 📸</h2>
+          <p class="text-gray-600 text-xs">記錄毛孩的美好時光</p>
+         </div>
+         <label for="file-input" id="upload-btn" class="paw-button text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer mb-3" style="background: linear-gradient(to right, #e5ad3f, #d99e2f);"> <span class="text-2xl">📷</span> <span>選擇照片</span> </label>
+         <input type="file" id="file-input" accept="image/*" class="hidden">
+         
+         <div id="upload-form-container" class="hidden space-y-3 pb-8">
+          <div id="image-preview-wrapper" class="relative rounded-xl overflow-hidden shadow-lg"><img id="image-preview" class="w-full object-contain max-h-48"> <button id="remove-image-btn" class="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center">✕</button></div>
+          <div><label class="block text-xs font-bold mb-1" style="color: #0c5832;">寫下回憶</label> <textarea id="photo-note" class="input-field w-full px-3 py-2 border-2 rounded-xl focus:outline-none resize-none text-sm" rows="3" placeholder="今天發生了什麼有趣的事呢？ 😊"></textarea></div>
+          <div><label class="block text-xs font-bold mb-1" style="color: #0c5832;">選擇日期</label> <input type="date" id="photo-date" class="input-field w-full px-3 py-2 border-2 rounded-xl focus:outline-none text-sm"></div>
+          <button id="save-photo-btn" class="paw-button w-full text-white font-bold py-3 rounded-xl" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 開始上傳 ✨ </button>
+          
+          <!-- 進度條包含百分比 -->
+          <div id="upload-progress-container" class="hidden">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-[10px] font-bold text-emerald-800">上傳進度</span>
+              <span id="upload-pct-text" class="text-[10px] font-bold text-emerald-800">0%</span>
+            </div>
+            <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div id="upload-progress-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div id="upload-success" class="hidden p-4 rounded-xl border-2 text-center bg-emerald-50 border-emerald-200 shadow-sm">
+            <p class="font-bold text-emerald-800 mb-2">成功紀錄美好回憶~ ✨</p>
+            <button id="upload-another-btn" class="paw-button w-full bg-emerald-800 text-white py-2 rounded-lg text-sm font-bold">繼續上傳下一張</button>
+          </div>
+         </div>
+        </section>
+
+        <!-- Calendar Tab -->
+        <section id="calendar-tab" class="flex-1 h-full p-5 overflow-auto hidden" style="background: linear-gradient(to bottom, #e7f5ee, #ffffff);">
+         <div class="flex items-center justify-between mb-6">
+          <button id="prev-month" class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">◀</button>
+          <h2 id="current-month" class="text-xl font-extrabold text-[#0c5832]"></h2>
+          <button id="next-month" class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">▶</button>
+         </div>
+         <div class="grid grid-cols-7 gap-2 mb-4 text-center text-xs font-bold text-gray-400 uppercase tracking-wider">
+          <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+         </div>
+         <div id="calendar-grid" class="calendar-grid-no-border"></div>
+        </section>
+
+        <!-- Profile Tab -->
+        <section id="profile-tab" class="flex-1 h-full p-5 overflow-auto hidden" style="background: linear-gradient(to bottom, #e7f5ee, #ffffff);">
+         <div class="flex flex-col items-center mb-6">
+          <div id="pet-avatar-display" class="w-24 h-24 rounded-full flex items-center justify-center text-5xl overflow-hidden border-4 shadow-xl border-emerald-800 bg-emerald-100">🐶</div>
+          <label for="avatar-input" class="mt-2 text-xs font-bold text-emerald-700 underline cursor-pointer">更換頭像</label>
+          <input type="file" id="avatar-input" accept="image/*" class="hidden">
+          <h3 id="profile-pet-name" class="text-xl font-bold mt-2">Lucky</h3>
+         </div>
+         <div class="space-y-2 pb-6">
+          <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">年齡</label><input type="number" id="profile-age" class="w-full text-sm focus:outline-none"></div>
+          <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">類別</label><select id="profile-type" class="w-full text-sm focus:outline-none"><option value="dog">🐶 狗狗</option><option value="cat">🐱 貓咪</option></select></div>
+          <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">體重</label><input type="number" id="profile-weight" class="w-full text-sm focus:outline-none"></div>
+          <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">品種</label><input type="text" id="profile-breed" class="w-full text-sm focus:outline-none"></div>
+          <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">毛色</label><input type="text" id="profile-color" class="w-full text-sm focus:outline-none"></div>
+         </div>
+         <button id="save-profile-btn" class="paw-button w-full text-white font-bold py-3 rounded-xl" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 儲存資料 ✨ </button>
+         <button id="logout-btn" class="w-full mt-4 bg-gray-100 text-gray-400 py-2 rounded-xl font-bold text-xs">登出帳號</button>
+        </section>
+      </div>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="h-20 flex-shrink-0 bg-white flex border-t border-emerald-100 shadow-[0_-4px_15px_rgba(0,0,0,0.03)]">
+     <button id="nav-upload" class="flex-1 flex flex-col items-center justify-center tab-active transition"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg><span class="text-[10px] font-bold">紀錄</span></button>
+     <button id="nav-calendar" class="flex-1 flex flex-col items-center justify-center text-gray-400 transition"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg><span class="text-[10px] font-bold">回憶</span></button>
+     <button id="nav-profile" class="flex-1 flex flex-col items-center justify-center text-gray-400 transition"><svg class="w-7 h-7 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="4" r="1.5" /><circle cx="19" cy="8" r="1.5" /><circle cx="5" cy="8" r="1.5" /><path d="M19.5 13c-.83 0-1.5.67-1.5 1.5 0 .15.03.29.07.43C15.4 15.35 13.21 16 12 16c-1.21 0-3.4-.65-6.07-1.07.04-.14.07-.28.07-.43 0-.83-.67-1.5-1.5-1.5S3 13.67 3 14.5c0 .66.42 1.23 1.01 1.44C5.37 18.07 7.61 21 12 21s6.63-2.93 7.99-5.06c.59-.21 1.01-.78 1.01-1.44 0-.83-.67-1.5-1.5-1.5z" stroke-linecap="round" stroke-linejoin="round" /></svg><span class="text-[10px] font-bold">寶貝</span></button>
+    </nav>
+   </div>
+
+   <!-- Detail Page -->
+   <div id="detail-page" class="detail-page hidden bg-white">
+    <div class="h-full flex flex-col slide-up">
+     <header class="h-14 flex-shrink-0 flex items-center px-4 border-b bg-white">
+      <button id="back-btn" class="w-10 h-10 rounded-full bg-emerald-800 text-white flex items-center justify-center shadow-lg font-bold">◀</button>
+      <h2 id="detail-title" class="flex-1 text-center font-extrabold text-[#0c5832]">日期</h2>
+      <div class="w-10"></div>
+     </header>
+     <div id="detail-content" class="flex-1 p-4 scrollable bg-gray-50/50"></div>
+     <div id="next-date-hint" class="h-12 flex-shrink-0 flex items-center justify-center bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-widest">↓↓ 繼續向下滑動翻閱下一天 ↓↓</div>
+    </div>
+   </div>
   </div>
+
   <script>
-    // Default configuration
-    const defaultConfig = {
-      app_title: '🐾 Copaws'
-    };
-
-    // Sample data - Demo photos (每個日期都有2-3張照片)
+    // 資料擴充至 80% 的日期都有照片，修正 1/9 連結
     const samplePhotos = {
-      '2025-01-02': [
-        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '新年第一天散步 🎉', time: '09:00' },
-        { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop', note: '在公園遇到新朋友', time: '09:30' }
-      ],
-      '2025-01-04': [
-        { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop', note: '週末去公園玩', time: '10:30' },
-        { image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=400&h=400&fit=crop', note: '追著飛盤跑', time: '11:00' }
-      ],
-      '2025-01-06': [
-        { image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=400&h=400&fit=crop', note: '在家裡玩耍 🏠', time: '15:00' },
-        { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '午後的悠閒時光', time: '15:45' }
-      ],
-      '2025-01-08': [
-        { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '今天天氣好好 ☀️', time: '11:00' },
-        { image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop', note: '開心奔跑', time: '11:30' },
-        { image: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=400&h=400&fit=crop', note: '玩累了休息一下', time: '12:00' }
-      ],
-      '2025-01-10': [
-        { image: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=400&h=400&fit=crop', note: '最愛的玩具時間 🎾', time: '16:00' },
-        { image: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&h=400&fit=crop', note: '玩得好開心', time: '16:30' }
-      ],
-      '2025-01-12': [
-        { image: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&h=400&fit=crop', note: '慵懶的週日午後', time: '14:00' },
-        { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '享受陽光', time: '14:30' }
-      ],
-      '2025-01-14': [
-        { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '又到了吃飯時間 🍖', time: '18:00' },
-        { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop', note: '吃得好滿足', time: '18:20' }
-      ],
-      '2025-01-15': [
-        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '今天帶Lucky去公園玩！遇到好多朋友 🐶', time: '10:30' },
-        { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop', note: '在草地上奔跑的樣子超可愛 💚', time: '11:15' },
-        { image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=400&h=400&fit=crop', note: '累了在樹蔭下休息', time: '12:00' }
-      ],
-      '2025-01-17': [
-        { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop', note: '一起看電視', time: '20:00' },
-        { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=400&fit=crop', note: '窩在沙發上', time: '20:30' }
-      ],
-      '2025-01-18': [
-        { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '第一次嘗試游泳！有點緊張但很勇敢 🏊', time: '14:20' },
-        { image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop', note: '玩水玩得好開心', time: '15:00' }
-      ],
-      '2025-01-20': [
-        { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=400&fit=crop', note: '洗澡囉 🛁', time: '10:00' },
-        { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '洗得香香的', time: '10:30' }
-      ],
-      '2025-01-22': [
-        { image: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=400&h=400&fit=crop', note: '新買的玩具！超級喜歡 🎾', time: '16:45' },
-        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '玩具真好玩', time: '17:15' }
-      ],
-      '2025-01-23': [
-        { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '今天心情很好 😊', time: '11:00' },
-        { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop', note: '每天都要開心', time: '11:30' }
-      ],
-      '2025-01-25': [
-        { image: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&h=400&fit=crop', note: '午睡時間～ 睡得好香甜', time: '13:30' },
-        { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '醒來第一件事就是找零食', time: '15:20' },
-        { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop', note: '晚上一起看電視 🎬', time: '19:00' }
-      ],
-      '2025-01-26': [
-        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '週日早晨散步', time: '08:00' },
-        { image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=400&h=400&fit=crop', note: '呼吸新鮮空氣', time: '08:30' }
-      ],
-      '2025-01-28': [
-        { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=400&fit=crop', note: '今天去寵物美容！變得香香的 ✨', time: '10:00' },
-        { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '新造型超帥氣', time: '11:30' }
-      ],
-      '2025-01-29': [
-        { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop', note: '跑跑跳跳好開心', time: '16:00' },
-        { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '運動真快樂', time: '16:30' }
-      ],
-      '2025-01-30': [
-        { image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=400&h=400&fit=crop', note: '在後院曬太陽 ☀️', time: '14:00' },
-        { image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop', note: '享受溫暖的陽光', time: '14:45' }
-      ]
+      '2025-01-01': [{ image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600', note: '元旦快樂！與 Lucky 的第一張合照 🎆', time: '00:15' }, { image: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=600', note: '睡得好沉', time: '10:00' }],
+      '2025-01-02': [{ image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600', note: '出門散步！今天遇到了柴犬朋友 🐕', time: '09:00' }, { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600', note: '玩得滿臉泥土', time: '10:30' }],
+      '2025-01-03': [{ image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?w=600', note: '買了新玩具，它咬著不放 🦴', time: '15:00' }, { image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600', note: '期待點心的表情', time: '16:00' }],
+      '2025-01-04': [{ image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600', note: '草地跑跑日！體力真的很好 💚', time: '14:20' }, { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=600', note: '追球球中', time: '14:50' }],
+      '2025-01-05': [{ image: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=600', note: '陪主人看書（其實是在睡覺）💤', time: '11:00' }, { image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?w=600', note: '好溫馨', time: '12:00' }],
+      '2025-01-06': [{ image: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=600', note: '天氣冷，幫它穿上小外套 🧥', time: '10:30' }, { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=600', note: '帥氣的側臉', time: '11:00' }],
+      '2025-01-07': [{ image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=600', note: '今天洗澡澡，變得很香 ✨', time: '14:00' }, { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=600', note: '剛洗完變成了落湯雞', time: '15:00' }],
+      '2025-01-08': [{ image: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=600', note: '在後院發現了小昆蟲 🦋', time: '16:15' }, { image: 'https://images.unsplash.com/photo-1494947665470-20322015e3a8?w=600', note: '專注的眼神', time: '16:40' }],
+      '2025-01-09': [{ image: 'https://images.unsplash.com/photo-1591768793355-74d7c80b0e17?w=600', note: '今天去看了醫生，打針好勇敢 💉', time: '11:00' }, { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=600', note: '回家立刻討摸摸', time: '12:30' }],
+      '2025-01-10': [{ image: 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=600', note: '慵懶的午後，陽光灑進來真舒服 ☀️', time: '15:20' }, { image: 'https://images.unsplash.com/photo-1510771463146-e89e6e86560e?w=600', note: '睡到翻肚了', time: '16:00' }],
+      '2025-01-12': [{ image: 'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600', note: '週末去寵物友善餐廳 🍔', time: '13:00' }, { image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?w=600', note: '乖乖等吃飯', time: '13:45' }],
+      '2025-01-14': [{ image: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=600', note: '學會了「擊掌」，它好聰明 🖐️', time: '20:10' }, { image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600', note: '開心的表情', time: '20:30' }],
+      '2025-01-15': [{ image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600', note: '公園大聚會！認識好多新朋友 🐶', time: '10:30' }, { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600', note: '大家一起跑跑', time: '11:15' }],
+      '2025-01-17': [{ image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=600', note: '今天天氣轉涼，窩在毯子裡 🛋️', time: '21:00' }, { image: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=600', note: '暖烘烘的', time: '21:30' }],
+      '2025-01-18': [{ image: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=600', note: '幫它剪指甲，雖然臉很臭但很配合 💅', time: '14:00' }, { image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?w=600', note: '不甘願的樣子', time: '14:20' }],
+      '2025-01-20': [{ image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600', note: '它會自己叼碗來，暗示肚子餓了 🍚', time: '18:00' }, { image: 'https://images.unsplash.com/photo-1510771463146-e89e6e86560e?w=600', note: '討飯中', time: '18:15' }],
+      '2025-01-21': [{ image: 'https://images.unsplash.com/photo-1494947665470-20322015e3a8?w=600', note: '玩躲貓貓，結果尾巴露出來了 🐕', time: '16:00' }, { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600', note: '被發現了', time: '16:15' }],
+      '2025-01-22': [{ image: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=600', note: '一起在客廳玩拉扯遊戲 🎾', time: '19:30' }, { image: 'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600', note: '超有活力', time: '20:00' }],
+      '2025-01-23': [{ image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600', note: '今天的眼神特別溫柔 ❤️', time: '11:00' }, { image: 'https://images.unsplash.com/photo-1510771463146-e89e6e86560e?w=600', note: '深情注視', time: '11:15' }],
+      '2025-01-25': [{ image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=600', note: '帶去山上走走，空氣超好 🏔️', time: '10:00' }, { image: 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=600', note: '登頂照', time: '11:30' }],
+      '2025-01-26': [{ image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600', note: '在家裡舉辦了小小的零食趴 🍖', time: '15:00' }, { image: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=600', note: '吃得超開心', time: '15:20' }],
+      '2025-01-28': [{ image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?w=600', note: '它現在會自己跳上車，準備出門 🚗', time: '09:00' }, { image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?w=600', note: '看窗外風景', time: '09:30' }],
+      '2025-01-29': [{ image: 'https://images.unsplash.com/photo-1494947665470-20322015e3a8?w=600', note: '陪我一起工作，它是最好的陪伴 💻', time: '14:00' }, { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=600', note: '在桌下睡覺', time: '15:00' }],
+      '2025-01-30': [{ image: 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=600', note: '月底了，幫它算算這個月吃了多少零食 🍪', time: '20:00' }, { image: 'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600', note: '一臉無辜', time: '20:15' }]
     };
 
-    // Global state
     let currentDate = new Date(2025, 0, 1);
-    let currentUser = null;
-    let currentViewDate = null;
     let petAvatar = null;
     let petProfile = { name: 'Lucky', age: '', type: 'dog', weight: '', breed: '', color: '' };
+    let isTransitioning = false;
 
-    // DOM Elements - Login
-    const loginScreen = document.getElementById('login-screen');
-    const mainApp = document.getElementById('main-app');
-    const authInput = document.getElementById('auth-input');
-    const authContinueBtn = document.getElementById('auth-continue-btn');
-    const googleLoginBtn = document.getElementById('google-login-btn');
-    const authStep1 = document.getElementById('auth-step-1');
-    const registrationForm = document.getElementById('registration-form');
-    const registerSubmitBtn = document.getElementById('register-submit-btn');
-    const backToLoginBtn = document.getElementById('back-to-login-btn');
-
-    // DOM Elements - Main App
-    const appTitle = document.getElementById('app-title');
-    const uploadTab = document.getElementById('upload-tab');
-    const calendarTab = document.getElementById('calendar-tab');
-    const profileTab = document.getElementById('profile-tab');
-    const navUpload = document.getElementById('nav-upload');
-    const navCalendar = document.getElementById('nav-calendar');
-    const navProfile = document.getElementById('nav-profile');
-    const petAvatarDisplay = document.getElementById('pet-avatar-display');
-    const avatarInput = document.getElementById('avatar-input');
-    const profilePetName = document.getElementById('profile-pet-name');
-    const profileAge = document.getElementById('profile-age');
-    const profileType = document.getElementById('profile-type');
-    const profileWeight = document.getElementById('profile-weight');
-    const profileBreed = document.getElementById('profile-breed');
-    const profileColor = document.getElementById('profile-color');
-    const saveProfileBtn = document.getElementById('save-profile-btn');
-    const logoutBtn = document.getElementById('logout-btn');
-    
-    // Upload Elements
-    const fileInput = document.getElementById('file-input');
-    const uploadFormContainer = document.getElementById('upload-form-container');
-    const imagePreviewContainer = document.getElementById('image-preview-container');
-    const imagePreview = document.getElementById('image-preview');
-    const removeImageBtn = document.getElementById('remove-image-btn');
-    const photoDate = document.getElementById('photo-date');
-    const photoNote = document.getElementById('photo-note');
-    const savePhotoBtn = document.getElementById('save-photo-btn');
-    const uploadProgressContainer = document.getElementById('upload-progress-container');
-    const uploadProgressBar = document.getElementById('upload-progress-bar');
-    const uploadPercentage = document.getElementById('upload-percentage');
-    const uploadSuccess = document.getElementById('upload-success');
-    const uploadAnotherBtn = document.getElementById('upload-another-btn');
-    
-    const calendarGrid = document.getElementById('calendar-grid');
-    const currentMonthEl = document.getElementById('current-month');
-    const prevMonthBtn = document.getElementById('prev-month');
-    const nextMonthBtn = document.getElementById('next-month');
-    const detailPage = document.getElementById('detail-page');
-    const detailTitle = document.getElementById('detail-title');
     const detailContent = document.getElementById('detail-content');
-    const backBtn = document.getElementById('back-btn');
-    const nextDateHint = document.getElementById('next-date-hint');
 
-    // Set default date to today
-    photoDate.valueAsDate = new Date();
-
-    // Toast notification
     function showToast(message) {
-      const toast = document.createElement('div');
-      toast.className = 'toast text-white';
-      toast.style.background = '#0c5832';
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2000);
+      const t = document.createElement('div');
+      t.className = 'toast'; t.textContent = message;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2000);
     }
 
-    // Auth - Continue button
-    authContinueBtn.addEventListener('click', () => {
-      registrationForm.classList.remove('hidden');
-      authStep1.classList.add('hidden');
-    });
-
-    // Google login - Demo
-    googleLoginBtn.addEventListener('click', () => {
-      loginUser('demo-user@example.com');
-    });
-
-    // Register submit
-    registerSubmitBtn.addEventListener('click', () => {
-      const petName = document.getElementById('pet-name').value || 'Lucky';
-      petProfile.name = petName;
-      petProfile.type = document.getElementById('pet-type').value || 'dog';
+    // 登入
+    document.getElementById('auth-continue-btn').onclick = () => {
+      document.getElementById('registration-form').classList.remove('hidden');
+      document.getElementById('auth-step-1').classList.add('hidden');
+    };
+    document.getElementById('register-submit-btn').onclick = () => {
+      petProfile.name = document.getElementById('pet-name').value || 'Lucky';
       petProfile.age = document.getElementById('pet-age').value;
-      petProfile.weight = document.getElementById('pet-weight').value;
       petProfile.breed = document.getElementById('pet-breed').value;
+      petProfile.weight = document.getElementById('pet-weight').value;
       petProfile.color = document.getElementById('pet-color').value;
-      
-      currentUser = { petName };
-      showToast(`歡迎加入 Copaws，${petName}！🐾`);
-      setTimeout(() => {
-        loginScreen.classList.add('hidden');
-        mainApp.classList.remove('hidden');
-        renderCalendar();
-      }, 1500);
-    });
+      petProfile.type = document.getElementById('pet-type').value;
+      loginUser();
+    };
+    document.getElementById('google-login-btn').onclick = () => loginUser();
 
-    // Back to login
-    backToLoginBtn.addEventListener('click', () => {
-      registrationForm.classList.add('hidden');
-      authStep1.classList.remove('hidden');
-    });
-
-    // Login user
-    function loginUser(email) {
-      currentUser = { email };
-      showToast('登入成功！');
+    function loginUser() {
+      showToast('登入成功！🐾');
       setTimeout(() => {
-        loginScreen.classList.add('hidden');
-        mainApp.classList.remove('hidden');
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
         renderCalendar();
       }, 1000);
     }
 
-    // File input change
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        imagePreview.src = event.target.result;
-        uploadFormContainer.classList.remove('hidden');
-        uploadProgressContainer.classList.add('hidden');
-        uploadSuccess.classList.add('hidden');
-        savePhotoBtn.classList.remove('hidden');
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Remove image
-    removeImageBtn.addEventListener('click', () => {
-      resetUploadForm();
-    });
-
-    // Reset upload form
-    function resetUploadForm() {
-      fileInput.value = '';
-      uploadFormContainer.classList.add('hidden');
-      photoNote.value = '';
-      photoDate.valueAsDate = new Date();
-      uploadProgressContainer.classList.add('hidden');
-      uploadSuccess.classList.add('hidden');
-      uploadProgressBar.style.width = '0%';
-      uploadPercentage.textContent = '0%';
-    }
-
-    // Save photo - Simulate upload
-    savePhotoBtn.addEventListener('click', () => {
-      // Hide upload button, show progress
-      savePhotoBtn.classList.add('hidden');
-      uploadProgressContainer.classList.remove('hidden');
-      
-      // Simulate upload progress
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.random() * 30;
-        if (progress > 100) progress = 100;
-        
-        uploadProgressBar.style.width = progress + '%';
-        uploadPercentage.textContent = Math.floor(progress) + '%';
-        
-        if (progress >= 100) {
-          clearInterval(interval);
-          // Show success message
-          setTimeout(() => {
-            uploadProgressContainer.classList.add('hidden');
-            uploadSuccess.classList.remove('hidden');
-            showToast('照片上傳成功！✨');
-          }, 300);
-        }
-      }, 200);
-    });
-
-    // Upload another photo
-    uploadAnotherBtn.addEventListener('click', () => {
-      resetUploadForm();
-    });
-
-    // Tab Navigation
-    navUpload.addEventListener('click', () => {
-      uploadTab.classList.remove('hidden');
-      calendarTab.classList.add('hidden');
-      profileTab.classList.add('hidden');
-      navUpload.classList.add('tab-active');
-      navUpload.classList.remove('text-gray-400');
-      navCalendar.classList.remove('tab-active');
-      navCalendar.classList.add('text-gray-400');
-      navProfile.classList.remove('tab-active');
-      navProfile.classList.add('text-gray-400');
-    });
-
-    navCalendar.addEventListener('click', () => {
-      uploadTab.classList.add('hidden');
-      calendarTab.classList.remove('hidden');
-      profileTab.classList.add('hidden');
-      navCalendar.classList.add('tab-active');
-      navCalendar.classList.remove('text-gray-400');
-      navUpload.classList.remove('tab-active');
-      navUpload.classList.add('text-gray-400');
-      navProfile.classList.remove('tab-active');
-      navProfile.classList.add('text-gray-400');
-      renderCalendar();
-    });
-
-    navProfile.addEventListener('click', () => {
-      uploadTab.classList.add('hidden');
-      calendarTab.classList.add('hidden');
-      profileTab.classList.remove('hidden');
-      navProfile.classList.add('tab-active');
-      navProfile.classList.remove('text-gray-400');
-      navUpload.classList.remove('tab-active');
-      navUpload.classList.add('text-gray-400');
-      navCalendar.classList.remove('tab-active');
-      navCalendar.classList.add('text-gray-400');
-      loadProfile();
-    });
-
-    // Avatar Upload
-    avatarInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        petAvatar = event.target.result;
-        petAvatarDisplay.innerHTML = `<img src="${petAvatar}" class="w-full h-full object-cover" alt="寵物頭像">`;
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Load Profile
-    function loadProfile() {
-      profilePetName.textContent = petProfile.name;
-      profileAge.value = petProfile.age;
-      profileType.value = petProfile.type;
-      profileWeight.value = petProfile.weight;
-      profileBreed.value = petProfile.breed;
-      profileColor.value = petProfile.color;
-      
-      if (petAvatar) {
-        petAvatarDisplay.innerHTML = `<img src="${petAvatar}" class="w-full h-full object-cover" alt="寵物頭像">`;
-      }
-    }
-
-    // Save Profile
-    saveProfileBtn.addEventListener('click', () => {
-      petProfile.age = profileAge.value;
-      petProfile.type = profileType.value;
-      petProfile.weight = profileWeight.value;
-      petProfile.breed = profileBreed.value;
-      petProfile.color = profileColor.value;
-      
-      showToast('資料已儲存！✨');
-    });
-
-    // Logout
-    logoutBtn.addEventListener('click', () => {
-      const confirmDiv = document.createElement('div');
-      confirmDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-      confirmDiv.innerHTML = `
-        <div class="bg-white rounded-2xl p-6 mx-4 max-w-sm">
-          <p class="text-lg font-bold mb-4 text-gray-800">確定要登出嗎？</p>
-          <div class="flex gap-3">
-            <button id="confirm-logout" class="flex-1 bg-red-500 text-white font-bold py-3 rounded-xl hover:bg-red-600">登出</button>
-            <button id="cancel-logout" class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300">取消</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(confirmDiv);
-      
-      document.getElementById('confirm-logout').addEventListener('click', () => {
-        location.reload();
+    // Tab 切換
+    function showTab(id) {
+      ['upload', 'calendar', 'profile'].forEach(t => {
+        document.getElementById(t + '-tab').classList.add('hidden');
+        document.getElementById('nav-' + t).classList.remove('tab-active');
+        document.getElementById('nav-' + t).classList.add('text-gray-400');
       });
-      
-      document.getElementById('cancel-logout').addEventListener('click', () => {
-        confirmDiv.remove();
-      });
-    });
+      document.getElementById(id + '-tab').classList.remove('hidden');
+      document.getElementById('nav-' + id).classList.add('tab-active');
+      document.getElementById('nav-' + id).classList.remove('text-gray-400');
+      if(id === 'calendar') renderCalendar();
+      if(id === 'profile') loadProfile();
+    }
+    document.getElementById('nav-upload').onclick = () => showTab('upload');
+    document.getElementById('nav-calendar').onclick = () => showTab('calendar');
+    document.getElementById('nav-profile').onclick = () => showTab('profile');
 
-    // Calendar Functions
+    // 日曆渲染
     function renderCalendar() {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
-      
-      currentMonthEl.textContent = `${year} 年 ${month + 1} 月`;
+      document.getElementById('current-month').textContent = `${year} 年 ${month + 1} 月`;
       
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-      
-      calendarGrid.innerHTML = '';
-      
-      // Empty cells before first day
-      for (let i = 0; i < firstDay; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.className = 'h-14';
-        calendarGrid.appendChild(emptyCell);
-      }
-      
-      // Days of month
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
+
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const dayPhotos = samplePhotos[dateStr];
-        
-        const dayCell = document.createElement('button');
-        dayCell.className = 'calendar-day h-14 rounded-xl flex items-center justify-center text-sm font-bold';
-        
-        if (dayPhotos && dayPhotos.length > 0) {
-          dayCell.classList.add('has-entry');
-          
-          // Create stacked photo effect
+        const photos = samplePhotos[dateStr];
+        const cell = document.createElement('button');
+        cell.className = 'calendar-day rounded-xl flex items-center justify-center';
+
+        if (photos && photos.length > 0) {
+          cell.classList.add('has-entry');
           let stackHtml = '<div class="photo-stack">';
-          
-          // Show up to 3 photos in a stack
-          const photosToShow = Math.min(3, dayPhotos.length);
-          for (let i = 0; i < photosToShow; i++) {
-            stackHtml += `
-              <div class="photo-stack-item">
-                <img src="${dayPhotos[i].image}" alt="照片" onerror="this.style.display='none';">
-              </div>
-            `;
+          const displayCount = Math.min(3, photos.length);
+          for(let i=0; i<displayCount; i++){
+            stackHtml += `<div class="photo-stack-item"><img src="${photos[i].image}"></div>`;
           }
-          
           stackHtml += '</div>';
-          
-          dayCell.innerHTML = `
-            ${stackHtml}
-            <span class="day-number">${day}</span>
-          `;
-          
-          dayCell.addEventListener('click', () => openDetailPage(dateStr));
+          cell.innerHTML = `${stackHtml}<span class="day-number">${day}</span>`;
+          cell.onclick = () => openDetailPage(dateStr);
         } else {
-          dayCell.textContent = day;
+          cell.innerHTML = `<span class="no-photo-day">${day}</span>`;
         }
-        
-        calendarGrid.appendChild(dayCell);
+        grid.appendChild(cell);
       }
     }
 
     function openDetailPage(dateStr) {
-      currentViewDate = dateStr;
       renderDetailPage(dateStr);
-      detailPage.classList.remove('hidden');
+      document.getElementById('detail-page').classList.remove('hidden');
     }
 
     function renderDetailPage(dateStr) {
       const [year, month, day] = dateStr.split('-');
-      detailTitle.textContent = `${year} 年 ${parseInt(month)} 月 ${parseInt(day)} 日`;
-      
-      const dayPhotos = samplePhotos[dateStr] || [];
-      
+      document.getElementById('detail-title').textContent = `${year} 年 ${parseInt(month)} 月 ${parseInt(day)} 日`;
+      const photos = samplePhotos[dateStr] || [];
       detailContent.innerHTML = '';
-      
-      if (dayPhotos.length === 0) {
-        detailContent.innerHTML = `
-          <div class="flex flex-col items-center justify-center h-full p-8">
-            <div class="text-6xl mb-4">📭</div>
-            <p class="text-gray-500">這天還沒有照片喔</p>
-          </div>
-        `;
-        nextDateHint.classList.add('hidden');
-        return;
-      }
-      
-      dayPhotos.forEach((photo, index) => {
+
+      photos.forEach((photo, index) => {
         const card = document.createElement('div');
-        card.className = 'bg-white rounded-2xl shadow-lg overflow-hidden mb-4 fade-in';
-        card.style.opacity = '0';
-        card.style.animation = `fadeIn 0.4s ease forwards`;
+        card.className = 'bg-white rounded-2xl shadow-sm border border-emerald-50 overflow-hidden mb-5 fade-in';
         card.style.animationDelay = `${index * 0.1}s`;
         
         const avatarHtml = petAvatar 
-          ? `<img src="${petAvatar}" class="w-8 h-8 rounded-full object-cover border-2" style="border-color: #c8e6d4;" alt="寵物頭像">`
-          : `<div class="w-8 h-8 rounded-full flex items-center justify-center text-lg border-2" style="background: linear-gradient(to bottom right, #c8e6d4, #10b981); border-color: #c8e6d4;">🐶</div>`;
-        
+          ? `<img src="${petAvatar}" class="w-8 h-8 rounded-full object-cover border-2 border-emerald-100 shadow-sm">`
+          : `<div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-lg border-2 border-white shadow-sm">🐶</div>`;
+
         card.innerHTML = `
-          <img src="${photo.image}" class="w-full aspect-square object-cover" alt="照片" onerror="this.src=''; this.alt='圖片載入失敗'; this.style.display='none';">
-          <div class="p-4">
-            <div class="flex items-start gap-3">
-              ${avatarHtml}
-              <div class="flex-1">
-                <p class="text-gray-700 whitespace-pre-wrap">${photo.note}</p>
-                <p class="text-xs text-gray-400 mt-2">🕐 ${photo.time}</p>
-              </div>
+          <img src="${photo.image}" class="w-full aspect-square object-cover">
+          <div class="p-4 flex gap-3 items-start">
+            <div class="flex-shrink-0">${avatarHtml}</div>
+            <div class="flex-1">
+              <p class="text-[#0c5832] text-sm font-semibold leading-relaxed">${photo.note}</p>
+              <p class="text-[10px] text-gray-400 mt-2 font-bold italic">🕐 ${photo.time}</p>
             </div>
           </div>
         `;
-        
         detailContent.appendChild(card);
       });
-      
-      // Always show next date hint if there's a next date
-      const nextDate = getNextDateWithPhotos(dateStr);
+
+      const nextDate = getNextDate(dateStr);
       if (nextDate) {
-        nextDateHint.classList.remove('hidden');
+        document.getElementById('next-date-hint').classList.remove('hidden');
         setupAutoScroll(dateStr);
       } else {
-        nextDateHint.classList.add('hidden');
+        // 如果沒有下一個日期，隱藏提示並移除捲動監聽
+        document.getElementById('next-date-hint').classList.add('hidden');
+        detailContent.onscroll = null;
       }
     }
 
     function setupAutoScroll(currentDateStr) {
-      // Remove any existing scroll handlers
-      const oldHandler = detailContent.scrollHandler;
-      if (oldHandler) {
-        detailContent.removeEventListener('scroll', oldHandler);
-      }
-      
-      let isTransitioning = false;
-      
-      const scrollHandler = function() {
+      detailContent.onscroll = () => {
         if (isTransitioning) return;
-        
-        const scrollTop = detailContent.scrollTop;
-        const scrollHeight = detailContent.scrollHeight;
-        const clientHeight = detailContent.clientHeight;
-        
-        // Check if scrolled to bottom
-        if (scrollTop + clientHeight >= scrollHeight - 10) {
-          const nextDate = getNextDateWithPhotos(currentDateStr);
+        // 偵測是否滑到底部
+        if (detailContent.scrollTop + detailContent.clientHeight >= detailContent.scrollHeight - 10) {
+          const nextDate = getNextDate(currentDateStr);
           if (nextDate) {
             isTransitioning = true;
-            detailContent.removeEventListener('scroll', scrollHandler);
-            
-            // Add fade out animation
             detailContent.classList.add('page-transition-out');
-            
             setTimeout(() => {
-              // Reset scroll to top
               detailContent.scrollTop = 0;
               detailContent.classList.remove('page-transition-out');
-              
-              // Load next date content
               renderDetailPage(nextDate);
-              currentViewDate = nextDate;
-              
-              // Add fade in animation
               detailContent.classList.add('page-transition-in');
-              
               setTimeout(() => {
                 detailContent.classList.remove('page-transition-in');
                 isTransitioning = false;
@@ -948,77 +470,102 @@
           }
         }
       };
-      
-      detailContent.scrollHandler = scrollHandler;
-      detailContent.addEventListener('scroll', scrollHandler);
     }
 
-    function getNextDateWithPhotos(currentDateStr) {
-      const allDates = Object.keys(samplePhotos).sort();
-      const currentIndex = allDates.indexOf(currentDateStr);
-      
-      if (currentIndex >= 0 && currentIndex < allDates.length - 1) {
-        return allDates[currentIndex + 1];
+    function getNextDate(dateStr) {
+      const dates = Object.keys(samplePhotos).sort();
+      const idx = dates.indexOf(dateStr);
+      if (idx >= 0 && idx < dates.length - 1) {
+        return dates[idx + 1];
       }
+      return null; // 最後一個日期回傳 null
+    }
+
+    // 上傳邏輯
+    document.getElementById('file-input').onchange = (e) => {
+      const file = e.target.files[0];
+      if(file) {
+        document.getElementById('image-preview').src = URL.createObjectURL(file);
+        document.getElementById('upload-form-container').classList.remove('hidden');
+        document.getElementById('save-photo-btn').classList.remove('hidden');
+        document.getElementById('upload-success').classList.add('hidden');
+        document.getElementById('upload-progress-container').classList.add('hidden');
+      }
+    };
+
+    document.getElementById('save-photo-btn').onclick = () => {
+      const container = document.getElementById('upload-progress-container');
+      const bar = document.getElementById('upload-progress-bar');
+      const text = document.getElementById('upload-pct-text');
       
-      return null;
-    }
+      container.classList.remove('hidden');
+      document.getElementById('save-photo-btn').classList.add('hidden');
+      
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.floor(Math.random() * 15) + 5;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          setTimeout(() => {
+            document.getElementById('upload-success').classList.remove('hidden');
+            container.classList.add('hidden');
+          }, 300);
+        }
+        bar.style.width = progress + '%';
+        text.textContent = progress + '%';
+      }, 150);
+    };
 
-    backBtn.addEventListener('click', () => {
-      detailPage.classList.add('hidden');
-      currentViewDate = null;
-      nextDateHint.classList.add('hidden');
-      // Remove scroll handler
-      if (detailContent.scrollHandler) {
-        detailContent.removeEventListener('scroll', detailContent.scrollHandler);
-        detailContent.scrollHandler = null;
+    document.getElementById('upload-another-btn').onclick = () => {
+      // 徹底初始化
+      document.getElementById('file-input').value = "";
+      document.getElementById('image-preview').src = "";
+      document.getElementById('photo-note').value = "";
+      document.getElementById('upload-form-container').classList.add('hidden');
+      document.getElementById('upload-success').classList.add('hidden');
+      document.getElementById('save-photo-btn').classList.remove('hidden');
+      document.getElementById('upload-progress-container').classList.add('hidden');
+      document.getElementById('upload-progress-bar').style.width = '0%';
+      document.getElementById('upload-pct-text').textContent = '0%';
+    };
+
+    document.getElementById('remove-image-btn').onclick = () => {
+      document.getElementById('file-input').value = "";
+      document.getElementById('upload-form-container').classList.add('hidden');
+    };
+
+    // 寶貝資料
+    document.getElementById('avatar-input').onchange = (e) => {
+      const file = e.target.files[0];
+      if(file) {
+        petAvatar = URL.createObjectURL(file);
+        document.getElementById('pet-avatar-display').innerHTML = `<img src="${petAvatar}" class="w-full h-full object-cover">`;
       }
-    });
+    };
 
-    prevMonthBtn.addEventListener('click', () => {
-      currentDate.setMonth(currentDate.getMonth() - 1);
-      renderCalendar();
-    });
-
-    nextMonthBtn.addEventListener('click', () => {
-      currentDate.setMonth(currentDate.getMonth() + 1);
-      renderCalendar();
-    });
-
-    // Element SDK Config Change Handler
-    async function onConfigChange(config) {
-      const title = config.app_title || defaultConfig.app_title;
-      appTitle.textContent = title;
+    function loadProfile() {
+      document.getElementById('profile-pet-name').textContent = petProfile.name;
+      document.getElementById('profile-age').value = petProfile.age;
+      document.getElementById('profile-type').value = petProfile.type;
+      document.getElementById('profile-weight').value = petProfile.weight;
+      document.getElementById('profile-breed').value = petProfile.breed;
+      document.getElementById('profile-color').value = petProfile.color;
     }
 
-    function mapToCapabilities(config) {
-      return {
-        recolorables: [],
-        borderables: [],
-        fontEditable: undefined,
-        fontSizeable: undefined
-      };
-    }
+    document.getElementById('save-profile-btn').onclick = () => {
+      petProfile.age = document.getElementById('profile-age').value;
+      petProfile.weight = document.getElementById('profile-weight').value;
+      petProfile.breed = document.getElementById('profile-breed').value;
+      petProfile.color = document.getElementById('profile-color').value;
+      petProfile.type = document.getElementById('profile-type').value;
+      showToast('資料已儲存！✨');
+    };
 
-    function mapToEditPanelValues(config) {
-      return new Map([
-        ['app_title', config.app_title || defaultConfig.app_title]
-      ]);
-    }
-
-    // Initialize
-    async function init() {
-      if (window.elementSdk) {
-        await window.elementSdk.init({
-          defaultConfig,
-          onConfigChange,
-          mapToCapabilities,
-          mapToEditPanelValues
-        });
-      }
-    }
-
-    init();
+    document.getElementById('back-btn').onclick = () => document.getElementById('detail-page').classList.add('hidden');
+    document.getElementById('prev-month').onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); };
+    document.getElementById('next-month').onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
+    document.getElementById('logout-btn').onclick = () => location.reload();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b9c6b1b448c49f7',t:'MTc2NzcxNTEyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ </body>
 </html>
