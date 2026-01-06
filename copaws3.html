@@ -250,6 +250,7 @@
          </div>
          <div class="space-y-2 pb-6">
           <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">年齡</label><input type="number" id="profile-age" class="w-full text-sm focus:outline-none"></div>
+		  <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">性別</label><select id="profile-gender" class="w-full text-sm focus:outline-none"><option value="male">♂ 公</option><option value="female">♀ 母</option></select></div>
           <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">類別</label><select id="profile-type" class="w-full text-sm focus:outline-none"><option value="dog">🐶 狗狗</option><option value="cat">🐱 貓咪</option></select></div>
           <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">體重</label><input type="number" id="profile-weight" class="w-full text-sm focus:outline-none"></div>
           <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">品種</label><input type="text" id="profile-breed" class="w-full text-sm focus:outline-none"></div>
@@ -314,7 +315,7 @@
 
     let currentDate = new Date(2025, 0, 1);
     let petAvatar = null;
-    let petProfile = { name: 'Lucky', age: '', type: 'dog', weight: '', breed: '', color: '' };
+    let petProfile = { name: 'Lucky', age: '', type: 'dog', gender: 'male', weight: '', breed: '', color: '' };
     let isTransitioning = false;
 
     const detailContent = document.getElementById('detail-content');
@@ -334,6 +335,7 @@
     document.getElementById('register-submit-btn').onclick = () => {
       petProfile.name = document.getElementById('pet-name').value || 'Lucky';
       petProfile.age = document.getElementById('pet-age').value;
+	  petProfile.gender = document.getElementById('pet-gender').value;
       petProfile.breed = document.getElementById('pet-breed').value;
       petProfile.weight = document.getElementById('pet-weight').value;
       petProfile.color = document.getElementById('pet-color').value;
@@ -481,17 +483,20 @@
       return null; // 最後一個日期回傳 null
     }
 
-    // 上傳邏輯
-    document.getElementById('file-input').onchange = (e) => {
-      const file = e.target.files[0];
-      if(file) {
-        document.getElementById('image-preview').src = URL.createObjectURL(file);
-        document.getElementById('upload-form-container').classList.remove('hidden');
-        document.getElementById('save-photo-btn').classList.remove('hidden');
-        document.getElementById('upload-success').classList.add('hidden');
-        document.getElementById('upload-progress-container').classList.add('hidden');
-      }
-    };
+// 上傳邏輯
+    document.getElementById('file-input').onchange = (e) => {
+      const file = e.target.files[0];
+      if(file) {
+        // --- 新增：設定默認日期為當天 (格式為 YYYY-MM-DD) ---
+        document.getElementById('photo-date').value = new Date().toISOString().split('T')[0];
+        
+        document.getElementById('image-preview').src = URL.createObjectURL(file);
+        document.getElementById('upload-form-container').classList.remove('hidden');
+        document.getElementById('save-photo-btn').classList.remove('hidden');
+        document.getElementById('upload-success').classList.add('hidden');
+        document.getElementById('upload-progress-container').classList.add('hidden');
+      }
+    };
 
     document.getElementById('save-photo-btn').onclick = () => {
       const container = document.getElementById('upload-progress-container');
@@ -548,6 +553,7 @@
       document.getElementById('profile-pet-name').textContent = petProfile.name;
       document.getElementById('profile-age').value = petProfile.age;
       document.getElementById('profile-type').value = petProfile.type;
+	  document.getElementById('profile-gender').value = petProfile.gender;
       document.getElementById('profile-weight').value = petProfile.weight;
       document.getElementById('profile-breed').value = petProfile.breed;
       document.getElementById('profile-color').value = petProfile.color;
@@ -559,6 +565,7 @@
       petProfile.breed = document.getElementById('profile-breed').value;
       petProfile.color = document.getElementById('profile-color').value;
       petProfile.type = document.getElementById('profile-type').value;
+	  petProfile.gender = document.getElementById('profile-gender').value;
       showToast('資料已儲存！✨');
     };
 
