@@ -291,8 +291,8 @@
     <header class="h-12 flex items-center justify-center px-6" style="background: linear-gradient(to right, #0c5832, #0a4528);">
      <h1 id="app-title" class="text-white font-bold text-lg">🐾 Copaws</h1><span class="demo-badge">示範模式</span>
     </header><!-- Main Content -->
-    <main class="flex-1 overflow-hidden flex flex-col" style="background: linear-gradient(to bottom, #e7f5ee, #ffffff);"><!-- Upload Tab Content -->
-     <section id="upload-tab" class="flex-1 flex flex-col p-4 overflow-hidden">
+    <main class="flex-1 overflow-auto flex flex-col" style="background: linear-gradient(to bottom, #e7f5ee, #ffffff);"><!-- Upload Tab Content -->
+     <section id="upload-tab" class="flex-1 flex flex-col p-4 overflow-auto">
       <div class="text-center mb-3">
        <h2 class="text-xl font-bold mb-1" style="color: #0c5832;">上傳照片 📸</h2>
        <p class="text-gray-600 text-xs">記錄毛孩的美好時光</p>
@@ -318,7 +318,7 @@
         <div class="text-3xl mb-1">
          ✅
         </div>
-        <p class="font-bold mb-2 text-sm" style="color: #0c5832;">上傳成功！</p><button id="upload-another-btn" class="paw-button w-full text-white font-semibold py-2.5 rounded-xl text-sm" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 繼續上傳下一張 </button>
+        <p class="font-bold mb-2 text-sm" style="color: #0c5832;">上傳成功！</p><button id="upload-another-btn" class="paw-button w-full text-white font-semibold py-2.5 rounded-xl text-sm" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 繼續上傳另一張 </button>
        </div>
       </div>
      </section><!-- Profile Tab Content -->
@@ -380,11 +380,11 @@
       </div><!-- Calendar Grid -->
       <div id="calendar-grid" class="grid grid-cols-7 gap-1 mb-4"></div><!-- Hint -->
       <div class="mt-auto p-3 rounded-xl text-center" style="background: linear-gradient(to right, #e7f5ee, #d4ebe1);">
-       <p class="text-sm font-semibold" style="color: #0c5832;">點擊日期查看毛孩的回憶</p>
+       <p class="text-sm font-semibold" style="color: #0c5832;">💡 點擊日期查看毛孩的回憶</p>
       </div>
      </section>
     </main><!-- Bottom Navigation -->
-    <nav class="h-20 bg-white flex" style="border-top: 1px solid #c8e6d4;"><button id="nav-upload" class="flex-1 flex flex-col items-center justify-center tab-active transition">
+    <nav class="h-20 bg-white flex" style="border-top: 1px solid #c8e6d4; flex-shrink: 0;"><button id="nav-upload" class="flex-1 flex flex-col items-center justify-center tab-active transition">
       <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
       </svg><span class="text-xs font-bold">紀錄</span> </button> <button id="nav-calendar" class="flex-1 flex flex-col items-center justify-center text-gray-400 transition">
       <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -414,7 +414,7 @@
       app_title: '🐾 Copaws'
     };
 
-    // Sample data - Demo photos (每個日期期都有2-3張照片)
+    // Sample data - Demo photos (每個日期都有2-3張照片)
     const samplePhotos = {
       '2025-01-02': [
         { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '新年第一天散步 🎉', time: '09:00' },
@@ -442,7 +442,7 @@
         { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '享受陽光', time: '14:30' }
       ],
       '2025-01-14': [
-        { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '又到開吃美食時間 🍖', time: '18:00' },
+        { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '又到了吃飯時間 🍖', time: '18:00' },
         { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop', note: '吃得好滿足', time: '18:20' }
       ],
       '2025-01-15': [
@@ -452,39 +452,39 @@
       ],
       '2025-01-17': [
         { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop', note: '一起看電視', time: '20:00' },
-        { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=400&fit=crop', note: '窩在沙發耍廢', time: '20:30' }
+        { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=400&fit=crop', note: '窩在沙發上', time: '20:30' }
       ],
       '2025-01-18': [
-        { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '第一次嘗試游泳！很緊張但很勇敢 🏊', time: '14:20' },
+        { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '第一次嘗試游泳！有點緊張但很勇敢 🏊', time: '14:20' },
         { image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop', note: '玩水玩得好開心', time: '15:00' }
       ],
       '2025-01-20': [
         { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=400&fit=crop', note: '洗澡囉 🛁', time: '10:00' },
-        { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '洗得香香', time: '10:30' }
+        { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '洗得香香的', time: '10:30' }
       ],
       '2025-01-22': [
         { image: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=400&h=400&fit=crop', note: '新買的玩具！超級喜歡 🎾', time: '16:45' },
-        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '玩具超好玩', time: '17:15' }
+        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '玩具真好玩', time: '17:15' }
       ],
       '2025-01-23': [
         { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '今天心情很好 😊', time: '11:00' },
         { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop', note: '每天都要開心', time: '11:30' }
       ],
       '2025-01-25': [
-        { image: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&h=400&fit=crop', note: '午睡時間 睡得好香甜', time: '13:30' },
-        { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '醒來第一件就開始找零食', time: '15:20' },
+        { image: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&h=400&fit=crop', note: '午睡時間～ 睡得好香甜', time: '13:30' },
+        { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '醒來第一件事就是找零食', time: '15:20' },
         { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop', note: '晚上一起看電視 🎬', time: '19:00' }
       ],
       '2025-01-26': [
-        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '早晨散步', time: '08:00' },
+        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '週日早晨散步', time: '08:00' },
         { image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=400&h=400&fit=crop', note: '呼吸新鮮空氣', time: '08:30' }
       ],
       '2025-01-28': [
         { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=400&fit=crop', note: '今天去寵物美容！變得香香的 ✨', time: '10:00' },
-        { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '新造型超元氣', time: '11:30' }
+        { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '新造型超帥氣', time: '11:30' }
       ],
       '2025-01-29': [
-        { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop', note: '跑跑跳好開心', time: '16:00' },
+        { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop', note: '跑跑跳跳好開心', time: '16:00' },
         { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '運動真快樂', time: '16:30' }
       ],
       '2025-01-30': [
@@ -877,7 +877,7 @@
           : `<div class="w-8 h-8 rounded-full flex items-center justify-center text-lg border-2" style="background: linear-gradient(to bottom right, #c8e6d4, #10b981); border-color: #c8e6d4;">🐶</div>`;
         
         card.innerHTML = `
-          <img src="${photo.image}" class="w-full aspect-square object-cover" alt="照片" onerror="this.src=''; this.alt='圖片加載失敗'; this.style.display='none';">
+          <img src="${photo.image}" class="w-full aspect-square object-cover" alt="照片" onerror="this.src=''; this.alt='圖片載入失敗'; this.style.display='none';">
           <div class="p-4">
             <div class="flex items-start gap-3">
               ${avatarHtml}
@@ -1020,5 +1020,5 @@
 
     init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b9c4eeec25c8f06',t:'MTc2NzcxMzk3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b9c6b1b448c49f7',t:'MTc2NzcxNTEyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
