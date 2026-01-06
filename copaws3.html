@@ -263,7 +263,7 @@
      </div><!-- Registration Form -->
      <div id="registration-form" class="hidden space-y-4">
       <div class="text-center mb-4">
-       <h2 class="text-2xl font-bold" style="color: #0c5832;">建立帳��</h2>
+       <h2 class="text-2xl font-bold" style="color: #0c5832;">建立帳號</h2>
        <p class="text-sm text-gray-600">幫寶貝建立專屬日記</p>
       </div>
       <div class="grid grid-cols-2 gap-3">
@@ -277,7 +277,7 @@
       <div><label for="pet-breed" class="block text-xs font-semibold text-gray-700 mb-1">品種</label> <input type="text" id="pet-breed" class="input-field w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm" style="border-color: #c8e6d4;" placeholder="例如：柴犬">
       </div>
       <div class="grid grid-cols-3 gap-3">
-       <div><label for="pet-age" class="block text-xs font-semibold text-gray-700 mb-1">年��</label> <input type="number" id="pet-age" class="input-field w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm" style="border-color: #c8e6d4;" placeholder="歲">
+       <div><label for="pet-age" class="block text-xs font-semibold text-gray-700 mb-1">年齡</label> <input type="number" id="pet-age" class="input-field w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm" style="border-color: #c8e6d4;" placeholder="歲">
        </div>
        <div><label for="pet-color" class="block text-xs font-semibold text-gray-700 mb-1">毛色</label> <input type="text" id="pet-color" class="input-field w-full px-3 py-2 border-2 rounded-lg focus:outline-none text-sm" style="border-color: #c8e6d4;" placeholder="黃色">
        </div>
@@ -303,7 +303,7 @@
       <div id="upload-form-container" class="hidden space-y-3 flex-1 flex flex-col"><!-- Image Preview -->
        <div id="image-preview-container" class="relative rounded-xl overflow-hidden shadow-lg"><img id="image-preview" class="w-full object-contain max-h-40" alt="預覽圖片"> <button id="remove-image-btn" class="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 text-sm"> ✕ </button>
        </div><!-- Note Input -->
-       <div class="flex-1 flex flex-col"><label for="photo-note" class="block text-xs font-bold mb-1" style="color: #0c5832;">寫下回憶</label> <textarea id="photo-note" class="input-field w-full px-3 py-2 border-2 rounded-xl focus:outline-none resize-none flex-1 text-sm" rows="3" style="border-color: #c8e6d4;" placeholder="今天發���了什麼有趣的事呢？ 😊"></textarea>
+       <div class="flex-1 flex flex-col"><label for="photo-note" class="block text-xs font-bold mb-1" style="color: #0c5832;">寫下回憶</label> <textarea id="photo-note" class="input-field w-full px-3 py-2 border-2 rounded-xl focus:outline-none resize-none flex-1 text-sm" rows="3" style="border-color: #c8e6d4;" placeholder="今天發生了什麼有趣的事呢？ 😊"></textarea>
        </div><!-- Date Selection -->
        <div><label for="photo-date" class="block text-xs font-bold mb-1" style="color: #0c5832;">選擇日期</label> <input type="date" id="photo-date" class="input-field w-full px-3 py-2 border-2 rounded-xl focus:outline-none text-sm" style="border-color: #c8e6d4;">
        </div><!-- Upload Button --> <button id="save-photo-btn" class="paw-button w-full text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 開始上傳 ✨ </button> <!-- Progress Bar (Hidden by default) -->
@@ -318,7 +318,7 @@
         <div class="text-3xl mb-1">
          ✅
         </div>
-        <p class="font-bold mb-2 text-sm" style="color: #0c5832;">上傳成功！</p><button id="upload-another-btn" class="paw-button w-full text-white font-semibold py-2.5 rounded-xl text-sm" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 繼續上傳��一張 </button>
+        <p class="font-bold mb-2 text-sm" style="color: #0c5832;">上傳成功！</p><button id="upload-another-btn" class="paw-button w-full text-white font-semibold py-2.5 rounded-xl text-sm" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 繼續上傳下一張 </button>
        </div>
       </div>
      </section><!-- Profile Tab Content -->
@@ -380,7 +380,7 @@
       </div><!-- Calendar Grid -->
       <div id="calendar-grid" class="grid grid-cols-7 gap-1 mb-4"></div><!-- Hint -->
       <div class="mt-auto p-3 rounded-xl text-center" style="background: linear-gradient(to right, #e7f5ee, #d4ebe1);">
-       <p class="text-sm font-semibold" style="color: #0c5832;">���� 點擊日期查看毛孩的回憶</p>
+       <p class="text-sm font-semibold" style="color: #0c5832;">點擊日期查看毛孩的回憶</p>
       </div>
      </section>
     </main><!-- Bottom Navigation -->
@@ -414,10 +414,10 @@
       app_title: '🐾 Copaws'
     };
 
-    // Sample data - Demo photos (每個���期都有2-3張照片)
+    // Sample data - Demo photos (每個日期期都有2-3張照片)
     const samplePhotos = {
       '2025-01-02': [
-        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '新��第一天散步 🎉', time: '09:00' },
+        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '新年第一天散步 🎉', time: '09:00' },
         { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop', note: '在公園遇到新朋友', time: '09:30' }
       ],
       '2025-01-04': [
@@ -426,12 +426,12 @@
       ],
       '2025-01-06': [
         { image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=400&h=400&fit=crop', note: '在家裡玩耍 🏠', time: '15:00' },
-        { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '午���的悠閒時光', time: '15:45' }
+        { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '午後的悠閒時光', time: '15:45' }
       ],
       '2025-01-08': [
         { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '今天天氣好好 ☀️', time: '11:00' },
         { image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop', note: '開心奔跑', time: '11:30' },
-        { image: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=400&h=400&fit=crop', note: '玩累了休息��下', time: '12:00' }
+        { image: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=400&h=400&fit=crop', note: '玩累了休息一下', time: '12:00' }
       ],
       '2025-01-10': [
         { image: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=400&h=400&fit=crop', note: '最愛的玩具時間 🎾', time: '16:00' },
@@ -442,7 +442,7 @@
         { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '享受陽光', time: '14:30' }
       ],
       '2025-01-14': [
-        { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '又到���吃��時間 🍖', time: '18:00' },
+        { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '又到開吃美食時間 🍖', time: '18:00' },
         { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop', note: '吃得好滿足', time: '18:20' }
       ],
       '2025-01-15': [
@@ -451,44 +451,44 @@
         { image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=400&h=400&fit=crop', note: '累了在樹蔭下休息', time: '12:00' }
       ],
       '2025-01-17': [
-        { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop', note: '一起看電��', time: '20:00' },
-        { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=400&fit=crop', note: '窩在沙發��', time: '20:30' }
+        { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop', note: '一起看電視', time: '20:00' },
+        { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=400&fit=crop', note: '窩在沙發耍廢', time: '20:30' }
       ],
       '2025-01-18': [
-        { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '第一次嘗試游泳！��������張但很勇敢 🏊', time: '14:20' },
+        { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '第一次嘗試游泳！很緊張但很勇敢 🏊', time: '14:20' },
         { image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop', note: '玩水玩得好開心', time: '15:00' }
       ],
       '2025-01-20': [
         { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=400&fit=crop', note: '洗澡囉 🛁', time: '10:00' },
-        { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '洗得香香��', time: '10:30' }
+        { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '洗得香香', time: '10:30' }
       ],
       '2025-01-22': [
-        { image: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=400&h=400&fit=crop', note: '新買的玩具！超級��歡 🎾', time: '16:45' },
-        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '玩具��好玩', time: '17:15' }
+        { image: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=400&h=400&fit=crop', note: '新買的玩具！超級喜歡 🎾', time: '16:45' },
+        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '玩具超好玩', time: '17:15' }
       ],
       '2025-01-23': [
         { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '今天心情很好 😊', time: '11:00' },
         { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop', note: '每天都要開心', time: '11:30' }
       ],
       '2025-01-25': [
-        { image: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&h=400&fit=crop', note: '��睡時間�� 睡得好香甜', time: '13:30' },
-        { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '醒來第一件���就����找零食', time: '15:20' },
+        { image: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400&h=400&fit=crop', note: '午睡時間 睡得好香甜', time: '13:30' },
+        { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop', note: '醒來第一件就開始找零食', time: '15:20' },
         { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=400&fit=crop', note: '晚上一起看電視 🎬', time: '19:00' }
       ],
       '2025-01-26': [
-        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '���日早晨散步', time: '08:00' },
+        { image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop', note: '早晨散步', time: '08:00' },
         { image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=400&h=400&fit=crop', note: '呼吸新鮮空氣', time: '08:30' }
       ],
       '2025-01-28': [
         { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400&h=400&fit=crop', note: '今天去寵物美容！變得香香的 ✨', time: '10:00' },
-        { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '新造型超���氣', time: '11:30' }
+        { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=400&h=400&fit=crop', note: '新造型超元氣', time: '11:30' }
       ],
       '2025-01-29': [
-        { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop', note: '跑跑跳��好開心', time: '16:00' },
+        { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop', note: '跑跑跳好開心', time: '16:00' },
         { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop', note: '運動真快樂', time: '16:30' }
       ],
       '2025-01-30': [
-        { image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=400&h=400&fit=crop', note: '在後院���太陽 ☀️', time: '14:00' },
+        { image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=400&h=400&fit=crop', note: '在後院曬太陽 ☀️', time: '14:00' },
         { image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop', note: '享受溫暖的陽光', time: '14:45' }
       ]
     };
@@ -877,7 +877,7 @@
           : `<div class="w-8 h-8 rounded-full flex items-center justify-center text-lg border-2" style="background: linear-gradient(to bottom right, #c8e6d4, #10b981); border-color: #c8e6d4;">🐶</div>`;
         
         card.innerHTML = `
-          <img src="${photo.image}" class="w-full aspect-square object-cover" alt="照片" onerror="this.src=''; this.alt='圖���載�����敗'; this.style.display='none';">
+          <img src="${photo.image}" class="w-full aspect-square object-cover" alt="照片" onerror="this.src=''; this.alt='圖片加載失敗'; this.style.display='none';">
           <div class="p-4">
             <div class="flex items-start gap-3">
               ${avatarHtml}
