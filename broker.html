@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鏈居平台 - 仲介端</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0,0,0,0.05);
+            z-index: 90;
+        }
+
+        .nav-btn {
+            transition: all 0.2s;
+        }
+
+        .nav-btn.active {
+            color: #2563eb;
+        }
+
+        .project-card {
+            transition: all 0.2s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <!-- 登入頁 -->
+    <div id="login-page" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
+        <div class="bg-white rounded-3xl shadow-2xl p-12 w-full max-w-md fade-in">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-black text-slate-900 mb-2">鏈居平台</h1>
+                <p class="text-slate-500">仲介端系統</p>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <input type="text" id="username" placeholder="帳號" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="password" id="password" placeholder="密碼" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <button onclick="login()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold text-lg shadow-xl hover:bg-blue-700 active:scale-95 transition-all">
+                登入系統
+            </button>
+        </div>
+    </div>
+
+    <!-- 主應用 -->
+    <div id="app" class="hidden pb-24">
+        <!-- 頂部導航 -->
+        <header class="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-50">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 id="page-title" class="text-xl font-black text-slate-900">案源查詢</h1>
+                    <p class="text-xs text-slate-500 mt-0.5" id="user-info">信義房屋 - 大安店 - 王業務</p>
+                </div>
+                <button onclick="logout()" class="text-xs text-slate-400 hover:text-slate-600 font-bold">登出</button>
+            </div>
+        </header>
+
+        <!-- 內容區 -->
+        <div id="content" class="p-6"></div>
+
+        <!-- 底部導航 -->
+        <nav class="bottom-nav">
+            <div class="flex justify-around items-center py-3">
+                <button onclick="navigateTo('search')" id="nav-search" class="nav-btn active flex flex-col items-center text-slate-400 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <span class="text-xs">案源查詢</span>
+                </button>
+                <button onclick="navigateTo('reports')" id="nav-reports" class="nav-btn flex flex-col items-center text-slate-400 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span class="text-xs">報備狀態</span>
+                </button>
+                <button onclick="navigateTo('commission')" id="nav-commission" class="nav-btn flex flex-col items-center text-slate-400 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="text-xs">成交佣金</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-6 py-4 rounded-2xl text-sm font-medium opacity-0 pointer-events-none transition-opacity duration-300 z-[200] shadow-xl">
+        操作成功
+    </div>
+
+    <script>
+        // 模擬資料
+        const projects = [
+            {
+                id: 'B10112345',
+                name: '璞園極上',
+                city: '台北市',
+                district: '內湖區',
+                road: '民權東路六段',
+                builder: '璞園建設',
+                price_min: 3280,
+                price_max: 4580,
+                area_min: 45,
+                area_max: 68,
+                layout: '2-3房',
+                type: '新成屋',
+                img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800',
+                cooperation_status: 'active',  // active / paused / need_confirm
+                recent_reports_count: 12,  // 近7天報備數
+                weekly_capacity: '本週尚可接待',
+                commission_rate_hint: '約 2%',
+                sla_response_time: '通常 24 小時內回覆'
+            },
+            {
+                id: 'B22012346',
+                name: '遠雄森河畔',
+                city: '新北市',
+                district: '板橋區',
+                road: '環河路四段',
+                builder: '遠雄建設',
+                price_min: 1850,
+                price_max: 2650,
+                area_min: 32,
+                area_max: 48,
+                layout: '2-3房',
+                type: '預售屋',
+                img: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=800',
+                cooperation_status: 'active',
+                recent_reports_count: 8,
+                weekly_capacity: '本週尚可接待',
+                commission_rate_hint: '約 2.5%',
+                sla_response_time: '通常 24 小時內回覆'
+            },
+            {
+                id: 'B10312347',
+                name: '國泰大美',
+                city: '台北市',
+                district: '中山區',
+                road: '南京東路三段',
+                builder: '國泰建設',
+                price_min: 5600,
+                price_max: 8200,
+                area_min: 68,
+                area_max: 95,
+                layout: '3-4房',
+                type: '豪宅',
+                img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800',
+                cooperation_status: 'paused',
+                recent_reports_count: 3,
+                weekly_capacity: '暫停報備中',
+                commission_rate_hint: '依成交另議',
+                sla_response_time: '通常 48 小時內回覆'
+            },
+            {
+                id: 'B10112348',
+                name: '信義之星',
+                city: '台北市',
+                district: '信義區',
+                road: '松仁路',
+                builder: '信義房屋',
+                price_min: 6800,
+                price_max: 12000,
+                area_min: 75,
+                area_max: 120,
+                layout: '3-5房',
+                type: '豪宅',
+                img: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800',
+                cooperation_status: 'active',
+                recent_reports_count: 25,
+                weekly_capacity: '熱門案件',
+                commission_rate_hint: '約 1.8%',
+                sla_response_time: '通常 12 小時內回覆'
+            },
+            {
+                id: 'B22012349',
+                name: '潤泰大直',
+                city: '台北市',
+                district: '中山區',
+                road: '北安路',
+                builder: '潤泰建設',
+                price_min: 4200,
+                price_max: 6500,
+                area_min: 55,
+                area_max: 88,
+                layout: '2-4房',
+                type: '新成屋',
+                img: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800',
+                cooperation_status: 'active',
+                recent_reports_count: 15,
+                weekly_capacity: '本週尚可接待',
+                commission_rate_hint: '約 2.2%',
+                sla_response_time: '通常 24 小時內回覆'
+            }
+        ];
+
+        let reports = [
+            {
+                id: 'R2024001',
+                project_id: 'B10112345',
+                project_name: '璞園極上',
+                buyer_name: '王小明',
+                buyer_phone: '0912-345-678',
+                broker_store: '信義房屋 - 大安店',
+                status: 'approved',
+                created_at: '2024-01-10 14:32',
+                preferred_date: '2024-01-15',
+                preferred_time: '14:00',
+                scheduled_date: '2024-01-15',
+                scheduled_time: '14:00',
+                viewing_qr_code: 'QR_R2024001_V001',  // QR Code 用於代銷掃描
+                approved_at: '2024-01-11 09:20'
+            },
+            {
+                id: 'R2024002',
+                project_id: 'B22012346',
+                project_name: '遠雄森河畔',
+                buyer_name: '李大華',
+                buyer_phone: '0923-456-789',
+                broker_store: '信義房屋 - 大安店',
+                status: 'pending',
+                created_at: '2024-01-11 10:20',
+                preferred_date: '2024-01-18',
+                preferred_time: '10:00',
+                scheduled_date: null,
+                scheduled_time: null
+            },
+            {
+                id: 'R2024003',
+                project_id: 'B10112345',
+                project_name: '璞園極上',
+                buyer_name: '陳美玲',
+                buyer_phone: '0934-567-890',
+                broker_store: '信義房屋 - 大安店',
+                status: 'cancelled_after_approved',
+                created_at: '2024-01-08 15:30',
+                preferred_date: '2024-01-12',
+                preferred_time: '15:00',
+                scheduled_date: '2024-01-12',
+                scheduled_time: '15:00',
+                approved_at: '2024-01-09 10:15',
+                cancelled_at: '2024-01-11 14:20',
+                cancel_reason: 'buyer_changed_mind',
+                cancel_note: '買方改變購屋計畫'
+            }
+        ];
+
+        let deals = [
+            {
+                deal_id: 'D2024001',
+                project_name: '璞園極上',
+                buyer_name: '張先生',
+                deal_price: 3580,
+                commission_rate: 2,
+                performance: 71.6,
+                broker_commission: 42.96,
+                deal_date: '2024-01-05',
+                status: 'confirmed'
+            }
+        ];
+
+        let currentPage = 'search';
+        let currentUser = {
+            store: '信義房屋 - 大安店',
+            name: '王業務'
+        };
+
+        // 篩選狀態
+        let currentFilters = {
+            city: '全部',
+            district: '',
+            priceMin: '',
+            priceMax: '',
+            type: '',
+            search: ''
+        };
+
+        // 首次登入標記（用於顯示制度提醒）
+        let firstLogin = true;
+
+        // 登入
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showToast('請輸入帳號密碼');
+                return;
+            }
+
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            navigateTo('search');
+            showToast('登入成功');
+        }
+
+        // 登出
+        function logout() {
+            document.getElementById('app').classList.add('hidden');
+            document.getElementById('login-page').classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // 導航
+        function navigateTo(page) {
+            currentPage = page;
+
+            // 更新底部導航
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`nav-${page}`).classList.add('active');
+
+            // 更新標題
+            const titles = {
+                search: '案源查詢',
+                reports: '報備狀態查詢',
+                commission: '成交佣金查詢'
+            };
+            document.getElementById('page-title').textContent = titles[page];
+
+            // 渲染內容
+            if (page === 'search') renderProjectSearch();
+            else if (page === 'reports') renderReportList();
+            else if (page === 'commission') renderCommissionList();
+        }
+
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('opacity-100');
+            setTimeout(() => toast.classList.remove('opacity-100'), 2500);
+        }
+
+        // ===== [A-01] 案源查詢 =====
+        function renderProjectSearch() {
+            const content = document.getElementById('content');
+
+            // 篩選案源
+            let filteredProjects = projects.filter(p => {
+                if (currentFilters.city !== '全部' && p.city !== currentFilters.city) return false;
+                if (currentFilters.district && p.district !== currentFilters.district) return false;
+                if (currentFilters.type && p.type !== currentFilters.type) return false;
+                if (currentFilters.priceMin && p.price_max < parseInt(currentFilters.priceMin)) return false;
+                if (currentFilters.priceMax && p.price_min > parseInt(currentFilters.priceMax)) return false;
+                if (currentFilters.search && !p.name.includes(currentFilters.search) && !p.district.includes(currentFilters.search)) return false;
+                return true;
+            });
+
+            const cities = ['全部', '台北市', '新北市', '桃園市', '台中市'];
+
+            content.innerHTML = `
+                <div class="fade-in">
+                    ${firstLogin ? renderSystemReminder() : ''}
+
+                    <!-- 搜尋框 -->
+                    <div class="mb-6">
+                        <div class="relative">
+                            <input type="text"
+                                   value="${currentFilters.search}"
+                                   oninput="updateSearch(this.value)"
+                                   placeholder="搜尋案名、地區..."
+                                   class="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- 城市切換標籤 -->
+                    <div class="flex gap-2 overflow-x-auto pb-2 mb-6">
+                        ${cities.map(c => `
+                            <button onclick="setFilterCity('${c}')"
+                                    class="px-5 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${currentFilters.city === c ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'bg-white text-slate-400 border border-slate-100'}">
+                                ${c}
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- 進階篩選 -->
+                    <div class="bg-white rounded-2xl p-4 mb-6 border border-slate-100">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-slate-900 text-sm">進階篩選</h3>
+                            <button onclick="resetFilters()" class="text-xs text-blue-600 font-bold">清除</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <select onchange="setFilterType(this.value)" class="bg-slate-50 border-0 rounded-xl p-3 text-xs font-bold outline-none">
+                                <option value="">類型</option>
+                                <option value="新成屋" ${currentFilters.type === '新成屋' ? 'selected' : ''}>新成屋</option>
+                                <option value="預售屋" ${currentFilters.type === '預售屋' ? 'selected' : ''}>預售屋</option>
+                                <option value="豪宅" ${currentFilters.type === '豪宅' ? 'selected' : ''}>豪宅</option>
+                            </select>
+                            <select onchange="setFilterDistrict(this.value)" class="bg-slate-50 border-0 rounded-xl p-3 text-xs font-bold outline-none">
+                                <option value="">地區</option>
+                                ${[...new Set(filteredProjects.map(p => p.district))].map(d => `
+                                    <option value="${d}" ${currentFilters.district === d ? 'selected' : ''}>${d}</option>
+                                `).join('')}
+                            </select>
+                            <input type="number"
+                                   placeholder="最低總價(萬)"
+                                   value="${currentFilters.priceMin}"
+                                   oninput="setFilterPriceMin(this.value)"
+                                   class="bg-slate-50 border-0 rounded-xl p-3 text-xs font-bold outline-none">
+                            <input type="number"
+                                   placeholder="最高總價(萬)"
+                                   value="${currentFilters.priceMax}"
+                                   oninput="setFilterPriceMax(this.value)"
+                                   class="bg-slate-50 border-0 rounded-xl p-3 text-xs font-bold outline-none">
+                        </div>
+                    </div>
+
+                    <!-- 結果統計 -->
+                    <p class="text-sm text-slate-500 mb-4">共找到 ${filteredProjects.length} 個建案</p>
+
+                    <!-- 建案列表 -->
+                    ${filteredProjects.length > 0 ? `
+                        <div class="space-y-6">
+                            ${filteredProjects.map(p => renderProjectCard(p)).join('')}
+                        </div>
+                    ` : `
+                        <div class="text-center py-12">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <p class="text-slate-400 text-sm">查無符合條件的建案</p>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function renderProjectCard(project) {
+            // 檢查該店是否已報備過此案
+            const alreadyReported = reports.some(r =>
+                r.project_id === project.id &&
+                r.broker_store === currentUser.store &&
+                (r.status === 'pending' || r.status === 'approved')
+            );
+
+            // 合作狀態配置
+            const statusConfig = {
+                'active': { text: '可立即報備', color: 'bg-green-100 text-green-700 border-green-200' },
+                'paused': { text: '暫停報備', color: 'bg-red-100 text-red-700 border-red-200' },
+                'need_confirm': { text: '需代銷確認', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' }
+            };
+
+            const status = statusConfig[project.cooperation_status];
+            const canReport = project.cooperation_status === 'active' && !alreadyReported;
+
+            return `
+                <div onclick="${canReport ? `showProjectDetail('${project.id}')` : ''}"
+                     class="project-card bg-white rounded-[32px] overflow-hidden shadow-sm border border-slate-100 ${canReport ? 'cursor-pointer' : 'opacity-75'}">
+
+                    <!-- 主視覺圖 -->
+                    <div class="h-52 relative">
+                        <img src="${project.img}" class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-blue-600">
+                            ${project.type}
+                        </div>
+                        ${alreadyReported ? `
+                            <div class="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-[10px] font-bold">
+                                已報備
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- 案源資訊 -->
+                    <div class="p-5">
+                        <!-- 案名與地址 -->
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-xl text-slate-900 mb-1">${project.name}</h3>
+                                <p class="text-slate-400 text-xs">${project.city}${project.district} · ${project.builder}</p>
+                            </div>
+                            <div class="text-right ml-3">
+                                <span class="text-2xl font-black text-rose-500">${project.price_min}</span>
+                                <span class="text-[10px] font-bold text-rose-500 block">萬起</span>
+                            </div>
+                        </div>
+
+                        <!-- 關鍵決策資訊 -->
+                        <div class="flex flex-wrap gap-1.5 mb-3">
+                            <!-- 合作狀態 -->
+                            <span class="px-2 py-1 ${status.color} border rounded-md text-xs font-bold">
+                                ${status.text}
+                            </span>
+
+                            <!-- 報備熱度 -->
+                            ${project.recent_reports_count > 0 ? `
+                                <span class="px-2 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-xs font-bold">
+                                    近7天 ${project.recent_reports_count} 組報備
+                                </span>
+                            ` : ''}
+
+                            <!-- 佣金率提示 -->
+                            <span class="px-2 py-1 bg-purple-50 text-purple-700 border border-purple-200 rounded-md text-xs font-bold">
+                                佣金 ${project.commission_rate_hint}
+                            </span>
+                        </div>
+
+                        <!-- 週間接待狀況 -->
+                        <div class="p-3 bg-slate-50 rounded-xl mb-3">
+                            <p class="text-xs text-slate-500 mb-1">接待狀況</p>
+                            <p class="text-sm font-bold text-slate-900">${project.weekly_capacity}</p>
+                        </div>
+
+                        <!-- 底部行動提示 -->
+                        ${alreadyReported ? `
+                            <div class="pt-3 border-t border-slate-100">
+                                <p class="text-xs text-orange-600 font-bold text-center">
+                                    ⚠️ 你已報備過此案，無法重複報備
+                                </p>
+                            </div>
+                        ` : project.cooperation_status === 'paused' ? `
+                            <div class="pt-3 border-t border-slate-100">
+                                <p class="text-xs text-red-600 font-bold text-center">
+                                    ⚠️ 此案暫停報備中
+                                </p>
+                            </div>
+                        ` : `
+                            <div class="pt-3 border-t border-slate-100">
+                                <p class="text-xs text-blue-600 font-bold text-center">
+                                    👉 點擊查看詳情並報備買方
+                                </p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 系統制度提醒條
+        function renderSystemReminder() {
+            return `
+                <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-6 rounded-xl relative">
+                    <button onclick="dismissReminder()" class="absolute top-2 right-2 text-blue-400 hover:text-blue-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                    <div class="flex items-start gap-3 pr-6">
+                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-900 text-sm mb-2">重要制度提醒</h4>
+                            <ul class="space-y-1 text-xs text-slate-700">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold flex-shrink-0">•</span>
+                                    <span><strong>帶看完成需由代銷掃描 QR Code</strong>，否則不計入帶看與業績</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold flex-shrink-0">•</span>
+                                    <span><strong>核可 ≠ 帶看</strong>，需等代銷排定時間並完成現場掃描確認</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold flex-shrink-0">•</span>
+                                    <span>報備需經代銷核可，非即時排定</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function dismissReminder() {
+            firstLogin = false;
+            renderProjectSearch();
+        }
+
+        // 篩選函數
+        function setFilterCity(city) {
+            currentFilters.city = city;
+            currentFilters.district = '';  // 切換城市時清除地區
+            renderProjectSearch();
+        }
+
+        function setFilterType(type) {
+            currentFilters.type = type;
+            renderProjectSearch();
+        }
+
+        function setFilterDistrict(district) {
+            currentFilters.district = district;
+            renderProjectSearch();
+        }
+
+        function setFilterPriceMin(value) {
+            currentFilters.priceMin = value;
+            renderProjectSearch();
+        }
+
+        function setFilterPriceMax(value) {
+            currentFilters.priceMax = value;
+            renderProjectSearch();
+        }
+
+        function updateSearch(value) {
+            currentFilters.search = value;
+            renderProjectSearch();
+        }
+
+        function resetFilters() {
+            currentFilters = {
+                city: '全部',
+                district: '',
+                priceMin: '',
+                priceMax: '',
+                type: '',
+                search: ''
+            };
+            renderProjectSearch();
+        }
+
+        // 建案詳細頁
+        function showProjectDetail(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            const content = document.getElementById('content');
+
+            // 檢查是否已報備
+            const alreadyReported = reports.some(r =>
+                r.project_id === project.id &&
+                r.broker_store === currentUser.store &&
+                (r.status === 'pending' || r.status === 'approved')
+            );
+
+            const canReport = project.cooperation_status === 'active' && !alreadyReported;
+
+            content.innerHTML = `
+                <div class="fade-in pb-6">
+                    <button onclick="navigateTo('search')" class="flex items-center gap-2 text-slate-500 mb-6 font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        返回列表
+                    </button>
+
+                    <!-- 主視覺 -->
+                    <div class="rounded-3xl overflow-hidden mb-6">
+                        <img src="${project.img}" class="w-full h-80 object-cover">
+                    </div>
+
+                    <!-- 基本資訊 -->
+                    <div class="bg-white rounded-3xl p-6 mb-6 border border-slate-100">
+                        <h1 class="text-3xl font-black text-slate-900 mb-2">${project.name}</h1>
+                        <p class="text-blue-600 font-bold mb-2">${project.city}${project.district} · ${project.road}</p>
+                        <p class="text-sm text-slate-500 mb-6">建商：${project.builder}</p>
+
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="p-4 bg-slate-50 rounded-xl">
+                                <p class="text-xs text-slate-500 mb-1">坪數區間</p>
+                                <p class="text-lg font-black text-slate-900">${project.area_min}-${project.area_max} 坪</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-xl">
+                                <p class="text-xs text-slate-500 mb-1">格局</p>
+                                <p class="text-lg font-black text-slate-900">${project.layout}</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-xl">
+                                <p class="text-xs text-slate-500 mb-1">類型</p>
+                                <p class="text-lg font-black text-slate-900">${project.type}</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-xl">
+                                <p class="text-xs text-slate-500 mb-1">佣金率</p>
+                                <p class="text-lg font-black text-purple-600">${project.commission_rate_hint}</p>
+                            </div>
+                        </div>
+
+                        <div class="p-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl text-white mb-4">
+                            <p class="text-sm opacity-80 mb-2">總價區間</p>
+                            <p class="text-4xl font-black">${project.price_min}-${project.price_max} <span class="text-xl">萬</span></p>
+                        </div>
+
+                        <!-- 報備熱度 -->
+                        <div class="p-4 bg-blue-50 rounded-xl">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-blue-600 mb-1">最近報備熱度</p>
+                                    <p class="text-sm font-bold text-blue-900">近 7 天已有 ${project.recent_reports_count} 組報備</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs text-blue-600 mb-1">接待狀況</p>
+                                    <p class="text-sm font-bold text-blue-900">${project.weekly_capacity}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 建案介紹 -->
+                    <div class="bg-white rounded-3xl p-6 mb-6 border border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">建案介紹</h3>
+                        <p class="text-slate-600 leading-loose">
+                            ${project.name} 位於 ${project.district} 核心地段，交通便利，生活機能完善。
+                            本案由 ${project.builder} 規劃，採用高品質建材，公設完善，是您理想的居住選擇。
+                        </p>
+                    </div>
+
+                    <!-- 報備規則提示區塊 -->
+                    <div class="bg-yellow-50 border-l-4 border-yellow-600 p-5 mb-6 rounded-xl">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 bg-yellow-600 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-slate-900 text-sm mb-3">報備流程與規則</h4>
+                                <ul class="space-y-2 text-xs text-slate-700">
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-yellow-600 font-bold flex-shrink-0">1.</span>
+                                        <span><strong>報備需經代銷核可，非即時排定</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-yellow-600 font-bold flex-shrink-0">2.</span>
+                                        <span>實際帶看時間以代銷排定為準（${project.sla_response_time}）</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-yellow-600 font-bold flex-shrink-0">3.</span>
+                                        <span><strong>完成帶看需由代銷掃描 QR Code 才計入帶看與業績</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-yellow-600 font-bold flex-shrink-0">4.</span>
+                                        <span>同一買方 7 日內不可重複報備此案</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 不可報備情境提示 -->
+                    ${!canReport ? `
+                        <div class="bg-red-50 border border-red-200 p-5 mb-6 rounded-xl">
+                            <div class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-red-900 text-sm mb-2">無法報備</h4>
+                                    <p class="text-xs text-red-700">
+                                        ${alreadyReported ? '你已報備過此案，無法重複報備' : project.cooperation_status === 'paused' ? '此案暫停報備中' : '此案需代銷確認後才可報備'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- 報備按鈕 -->
+                    <button onclick="${canReport ? `showReportForm('${project.id}')` : 'return false'}"
+                            class="w-full py-5 rounded-2xl font-bold text-lg shadow-xl transition-all ${canReport ? 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95 cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}">
+                        ${canReport ? '報備買方' : '無法報備'}
+                    </button>
+                </div>
+            `;
+        }
+
+        // ===== [A-02] 報備送出 =====
+        function showReportForm(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            const content = document.getElementById('content');
+
+            content.innerHTML = `
+                <div class="fade-in">
+                    <button onclick="showProjectDetail('${projectId}')" class="flex items-center gap-2 text-slate-500 mb-6 font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        返回
+                    </button>
+
+                    <div class="bg-white rounded-3xl p-6 border border-slate-100">
+                        <h2 class="text-2xl font-black text-slate-900 mb-2">報備買方</h2>
+                        <p class="text-slate-500 mb-1">${project.name}</p>
+                        <p class="text-xs text-slate-400 mb-6">實際帶看時間以代銷核可為準（${project.sla_response_time}）</p>
+
+                        <form onsubmit="submitReport(event, '${projectId}')" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-600 mb-2">買方姓名 *</label>
+                                <input type="text"
+                                       id="buyer-name"
+                                       required
+                                       class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="請輸入姓名">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-600 mb-2">買方電話 *</label>
+                                <input type="tel"
+                                       id="buyer-phone"
+                                       required
+                                       pattern="09[0-9]{2}-[0-9]{3}-[0-9]{3}"
+                                       oninput="checkDuplicateReport('${projectId}')"
+                                       class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="09XX-XXX-XXX">
+                                <div id="duplicate-warning" class="hidden mt-2 p-3 bg-orange-50 border border-orange-200 rounded-xl">
+                                    <p class="text-xs text-orange-700 font-bold">⚠️ 此買方已報備此建案，請勿重複送出</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-600 mb-2">希望帶看日期 *</label>
+                                <input type="date"
+                                       id="preferred-date"
+                                       required
+                                       class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500">
+                                <p class="text-xs text-slate-400 mt-2">※ 需選擇今日或之後的日期</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-600 mb-2">希望帶看時間 *</label>
+                                <input type="time"
+                                       id="preferred-time"
+                                       required
+                                       class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <!-- 送出前提示 -->
+                            <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-xl mt-6">
+                                <div class="flex items-start gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <div class="flex-1">
+                                        <p class="text-xs font-bold text-slate-900 mb-1">送出前請確認</p>
+                                        <ul class="text-xs text-slate-700 space-y-1">
+                                            <li>• 送出後需經代銷核可，非保證帶看</li>
+                                            <li>• 請確認買方資料正確，避免糾紛</li>
+                                            <li>• 同一買方 7 日內不可重複報備</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit"
+                                    id="submit-button"
+                                    class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl hover:bg-blue-700 active:scale-95 transition-all mt-6">
+                                確認送出報備
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            // 設定最小日期為今天
+            document.getElementById('preferred-date').min = new Date().toISOString().split('T')[0];
+        }
+
+        // 即時檢查重複報備
+        function checkDuplicateReport(projectId) {
+            const buyerPhone = document.getElementById('buyer-phone').value;
+            const warningEl = document.getElementById('duplicate-warning');
+            const submitBtn = document.getElementById('submit-button');
+
+            if (!buyerPhone || buyerPhone.length < 12) {
+                warningEl.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                return;
+            }
+
+            const duplicate = reports.find(r =>
+                r.project_id === projectId &&
+                r.buyer_phone === buyerPhone &&
+                (r.status === 'pending' || r.status === 'approved')
+            );
+
+            if (duplicate) {
+                warningEl.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                warningEl.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function submitReport(event, projectId) {
+            event.preventDefault();
+
+            const buyerName = document.getElementById('buyer-name').value;
+            const buyerPhone = document.getElementById('buyer-phone').value;
+            const preferredDate = document.getElementById('preferred-date').value;
+            const preferredTime = document.getElementById('preferred-time').value;
+
+            // 檢查重複報備
+            const duplicate = reports.find(r =>
+                r.project_id === projectId &&
+                r.buyer_phone === buyerPhone &&
+                (r.status === 'pending' || r.status === 'approved')
+            );
+
+            if (duplicate) {
+                showToast('此買方已報備此建案，請勿重複送出');
+                return;
+            }
+
+            // 新增報備
+            const newReport = {
+                id: 'R2024' + String(reports.length + 1).padStart(3, '0'),
+                project_id: projectId,
+                project_name: projects.find(p => p.id === projectId).name,
+                buyer_name: buyerName,
+                buyer_phone: buyerPhone,
+                status: 'pending',
+                created_at: new Date().toISOString().slice(0, 16).replace('T', ' '),
+                preferred_date: preferredDate,
+                preferred_time: preferredTime,
+                scheduled_date: null,
+                scheduled_time: null
+            };
+
+            reports.push(newReport);
+            showToast('✅ 報備送出成功！等待代銷核可');
+
+            setTimeout(() => {
+                navigateTo('reports');
+            }, 1500);
+        }
+
+        // ===== [A-03] 報備狀態查詢 =====
+        function renderReportList() {
+            const content = document.getElementById('content');
+
+            const statusGroups = {
+                pending: reports.filter(r => r.status === 'pending'),
+                approved: reports.filter(r => r.status === 'approved'),
+                completed: reports.filter(r => r.status === 'completed'),
+                cancelled: reports.filter(r => r.status === 'cancelled_after_approved'),
+                rejected: reports.filter(r => r.status === 'rejected')
+            };
+
+            content.innerHTML = `
+                <div class="fade-in">
+                    <!-- 頁籤 -->
+                    <div class="flex gap-2 overflow-x-auto mb-6 pb-2">
+                        <button onclick="filterReports('all')" class="px-4 py-2 bg-blue-600 text-white rounded-full text-xs font-bold whitespace-nowrap">全部 (${reports.length})</button>
+                        <button onclick="filterReports('pending')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-full text-xs font-bold whitespace-nowrap">待核可 (${statusGroups.pending.length})</button>
+                        <button onclick="filterReports('approved')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-full text-xs font-bold whitespace-nowrap">已核可 (${statusGroups.approved.length})</button>
+                        <button onclick="filterReports('completed')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-full text-xs font-bold whitespace-nowrap">已帶看 (${statusGroups.completed.length})</button>
+                        <button onclick="filterReports('cancelled')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-full text-xs font-bold whitespace-nowrap">已取消 (${statusGroups.cancelled.length})</button>
+                    </div>
+
+                    <!-- 報備列表 -->
+                    <div class="space-y-4">
+                        ${reports.length === 0 ? `
+                            <div class="text-center py-20">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <p class="text-slate-400 font-bold">尚無報備記錄</p>
+                            </div>
+                        ` : reports.map(r => renderReportCard(r)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderReportCard(report) {
+            const nextStep = getNextStep(report);
+
+            return `
+                <div class="bg-white rounded-2xl p-5 border border-slate-100">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1">
+                            <h3 class="font-bold text-slate-900">${maskName(report.buyer_name)} ${maskPhone(report.buyer_phone)}</h3>
+                            <p class="text-sm text-slate-500 mt-1">${report.project_name}</p>
+                        </div>
+                        <span class="px-3 py-1 ${getStatusColor(report.status)} rounded-full text-xs font-bold">${getStatusText(report.status)}</span>
+                    </div>
+
+                    ${report.status === 'approved' ? `
+                        <!-- 已核可：顯示帶看時間 + QR Code -->
+                        <div class="p-4 bg-blue-50 rounded-xl mb-3">
+                            <p class="text-xs text-blue-600 font-bold mb-2">已排定帶看時間</p>
+                            <p class="text-sm text-blue-900 font-black mb-3">${report.scheduled_date} ${report.scheduled_time}</p>
+
+                            <!-- QR Code 區域 -->
+                            <div class="bg-white p-3 rounded-lg border border-blue-200 mb-3">
+                                <p class="text-xs text-slate-600 font-bold mb-2 text-center">帶看 QR Code（現場出示給代銷掃描）</p>
+                                <div id="qr-${report.id}" class="flex justify-center"></div>
+                                <p class="text-xs text-slate-400 text-center mt-2">QR Code: ${report.viewing_qr_code}</p>
+                            </div>
+
+                            <button onclick="event.stopPropagation(); showCancelReportModal('${report.id}')"
+                                    class="w-full py-2 bg-red-50 text-red-600 rounded-lg text-sm font-bold hover:bg-red-100 transition-all">
+                                取消此報備
+                            </button>
+                        </div>
+                    ` : report.status === 'cancelled_after_approved' ? `
+                        <!-- 已取消：顯示取消資訊 -->
+                        <div class="p-4 bg-slate-50 rounded-xl mb-3">
+                            <p class="text-xs text-slate-500 mb-2">取消時間：${report.cancelled_at}</p>
+                            <p class="text-xs text-slate-600"><span class="font-bold">取消原因：</span>${getCancelReasonText(report.cancel_reason)}</p>
+                            ${report.cancel_note ? `<p class="text-xs text-slate-600 mt-1"><span class="font-bold">說明：</span>${report.cancel_note}</p>` : ''}
+                        </div>
+                    ` : ''}
+
+                    <!-- 下一步提示 + 查看詳情 -->
+                    <div class="flex justify-between items-center pt-3 border-t border-slate-100">
+                        <p class="text-xs text-slate-500">${nextStep}</p>
+                        <button onclick="showReportDetail('${report.id}')" class="text-xs text-blue-600 font-bold">查看詳情 →</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 在報備卡片渲染後，生成 QR Code
+        function renderReportList() {
+            const content = document.getElementById('content');
+
+            const statusGroups = {
+                pending: reports.filter(r => r.status === 'pending'),
+                approved: reports.filter(r => r.status === 'approved'),
+                completed: reports.filter(r => r.status === 'completed'),
+                cancelled: reports.filter(r => r.status === 'cancelled_after_approved'),
+                rejected: reports.filter(r => r.status === 'rejected')
+            };
+
+            content.innerHTML = `
+                <div class="fade-in">
+                    <!-- 頁籤 -->
+                    <div class="flex gap-2 overflow-x-auto mb-6 pb-2">
+                        <button onclick="filterReports('all')" class="px-4 py-2 bg-blue-600 text-white rounded-full text-xs font-bold whitespace-nowrap">全部 (${reports.length})</button>
+                        <button onclick="filterReports('pending')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-full text-xs font-bold whitespace-nowrap">待核可 (${statusGroups.pending.length})</button>
+                        <button onclick="filterReports('approved')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-full text-xs font-bold whitespace-nowrap">已核可 (${statusGroups.approved.length})</button>
+                        <button onclick="filterReports('completed')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-full text-xs font-bold whitespace-nowrap">已帶看 (${statusGroups.completed.length})</button>
+                        <button onclick="filterReports('cancelled')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-full text-xs font-bold whitespace-nowrap">已取消 (${statusGroups.cancelled.length})</button>
+                    </div>
+
+                    <!-- 報備列表 -->
+                    <div class="space-y-4">
+                        ${reports.length === 0 ? `
+                            <div class="text-center py-20">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <p class="text-slate-400 font-bold">尚無報備記錄</p>
+                            </div>
+                        ` : reports.map(r => renderReportCard(r)).join('')}
+                    </div>
+                </div>
+            `;
+
+            // 渲染完成後，為所有已核可的報備生成 QR Code
+            setTimeout(() => {
+                reports.filter(r => r.status === 'approved').forEach(r => {
+                    const qrContainer = document.getElementById(`qr-${r.id}`);
+                    if (qrContainer && !qrContainer.hasChildNodes()) {
+                        new QRCode(qrContainer, {
+                            text: r.viewing_qr_code,
+                            width: 120,
+                            height: 120
+                        });
+                    }
+                });
+            }, 100);
+        }
+
+        // 獲取下一步提示
+        function getNextStep(report) {
+            if (report.status === 'pending') {
+                return '▶ 下一步：等待代銷核可';
+            } else if (report.status === 'approved') {
+                return '▶ 下一步：準時帶看並出示 QR Code';
+            } else if (report.status === 'completed') {
+                return '已完成帶看流程';
+            } else if (report.status === 'cancelled_after_approved') {
+                return '已取消，流程結束';
+            } else if (report.status === 'rejected') {
+                return '已被代銷拒絕';
+            }
+            return '點擊查看詳情';
+        }
+
+        // 取消原因文字對應
+        function getCancelReasonText(reason) {
+            const reasonMap = {
+                'buyer_changed_mind': '買方改變心意',
+                'buyer_unreachable': '買方無法聯絡',
+                'schedule_conflict': '時間衝突',
+                'bought_elsewhere': '買方已購買其他物件',
+                'conditions_not_met': '條件不符',
+                'other': '其他原因'
+            };
+            return reasonMap[reason] || reason;
+        }
+
+        // 顯示取消報備彈窗
+        function showCancelReportModal(reportId) {
+            const report = reports.find(r => r.id === reportId);
+
+            const overlay = document.createElement('div');
+            overlay.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center px-4';
+            overlay.innerHTML = `
+                <div class="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
+                    <h3 class="text-xl font-black text-slate-900 mb-2">取消報備</h3>
+                    <p class="text-sm text-slate-500 mb-6">${report.project_name} - ${maskName(report.buyer_name)}</p>
+
+                    <div class="bg-red-50 border border-red-200 p-4 rounded-xl mb-6">
+                        <p class="text-xs text-red-700 font-bold">⚠️ 注意事項</p>
+                        <ul class="text-xs text-red-600 mt-2 space-y-1">
+                            <li>• 取消後無法復原</li>
+                            <li>• 需選擇取消原因（代銷會看到）</li>
+                            <li>• 不計入帶看紀錄</li>
+                        </ul>
+                    </div>
+
+                    <form onsubmit="submitCancelReport(event, '${reportId}')" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 mb-2">取消原因 *</label>
+                            <select id="cancel-reason" required class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold outline-none">
+                                <option value="">請選擇原因</option>
+                                <option value="buyer_changed_mind">買方改變心意</option>
+                                <option value="buyer_unreachable">買方無法聯絡</option>
+                                <option value="schedule_conflict">時間衝突</option>
+                                <option value="bought_elsewhere">買方已購買其他物件</option>
+                                <option value="conditions_not_met">條件不符</option>
+                                <option value="other">其他原因</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 mb-2">補充說明（選填）</label>
+                            <textarea id="cancel-note"
+                                      rows="3"
+                                      class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm outline-none resize-none"
+                                      placeholder="可補充說明具體情況..."></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" onclick="this.closest('.fixed').remove()" class="py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">返回</button>
+                            <button type="submit" class="py-3 bg-red-600 text-white rounded-xl font-bold">確認取消</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        // 提交取消報備
+        function submitCancelReport(event, reportId) {
+            event.preventDefault();
+
+            const reason = document.getElementById('cancel-reason').value;
+            const note = document.getElementById('cancel-note').value;
+
+            const report = reports.find(r => r.id === reportId);
+            if (report) {
+                report.status = 'cancelled_after_approved';
+                report.cancelled_at = new Date().toISOString().slice(0, 16).replace('T', ' ');
+                report.cancel_reason = reason;
+                report.cancel_note = note;
+            }
+
+            document.querySelector('.fixed').remove();
+            showToast('✅ 已取消報備');
+            renderReportList();
+        }
+
+        function showReportDetail(reportId) {
+            const report = reports.find(r => r.id === reportId);
+            const content = document.getElementById('content');
+
+            content.innerHTML = `
+                <div class="fade-in">
+                    <button onclick="navigateTo('reports')" class="flex items-center gap-2 text-slate-500 mb-6 font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        返回列表
+                    </button>
+
+                    <div class="bg-white rounded-3xl p-6 border border-slate-100 mb-6">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <h2 class="text-2xl font-black text-slate-900 mb-1">${report.buyer_name}</h2>
+                                <p class="text-slate-500">${report.buyer_phone}</p>
+                            </div>
+                            <span class="px-4 py-2 ${getStatusColor(report.status)} rounded-full text-sm font-bold">${getStatusText(report.status)}</span>
+                        </div>
+
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between py-3 border-b border-slate-100">
+                                <span class="text-slate-500">建案</span>
+                                <span class="font-bold text-slate-900">${report.project_name}</span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-slate-100">
+                                <span class="text-slate-500">報備時間</span>
+                                <span class="font-bold text-slate-900">${report.created_at}</span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-slate-100">
+                                <span class="text-slate-500">希望日期</span>
+                                <span class="font-bold text-slate-900">${report.preferred_date} ${report.preferred_time}</span>
+                            </div>
+                            ${report.scheduled_date ? `
+                                <div class="flex justify-between py-3">
+                                    <span class="text-slate-500">實際帶看</span>
+                                    <span class="font-bold text-blue-600">${report.scheduled_date} ${report.scheduled_time}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        ${report.status === 'pending' ? `
+                            <div class="p-4 bg-yellow-50 rounded-xl">
+                                <p class="text-sm text-yellow-800 font-bold">⏳ 等待代銷核可中...</p>
+                            </div>
+                        ` : report.status === 'approved' ? `
+                            <div class="p-4 bg-blue-50 rounded-xl">
+                                <p class="text-sm text-blue-800 font-bold">✅ 已核可，請準時帶看</p>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- 時間軸 -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-100">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">進度時間軸</h3>
+                        <div class="space-y-4">
+                            <div class="flex gap-4">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-3 h-3 rounded-full bg-blue-600"></div>
+                                    <div class="w-0.5 h-full bg-slate-200 mt-2"></div>
+                                </div>
+                                <div class="pb-6">
+                                    <p class="font-bold text-slate-900">【仲介】報備送出</p>
+                                    <p class="text-xs text-slate-400 mt-1">${report.created_at}</p>
+                                </div>
+                            </div>
+                            ${report.status !== 'pending' ? `
+                                <div class="flex gap-4">
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-3 h-3 rounded-full bg-green-600"></div>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-slate-900">【代銷】已核可</p>
+                                        <p class="text-xs text-slate-400 mt-1">${report.created_at}</p>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function filterReports(status) {
+            // 簡易實作，實際應重新渲染列表
+            showToast('篩選功能：' + status);
+        }
+
+        // ===== [A-04] 成交佣金查詢 =====
+        function renderCommissionList() {
+            const content = document.getElementById('content');
+
+            const totalCommission = deals.reduce((sum, d) => sum + d.broker_commission, 0);
+
+            content.innerHTML = `
+                <div class="fade-in">
+                    <!-- 總覽卡片 -->
+                    <div class="bg-gradient-to-br from-green-500 to-teal-500 rounded-3xl p-6 text-white mb-6">
+                        <p class="text-sm opacity-80 mb-2">本月佣金收入</p>
+                        <p class="text-5xl font-black mb-2">${totalCommission.toFixed(2)} <span class="text-2xl">萬</span></p>
+                        <p class="text-xs opacity-60">${deals.length} 筆成交</p>
+                    </div>
+
+                    <!-- 成交列表 -->
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">成交明細</h3>
+                    <div class="space-y-4">
+                        ${deals.length === 0 ? `
+                            <div class="text-center py-20">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <p class="text-slate-400 font-bold">尚無成交記錄</p>
+                            </div>
+                        ` : deals.map(d => `
+                            <div onclick="showDealDetail('${d.deal_id}')" class="bg-white rounded-2xl p-6 border border-slate-100 cursor-pointer hover:shadow-lg transition-all">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-slate-900 mb-1">${d.project_name}</h3>
+                                        <p class="text-sm text-slate-500">${maskName(d.buyer_name)}</p>
+                                    </div>
+                                    <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">已成交</span>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div class="p-3 bg-slate-50 rounded-xl">
+                                        <p class="text-xs text-slate-500 mb-1">成交價</p>
+                                        <p class="text-lg font-black text-slate-900">${d.deal_price} 萬</p>
+                                    </div>
+                                    <div class="p-3 bg-slate-50 rounded-xl">
+                                        <p class="text-xs text-slate-500 mb-1">佣金率</p>
+                                        <p class="text-lg font-black text-slate-900">${d.commission_rate}%</p>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 bg-green-50 rounded-xl">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-green-800 font-bold">仲介佣金</span>
+                                        <span class="text-2xl font-black text-green-600">${d.broker_commission} 萬</span>
+                                    </div>
+                                </div>
+
+                                <p class="text-xs text-slate-400 mt-4">成交日期：${d.deal_date}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showDealDetail(dealId) {
+            const deal = deals.find(d => d.deal_id === dealId);
+            const content = document.getElementById('content');
+
+            content.innerHTML = `
+                <div class="fade-in">
+                    <button onclick="navigateTo('commission')" class="flex items-center gap-2 text-slate-500 mb-6 font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        返回列表
+                    </button>
+
+                    <div class="bg-white rounded-3xl p-6 border border-slate-100">
+                        <h2 class="text-2xl font-black text-slate-900 mb-6">成交明細</h2>
+
+                        <div class="space-y-4 mb-6">
+                            <div class="flex justify-between py-3 border-b border-slate-100">
+                                <span class="text-slate-500">建案</span>
+                                <span class="font-bold text-slate-900">${deal.project_name}</span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-slate-100">
+                                <span class="text-slate-500">買方</span>
+                                <span class="font-bold text-slate-900">${deal.buyer_name}</span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-slate-100">
+                                <span class="text-slate-500">成交價</span>
+                                <span class="font-bold text-slate-900">${deal.deal_price} 萬</span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-slate-100">
+                                <span class="text-slate-500">佣金率</span>
+                                <span class="font-bold text-slate-900">${deal.commission_rate}%</span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-slate-100">
+                                <span class="text-slate-500">業績總額</span>
+                                <span class="font-bold text-blue-600">${deal.performance} 萬</span>
+                            </div>
+                        </div>
+
+                        <div class="p-6 bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl text-white mb-6">
+                            <p class="text-sm opacity-80 mb-2">仲介佣金（60%）</p>
+                            <p class="text-5xl font-black">${deal.broker_commission} <span class="text-2xl">萬</span></p>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-xl">
+                            <p class="text-xs text-slate-500 mb-2">佣金分配</p>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-600">業績總額</span>
+                                    <span class="font-bold">${deal.performance} 萬</span>
+                                </div>
+                                <div class="flex justify-between text-green-600">
+                                    <span>仲介端（60%）</span>
+                                    <span class="font-bold">${deal.broker_commission} 萬</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-400 mt-6">成交日期：${deal.deal_date}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 工具函數
+        function maskName(name) {
+            if (name.length <= 1) return name;
+            return name[0] + '○'.repeat(name.length - 1);
+        }
+
+        function maskPhone(phone) {
+            return phone.replace(/(\d{4})-(\d{3})-(\d{3})/, '****-***-$3');
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': '已報備・待核可',
+                'approved': '已核可',
+                'completed': '已帶看',
+                'rejected': '已拒絕',
+                'cancelled': '已取消',
+                'cancelled_after_approved': '已核可後取消'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getStatusColor(status) {
+            const colorMap = {
+                'pending': 'bg-yellow-100 text-yellow-700',
+                'approved': 'bg-blue-100 text-blue-700',
+                'completed': 'bg-green-100 text-green-700',
+                'cancelled_after_approved': 'bg-slate-100 text-slate-600',
+                'rejected': 'bg-red-100 text-red-700',
+                'cancelled': 'bg-slate-100 text-slate-600'
+            };
+            return colorMap[status] || 'bg-slate-100 text-slate-600';
+        }
+    </script>
+</body>
+</html>

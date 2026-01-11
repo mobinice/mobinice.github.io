@@ -1,4 +1,25 @@
 <!doctype html>
+<!--
+  Copaws 寵物日記 - 毛孩管理重構版
+
+  資料結構：
+  - ownerProfile: { ownerName, birthday, email, phone, gender, avatar }
+  - pets: [{ petId, name, type, gender, breed, birthdayOrAge, color, weight, avatar, notes: [{ noteId, title, content, tag, pinned, createdAt, updatedAt }] }]
+  - photos: [{ photoId, date, image, note, time, petIds: [] }] // petIds 為關聯的寵物 ID 陣列
+  - selectedPetFilter: [] // 日曆篩選的寵物 ID（空陣列表示顯示全部）
+
+  localStorage Key: 'copawsAppData'
+  版本號: 'v2' (用於資料遷移判斷)
+
+  主要 Render 函式：
+  - renderOwnerProfile(): 渲染飼主資料區
+  - renderPetsList(): 渲染寵物清單
+  - renderPetNotes(petId): 渲染特定寵物的注意事項
+  - renderPetSelector(): 渲染上傳頁面的寵物選擇器
+  - renderPetFilter(): 渲染日曆頁面的寵物篩選器
+  - openPetEditModal(petId): 開啟寵物編輯 Modal
+  - openNotesModal(petId): 開啟注意事項 Modal
+-->
 <html lang="zh-TW" class="h-full">
  <head>
   <meta charset="UTF-8">
@@ -22,19 +43,19 @@
       color: #0c5832;
       border-bottom: 3px solid #0c5832;
     }
-    
+
     .paw-button {
       transition: all 0.3s ease;
       position: relative;
     }
-    
+
     .paw-button:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(12, 88, 50, 0.3);
     }
-    
+
     .paw-button:active { transform: scale(0.95); }
-    
+
     /* 日曆樣式：移除邊框格線 */
     .calendar-grid-no-border {
       display: grid;
@@ -47,18 +68,18 @@
       position: relative;
       background: transparent;
       border: none;
-      height: 70px; /* 稍微撐高方便顯示堆疊 */
+      height: 70px;
     }
-    
+
     .calendar-day:hover { transform: scale(1.08); }
-    
+
     /* 照片堆疊效果 */
     .photo-stack {
       position: relative;
       width: 100%;
       height: 100%;
     }
-    
+
     .photo-stack-item {
       position: absolute;
       width: 100%;
@@ -69,35 +90,35 @@
       transition: transform 0.2s ease;
       background: #eee;
     }
-    
+
     .photo-stack-item img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    
+
     /* 堆疊參數 */
     .photo-stack-item:nth-child(1) { transform: translate(0, 0) rotate(0deg); z-index: 3; }
     .photo-stack-item:nth-child(2) { transform: translate(3px, 3px) rotate(4deg); z-index: 2; }
     .photo-stack-item:nth-child(3) { transform: translate(6px, 6px) rotate(-4deg); z-index: 1; }
-    
+
     .calendar-day:hover .photo-stack-item:nth-child(1) { transform: translate(-2px, -2px) rotate(-3deg); }
-    
+
     /* 日期數字顏色：統一為綠色 */
     .day-number {
-      position: absolute; 
-      bottom: 4px; 
-      right: 4px; 
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
       font-size: 11px;
-      background: rgba(255,255,255,0.9); 
+      background: rgba(255,255,255,0.9);
       padding: 1px 5px;
-      border-radius: 4px; 
-      z-index: 10; 
-      font-weight: 800; 
+      border-radius: 4px;
+      z-index: 10;
+      font-weight: 800;
       color: #0c5832;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    
+
     .no-photo-day {
       color: #0c5832;
       font-weight: 800;
@@ -107,56 +128,193 @@
     /* 動畫 */
     .fade-in { animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    
+
     .page-transition-out { animation: fadeOutScale 0.4s ease forwards; }
     .page-transition-in { animation: fadeInScale 0.5s ease forwards; }
     @keyframes fadeOutScale { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
     @keyframes fadeInScale { from { opacity: 0; transform: scale(1.05); } to { opacity: 1; transform: scale(1); } }
-    
+
     .scrollable { overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .scrollable::-webkit-scrollbar { width: 4px; }
     .scrollable::-webkit-scrollbar-thumb { background: #e5ad3f; border-radius: 4px; }
-    
+
     .detail-page { position: absolute; inset: 0; z-index: 50; }
-    
+
     .paw-icon {
       display: inline-block; animation: pawBounce 2s ease-in-out infinite;
       filter: sepia(100%) saturate(300%) hue-rotate(10deg) brightness(1.1);
     }
     @keyframes pawBounce { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-5px) rotate(-5deg); } }
-    
-    .login-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 24px; box-shadow: 0 20px 60px rgba(12, 88, 50, 0.2); }
+
+    .login-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 24px; box-shadow: 0 20px 60px rgba(12, 88, 50, 0.2); max-height: 90vh; overflow-y: auto; }
+    .login-card::-webkit-scrollbar { width: 6px; }
+    .login-card::-webkit-scrollbar-track { background: rgba(200, 230, 212, 0.3); border-radius: 10px; }
+    .login-card::-webkit-scrollbar-thumb { background: #0c5832; border-radius: 10px; }
+    .login-card::-webkit-scrollbar-thumb:hover { background: #0a4528; }
     .input-field { transition: all 0.3s ease; border-color: #c8e6d4; }
     .input-field:focus { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(12, 88, 50, 0.15); border-color: #0c5832; }
-    
+
     .toast {
       position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
       background: #0c5832; color: white; padding: 12px 24px; border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; animation: slideDown 0.3s ease;
     }
     @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
-    
+
     .demo-badge {
       display: inline-block; background: linear-gradient(135deg, #e5ad3f 0%, #d99e2f 100%);
       color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-left: 8px;
+    }
+
+    /* Modal 樣式 */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-content::-webkit-scrollbar { width: 6px; }
+    .modal-content::-webkit-scrollbar-thumb { background: #0c5832; border-radius: 10px; }
+
+    /* 寵物卡片樣式 */
+    .pet-card {
+      background: white;
+      border: 2px solid #c8e6d4;
+      border-radius: 12px;
+      padding: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .pet-card:hover {
+      border-color: #0c5832;
+      box-shadow: 0 4px 12px rgba(12, 88, 50, 0.15);
+    }
+
+    /* 注意事項卡片 */
+    .note-card {
+      background: #f8fdf9;
+      border: 1px solid #e0f2e6;
+      border-radius: 8px;
+      padding: 0.75rem;
+      transition: all 0.2s ease;
+    }
+
+    .note-card:hover {
+      border-color: #c8e6d4;
+      box-shadow: 0 2px 8px rgba(12, 88, 50, 0.1);
+    }
+
+    .note-card.pinned {
+      background: #fff8e1;
+      border-color: #ffd54f;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    .badge-pinned {
+      background: #ffd54f;
+      color: #8b6914;
+    }
+
+    .badge-tag {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    /* 寵物選擇 Tag 樣式 */
+    .pet-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid #c8e6d4;
+      background: white;
+      color: #0c5832;
+    }
+
+    .pet-tag:hover {
+      border-color: #0c5832;
+      background: #e7f5ee;
+    }
+
+    .pet-tag.selected {
+      background: #0c5832;
+      color: white;
+      border-color: #0c5832;
+    }
+
+    .pet-tag.filter-tag {
+      font-size: 11px;
+      padding: 3px 8px;
+    }
+
+    .pet-tag.filter-tag.active {
+      background: #0c5832;
+      color: white;
+    }
+
+    .pet-tag-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid #c8e6d4;
+    }
+
+    .pet-tag.selected .pet-tag-avatar {
+      border-color: white;
+    }
+
+    .pet-tag.filter-tag.active .pet-tag-avatar {
+      border-color: white;
     }
   </style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
  <body class="bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100">
   <div class="w-full h-full bg-white flex flex-col relative">
-   
+
    <!-- Login Screen -->
    <div id="login-screen" class="absolute inset-0 z-[60] flex flex-col items-center justify-center p-8 overflow-hidden" style="background: linear-gradient(to bottom right, #e7f5ee, #d4ebe1, #c8e6d4);">
     <div class="absolute top-10 left-10 text-6xl opacity-30 paw-icon">🐾</div>
     <div class="absolute bottom-20 right-10 text-6xl opacity-30 paw-icon" style="animation-delay: 0.5s;">🐾</div>
     <div class="login-card w-full max-w-sm p-8 relative z-10">
-     <div class="text-center mb-8">
+     <div id="login-header" class="text-center mb-8">
       <div class="text-6xl mb-4 paw-icon">🐾</div>
       <h1 class="text-4xl font-extrabold mb-2" style="color: #0c5832;">Copaws</h1>
       <p class="text-gray-600 text-sm">記錄寶貝的每一刻 ❤️</p>
      </div>
-     
+
+     <div id="registration-header" class="text-center mb-3 hidden">
+      <h1 class="text-xl font-extrabold" style="color: #0c5832;">建立帳號</h1>
+     </div>
+
      <div id="auth-step-1" class="space-y-4">
       <div><label class="block text-sm font-semibold text-gray-700 mb-2">Email 或手機號碼</label> <input type="text" id="auth-input" class="input-field w-full px-4 py-3 border-2 rounded-xl focus:outline-none" placeholder="輸入 Email 或手機號碼"></div>
       <button id="auth-continue-btn" class="paw-button w-full text-white font-bold py-3 rounded-xl" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 繼續 </button>
@@ -166,21 +324,17 @@
       </button>
      </div>
 
-     <div id="registration-form" class="hidden space-y-4">
-      <div class="text-center mb-4"><h2 class="text-2xl font-bold" style="color: #0c5832;">建立帳號</h2></div>
-      <div class="grid grid-cols-2 gap-3">
-        <div><label class="block text-xs font-semibold text-gray-700 mb-1">寵物類別</label> <select id="pet-type" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm"><option value="dog">🐶 狗狗</option><option value="cat">🐱 貓咪</option></select></div>
-        <div><label class="block text-xs font-semibold text-gray-700 mb-1">性別</label> <select id="pet-gender" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm"><option value="male">公</option><option value="female">母</option></select></div>
-      </div>
-      <div><label class="block text-xs font-semibold text-gray-700 mb-1">寵物名字</label> <input type="text" id="pet-name" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm" placeholder="Lucky"></div>
-      <div><label class="block text-xs font-semibold text-gray-700 mb-1">品種</label> <input type="text" id="pet-breed" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm" placeholder="例如：柴犬"></div>
-      <div class="grid grid-cols-3 gap-3">
-        <div><label class="block text-xs font-semibold text-gray-700 mb-1">年齡</label> <input type="number" id="pet-age" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm" placeholder="歲"></div>
-        <div><label class="block text-xs font-semibold text-gray-700 mb-1">毛色</label> <input type="text" id="pet-color" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm" placeholder="黃色"></div>
-        <div><label class="block text-xs font-semibold text-gray-700 mb-1">體重</label> <input type="number" id="pet-weight" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm" placeholder="kg"></div>
-      </div>
-      <button id="register-submit-btn" class="paw-button w-full text-white font-bold py-3 rounded-xl mt-4" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 開始記錄 🐾 </button>
-      <button id="back-to-login-btn" class="w-full text-gray-600 text-sm"> ← 返回 </button>
+     <div id="registration-form" class="hidden space-y-2">
+      <div><label class="block text-xs font-semibold text-gray-700 mb-0.5">暱稱 <span class="text-red-500">*</span></label> <input type="text" id="owner-nickname" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm" placeholder="請輸入暱稱" required></div>
+      <div><label class="block text-xs font-semibold text-gray-700 mb-0.5">生日 <span class="text-red-500">*</span></label> <input type="date" id="owner-birthday" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm" required></div>
+      <div><label class="block text-xs font-semibold text-gray-700 mb-0.5">通訊 EMAIL</label> <input type="email" id="owner-email" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm" placeholder="example@email.com"></div>
+      <div><label class="block text-xs font-semibold text-gray-700 mb-0.5">通訊電話</label> <input type="tel" id="owner-phone" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm" placeholder="0912345678"></div>
+      <div><label class="block text-xs font-semibold text-gray-700 mb-0.5">性別</label> <select id="owner-gender" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm"><option value="">請選擇</option><option value="male">男</option><option value="female">女</option><option value="other">其他</option></select></div>
+      <div><label class="block text-xs font-semibold text-gray-700 mb-0.5">興趣</label> <input type="text" id="owner-interests" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm" placeholder="例如：攝影、散步、寵物訓練"></div>
+      <div><label class="block text-xs font-semibold text-gray-700 mb-0.5">喜歡的寵物類別</label> <select id="owner-pet-type" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm"><option value="">請選擇</option><option value="dog">🐶 狗狗</option><option value="cat">🐱 貓咪</option><option value="both">都喜歡</option></select></div>
+      <div><label class="block text-xs font-semibold text-gray-700 mb-0.5">喜歡的寵物品種</label> <input type="text" id="owner-pet-breed" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm" placeholder="例如：柴犬、英短"></div>
+      <button id="register-submit-btn" class="paw-button w-full text-white font-bold py-2.5 rounded-xl mt-3" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 開始記錄 🐾 </button>
+      <button id="back-to-login-btn" class="w-full text-gray-600 text-sm mt-1"> ← 返回 </button>
      </div>
     </div>
    </div>
@@ -193,7 +347,7 @@
 
     <main class="flex-1 overflow-hidden relative">
       <div class="absolute inset-0 flex flex-col">
-        
+
         <!-- Upload Tab -->
         <section id="upload-tab" class="flex-1 h-full p-4 overflow-auto" style="background: linear-gradient(to bottom, #e7f5ee, #ffffff);">
          <div class="text-center mb-3">
@@ -202,14 +356,22 @@
          </div>
          <label for="file-input" id="upload-btn" class="paw-button text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer mb-3" style="background: linear-gradient(to right, #e5ad3f, #d99e2f);"> <span class="text-2xl">📷</span> <span>選擇照片</span> </label>
          <input type="file" id="file-input" accept="image/*" class="hidden">
-         
+
          <div id="upload-form-container" class="hidden space-y-3 pb-8">
           <div id="image-preview-wrapper" class="relative rounded-xl overflow-hidden shadow-lg"><img id="image-preview" class="w-full object-contain max-h-48"> <button id="remove-image-btn" class="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center">✕</button></div>
+
+          <!-- 寵物選擇器 -->
+          <div>
+            <label class="block text-xs font-bold mb-1" style="color: #0c5832;">選擇寵物（可多選）</label>
+            <div id="pet-selector-container" class="flex flex-wrap gap-2">
+              <!-- 寵物 tags 將動態插入這裡 -->
+            </div>
+          </div>
+
           <div><label class="block text-xs font-bold mb-1" style="color: #0c5832;">寫下回憶</label> <textarea id="photo-note" class="input-field w-full px-3 py-2 border-2 rounded-xl focus:outline-none resize-none text-sm" rows="3" placeholder="今天發生了什麼有趣的事呢？ 😊"></textarea></div>
           <div><label class="block text-xs font-bold mb-1" style="color: #0c5832;">選擇日期</label> <input type="date" id="photo-date" class="input-field w-full px-3 py-2 border-2 rounded-xl focus:outline-none text-sm"></div>
           <button id="save-photo-btn" class="paw-button w-full text-white font-bold py-3 rounded-xl" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 開始上傳 ✨ </button>
-          
-          <!-- 進度條包含百分比 -->
+
           <div id="upload-progress-container" class="hidden">
             <div class="flex justify-between items-center mb-1">
               <span class="text-[10px] font-bold text-emerald-800">上傳進度</span>
@@ -228,36 +390,63 @@
         </section>
 
         <!-- Calendar Tab -->
-        <section id="calendar-tab" class="flex-1 h-full p-5 overflow-auto hidden" style="background: linear-gradient(to bottom, #e7f5ee, #ffffff);">
-         <div class="flex items-center justify-between mb-6">
-          <button id="prev-month" class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">◀</button>
-          <h2 id="current-month" class="text-xl font-extrabold text-[#0c5832]"></h2>
-          <button id="next-month" class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">▶</button>
+        <section id="calendar-tab" class="flex-1 h-full overflow-auto hidden" style="background: linear-gradient(to bottom, #e7f5ee, #ffffff);">
+         <div class="p-5 pb-20">
+          <!-- 寵物篩選器 -->
+          <div class="mb-4">
+            <div id="pet-filter-container" class="flex flex-wrap gap-2 justify-center">
+              <!-- 寵物篩選 tags 將動態插入這裡 -->
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between mb-6">
+           <button id="prev-month" class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">◀</button>
+           <h2 id="current-month" class="text-xl font-extrabold text-[#0c5832]"></h2>
+           <button id="next-month" class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">▶</button>
+          </div>
+          <div class="grid grid-cols-7 gap-2 mb-4 text-center text-xs font-bold text-gray-400 uppercase tracking-wider">
+           <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+          </div>
+          <div id="calendar-grid" class="calendar-grid-no-border"></div>
          </div>
-         <div class="grid grid-cols-7 gap-2 mb-4 text-center text-xs font-bold text-gray-400 uppercase tracking-wider">
-          <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
-         </div>
-         <div id="calendar-grid" class="calendar-grid-no-border"></div>
         </section>
 
-        <!-- Profile Tab -->
-        <section id="profile-tab" class="flex-1 h-full p-5 overflow-auto hidden" style="background: linear-gradient(to bottom, #e7f5ee, #ffffff);">
-         <div class="flex flex-col items-center mb-6">
-          <div id="pet-avatar-display" class="w-24 h-24 rounded-full flex items-center justify-center text-5xl overflow-hidden border-4 shadow-xl border-emerald-800 bg-emerald-100">🐶</div>
-          <label for="avatar-input" class="mt-2 text-xs font-bold text-emerald-700 underline cursor-pointer">更換頭像</label>
-          <input type="file" id="avatar-input" accept="image/*" class="hidden">
-          <h3 id="profile-pet-name" class="text-xl font-bold mt-2">Lucky</h3>
+        <!-- Profile Tab - 家庭管理 -->
+        <section id="profile-tab" class="flex-1 h-full overflow-auto hidden" style="background: linear-gradient(to bottom, #e7f5ee, #ffffff);">
+         <div class="p-4 space-y-6 pb-20">
+
+          <!-- 飼主資料區 -->
+          <div class="bg-white rounded-2xl p-4 shadow-sm border-2 border-emerald-100">
+            <h3 class="text-lg font-bold text-emerald-800 mb-3 flex items-center gap-2">
+              <span>👤</span>
+              <span>飼主資料</span>
+            </h3>
+            <div class="space-y-2">
+              <div><label class="text-[10px] font-bold text-gray-600 block mb-0.5">姓名 <span class="text-red-500">*</span></label><input type="text" id="owner-name-input" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm focus:outline-none" placeholder="請輸入姓名"></div>
+              <div><label class="text-[10px] font-bold text-gray-600 block mb-0.5">生日 <span class="text-red-500">*</span></label><input type="date" id="owner-birthday-input" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm focus:outline-none"></div>
+              <div><label class="text-[10px] font-bold text-gray-600 block mb-0.5">Email</label><input type="email" id="owner-email-input" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm focus:outline-none" placeholder="example@email.com"></div>
+              <div><label class="text-[10px] font-bold text-gray-600 block mb-0.5">電話</label><input type="tel" id="owner-phone-input" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm focus:outline-none" placeholder="0912345678"></div>
+              <div><label class="text-[10px] font-bold text-gray-600 block mb-0.5">性別</label><select id="owner-gender-input" class="input-field w-full px-3 py-1.5 border-2 rounded-lg text-sm focus:outline-none"><option value="">請選擇</option><option value="male">男</option><option value="female">女</option><option value="other">其他</option></select></div>
+            </div>
+            <button id="save-owner-btn" class="paw-button w-full mt-3 text-white font-bold py-2 rounded-xl text-sm" style="background: linear-gradient(to right, #0c5832, #0a4528);">儲存飼主資料</button>
+          </div>
+
+          <!-- 寵物清單區 -->
+          <div class="bg-white rounded-2xl p-4 shadow-sm border-2 border-emerald-100">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-bold text-emerald-800 flex items-center gap-2">
+                <span>🐾</span>
+                <span id="pets-count-title">我的毛孩 (0/5)</span>
+              </h3>
+            </div>
+            <div id="pets-list-container" class="space-y-3 mb-3">
+              <!-- 寵物卡片將動態插入這裡 -->
+            </div>
+            <button id="add-pet-btn" class="paw-button w-full text-emerald-800 font-bold py-2 rounded-xl text-sm border-2 border-emerald-800 hover:bg-emerald-50">+ 新增寵物</button>
+          </div>
+
+          <button id="logout-btn" class="w-full bg-gray-100 text-gray-400 py-2 rounded-xl font-bold text-xs">登出帳號</button>
          </div>
-         <div class="space-y-2 pb-6">
-          <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">年齡</label><input type="number" id="profile-age" class="w-full text-sm focus:outline-none"></div>
-		  <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">性別</label><select id="profile-gender" class="w-full text-sm focus:outline-none"><option value="male">公</option><option value="female">母</option></select></div>
-          <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">類別</label><select id="profile-type" class="w-full text-sm focus:outline-none"><option value="dog">🐶 狗狗</option><option value="cat">🐱 貓咪</option></select></div>
-          <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">體重</label><input type="number" id="profile-weight" class="w-full text-sm focus:outline-none"></div>
-          <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">品種</label><input type="text" id="profile-breed" class="w-full text-sm focus:outline-none"></div>
-          <div class="rounded-lg p-2 border-2 bg-white border-emerald-100"><label class="text-[10px] font-bold text-emerald-800 block">毛色</label><input type="text" id="profile-color" class="w-full text-sm focus:outline-none"></div>
-         </div>
-         <button id="save-profile-btn" class="paw-button w-full text-white font-bold py-3 rounded-xl" style="background: linear-gradient(to right, #0c5832, #0a4528);"> 儲存資料 ✨ </button>
-         <button id="logout-btn" class="w-full mt-4 bg-gray-100 text-gray-400 py-2 rounded-xl font-bold text-xs">登出帳號</button>
         </section>
       </div>
     </main>
@@ -266,7 +455,7 @@
     <nav class="h-20 flex-shrink-0 bg-white flex border-t border-emerald-100 shadow-[0_-4px_15px_rgba(0,0,0,0.03)]">
      <button id="nav-upload" class="flex-1 flex flex-col items-center justify-center tab-active transition"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg><span class="text-[10px] font-bold">紀錄</span></button>
      <button id="nav-calendar" class="flex-1 flex flex-col items-center justify-center text-gray-400 transition"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg><span class="text-[10px] font-bold">回憶</span></button>
-     <button id="nav-profile" class="flex-1 flex flex-col items-center justify-center text-gray-400 transition"><svg class="w-7 h-7 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="4" r="1.5" /><circle cx="19" cy="8" r="1.5" /><circle cx="5" cy="8" r="1.5" /><path d="M19.5 13c-.83 0-1.5.67-1.5 1.5 0 .15.03.29.07.43C15.4 15.35 13.21 16 12 16c-1.21 0-3.4-.65-6.07-1.07.04-.14.07-.28.07-.43 0-.83-.67-1.5-1.5-1.5S3 13.67 3 14.5c0 .66.42 1.23 1.01 1.44C5.37 18.07 7.61 21 12 21s6.63-2.93 7.99-5.06c.59-.21 1.01-.78 1.01-1.44 0-.83-.67-1.5-1.5-1.5z" stroke-linecap="round" stroke-linejoin="round" /></svg><span class="text-[10px] font-bold">寶貝</span></button>
+     <button id="nav-profile" class="flex-1 flex flex-col items-center justify-center text-gray-400 transition"><svg class="w-7 h-7 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" /></svg><span class="text-[10px] font-bold">家庭</span></button>
     </nav>
    </div>
 
@@ -282,67 +471,863 @@
      <div id="next-date-hint" class="h-12 flex-shrink-0 flex items-center justify-center bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-widest">↓↓ 繼續向下滑動翻閱下一天 ↓↓</div>
     </div>
    </div>
+
+   <!-- 寵物編輯 Modal -->
+   <div id="pet-edit-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="p-4 border-b flex items-center justify-between bg-emerald-50">
+        <h3 id="pet-edit-modal-title" class="text-lg font-bold text-emerald-800">編輯寵物</h3>
+        <button id="close-pet-edit-modal" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center">✕</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <input type="hidden" id="pet-edit-id">
+        <input type="hidden" id="pet-edit-avatar-data">
+
+        <!-- 頭像上傳區域 -->
+        <div class="flex flex-col items-center mb-3">
+          <label class="text-xs font-bold text-gray-600 block mb-2">寵物頭像</label>
+          <div class="relative">
+            <div id="pet-avatar-preview" class="w-24 h-24 rounded-full border-2 border-emerald-200 overflow-hidden bg-emerald-50 flex items-center justify-center cursor-pointer hover:border-emerald-400 transition">
+              <span class="text-3xl">📷</span>
+            </div>
+            <input type="file" id="pet-avatar-input" accept="image/*" class="hidden">
+            <button type="button" onclick="document.getElementById('pet-avatar-input').click()" class="absolute bottom-0 right-0 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center text-xs font-bold hover:bg-emerald-700 shadow-lg">+</button>
+          </div>
+          <button type="button" id="remove-pet-avatar-btn" class="text-xs text-red-500 mt-2 hidden hover:underline">移除頭像</button>
+        </div>
+
+        <div><label class="text-xs font-bold text-gray-600 block mb-1">名字 <span class="text-red-500">*</span></label><input type="text" id="pet-edit-name" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm focus:outline-none" placeholder="例如：Lucky"></div>
+        <div><label class="text-xs font-bold text-gray-600 block mb-1">類別</label><select id="pet-edit-type" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm focus:outline-none"><option value="dog">🐶 狗狗</option><option value="cat">🐱 貓咪</option><option value="other">其他</option></select></div>
+        <div><label class="text-xs font-bold text-gray-600 block mb-1">性別</label><select id="pet-edit-gender" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm focus:outline-none"><option value="male">公</option><option value="female">母</option></select></div>
+        <div><label class="text-xs font-bold text-gray-600 block mb-1">品種</label><input type="text" id="pet-edit-breed" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm focus:outline-none" placeholder="例如：柴犬"></div>
+        <div><label class="text-xs font-bold text-gray-600 block mb-1">生日/年齡</label><input type="text" id="pet-edit-birthday" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm focus:outline-none" placeholder="例如：2020-01-01 或 3歲"></div>
+        <div><label class="text-xs font-bold text-gray-600 block mb-1">毛色</label><input type="text" id="pet-edit-color" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm focus:outline-none" placeholder="例如：黃色"></div>
+        <div><label class="text-xs font-bold text-gray-600 block mb-1">體重 (kg)</label><input type="number" id="pet-edit-weight" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm focus:outline-none" placeholder="例如：15"></div>
+        <div class="flex gap-2 pt-2">
+          <button id="save-pet-btn" class="flex-1 paw-button text-white font-bold py-2 rounded-xl text-sm" style="background: linear-gradient(to right, #0c5832, #0a4528);">儲存</button>
+          <button id="delete-pet-btn" class="px-4 bg-red-500 text-white font-bold py-2 rounded-xl text-sm hover:bg-red-600">刪除</button>
+        </div>
+      </div>
+    </div>
+   </div>
+
+   <!-- 注意事項 Modal -->
+   <div id="notes-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="p-4 border-b flex items-center justify-between bg-emerald-50">
+        <h3 id="notes-modal-title" class="text-lg font-bold text-emerald-800">注意事項</h3>
+        <button id="close-notes-modal" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center">✕</button>
+      </div>
+      <div class="p-4">
+        <input type="hidden" id="notes-pet-id">
+        <button id="add-note-btn" class="w-full mb-3 paw-button text-emerald-800 font-bold py-2 rounded-xl text-sm border-2 border-emerald-800 hover:bg-emerald-50">+ 新增注意事項</button>
+        <div id="notes-list-container" class="space-y-2">
+          <!-- 注意事項卡片將動態插入這裡 -->
+        </div>
+      </div>
+    </div>
+   </div>
+
+   <!-- 注意事項編輯 Modal -->
+   <div id="note-edit-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="p-4 border-b flex items-center justify-between bg-emerald-50">
+        <h3 id="note-edit-modal-title" class="text-lg font-bold text-emerald-800">編輯注意事項</h3>
+        <button id="close-note-edit-modal" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center">✕</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <input type="hidden" id="note-edit-id">
+        <input type="hidden" id="note-edit-pet-id">
+        <div><label class="text-xs font-bold text-gray-600 block mb-1">標題（可選）</label><input type="text" id="note-edit-title" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm focus:outline-none" placeholder="例如：飲食注意"></div>
+        <div><label class="text-xs font-bold text-gray-600 block mb-1">內容 <span class="text-red-500">*</span></label><textarea id="note-edit-content" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm focus:outline-none resize-none" rows="4" placeholder="請輸入注意事項內容..."></textarea></div>
+        <div><label class="text-xs font-bold text-gray-600 block mb-1">標籤（可選）</label><input type="text" id="note-edit-tag" class="input-field w-full px-3 py-2 border-2 rounded-lg text-sm focus:outline-none" placeholder="例如：重要、健康、飲食"></div>
+        <div class="flex gap-2 pt-2">
+          <button id="save-note-btn" class="flex-1 paw-button text-white font-bold py-2 rounded-xl text-sm" style="background: linear-gradient(to right, #0c5832, #0a4528);">儲存</button>
+          <button id="delete-note-btn" class="px-4 bg-red-500 text-white font-bold py-2 rounded-xl text-sm hover:bg-red-600">刪除</button>
+        </div>
+      </div>
+    </div>
+   </div>
   </div>
 
   <script>
-    // 資料擴充至 80% 的日期都有照片，修正 1/9 連結
+    // ========== 資料結構與 localStorage 管理 ==========
+    const STORAGE_KEY = 'copawsAppData';
+    const DATA_VERSION = 'v2';
+
+    let appData = {
+      version: DATA_VERSION,
+      ownerProfile: {
+        ownerName: '',
+        birthday: '',
+        email: '',
+        phone: '',
+        gender: '',
+        avatar: null
+      },
+      pets: [],
+      photos: [], // 儲存照片資料，包含 petIds
+      selectedPetIds: [], // 上傳時選中的寵物
+      selectedPetFilter: [], // 日曆篩選的寵物（空陣列=全部）
+      currentPetId: null
+    };
+
+    // localStorage Helper 函數
+    function loadAppData() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed.version === DATA_VERSION) {
+            appData = parsed;
+            // 確保必要的欄位存在
+            if (!appData.photos) appData.photos = [];
+            if (!appData.selectedPetIds) appData.selectedPetIds = [];
+            if (!appData.selectedPetFilter) appData.selectedPetFilter = [];
+          } else {
+            migrateOldData();
+          }
+        }
+      } catch (e) {
+        console.error('載入資料失敗:', e);
+      }
+    }
+
+    function saveAppData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        return true;
+      } catch (e) {
+        console.error('儲存資料失敗:', e);
+        showToast('儲存失敗！資料可能過大，請嘗試使用較小的圖片。');
+        return false;
+      }
+    }
+
+    function migrateOldData() {
+      try {
+        const oldPetProfile = localStorage.getItem('petProfile');
+        if (oldPetProfile) {
+          const old = JSON.parse(oldPetProfile);
+          if (old.nickname) {
+            appData.ownerProfile.ownerName = old.nickname;
+          }
+          if (old.birthday) appData.ownerProfile.birthday = old.birthday;
+          if (old.email) appData.ownerProfile.email = old.email;
+          if (old.phone) appData.ownerProfile.phone = old.phone;
+          if (old.gender) appData.ownerProfile.gender = old.gender;
+
+          if (old.name || old.age) {
+            const firstPet = {
+              petId: generateId(),
+              name: old.name || 'Lucky',
+              type: old.type || 'dog',
+              gender: old.gender || 'male',
+              breed: old.breed || '',
+              birthdayOrAge: old.age ? old.age + '歲' : '',
+              color: old.color || '',
+              weight: old.weight || '',
+              avatar: null,
+              notes: []
+            };
+            appData.pets.push(firstPet);
+          }
+        }
+
+        appData.version = DATA_VERSION;
+        appData.photos = [];
+        appData.selectedPetIds = [];
+        appData.selectedPetFilter = [];
+        saveAppData();
+      } catch (e) {
+        console.error('資料遷移失敗:', e);
+      }
+    }
+
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    // ========== Toast 通知 ==========
+    function showToast(message) {
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = message;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2000);
+    }
+
+    // ========== 飼主資料管理 ==========
+    function renderOwnerProfile() {
+      document.getElementById('owner-name-input').value = appData.ownerProfile.ownerName || '';
+      document.getElementById('owner-birthday-input').value = appData.ownerProfile.birthday || '';
+      document.getElementById('owner-email-input').value = appData.ownerProfile.email || '';
+      document.getElementById('owner-phone-input').value = appData.ownerProfile.phone || '';
+      document.getElementById('owner-gender-input').value = appData.ownerProfile.gender || '';
+    }
+
+    function saveOwnerProfile() {
+      const ownerName = document.getElementById('owner-name-input').value.trim();
+      const birthday = document.getElementById('owner-birthday-input').value;
+
+      if (!ownerName) {
+        showToast('請輸入姓名！');
+        return;
+      }
+      if (!birthday) {
+        showToast('請選擇生日！');
+        return;
+      }
+
+      appData.ownerProfile.ownerName = ownerName;
+      appData.ownerProfile.birthday = birthday;
+      appData.ownerProfile.email = document.getElementById('owner-email-input').value;
+      appData.ownerProfile.phone = document.getElementById('owner-phone-input').value;
+      appData.ownerProfile.gender = document.getElementById('owner-gender-input').value;
+
+      saveAppData();
+      showToast('飼主資料已儲存！✨');
+    }
+
+    // ========== 寵物管理 ==========
+    function renderPetsList() {
+      const container = document.getElementById('pets-list-container');
+      const countTitle = document.getElementById('pets-count-title');
+      const addBtn = document.getElementById('add-pet-btn');
+
+      countTitle.textContent = `我的毛孩 (${appData.pets.length}/5)`;
+
+      if (appData.pets.length >= 5) {
+        addBtn.disabled = true;
+        addBtn.textContent = '已達上限 5 隻';
+        addBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        addBtn.disabled = false;
+        addBtn.textContent = '+ 新增寵物';
+        addBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+
+      container.innerHTML = '';
+
+      if (appData.pets.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">還沒有寵物資料，點擊下方按鈕新增吧！</p>';
+        return;
+      }
+
+      appData.pets.forEach(pet => {
+        const card = document.createElement('div');
+        card.className = 'pet-card';
+
+        const petIcon = pet.type === 'dog' ? '🐶' : pet.type === 'cat' ? '🐱' : '🐾';
+        const genderIcon = pet.gender === 'male' ? '♂' : '♀';
+        const notesCount = pet.notes ? pet.notes.length : 0;
+
+        card.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-2xl flex-shrink-0">
+              ${pet.avatar ? `<img src="${pet.avatar}" class="w-full h-full object-cover rounded-full">` : petIcon}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h4 class="font-bold text-emerald-800">${pet.name}</h4>
+                <span class="text-xs text-gray-500">${genderIcon}</span>
+              </div>
+              <div class="text-xs text-gray-600 space-y-0.5">
+                ${pet.breed ? `<div>品種：${pet.breed}</div>` : ''}
+                ${pet.birthdayOrAge ? `<div>年齡：${pet.birthdayOrAge}</div>` : ''}
+                ${pet.weight ? `<div>體重：${pet.weight} kg</div>` : ''}
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-2 mt-3">
+            <button class="flex-1 text-xs font-bold py-1.5 rounded-lg border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50" onclick="openPetEditModal('${pet.petId}')">編輯資料</button>
+            <button class="flex-1 text-xs font-bold py-1.5 rounded-lg border-2 border-amber-600 text-amber-600 hover:bg-amber-50" onclick="openNotesModal('${pet.petId}')">注意事項 (${notesCount})</button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function openPetEditModal(petId = null) {
+      const modal = document.getElementById('pet-edit-modal');
+      const title = document.getElementById('pet-edit-modal-title');
+      const deleteBtn = document.getElementById('delete-pet-btn');
+
+      if (petId) {
+        const pet = appData.pets.find(p => p.petId === petId);
+        if (!pet) return;
+
+        title.textContent = '編輯寵物';
+        deleteBtn.classList.remove('hidden');
+
+        document.getElementById('pet-edit-id').value = pet.petId;
+        document.getElementById('pet-edit-name').value = pet.name || '';
+        document.getElementById('pet-edit-type').value = pet.type || 'dog';
+        document.getElementById('pet-edit-gender').value = pet.gender || 'male';
+        document.getElementById('pet-edit-breed').value = pet.breed || '';
+        document.getElementById('pet-edit-birthday').value = pet.birthdayOrAge || '';
+        document.getElementById('pet-edit-color').value = pet.color || '';
+        document.getElementById('pet-edit-weight').value = pet.weight || '';
+
+        // 設置頭像
+        document.getElementById('pet-edit-avatar-data').value = pet.avatar || '';
+        updatePetAvatarPreview(pet.avatar);
+      } else {
+        title.textContent = '新增寵物';
+        deleteBtn.classList.add('hidden');
+
+        document.getElementById('pet-edit-id').value = '';
+        document.getElementById('pet-edit-name').value = '';
+        document.getElementById('pet-edit-type').value = 'dog';
+        document.getElementById('pet-edit-gender').value = 'male';
+        document.getElementById('pet-edit-breed').value = '';
+        document.getElementById('pet-edit-birthday').value = '';
+        document.getElementById('pet-edit-color').value = '';
+        document.getElementById('pet-edit-weight').value = '';
+
+        // 重置頭像
+        document.getElementById('pet-edit-avatar-data').value = '';
+        updatePetAvatarPreview(null);
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closePetEditModal() {
+      document.getElementById('pet-edit-modal').classList.add('hidden');
+    }
+
+    function savePet() {
+      const petId = document.getElementById('pet-edit-id').value;
+      const name = document.getElementById('pet-edit-name').value.trim();
+
+      if (!name) {
+        showToast('請輸入寵物名字！');
+        return;
+      }
+
+      const petData = {
+        name: name,
+        type: document.getElementById('pet-edit-type').value,
+        gender: document.getElementById('pet-edit-gender').value,
+        breed: document.getElementById('pet-edit-breed').value,
+        birthdayOrAge: document.getElementById('pet-edit-birthday').value,
+        color: document.getElementById('pet-edit-color').value,
+        weight: document.getElementById('pet-edit-weight').value,
+        avatar: document.getElementById('pet-edit-avatar-data').value || null
+      };
+
+      let isNewPet = false;
+
+      if (petId) {
+        const index = appData.pets.findIndex(p => p.petId === petId);
+        if (index !== -1) {
+          appData.pets[index] = { ...appData.pets[index], ...petData };
+        }
+      } else {
+        if (appData.pets.length >= 5) {
+          showToast('已達上限 5 隻！');
+          return;
+        }
+        const newPet = {
+          petId: generateId(),
+          ...petData,
+          notes: []
+        };
+        appData.pets.push(newPet);
+        isNewPet = true;
+      }
+
+      const success = saveAppData();
+      if (success) {
+        showToast(isNewPet ? '寵物已新增！✨' : '寵物資料已更新！✨');
+        renderPetsList();
+        renderPetSelector();
+        renderPetFilter();
+        closePetEditModal();
+      }
+    }
+
+    function deletePet() {
+      const petId = document.getElementById('pet-edit-id').value;
+      if (!petId) return;
+
+      if (confirm('確定要刪除這隻寵物嗎？所有相關的注意事項也會被刪除。')) {
+        appData.pets = appData.pets.filter(p => p.petId !== petId);
+        // 同時清理照片中的關聯
+        appData.photos.forEach(photo => {
+          if (photo.petIds) {
+            photo.petIds = photo.petIds.filter(id => id !== petId);
+          }
+        });
+        saveAppData();
+        renderPetsList();
+        renderPetSelector();
+        renderPetFilter();
+        closePetEditModal();
+        showToast('寵物已刪除');
+      }
+    }
+
+    // ========== 寵物選擇器（上傳頁面）==========
+    function renderPetSelector() {
+      const container = document.getElementById('pet-selector-container');
+      container.innerHTML = '';
+
+      if (appData.pets.length === 0) {
+        container.innerHTML = '<p class="text-xs text-gray-400">請先在「家庭」頁面新增寵物</p>';
+        return;
+      }
+
+      appData.pets.forEach(pet => {
+        const tag = document.createElement('div');
+        tag.className = 'pet-tag';
+        if (appData.selectedPetIds.includes(pet.petId)) {
+          tag.classList.add('selected');
+        }
+
+        // 使用頭像或預設圖示
+        let iconHtml = '';
+        if (pet.avatar) {
+          iconHtml = `<img src="${pet.avatar}" class="pet-tag-avatar">`;
+        } else {
+          const petIcon = pet.type === 'dog' ? '🐶' : pet.type === 'cat' ? '🐱' : '🐾';
+          iconHtml = `<span>${petIcon}</span>`;
+        }
+        tag.innerHTML = `${iconHtml}<span>${pet.name}</span>`;
+
+        tag.onclick = () => {
+          const index = appData.selectedPetIds.indexOf(pet.petId);
+          if (index > -1) {
+            appData.selectedPetIds.splice(index, 1);
+            tag.classList.remove('selected');
+          } else {
+            appData.selectedPetIds.push(pet.petId);
+            tag.classList.add('selected');
+          }
+        };
+
+        container.appendChild(tag);
+      });
+    }
+
+    // ========== 寵物篩選器（日曆頁面）==========
+    function renderPetFilter() {
+      const container = document.getElementById('pet-filter-container');
+      container.innerHTML = '';
+
+      // 全部選項
+      const allTag = document.createElement('div');
+      allTag.className = 'pet-tag filter-tag';
+      if (appData.selectedPetFilter.length === 0) {
+        allTag.classList.add('active');
+      }
+      allTag.innerHTML = '<span>全部</span>';
+      allTag.onclick = () => {
+        appData.selectedPetFilter = [];
+        renderPetFilter();
+        renderCalendar();
+      };
+      container.appendChild(allTag);
+
+      // 個別寵物選項
+      appData.pets.forEach(pet => {
+        const tag = document.createElement('div');
+        tag.className = 'pet-tag filter-tag';
+        if (appData.selectedPetFilter.includes(pet.petId)) {
+          tag.classList.add('active');
+        }
+
+        // 使用頭像或預設圖示
+        let iconHtml = '';
+        if (pet.avatar) {
+          iconHtml = `<img src="${pet.avatar}" class="pet-tag-avatar">`;
+        } else {
+          const petIcon = pet.type === 'dog' ? '🐶' : pet.type === 'cat' ? '🐱' : '🐾';
+          iconHtml = `<span>${petIcon}</span>`;
+        }
+        tag.innerHTML = `${iconHtml}<span>${pet.name}</span>`;
+
+        tag.onclick = () => {
+          const index = appData.selectedPetFilter.indexOf(pet.petId);
+          if (index > -1) {
+            appData.selectedPetFilter.splice(index, 1);
+          } else {
+            appData.selectedPetFilter.push(pet.petId);
+          }
+          renderPetFilter();
+          renderCalendar();
+        };
+
+        container.appendChild(tag);
+      });
+    }
+
+    // ========== 注意事項管理 ==========
+    function openNotesModal(petId) {
+      const pet = appData.pets.find(p => p.petId === petId);
+      if (!pet) return;
+
+      const modal = document.getElementById('notes-modal');
+      const title = document.getElementById('notes-modal-title');
+
+      title.textContent = `${pet.name} 的注意事項`;
+      document.getElementById('notes-pet-id').value = petId;
+
+      renderPetNotes(petId);
+      modal.classList.remove('hidden');
+    }
+
+    function closeNotesModal() {
+      document.getElementById('notes-modal').classList.add('hidden');
+    }
+
+    function renderPetNotes(petId) {
+      const pet = appData.pets.find(p => p.petId === petId);
+      if (!pet) return;
+
+      const container = document.getElementById('notes-list-container');
+      container.innerHTML = '';
+
+      if (!pet.notes || pet.notes.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">還沒有注意事項</p>';
+        return;
+      }
+
+      const sortedNotes = [...pet.notes].sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+
+      sortedNotes.forEach(note => {
+        const card = document.createElement('div');
+        card.className = `note-card ${note.pinned ? 'pinned' : ''}`;
+
+        const timeStr = new Date(note.createdAt).toLocaleDateString('zh-TW');
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <div class="flex-1">
+              ${note.title ? `<h5 class="font-bold text-sm text-emerald-800 mb-1">${note.title}</h5>` : ''}
+              <p class="text-xs text-gray-700 whitespace-pre-wrap">${note.content}</p>
+            </div>
+            <button class="text-xl flex-shrink-0" onclick="toggleNotePin('${petId}', '${note.noteId}')">
+              ${note.pinned ? '📌' : '📍'}
+            </button>
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1">
+              ${note.pinned ? '<span class="badge badge-pinned">置頂</span>' : ''}
+              ${note.tag ? `<span class="badge badge-tag">${note.tag}</span>` : ''}
+              <span class="text-[10px] text-gray-400">${timeStr}</span>
+            </div>
+            <div class="flex gap-1">
+              <button class="text-xs text-blue-600 font-bold" onclick="openNoteEditModal('${petId}', '${note.noteId}')">編輯</button>
+              <button class="text-xs text-red-600 font-bold" onclick="deleteNote('${petId}', '${note.noteId}')">刪除</button>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function toggleNotePin(petId, noteId) {
+      const pet = appData.pets.find(p => p.petId === petId);
+      if (!pet || !pet.notes) return;
+
+      const note = pet.notes.find(n => n.noteId === noteId);
+      if (!note) return;
+
+      note.pinned = !note.pinned;
+      note.updatedAt = new Date().toISOString();
+
+      saveAppData();
+      renderPetNotes(petId);
+      renderPetsList();
+      showToast(note.pinned ? '已置頂' : '已取消置頂');
+    }
+
+    function openNoteEditModal(petId, noteId = null) {
+      const modal = document.getElementById('note-edit-modal');
+      const title = document.getElementById('note-edit-modal-title');
+      const deleteBtn = document.getElementById('delete-note-btn');
+
+      document.getElementById('note-edit-pet-id').value = petId;
+
+      if (noteId) {
+        const pet = appData.pets.find(p => p.petId === petId);
+        if (!pet) return;
+        const note = pet.notes.find(n => n.noteId === noteId);
+        if (!note) return;
+
+        title.textContent = '編輯注意事項';
+        deleteBtn.classList.remove('hidden');
+
+        document.getElementById('note-edit-id').value = note.noteId;
+        document.getElementById('note-edit-title').value = note.title || '';
+        document.getElementById('note-edit-content').value = note.content || '';
+        document.getElementById('note-edit-tag').value = note.tag || '';
+      } else {
+        title.textContent = '新增注意事項';
+        deleteBtn.classList.add('hidden');
+
+        document.getElementById('note-edit-id').value = '';
+        document.getElementById('note-edit-title').value = '';
+        document.getElementById('note-edit-content').value = '';
+        document.getElementById('note-edit-tag').value = '';
+      }
+
+      closeNotesModal();
+      modal.classList.remove('hidden');
+    }
+
+    function closeNoteEditModal() {
+      const modal = document.getElementById('note-edit-modal');
+      modal.classList.add('hidden');
+
+      const petId = document.getElementById('note-edit-pet-id').value;
+      if (petId) {
+        openNotesModal(petId);
+      }
+    }
+
+    function saveNote() {
+      const petId = document.getElementById('note-edit-pet-id').value;
+      const noteId = document.getElementById('note-edit-id').value;
+      const content = document.getElementById('note-edit-content').value.trim();
+
+      if (!content) {
+        showToast('請輸入內容！');
+        return;
+      }
+
+      const pet = appData.pets.find(p => p.petId === petId);
+      if (!pet) return;
+
+      if (!pet.notes) pet.notes = [];
+
+      const noteData = {
+        title: document.getElementById('note-edit-title').value.trim(),
+        content: content,
+        tag: document.getElementById('note-edit-tag').value.trim(),
+        updatedAt: new Date().toISOString()
+      };
+
+      if (noteId) {
+        const index = pet.notes.findIndex(n => n.noteId === noteId);
+        if (index !== -1) {
+          pet.notes[index] = { ...pet.notes[index], ...noteData };
+          showToast('注意事項已更新！✨');
+        }
+      } else {
+        const newNote = {
+          noteId: generateId(),
+          ...noteData,
+          pinned: false,
+          createdAt: new Date().toISOString()
+        };
+        pet.notes.push(newNote);
+        showToast('注意事項已新增！✨');
+      }
+
+      saveAppData();
+      renderPetsList();
+
+      document.getElementById('note-edit-modal').classList.add('hidden');
+      openNotesModal(petId);
+    }
+
+    function deleteNote(petId, noteId) {
+      if (!confirm('確定要刪除這則注意事項嗎？')) return;
+
+      const pet = appData.pets.find(p => p.petId === petId);
+      if (!pet || !pet.notes) return;
+
+      pet.notes = pet.notes.filter(n => n.noteId !== noteId);
+
+      saveAppData();
+      renderPetNotes(petId);
+      renderPetsList();
+      showToast('注意事項已刪除');
+    }
+
+    // ========== 頭像處理 ==========
+    function updatePetAvatarPreview(avatarUrl) {
+      const preview = document.getElementById('pet-avatar-preview');
+      const removeBtn = document.getElementById('remove-pet-avatar-btn');
+
+      if (avatarUrl) {
+        preview.innerHTML = `<img src="${avatarUrl}" class="w-full h-full object-cover">`;
+        removeBtn.classList.remove('hidden');
+      } else {
+        preview.innerHTML = '<span class="text-3xl">📷</span>';
+        removeBtn.classList.add('hidden');
+      }
+    }
+
+    function handlePetAvatarSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // 檢查文件類型
+      if (!file.type.startsWith('image/')) {
+        showToast('請選擇圖片文件！');
+        return;
+      }
+
+      // 檢查文件大小（限制 10MB）
+      if (file.size > 10 * 1024 * 1024) {
+        showToast('圖片大小不能超過 10MB！');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          // 壓縮圖片到最大 400x400
+          const maxSize = 400;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxSize) {
+              height = (height * maxSize) / width;
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width = (width * maxSize) / height;
+              height = maxSize;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // 轉換為 JPEG 格式，品質 0.8
+          const compressedData = canvas.toDataURL('image/jpeg', 0.8);
+          document.getElementById('pet-edit-avatar-data').value = compressedData;
+          updatePetAvatarPreview(compressedData);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removePetAvatar() {
+      document.getElementById('pet-edit-avatar-data').value = '';
+      updatePetAvatarPreview(null);
+      document.getElementById('pet-avatar-input').value = '';
+    }
+
+    // ========== 事件綁定 ==========
+    document.getElementById('save-owner-btn').onclick = saveOwnerProfile;
+    document.getElementById('add-pet-btn').onclick = () => openPetEditModal();
+    document.getElementById('close-pet-edit-modal').onclick = closePetEditModal;
+    document.getElementById('save-pet-btn').onclick = savePet;
+    document.getElementById('delete-pet-btn').onclick = deletePet;
+    document.getElementById('pet-avatar-input').onchange = handlePetAvatarSelect;
+    document.getElementById('remove-pet-avatar-btn').onclick = removePetAvatar;
+    document.getElementById('close-notes-modal').onclick = closeNotesModal;
+    document.getElementById('add-note-btn').onclick = () => {
+      const petId = document.getElementById('notes-pet-id').value;
+      openNoteEditModal(petId);
+    };
+    document.getElementById('close-note-edit-modal').onclick = closeNoteEditModal;
+    document.getElementById('save-note-btn').onclick = saveNote;
+
+    // Modal 點擊背景關閉
+    document.getElementById('pet-edit-modal').onclick = (e) => {
+      if (e.target.id === 'pet-edit-modal') closePetEditModal();
+    };
+    document.getElementById('notes-modal').onclick = (e) => {
+      if (e.target.id === 'notes-modal') closeNotesModal();
+    };
+    document.getElementById('note-edit-modal').onclick = (e) => {
+      if (e.target.id === 'note-edit-modal') closeNoteEditModal();
+    };
+
+    // ========== 原有功能：日曆與照片 ==========
+
+    // 示範照片資料（包含 petIds）
     const samplePhotos = {
-      '2025-01-01': [{ image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600', note: '元旦快樂！與 Lucky 的第一張合照 🎆', time: '00:15' }, { image: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=600', note: '睡得好沉', time: '10:00' }],
-      '2025-01-02': [{ image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600', note: '出門散步！今天遇到了柴犬朋友 🐕', time: '09:00' }, { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600', note: '玩得滿臉泥土', time: '10:30' }],
-      '2025-01-03': [{ image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?w=600', note: '買了新玩具，它咬著不放 🦴', time: '15:00' }, { image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600', note: '期待點心的表情', time: '16:00' }],
-      '2025-01-04': [{ image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600', note: '草地跑跑日！體力真的很好 💚', time: '14:20' }, { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=600', note: '追球球中', time: '14:50' }],
-      '2025-01-05': [{ image: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=600', note: '陪主人看書（其實是在睡覺）💤', time: '11:00' }, { image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?w=600', note: '好溫馨', time: '12:00' }],
-      '2025-01-06': [{ image: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=600', note: '天氣冷，幫它穿上小外套 🧥', time: '10:30' }, { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=600', note: '帥氣的側臉', time: '11:00' }],
-      '2025-01-07': [{ image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=600', note: '今天洗澡澡，變得很香 ✨', time: '14:00' }, { image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=600', note: '剛洗完變成了落湯雞', time: '15:00' }],
-      '2025-01-08': [{ image: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=600', note: '在後院發現了小昆蟲 🦋', time: '16:15' }, { image: 'https://images.unsplash.com/photo-1494947665470-20322015e3a8?w=600', note: '專注的眼神', time: '16:40' }],
-      '2025-01-09': [{ image: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=600', note: '今天去看了醫生，打針好勇敢 💉', time: '11:00' }, { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=600', note: '回家立刻討摸摸', time: '12:30' }],
-      '2025-01-10': [{ image: 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=600', note: '慵懶的午後，陽光灑進來真舒服 ☀️', time: '15:20' }, { image: 'https://images.unsplash.com/photo-1510771463146-e89e6e86560e?w=600', note: '睡到翻肚了', time: '16:00' }],
-      '2025-01-12': [{ image: 'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600', note: '週末去寵物友善餐廳 🍔', time: '13:00' }, { image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?w=600', note: '乖乖等吃飯', time: '13:45' }],
-      '2025-01-14': [{ image: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=600', note: '學會了「擊掌」，它好聰明 🖐️', time: '20:10' }, { image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600', note: '開心的表情', time: '20:30' }],
-      '2025-01-15': [{ image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600', note: '公園大聚會！認識好多新朋友 🐶', time: '10:30' }, { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600', note: '大家一起跑跑', time: '11:15' }],
-      '2025-01-17': [{ image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=600', note: '今天天氣轉涼，窩在毯子裡 🛋️', time: '21:00' }, { image: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=600', note: '暖烘烘的', time: '21:30' }],
-      '2025-01-18': [{ image: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=600', note: '幫它剪指甲，雖然臉很臭但很配合 💅', time: '14:00' }, { image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?w=600', note: '不甘願的樣子', time: '14:20' }],
-      '2025-01-20': [{ image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600', note: '它會自己叼碗來，暗示肚子餓了 🍚', time: '18:00' }, { image: 'https://images.unsplash.com/photo-1510771463146-e89e6e86560e?w=600', note: '討飯中', time: '18:15' }],
-      '2025-01-21': [{ image: 'https://images.unsplash.com/photo-1494947665470-20322015e3a8?w=600', note: '玩躲貓貓，結果尾巴露出來了 🐕', time: '16:00' }, { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600', note: '被發現了', time: '16:15' }],
-      '2025-01-22': [{ image: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=600', note: '一起在客廳玩拉扯遊戲 🎾', time: '19:30' }, { image: 'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600', note: '超有活力', time: '20:00' }],
-      '2025-01-23': [{ image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600', note: '今天的眼神特別溫柔 ❤️', time: '11:00' }, { image: 'https://images.unsplash.com/photo-1510771463146-e89e6e86560e?w=600', note: '深情注視', time: '11:15' }],
-      '2025-01-25': [{ image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=600', note: '帶去山上走走，空氣超好 🏔️', time: '10:00' }, { image: 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=600', note: '登頂照', time: '11:30' }],
-      '2025-01-26': [{ image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600', note: '在家裡舉辦了小小的零食趴 🍖', time: '15:00' }, { image: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=600', note: '吃得超開心', time: '15:20' }],
-      '2025-01-28': [{ image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?w=600', note: '它現在會自己跳上車，準備出門 🚗', time: '09:00' }, { image: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?w=600', note: '看窗外風景', time: '09:30' }],
-      '2025-01-29': [{ image: 'https://images.unsplash.com/photo-1494947665470-20322015e3a8?w=600', note: '陪我一起工作，它是最好的陪伴 💻', time: '14:00' }, { image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=600', note: '在桌下睡覺', time: '15:00' }],
-      '2025-01-30': [{ image: 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=600', note: '月底了，幫它算算這個月吃了多少零食 🍪', time: '20:00' }, { image: 'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600', note: '一臉無辜', time: '20:15' }]
+      '2025-01-01': [{ image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600', note: '元旦快樂！與 Lucky 的第一張合照 🎆', time: '00:15', petIds: [] }, { image: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=600', note: '睡得好沉', time: '10:00', petIds: [] }],
+      '2025-01-02': [{ image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600', note: '出門散步！今天遇到了柴犬朋友 🐕', time: '09:00', petIds: [] }, { image: 'https://images.unsplash.com/photo-1544568100-847a948585b9?w=600', note: '和鄰居家的狗狗玩耍 🐕', time: '16:30', petIds: [] }],
+      '2025-01-03': [{ image: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?w=600', note: '買了新玩具，它咬著不放 🦴', time: '15:00', petIds: [] }, { image: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=600', note: '新玩具真的很喜歡', time: '18:20', petIds: [] }],
+      '2025-01-04': [{ image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600', note: '草地跑跑日！體力真的很好 💚', time: '14:20', petIds: [] }, { image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600', note: '在公園玩到不想回家', time: '17:00', petIds: [] }],
+      '2025-01-05': [{ image: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=600', note: '陪主人看書（其實是在睡覺）💤', time: '11:00', petIds: [] }, { image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=600', note: '午睡時間到', time: '14:30', petIds: [] }],
+      '2025-01-06': [{ image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=600', note: '今天洗澡香香的 🛁', time: '10:00', petIds: [] }, { image: 'https://images.unsplash.com/photo-1422565096762-bdb997a56a84?w=600', note: '洗完澡變得更帥了', time: '11:00', petIds: [] }],
+      '2025-01-07': [{ image: 'https://images.unsplash.com/photo-1523480717984-24cba35ae1ef?w=600', note: '去寵物店剪毛囉 ✂️', time: '15:00', petIds: [] }, { image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=600', note: '新造型超可愛', time: '16:30', petIds: [] }],
+      '2025-01-08': [{ image: 'https://images.unsplash.com/photo-1510771463146-e89e6e86560e?w=600', note: '在沙發上賴床不起來 🛋️', time: '09:00', petIds: [] }, { image: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=600', note: '終於願意起床了', time: '11:00', petIds: [] }],
+      '2025-01-09': [{ image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600', note: '今天特別活潑 🎾', time: '14:00', petIds: [] }, { image: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=600', note: '玩球玩得好開心', time: '15:30', petIds: [] }, { image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=600', note: '累了在樹下休息', time: '17:00', petIds: [] }],
+      '2025-01-10': [{ image: 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=600', note: '慵懶的午後，陽光灑進來真舒服 ☀️', time: '15:20', petIds: [] }, { image: 'https://images.unsplash.com/photo-1541364983171-a8ba01e95cfc?w=600', note: '趴在窗邊看風景', time: '16:00', petIds: [] }],
+      '2025-01-11': [{ image: 'https://images.unsplash.com/photo-1560807707-8cc77767d783?w=600', note: '今天是美好的一天 ✨', time: '10:00', petIds: [] }, { image: 'https://images.unsplash.com/photo-1453227588063-bb302b62f50b?w=600', note: '和主人一起曬太陽', time: '14:00', petIds: [] }],
+      '2025-01-12': [{ image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=600', note: '發現新的探險地點 🗺️', time: '09:30', petIds: [] }, { image: 'https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=600', note: '好奇地聞來聞去', time: '10:30', petIds: [] }],
+      '2025-01-13': [{ image: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=600', note: '最喜歡的午睡時光 💤', time: '13:00', petIds: [] }, { image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600', note: '睡到不省人事', time: '15:00', petIds: [] }],
+      '2025-01-14': [{ image: 'https://images.unsplash.com/photo-1583512603806-077998240c7a?w=600', note: '超愛這個抱枕 🧸', time: '11:00', petIds: [] }, { image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=600', note: '抱著抱枕不放', time: '12:00', petIds: [] }],
+      '2025-01-15': [{ image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600', note: '好奇心爆棚的一天 👀', time: '10:00', petIds: [] }, { image: 'https://images.unsplash.com/photo-1444212477490-ca407925329e?w=600', note: '發現有趣的東西', time: '12:00', petIds: [] }, { image: 'https://images.unsplash.com/photo-1573865526739-10c1dd7463aa?w=600', note: '盯著門外看', time: '16:00', petIds: [] }]
     };
 
     let currentDate = new Date(2025, 0, 1);
-    let petAvatar = null;
-    let petProfile = { name: 'Lucky', age: '', type: 'dog', gender: 'male', weight: '', breed: '', color: '' };
     let isTransitioning = false;
-
     const detailContent = document.getElementById('detail-content');
 
-    function showToast(message) {
-      const t = document.createElement('div');
-      t.className = 'toast'; t.textContent = message;
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 2000);
+    function detectAndFillPhone() {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (isMobile) {
+        const phoneInput = document.getElementById('owner-phone');
+      }
     }
 
     // 登入
     document.getElementById('auth-continue-btn').onclick = () => {
       document.getElementById('registration-form').classList.remove('hidden');
       document.getElementById('auth-step-1').classList.add('hidden');
+      document.getElementById('login-header').classList.add('hidden');
+      document.getElementById('registration-header').classList.remove('hidden');
+      document.querySelector('.login-card').style.padding = '1.25rem';
+      detectAndFillPhone();
     };
+
     document.getElementById('register-submit-btn').onclick = () => {
-      petProfile.name = document.getElementById('pet-name').value || 'Lucky';
-      petProfile.age = document.getElementById('pet-age').value;
-	  petProfile.gender = document.getElementById('pet-gender').value;
-      petProfile.breed = document.getElementById('pet-breed').value;
-      petProfile.weight = document.getElementById('pet-weight').value;
-      petProfile.color = document.getElementById('pet-color').value;
-      petProfile.type = document.getElementById('pet-type').value;
+      const nickname = document.getElementById('owner-nickname').value.trim();
+      const birthday = document.getElementById('owner-birthday').value;
+
+      if (!nickname) {
+        showToast('請輸入暱稱！');
+        return;
+      }
+      if (!birthday) {
+        showToast('請選擇生日！');
+        return;
+      }
+
+      appData.ownerProfile.ownerName = nickname;
+      appData.ownerProfile.birthday = birthday;
+      appData.ownerProfile.email = document.getElementById('owner-email').value;
+      appData.ownerProfile.phone = document.getElementById('owner-phone').value;
+      appData.ownerProfile.gender = document.getElementById('owner-gender').value;
+
+      saveAppData();
       loginUser();
     };
+
     document.getElementById('google-login-btn').onclick = () => loginUser();
+
+    document.getElementById('back-to-login-btn').onclick = () => {
+      document.getElementById('registration-form').classList.add('hidden');
+      document.getElementById('auth-step-1').classList.remove('hidden');
+      document.getElementById('login-header').classList.remove('hidden');
+      document.getElementById('registration-header').classList.add('hidden');
+      document.querySelector('.login-card').style.padding = '2rem';
+    };
 
     function loginUser() {
       showToast('登入成功！🐾');
@@ -363,19 +1348,28 @@
       document.getElementById(id + '-tab').classList.remove('hidden');
       document.getElementById('nav-' + id).classList.add('tab-active');
       document.getElementById('nav-' + id).classList.remove('text-gray-400');
-      if(id === 'calendar') renderCalendar();
-      if(id === 'profile') loadProfile();
+      if(id === 'calendar') {
+        renderPetFilter();
+        renderCalendar();
+      }
+      if(id === 'profile') {
+        renderOwnerProfile();
+        renderPetsList();
+      }
+      if(id === 'upload') {
+        renderPetSelector();
+      }
     }
     document.getElementById('nav-upload').onclick = () => showTab('upload');
     document.getElementById('nav-calendar').onclick = () => showTab('calendar');
     document.getElementById('nav-profile').onclick = () => showTab('profile');
 
-    // 日曆渲染
+    // 日曆渲染（支援篩選）
     function renderCalendar() {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
       document.getElementById('current-month').textContent = `${year} 年 ${month + 1} 月`;
-      
+
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const grid = document.getElementById('calendar-grid');
@@ -385,7 +1379,17 @@
 
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const photos = samplePhotos[dateStr];
+        let photos = samplePhotos[dateStr];
+
+        // 根據篩選器過濾照片
+        if (photos && appData.selectedPetFilter.length > 0) {
+          photos = photos.filter(photo => {
+            // 如果照片沒有關聯寵物，或關聯的寵物在篩選器中
+            if (!photo.petIds || photo.petIds.length === 0) return true;
+            return photo.petIds.some(petId => appData.selectedPetFilter.includes(petId));
+          });
+        }
+
         const cell = document.createElement('button');
         cell.className = 'calendar-day rounded-xl flex items-center justify-center';
 
@@ -414,17 +1418,46 @@
     function renderDetailPage(dateStr) {
       const [year, month, day] = dateStr.split('-');
       document.getElementById('detail-title').textContent = `${year} 年 ${parseInt(month)} 月 ${parseInt(day)} 日`;
-      const photos = samplePhotos[dateStr] || [];
+      let photos = samplePhotos[dateStr] || [];
+
+      // 根據篩選器過濾照片
+      if (appData.selectedPetFilter.length > 0) {
+        photos = photos.filter(photo => {
+          if (!photo.petIds || photo.petIds.length === 0) return true;
+          return photo.petIds.some(petId => appData.selectedPetFilter.includes(petId));
+        });
+      }
+
       detailContent.innerHTML = '';
 
       photos.forEach((photo, index) => {
         const card = document.createElement('div');
         card.className = 'bg-white rounded-2xl shadow-sm border border-emerald-50 overflow-hidden mb-5 fade-in';
         card.style.animationDelay = `${index * 0.1}s`;
-        
-        const avatarHtml = petAvatar 
-          ? `<img src="${petAvatar}" class="w-8 h-8 rounded-full object-cover border-2 border-emerald-100 shadow-sm">`
-          : `<div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-lg border-2 border-white shadow-sm">🐶</div>`;
+
+        // 根據照片的 petIds 顯示對應頭像
+        let avatarHtml = '';
+        let pet = null;
+
+        // 如果照片有關聯寵物，使用關聯的寵物
+        if (photo.petIds && photo.petIds.length > 0) {
+          pet = appData.pets.find(p => p.petId === photo.petIds[0]);
+        }
+        // 如果沒有關聯寵物，但用戶有新增寵物，則顯示第一個寵物的頭像
+        else if (appData.pets.length > 0) {
+          pet = appData.pets[0];
+        }
+
+        if (pet) {
+          if (pet.avatar) {
+            avatarHtml = `<img src="${pet.avatar}" class="w-8 h-8 rounded-full object-cover border-2 border-emerald-100 shadow-sm">`;
+          } else {
+            const petIcon = pet.type === 'dog' ? '🐶' : pet.type === 'cat' ? '🐱' : '🐾';
+            avatarHtml = `<div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-lg border-2 border-white shadow-sm">${petIcon}</div>`;
+          }
+        } else {
+          avatarHtml = `<div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-lg border-2 border-white shadow-sm">🐾</div>`;
+        }
 
         card.innerHTML = `
           <img src="${photo.image}" class="w-full aspect-square object-cover">
@@ -444,7 +1477,6 @@
         document.getElementById('next-date-hint').classList.remove('hidden');
         setupAutoScroll(dateStr);
       } else {
-        // 如果沒有下一個日期，隱藏提示並移除捲動監聽
         document.getElementById('next-date-hint').classList.add('hidden');
         detailContent.onscroll = null;
       }
@@ -453,7 +1485,6 @@
     function setupAutoScroll(currentDateStr) {
       detailContent.onscroll = () => {
         if (isTransitioning) return;
-        // 偵測是否滑到底部
         if (detailContent.scrollTop + detailContent.clientHeight >= detailContent.scrollHeight - 10) {
           const nextDate = getNextDate(currentDateStr);
           if (nextDate) {
@@ -480,32 +1511,32 @@
       if (idx >= 0 && idx < dates.length - 1) {
         return dates[idx + 1];
       }
-      return null; // 最後一個日期回傳 null
+      return null;
     }
 
-// 上傳邏輯
-    document.getElementById('file-input').onchange = (e) => {
-      const file = e.target.files[0];
-      if(file) {
-        // --- 新增：設定默認日期為當天 (格式為 YYYY-MM-DD) ---
-        document.getElementById('photo-date').value = new Date().toISOString().split('T')[0];
-        
-        document.getElementById('image-preview').src = URL.createObjectURL(file);
-        document.getElementById('upload-form-container').classList.remove('hidden');
-        document.getElementById('save-photo-btn').classList.remove('hidden');
-        document.getElementById('upload-success').classList.add('hidden');
-        document.getElementById('upload-progress-container').classList.add('hidden');
-      }
-    };
+    // 上傳邏輯
+    document.getElementById('file-input').onchange = (e) => {
+      const file = e.target.files[0];
+      if(file) {
+        document.getElementById('photo-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('image-preview').src = URL.createObjectURL(file);
+        document.getElementById('upload-form-container').classList.remove('hidden');
+        document.getElementById('save-photo-btn').classList.remove('hidden');
+        document.getElementById('upload-success').classList.add('hidden');
+        document.getElementById('upload-progress-container').classList.add('hidden');
+        appData.selectedPetIds = []; // 重置選擇
+        renderPetSelector();
+      }
+    };
 
     document.getElementById('save-photo-btn').onclick = () => {
       const container = document.getElementById('upload-progress-container');
       const bar = document.getElementById('upload-progress-bar');
       const text = document.getElementById('upload-pct-text');
-      
+
       container.classList.remove('hidden');
       document.getElementById('save-photo-btn').classList.add('hidden');
-      
+
       let progress = 0;
       const interval = setInterval(() => {
         progress += Math.floor(Math.random() * 15) + 5;
@@ -515,6 +1546,10 @@
           setTimeout(() => {
             document.getElementById('upload-success').classList.remove('hidden');
             container.classList.add('hidden');
+
+            // 這裡可以儲存照片到 appData.photos
+            // 包含選中的 petIds
+            showToast(`已標記 ${appData.selectedPetIds.length} 隻寵物`);
           }, 300);
         }
         bar.style.width = progress + '%';
@@ -523,7 +1558,6 @@
     };
 
     document.getElementById('upload-another-btn').onclick = () => {
-      // 徹底初始化
       document.getElementById('file-input').value = "";
       document.getElementById('image-preview').src = "";
       document.getElementById('photo-note').value = "";
@@ -533,46 +1567,28 @@
       document.getElementById('upload-progress-container').classList.add('hidden');
       document.getElementById('upload-progress-bar').style.width = '0%';
       document.getElementById('upload-pct-text').textContent = '0%';
+      appData.selectedPetIds = [];
     };
 
     document.getElementById('remove-image-btn').onclick = () => {
       document.getElementById('file-input').value = "";
       document.getElementById('upload-form-container').classList.add('hidden');
-    };
-
-    // 寶貝資料
-    document.getElementById('avatar-input').onchange = (e) => {
-      const file = e.target.files[0];
-      if(file) {
-        petAvatar = URL.createObjectURL(file);
-        document.getElementById('pet-avatar-display').innerHTML = `<img src="${petAvatar}" class="w-full h-full object-cover">`;
-      }
-    };
-
-    function loadProfile() {
-      document.getElementById('profile-pet-name').textContent = petProfile.name;
-      document.getElementById('profile-age').value = petProfile.age;
-      document.getElementById('profile-type').value = petProfile.type;
-	  document.getElementById('profile-gender').value = petProfile.gender;
-      document.getElementById('profile-weight').value = petProfile.weight;
-      document.getElementById('profile-breed').value = petProfile.breed;
-      document.getElementById('profile-color').value = petProfile.color;
-    }
-
-    document.getElementById('save-profile-btn').onclick = () => {
-      petProfile.age = document.getElementById('profile-age').value;
-      petProfile.weight = document.getElementById('profile-weight').value;
-      petProfile.breed = document.getElementById('profile-breed').value;
-      petProfile.color = document.getElementById('profile-color').value;
-      petProfile.type = document.getElementById('profile-type').value;
-	  petProfile.gender = document.getElementById('profile-gender').value;
-      showToast('資料已儲存！✨');
+      appData.selectedPetIds = [];
     };
 
     document.getElementById('back-btn').onclick = () => document.getElementById('detail-page').classList.add('hidden');
     document.getElementById('prev-month').onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); };
     document.getElementById('next-month').onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
-    document.getElementById('logout-btn').onclick = () => location.reload();
+
+    // 登出按鈕 - 添加確認對話框
+    document.getElementById('logout-btn').onclick = () => {
+      if (confirm('確定要登出嗎？')) {
+        location.reload();
+      }
+    };
+
+    // ========== 初始化 ==========
+    loadAppData();
   </script>
  </body>
 </html>

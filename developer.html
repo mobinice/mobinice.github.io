@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鏈居平台 - 代銷端</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .qr-scanner {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+            border: 3px solid #3b82f6;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        .qr-scanner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(300px); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <!-- 登入頁 -->
+    <div id="login-page" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-600">
+        <div class="bg-white rounded-3xl shadow-2xl p-12 w-full max-w-md fade-in">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-black text-slate-900 mb-2">鏈居平台</h1>
+                <p class="text-slate-500">代銷端系統</p>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <input type="text" id="username" placeholder="帳號" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold outline-none focus:ring-2 focus:ring-purple-500">
+                <input type="password" id="password" placeholder="密碼" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+
+            <button onclick="login()" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold text-lg shadow-xl hover:bg-purple-700 active:scale-95 transition-all">
+                登入系統
+            </button>
+        </div>
+    </div>
+
+    <!-- 主應用 -->
+    <div id="app" class="hidden min-h-screen">
+        <!-- 頂部導航 -->
+        <header class="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-50">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 id="page-title" class="text-xl font-black text-slate-900">璞園極上</h1>
+                    <p class="text-xs text-slate-500 mt-0.5" id="user-info">王業務 - 代銷業務</p>
+                </div>
+                <button onclick="logout()" class="text-xs text-slate-400 hover:text-slate-600 font-bold">登出</button>
+            </div>
+        </header>
+
+        <!-- 內容區 -->
+        <div id="content" class="p-6"></div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-6 py-4 rounded-2xl text-sm font-medium opacity-0 pointer-events-none transition-opacity duration-300 z-[200] shadow-xl">
+        操作成功
+    </div>
+
+    <script>
+        // 模擬資料
+        let reports = [
+            {
+                id: 'R2024001',
+                project_name: '璞園極上',
+                buyer_name: '王小明',
+                buyer_phone: '0912-345-678',
+                broker_store: '信義房屋 - 大安店',
+                broker_agent: '王業務',
+                status: 'pending',
+                preferred_date: '2024-01-15',
+                preferred_time: '14:00',
+                created_at: '2024-01-10 14:32',
+                scheduled_date: null,
+                scheduled_time: null,
+                progress_status: null,
+                viewing_completed: false,
+                notes: [],
+                // SLA tracking
+                sla_deadline_at: '2024-01-11 14:32',  // 24h after creation
+                last_updated_at: '2024-01-10 14:32',
+                last_updated_by_role: '仲介',
+                last_updated_by_name: '王業務'
+            },
+            {
+                id: 'R2024002',
+                project_name: '璞園極上',
+                buyer_name: '李大華',
+                buyer_phone: '0923-456-789',
+                broker_store: '永慶房屋 - 內湖店',
+                broker_agent: '李業務',
+                status: 'approved',
+                preferred_date: '2024-01-16',
+                preferred_time: '10:00',
+                created_at: '2024-01-11 10:20',
+                scheduled_date: '2024-01-16',
+                scheduled_time: '10:00',
+                progress_status: 'negotiating',
+                viewing_completed: true,
+                notes: [
+                    { time: '2024-01-16 10:30', actor: '代銷', text: '已完成帶看，客戶對格局滿意' }
+                ],
+                // SLA tracking
+                sla_deadline_at: '2024-01-17 10:30',  // 24h after viewing
+                last_updated_at: '2024-01-16 10:30',
+                last_updated_by_role: '代銷',
+                last_updated_by_name: '王業務'
+            },
+            {
+                id: 'R2024003',
+                project_name: '璞園極上',
+                buyer_name: '張美麗',
+                buyer_phone: '0934-567-890',
+                broker_store: '台灣房屋 - 信義店',
+                broker_agent: '陳業務',
+                status: 'pending',
+                preferred_date: '2024-01-12',
+                preferred_time: '15:00',
+                created_at: '2024-01-08 09:15',
+                scheduled_date: null,
+                scheduled_time: null,
+                progress_status: null,
+                viewing_completed: false,
+                notes: [],
+                // SLA tracking - overdue example
+                sla_deadline_at: '2024-01-09 09:15',  // Already overdue by 72+ hours
+                last_updated_at: '2024-01-08 09:15',
+                last_updated_by_role: '仲介',
+                last_updated_by_name: '陳業務'
+            },
+            {
+                id: 'R2024004',
+                project_name: '璞園極上',
+                buyer_name: '林志明',
+                buyer_phone: '0945-678-901',
+                broker_store: '永慶房屋 - 南港店',
+                broker_agent: '黃業務',
+                status: 'approved',
+                preferred_date: '2024-01-17',
+                preferred_time: '11:00',
+                created_at: '2024-01-11 16:45',
+                scheduled_date: '2024-01-17',
+                scheduled_time: '11:00',
+                progress_status: null,
+                viewing_completed: true,
+                viewing_qr_code: 'QR_R2024004_V002',
+                notes: [],
+                // SLA tracking - needs progress update
+                sla_deadline_at: '2024-01-18 11:00',
+                last_updated_at: '2024-01-17 11:00',
+                last_updated_by_role: '代銷',
+                last_updated_by_name: '王業務'
+            },
+            {
+                id: 'R2024005',
+                project_name: '璞園極上',
+                buyer_name: '陳美玲',
+                buyer_phone: '0956-789-012',
+                broker_store: '信義房屋 - 大安店',
+                broker_agent: '王業務',
+                status: 'cancelled_after_approved',
+                preferred_date: '2024-01-12',
+                preferred_time: '15:00',
+                created_at: '2024-01-08 15:30',
+                scheduled_date: '2024-01-12',
+                scheduled_time: '15:00',
+                approved_at: '2024-01-09 10:15',
+                cancelled_at: '2024-01-11 14:20',
+                cancel_reason: 'buyer_changed_mind',
+                cancel_note: '買方改變購屋計畫',
+                viewing_qr_code: 'QR_R2024005_V003',
+                progress_status: null,
+                viewing_completed: false,
+                notes: [],
+                sla_deadline_at: null,
+                last_updated_at: '2024-01-11 14:20',
+                last_updated_by_role: '仲介',
+                last_updated_by_name: '王業務'
+            }
+        ];
+
+        let currentUser = {
+            name: '王業務',
+            role: '代銷業務',
+            project: '璞園極上'
+        };
+
+        // 登入
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showToast('請輸入帳號密碼');
+                return;
+            }
+
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            renderHome();
+            showToast('登入成功');
+        }
+
+        // 登出
+        function logout() {
+            document.getElementById('app').classList.add('hidden');
+            document.getElementById('login-page').classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('opacity-100');
+            setTimeout(() => toast.classList.remove('opacity-100'), 2500);
+        }
+
+        // ===== 首頁 =====
+        function renderHome() {
+            const content = document.getElementById('content');
+
+            const pendingCount = reports.filter(r => r.status === 'pending').length;
+            const needUpdateCount = reports.filter(r => r.status === 'approved' && r.viewing_completed && !r.progress_status).length;
+            const totalActionable = pendingCount + needUpdateCount;
+
+            content.innerHTML = `
+                <div class="fade-in space-y-5 max-w-md mx-auto">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-black text-slate-900 mb-1">今日待辦</h2>
+                        <p class="text-sm text-slate-500">共 ${totalActionable} 筆需要處理</p>
+                    </div>
+
+                    <!-- 1. 待核可 -->
+                    <button onclick="renderReportList('pending')" class="w-full bg-white border-2 ${pendingCount > 0 ? 'border-orange-400 bg-orange-50/30' : 'border-slate-200'} p-6 rounded-3xl shadow-lg hover:shadow-xl active:scale-98 transition-all text-left relative overflow-hidden">
+                        ${pendingCount > 0 ? `
+                            <div class="absolute top-4 right-4">
+                                <span class="px-3 py-1.5 bg-orange-500 text-white rounded-full text-xs font-black">${pendingCount}</span>
+                            </div>
+                        ` : ''}
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            </div>
+                            <div class="flex-1 pr-12">
+                                <h3 class="text-lg font-black text-slate-900 mb-0.5">待核可</h3>
+                                <p class="text-xs text-slate-500">需審核並排定帶看時間</p>
+                            </div>
+                        </div>
+                        ${pendingCount > 0 ? `
+                            <div class="mt-3 pt-3 border-t border-orange-200">
+                                <p class="text-xs text-orange-700 font-bold">⏰ ${pendingCount} 筆待核可報備</p>
+                            </div>
+                        ` : `
+                            <div class="mt-3 pt-3 border-t border-slate-100">
+                                <p class="text-xs text-slate-400">✓ 目前沒有待處理項目</p>
+                            </div>
+                        `}
+                    </button>
+
+                    <!-- 2. 待更新進度 -->
+                    <button onclick="renderReportList('needUpdate')" class="w-full bg-white border-2 ${needUpdateCount > 0 ? 'border-blue-400 bg-blue-50/30' : 'border-slate-200'} p-6 rounded-3xl shadow-lg hover:shadow-xl active:scale-98 transition-all text-left relative overflow-hidden">
+                        ${needUpdateCount > 0 ? `
+                            <div class="absolute top-4 right-4">
+                                <span class="px-3 py-1.5 bg-blue-500 text-white rounded-full text-xs font-black">${needUpdateCount}</span>
+                            </div>
+                        ` : ''}
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            </div>
+                            <div class="flex-1 pr-12">
+                                <h3 class="text-lg font-black text-slate-900 mb-0.5">待更新進度</h3>
+                                <p class="text-xs text-slate-500">已完成帶看待登錄結果</p>
+                            </div>
+                        </div>
+                        ${needUpdateCount > 0 ? `
+                            <div class="mt-3 pt-3 border-t border-blue-200">
+                                <p class="text-xs text-blue-700 font-bold">📝 ${needUpdateCount} 筆待更新進度</p>
+                            </div>
+                        ` : `
+                            <div class="mt-3 pt-3 border-t border-slate-100">
+                                <p class="text-xs text-slate-400">✓ 目前沒有待處理項目</p>
+                            </div>
+                        `}
+                    </button>
+
+                    <!-- 3. QR 掃描 -->
+                    <button onclick="renderQRScanner()" class="w-full bg-gradient-to-br from-purple-500 to-pink-600 text-white p-6 rounded-3xl shadow-xl hover:shadow-2xl active:scale-98 transition-all text-left">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black mb-0.5">QR 掃描</h3>
+                                <p class="text-xs opacity-90">現場帶看確認</p>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-white/20">
+                            <p class="text-xs opacity-90">💡 掃描後才計入帶看（KPI 唯一來源）</p>
+                        </div>
+                    </button>
+
+                    <!-- 快捷入口 -->
+                    <div class="mt-8 pt-6 border-t border-slate-200">
+                        <button onclick="renderReportList('all')" class="w-full text-center text-sm text-slate-500 hover:text-slate-700 font-bold py-2">
+                            查看所有報備 →
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== [B-02] QR 掃描 =====
+        function renderQRScanner() {
+            const content = document.getElementById('content');
+
+            content.innerHTML = `
+                <div class="fade-in max-w-md mx-auto">
+                    <button onclick="renderHome()" class="flex items-center gap-2 text-slate-500 mb-6 font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        返回
+                    </button>
+
+                    <div class="bg-white rounded-3xl p-8 border border-slate-200">
+                        <h2 class="text-2xl font-black text-slate-900 mb-6 text-center">掃描帶看 QR Code</h2>
+
+                        <!-- QR 掃描區 -->
+                        <div class="qr-scanner mb-6 flex items-center justify-center bg-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-32 h-32 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                        </div>
+
+                        <p class="text-center text-slate-500 text-sm mb-6">請將仲介出示的 QR Code 對準掃描框</p>
+
+                        <!-- 模擬掃描按鈕 -->
+                        <button onclick="simulateQRScan()" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold hover:bg-purple-700 active:scale-95 transition-all">
+                            模擬掃描（測試用）
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function simulateQRScan() {
+            // 模擬掃描成功
+            const report_id = 'R2024002';
+            const report = reports.find(r => r.id === report_id);
+
+            if (!report) {
+                showToast('❌ QR Code 無效');
+                return;
+            }
+
+            // 更新報備為已完成帶看
+            report.viewing_completed = true;
+            report.last_updated_at = new Date().toISOString().slice(0, 16).replace('T', ' ');
+            report.last_updated_by_role = '代銷';
+            report.last_updated_by_name = currentUser.name;
+
+            // 顯示掃描成功頁面
+            showQRScanSuccess(report);
+        }
+
+        function showQRScanSuccess(report) {
+            const content = document.getElementById('content');
+
+            content.innerHTML = `
+                <div class="fade-in max-w-md mx-auto">
+                    <div class="bg-white rounded-3xl p-8 border border-slate-200 text-center">
+                        <!-- Success Icon -->
+                        <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+
+                        <h2 class="text-2xl font-black text-slate-900 mb-2">掃描成功！</h2>
+                        <p class="text-slate-500 text-sm mb-8">帶看已確認完成，現在請登錄進度</p>
+
+                        <!-- Report Info Card -->
+                        <div class="bg-slate-50 rounded-2xl p-5 text-left mb-8">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="font-bold text-slate-900 text-lg mb-1">${maskName(report.buyer_name)}</h3>
+                                    <p class="text-xs text-slate-500">${report.broker_store}</p>
+                                </div>
+                                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
+                                    ✓ 已帶看
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">帶看時間</p>
+                                    <p class="text-sm font-bold text-slate-900">${report.scheduled_date || report.preferred_date}</p>
+                                    <p class="text-sm font-bold text-slate-900">${report.scheduled_time || report.preferred_time}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">確認時間</p>
+                                    <p class="text-sm font-bold text-slate-900">${new Date().toLocaleDateString('zh-TW')}</p>
+                                    <p class="text-sm font-bold text-slate-900">${new Date().toLocaleTimeString('zh-TW', {hour: '2-digit', minute: '2-digit'})}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Next Step Info -->
+                        <div class="bg-purple-50 border border-purple-200 rounded-2xl p-4 mb-6 text-left">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <span class="text-white font-black">!</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold text-slate-900 mb-1">下一步：登錄買方進度</p>
+                                    <p class="text-xs text-slate-600">請記錄帶看結果（不合適/洽談中/洽談失敗）</p>
+                                    <p class="text-xs text-purple-600 font-bold mt-2">💡 此步驟將計入 KPI 統計</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="space-y-3">
+                            <button onclick="showProgressUpdate('${report.id}')" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold text-lg shadow-xl hover:bg-purple-700 active:scale-95 transition-all">
+                                立即登錄進度
+                            </button>
+                            <button onclick="renderHome()" class="w-full bg-slate-100 text-slate-600 py-3 rounded-2xl font-bold hover:bg-slate-200 active:scale-95 transition-all">
+                                稍後處理
+                            </button>
+                        </div>
+
+                        <!-- Timer Hint -->
+                        <p class="text-xs text-slate-400 mt-6">
+                            ⏰ 建議 24 小時內完成登錄
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== [B-01] 報備處理 =====
+        let currentFilter = {
+            layer: 'reportStatus',  // reportStatus, viewingStatus, businessProgress
+            value: 'all'
+        };
+
+        let batchMode = false;
+        let selectedReports = new Set();
+
+        function renderReportList(quickFilter = null) {
+            const content = document.getElementById('content');
+
+            // Handle quick filter from home page
+            if (quickFilter === 'pending') {
+                currentFilter = { layer: 'reportStatus', value: 'pending' };
+            } else if (quickFilter === 'needUpdate') {
+                currentFilter = { layer: 'custom', value: 'needUpdate' };
+            } else if (quickFilter === 'all') {
+                currentFilter = { layer: 'reportStatus', value: 'all' };
+            }
+
+            // Layer 1: Report Status
+            const reportStatusGroups = {
+                all: reports,
+                pending: reports.filter(r => r.status === 'pending'),
+                approved: reports.filter(r => r.status === 'approved'),
+                rejected: reports.filter(r => r.status === 'rejected'),
+                cancelled: reports.filter(r => r.status === 'cancelled'),
+                cancelled_after_approved: reports.filter(r => r.status === 'cancelled_after_approved')
+            };
+
+            // Layer 2: Viewing Status
+            const viewingStatusGroups = {
+                all: reports,
+                completed: reports.filter(r => r.viewing_completed === true),
+                not_completed: reports.filter(r => r.status === 'approved' && !r.viewing_completed),
+                no_show: reports.filter(r => r.no_show === true),
+                cancelled: reports.filter(r => r.viewing_cancelled === true)
+            };
+
+            // Layer 3: Business Progress
+            const progressGroups = {
+                all: reports.filter(r => r.progress_status),
+                not_suitable: reports.filter(r => r.progress_status === 'not_suitable'),
+                negotiating: reports.filter(r => r.progress_status === 'negotiating'),
+                failed: reports.filter(r => r.progress_status === 'failed'),
+                deposited: reports.filter(r => r.progress_status === 'deposited'),
+                closed: reports.filter(r => r.progress_status === 'closed')
+            };
+
+            // Custom filter for "need update"
+            const needUpdateList = reports.filter(r => r.status === 'approved' && r.viewing_completed && !r.progress_status);
+
+            // Get filtered list based on current filter
+            let filteredReports = reports;
+            if (currentFilter.layer === 'reportStatus') {
+                filteredReports = reportStatusGroups[currentFilter.value] || reports;
+            } else if (currentFilter.layer === 'viewingStatus') {
+                filteredReports = viewingStatusGroups[currentFilter.value] || reports;
+            } else if (currentFilter.layer === 'businessProgress') {
+                filteredReports = progressGroups[currentFilter.value] || reports;
+            } else if (currentFilter.layer === 'custom' && currentFilter.value === 'needUpdate') {
+                filteredReports = needUpdateList;
+            }
+
+            content.innerHTML = `
+                <div class="fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <button onclick="renderHome()" class="flex items-center gap-2 text-slate-500 font-bold">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            返回
+                        </button>
+                        ${reportStatusGroups.pending.length > 0 ? `
+                            <button onclick="toggleBatchMode()" class="px-4 py-2 ${batchMode ? 'bg-purple-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-xl text-sm font-bold">
+                                ${batchMode ? '取消批次' : '批次操作'}
+                            </button>
+                        ` : ''}
+                    </div>
+
+                    <!-- Batch Operations Toolbar -->
+                    ${batchMode && reportStatusGroups.pending.length > 0 ? `
+                        <div class="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-2xl">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-3">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" id="select-all" onchange="toggleSelectAll()" class="w-5 h-5 text-purple-600 rounded">
+                                        <span class="text-sm font-bold text-slate-700">全選</span>
+                                    </label>
+                                    <span class="text-sm text-slate-500">已選 ${selectedReports.size} 筆</span>
+                                </div>
+                                ${selectedReports.size > 0 ? `
+                                    <div class="flex gap-2">
+                                        <button onclick="batchApprove()" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 active:scale-95 transition-all">
+                                            批次核可 (${selectedReports.size})
+                                        </button>
+                                        <button onclick="batchReject()" class="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 active:scale-95 transition-all">
+                                            批次拒絕 (${selectedReports.size})
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- 三層篩選系統 -->
+                    <div class="mb-6">
+                        <!-- Layer Selector -->
+                        <div class="flex gap-2 mb-4">
+                            <button onclick="switchFilterLayer('reportStatus')" class="px-4 py-2 ${currentFilter.layer === 'reportStatus' ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-xl text-sm font-bold">
+                                報備狀態
+                            </button>
+                            <button onclick="switchFilterLayer('viewingStatus')" class="px-4 py-2 ${currentFilter.layer === 'viewingStatus' ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-xl text-sm font-bold">
+                                帶看狀態
+                            </button>
+                            <button onclick="switchFilterLayer('businessProgress')" class="px-4 py-2 ${currentFilter.layer === 'businessProgress' ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-xl text-sm font-bold">
+                                業務進度
+                            </button>
+                        </div>
+
+                        <!-- Layer 1: Report Status -->
+                        <div id="layer-reportStatus" class="${currentFilter.layer === 'reportStatus' ? '' : 'hidden'} flex gap-2 overflow-x-auto pb-2">
+                            <button onclick="applyFilter('reportStatus', 'all')" class="px-4 py-2 ${currentFilter.layer === 'reportStatus' && currentFilter.value === 'all' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                全部 (${reportStatusGroups.all.length})
+                            </button>
+                            <button onclick="applyFilter('reportStatus', 'pending')" class="px-4 py-2 ${currentFilter.layer === 'reportStatus' && currentFilter.value === 'pending' ? 'bg-orange-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                待核可 (${reportStatusGroups.pending.length})
+                            </button>
+                            <button onclick="applyFilter('reportStatus', 'approved')" class="px-4 py-2 ${currentFilter.layer === 'reportStatus' && currentFilter.value === 'approved' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                已核可 (${reportStatusGroups.approved.length})
+                            </button>
+                            <button onclick="applyFilter('reportStatus', 'rejected')" class="px-4 py-2 ${currentFilter.layer === 'reportStatus' && currentFilter.value === 'rejected' ? 'bg-red-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                已拒絕 (${reportStatusGroups.rejected.length})
+                            </button>
+                            <button onclick="applyFilter('reportStatus', 'cancelled')" class="px-4 py-2 ${currentFilter.layer === 'reportStatus' && currentFilter.value === 'cancelled' ? 'bg-slate-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                已取消 (${reportStatusGroups.cancelled.length})
+                            </button>
+                            <button onclick="applyFilter('reportStatus', 'cancelled_after_approved')" class="px-4 py-2 ${currentFilter.layer === 'reportStatus' && currentFilter.value === 'cancelled_after_approved' ? 'bg-amber-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                已核可後取消 (${reportStatusGroups.cancelled_after_approved.length})
+                            </button>
+                        </div>
+
+                        <!-- Layer 2: Viewing Status -->
+                        <div id="layer-viewingStatus" class="${currentFilter.layer === 'viewingStatus' ? '' : 'hidden'} flex gap-2 overflow-x-auto pb-2">
+                            <button onclick="applyFilter('viewingStatus', 'all')" class="px-4 py-2 ${currentFilter.layer === 'viewingStatus' && currentFilter.value === 'all' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                全部 (${viewingStatusGroups.all.length})
+                            </button>
+                            <button onclick="applyFilter('viewingStatus', 'completed')" class="px-4 py-2 ${currentFilter.layer === 'viewingStatus' && currentFilter.value === 'completed' ? 'bg-green-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                已帶看 (${viewingStatusGroups.completed.length})
+                            </button>
+                            <button onclick="applyFilter('viewingStatus', 'not_completed')" class="px-4 py-2 ${currentFilter.layer === 'viewingStatus' && currentFilter.value === 'not_completed' ? 'bg-orange-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                未帶看 (${viewingStatusGroups.not_completed.length})
+                            </button>
+                            <button onclick="applyFilter('viewingStatus', 'no_show')" class="px-4 py-2 ${currentFilter.layer === 'viewingStatus' && currentFilter.value === 'no_show' ? 'bg-red-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                爽約 (${viewingStatusGroups.no_show.length})
+                            </button>
+                            <button onclick="applyFilter('viewingStatus', 'cancelled')" class="px-4 py-2 ${currentFilter.layer === 'viewingStatus' && currentFilter.value === 'cancelled' ? 'bg-slate-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                取消 (${viewingStatusGroups.cancelled.length})
+                            </button>
+                        </div>
+
+                        <!-- Layer 3: Business Progress -->
+                        <div id="layer-businessProgress" class="${currentFilter.layer === 'businessProgress' ? '' : 'hidden'} flex gap-2 overflow-x-auto pb-2">
+                            <button onclick="applyFilter('businessProgress', 'all')" class="px-4 py-2 ${currentFilter.layer === 'businessProgress' && currentFilter.value === 'all' ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                全部 (${progressGroups.all.length})
+                            </button>
+                            <button onclick="applyFilter('businessProgress', 'not_suitable')" class="px-4 py-2 ${currentFilter.layer === 'businessProgress' && currentFilter.value === 'not_suitable' ? 'bg-slate-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                不合適 (${progressGroups.not_suitable.length})
+                            </button>
+                            <button onclick="applyFilter('businessProgress', 'negotiating')" class="px-4 py-2 ${currentFilter.layer === 'businessProgress' && currentFilter.value === 'negotiating' ? 'bg-yellow-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                洽談中 (${progressGroups.negotiating.length})
+                            </button>
+                            <button onclick="applyFilter('businessProgress', 'failed')" class="px-4 py-2 ${currentFilter.layer === 'businessProgress' && currentFilter.value === 'failed' ? 'bg-red-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                洽談失敗 (${progressGroups.failed.length})
+                            </button>
+                            <button onclick="applyFilter('businessProgress', 'deposited')" class="px-4 py-2 ${currentFilter.layer === 'businessProgress' && currentFilter.value === 'deposited' ? 'bg-purple-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                已收訂 (${progressGroups.deposited.length})
+                            </button>
+                            <button onclick="applyFilter('businessProgress', 'closed')" class="px-4 py-2 ${currentFilter.layer === 'businessProgress' && currentFilter.value === 'closed' ? 'bg-green-600 text-white' : 'bg-white border border-slate-200 text-slate-600'} rounded-full text-xs font-bold whitespace-nowrap">
+                                已成交 (${progressGroups.closed.length})
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 待處理優先顯示 -->
+                    ${reportStatusGroups.pending.length > 0 && currentFilter.value === 'all' ? `
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold text-slate-900 mb-4">⏰ 待核可報備</h3>
+                            <div class="space-y-3">
+                                ${reportStatusGroups.pending.map(r => renderReportCard(r, true)).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${needUpdateList.length > 0 && currentFilter.value === 'all' ? `
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold text-slate-900 mb-4">📝 待更新進度</h3>
+                            <div class="space-y-3">
+                                ${needUpdateList.map(r => renderReportCard(r, false)).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- 篩選結果 -->
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-900">
+                            ${currentFilter.value === 'needUpdate' ? '待更新進度' : currentFilter.value === 'all' ? '所有報備' : '篩選結果'}
+                        </h3>
+                        <span class="text-sm text-slate-500">${filteredReports.length} 筆</span>
+                    </div>
+
+                    ${filteredReports.length > 0 ? `
+                        <div class="space-y-3">
+                            ${filteredReports.map(r => renderReportCard(r, currentFilter.value === 'pending')).join('')}
+                        </div>
+                    ` : `
+                        <div class="text-center py-12">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+                            <p class="text-slate-400 text-sm">目前沒有符合條件的報備</p>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function switchFilterLayer(layer) {
+            currentFilter = { layer: layer, value: 'all' };
+            renderReportList();
+        }
+
+        function applyFilter(layer, value) {
+            currentFilter = { layer: layer, value: value };
+            renderReportList();
+        }
+
+        function renderReportCard(report, isPending) {
+            const slaStatus = calculateSLAStatus(report);
+            const nextStep = getNextStep(report);
+            const showCheckbox = batchMode && isPending;
+
+            return `
+                <div class="bg-white rounded-2xl p-5 border ${slaStatus.borderClass} ${showCheckbox ? 'relative' : isPending || (report.viewing_completed && !report.progress_status) ? '' : 'cursor-pointer hover:shadow-lg'} transition-all"
+                     onclick="${showCheckbox || isPending || (report.viewing_completed && !report.progress_status) ? '' : `showReportDetail('${report.id}')`}">
+
+                    ${showCheckbox ? `
+                        <!-- Batch Mode Checkbox -->
+                        <div class="absolute top-3 left-3 z-10">
+                            <input type="checkbox"
+                                   id="check-${report.id}"
+                                   ${selectedReports.has(report.id) ? 'checked' : ''}
+                                   onchange="toggleReportSelection('${report.id}')"
+                                   onclick="event.stopPropagation()"
+                                   class="w-6 h-6 text-purple-600 rounded border-2 border-slate-300 cursor-pointer">
+                        </div>
+                    ` : ''}
+
+                    <!-- Header: Name & SLA Badge -->
+                    <div class="flex justify-between items-start mb-3 ${showCheckbox ? 'ml-8' : ''}">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h3 class="font-bold text-slate-900 text-base">${maskName(report.buyer_name)}</h3>
+                                <span class="text-xs text-slate-400">${maskPhone(report.buyer_phone)}</span>
+                            </div>
+                            <p class="text-xs text-slate-500">${report.broker_store} · ${report.broker_agent}</p>
+                        </div>
+                        ${slaStatus.badge}
+                    </div>
+
+                    <!-- Status Tags -->
+                    <div class="flex flex-wrap gap-1.5 mb-3">
+                        <span class="px-2 py-1 ${getStatusColor(report)} rounded-md text-xs font-bold">
+                            ${getStatusText(report)}
+                        </span>
+                        ${report.viewing_completed ? `
+                            <span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-bold">
+                                ✓ 已帶看
+                            </span>
+                        ` : report.status === 'approved' ? `
+                            <span class="px-2 py-1 bg-orange-100 text-orange-700 rounded-md text-xs font-bold">
+                                待帶看
+                            </span>
+                        ` : ''}
+                        ${report.progress_status ? `
+                            <span class="px-2 py-1 ${getProgressColor(report.progress_status)} rounded-md text-xs font-bold">
+                                ${getProgressText(report.progress_status)}
+                            </span>
+                        ` : ''}
+                    </div>
+
+                    <!-- Cancel Information (for cancelled_after_approved status) -->
+                    ${report.status === 'cancelled_after_approved' ? `
+                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl mb-3">
+                            <div class="flex items-start gap-2 mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                <div class="flex-1">
+                                    <p class="text-xs font-bold text-amber-900 mb-1">仲介已取消此報備</p>
+                                    <div class="space-y-1">
+                                        <p class="text-xs text-amber-800"><span class="font-bold">取消時間：</span>${report.cancelled_at}</p>
+                                        <p class="text-xs text-amber-800"><span class="font-bold">取消原因：</span>${getCancelReasonText(report.cancel_reason)}</p>
+                                        ${report.cancel_note ? `<p class="text-xs text-amber-800"><span class="font-bold">補充說明：</span>${report.cancel_note}</p>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Time Information Grid -->
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <div class="p-2 bg-slate-50 rounded-lg">
+                            <p class="text-xs text-slate-500 mb-0.5">希望時間</p>
+                            <p class="text-xs font-bold text-slate-900">${report.preferred_date}</p>
+                            <p class="text-xs font-bold text-slate-900">${report.preferred_time}</p>
+                        </div>
+                        ${report.scheduled_date ? `
+                            <div class="p-2 bg-blue-50 rounded-lg">
+                                <p class="text-xs text-blue-600 mb-0.5">排定時間</p>
+                                <p class="text-xs font-bold text-blue-900">${report.scheduled_date}</p>
+                                <p class="text-xs font-bold text-blue-900">${report.scheduled_time}</p>
+                            </div>
+                        ` : `
+                            <div class="p-2 bg-slate-50 rounded-lg">
+                                <p class="text-xs text-slate-500 mb-0.5">最後更新</p>
+                                <p class="text-xs font-bold text-slate-900">${formatRelativeTime(report.last_updated_at)}</p>
+                                <p class="text-xs text-slate-500">by ${report.last_updated_by_name}</p>
+                            </div>
+                        `}
+                    </div>
+
+                    ${isPending ? `
+                        <!-- Pending Actions -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="event.stopPropagation(); approveReport('${report.id}')" class="py-3 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 active:scale-95 transition-all">
+                                核可
+                            </button>
+                            <button onclick="event.stopPropagation(); rejectReport('${report.id}')" class="py-3 bg-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-300 active:scale-95 transition-all">
+                                拒絕
+                            </button>
+                        </div>
+                    ` : report.viewing_completed && !report.progress_status ? `
+                        <!-- Need Update Actions -->
+                        <button onclick="event.stopPropagation(); showProgressUpdate('${report.id}')" class="w-full py-3 bg-purple-600 text-white rounded-xl font-bold text-sm hover:bg-purple-700 active:scale-95 transition-all">
+                            登錄進度
+                        </button>
+                    ` : ''}
+
+                    <!-- Next Step Hint -->
+                    <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <div class="flex-1">
+                            <p class="text-xs text-slate-400">${nextStep.text}</p>
+                        </div>
+                        ${nextStep.showArrow ? `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Calculate SLA status and return badge + border styling
+        function calculateSLAStatus(report) {
+            const now = new Date();
+            const deadline = new Date(report.sla_deadline_at);
+            const diffMs = deadline - now;
+            const diffHours = diffMs / (1000 * 60 * 60);
+
+            if (diffHours < 0) {
+                // Overdue
+                const overdueHours = Math.abs(Math.floor(diffHours));
+                if (overdueHours >= 72) {
+                    return {
+                        badge: `<span class="px-2 py-1 bg-red-500 text-white rounded-md text-xs font-black animate-pulse">逾期 ${overdueHours}h</span>`,
+                        borderClass: 'border-red-300 bg-red-50/20'
+                    };
+                } else if (overdueHours >= 48) {
+                    return {
+                        badge: `<span class="px-2 py-1 bg-red-500 text-white rounded-md text-xs font-bold">逾期 ${overdueHours}h</span>`,
+                        borderClass: 'border-red-300 bg-red-50/10'
+                    };
+                } else if (overdueHours >= 24) {
+                    return {
+                        badge: `<span class="px-2 py-1 bg-orange-500 text-white rounded-md text-xs font-bold">逾期 ${overdueHours}h</span>`,
+                        borderClass: 'border-orange-300'
+                    };
+                } else {
+                    return {
+                        badge: `<span class="px-2 py-1 bg-yellow-500 text-white rounded-md text-xs font-bold">逾期 ${overdueHours}h</span>`,
+                        borderClass: 'border-yellow-300'
+                    };
+                }
+            } else if (diffHours <= 24) {
+                // Warning: less than 24h remaining
+                const remainingHours = Math.floor(diffHours);
+                return {
+                    badge: `<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-md text-xs font-bold">剩 ${remainingHours}h</span>`,
+                    borderClass: 'border-slate-200'
+                };
+            } else {
+                // Normal: more than 24h remaining
+                return {
+                    badge: '',
+                    borderClass: 'border-slate-200'
+                };
+            }
+        }
+
+        // Get next step hint for card
+        function getNextStep(report) {
+            if (report.status === 'pending') {
+                return { text: '▶ 下一步：核可並排定時間', showArrow: false };
+            }
+            if (report.status === 'cancelled_after_approved') {
+                return { text: '仲介已取消，流程結束', showArrow: false };
+            }
+            if (report.viewing_completed && !report.progress_status) {
+                return { text: '▶ 下一步：登錄帶看進度', showArrow: false };
+            }
+            if (report.status === 'approved' && !report.viewing_completed) {
+                return { text: `等待 ${report.scheduled_date} 帶看`, showArrow: false };
+            }
+            if (report.progress_status === 'negotiating') {
+                return { text: '洽談中 - 等待後續更新', showArrow: false };
+            }
+            if (report.progress_status === 'not_suitable' || report.progress_status === 'failed') {
+                return { text: '流程結束', showArrow: false };
+            }
+            if (report.progress_status === 'closed') {
+                return { text: '✓ 已成交', showArrow: false };
+            }
+            return { text: '點擊查看詳情', showArrow: true };
+        }
+
+        // Format relative time
+        function formatRelativeTime(timestamp) {
+            const now = new Date();
+            const time = new Date(timestamp);
+            const diffMs = now - time;
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+            if (diffMins < 60) {
+                return `${diffMins} 分鐘前`;
+            } else if (diffHours < 24) {
+                return `${diffHours} 小時前`;
+            } else {
+                return `${diffDays} 天前`;
+            }
+        }
+
+        function getProgressColor(status) {
+            const colors = {
+                'not_suitable': 'bg-slate-100 text-slate-600',
+                'negotiating': 'bg-yellow-100 text-yellow-700',
+                'failed': 'bg-red-100 text-red-700',
+                'deposited': 'bg-purple-100 text-purple-700',
+                'closed': 'bg-green-100 text-green-700'
+            };
+            return colors[status] || 'bg-slate-100 text-slate-600';
+        }
+
+        // Batch operation functions
+        function toggleBatchMode() {
+            batchMode = !batchMode;
+            if (!batchMode) {
+                selectedReports.clear();
+            }
+            renderReportList();
+        }
+
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('select-all');
+            const pendingReports = reports.filter(r => r.status === 'pending');
+
+            if (selectAllCheckbox.checked) {
+                pendingReports.forEach(r => selectedReports.add(r.id));
+            } else {
+                selectedReports.clear();
+            }
+            renderReportList();
+        }
+
+        function toggleReportSelection(reportId) {
+            if (selectedReports.has(reportId)) {
+                selectedReports.delete(reportId);
+            } else {
+                selectedReports.add(reportId);
+            }
+            renderReportList();
+        }
+
+        function batchApprove() {
+            if (selectedReports.size === 0) return;
+
+            if (!confirm(`確定要核可 ${selectedReports.size} 筆報備嗎？\n\n將使用買方希望時間作為排定時間。`)) {
+                return;
+            }
+
+            selectedReports.forEach(reportId => {
+                const report = reports.find(r => r.id === reportId);
+                if (report && report.status === 'pending') {
+                    report.status = 'approved';
+                    report.scheduled_date = report.preferred_date;
+                    report.scheduled_time = report.preferred_time;
+                    report.last_updated_at = new Date().toISOString().slice(0, 16).replace('T', ' ');
+                    report.last_updated_by_role = '代銷';
+                    report.last_updated_by_name = currentUser.name;
+                }
+            });
+
+            showToast(`✅ 已批次核可 ${selectedReports.size} 筆報備`);
+            selectedReports.clear();
+            batchMode = false;
+            renderReportList();
+        }
+
+        function batchReject() {
+            if (selectedReports.size === 0) return;
+
+            if (!confirm(`確定要拒絕 ${selectedReports.size} 筆報備嗎？\n\n此操作無法復原。`)) {
+                return;
+            }
+
+            selectedReports.forEach(reportId => {
+                const report = reports.find(r => r.id === reportId);
+                if (report && report.status === 'pending') {
+                    report.status = 'rejected';
+                    report.last_updated_at = new Date().toISOString().slice(0, 16).replace('T', ' ');
+                    report.last_updated_by_role = '代銷';
+                    report.last_updated_by_name = currentUser.name;
+                }
+            });
+
+            showToast(`已批次拒絕 ${selectedReports.size} 筆報備`);
+            selectedReports.clear();
+            batchMode = false;
+            renderReportList();
+        }
+
+        function approveReport(reportId) {
+            event.stopPropagation();
+
+            const report = reports.find(r => r.id === reportId);
+            if (!report) return;
+
+            // 顯示排定時間的彈窗
+            const content = document.getElementById('content');
+            const overlay = document.createElement('div');
+            overlay.id = 'approve-modal';
+            overlay.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center px-4';
+            overlay.innerHTML = `
+                <div class="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
+                    <h3 class="text-xl font-black text-slate-900 mb-4">核可報備並排定時間</h3>
+                    <p class="text-sm text-slate-500 mb-6">${report.buyer_name} - ${report.project_name}</p>
+
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 mb-2">帶看日期</label>
+                            <input type="date" id="schedule-date" value="${report.preferred_date}" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 mb-2">帶看時間</label>
+                            <input type="time" id="schedule-time" value="${report.preferred_time}" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="closeApproveModal()" class="py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">取消</button>
+                        <button onclick="confirmApprove('${reportId}')" class="py-3 bg-blue-600 text-white rounded-xl font-bold">確認核可</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        function closeApproveModal() {
+            const modal = document.getElementById('approve-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function confirmApprove(reportId) {
+            const scheduleDate = document.getElementById('schedule-date').value;
+            const scheduleTime = document.getElementById('schedule-time').value;
+
+            const report = reports.find(r => r.id === reportId);
+            if (report) {
+                report.status = 'approved';
+                report.scheduled_date = scheduleDate;
+                report.scheduled_time = scheduleTime;
+                report.approved_at = new Date().toISOString().slice(0, 16).replace('T', ' ');
+                report.last_updated_at = new Date().toISOString().slice(0, 16).replace('T', ' ');
+                report.last_updated_by_role = '代銷';
+                report.last_updated_by_name = currentUser.name;
+
+                // 生成 QR Code 識別碼
+                const viewingId = 'V' + String(reports.length + Date.now()).slice(-6);
+                report.viewing_qr_code = `QR_${reportId}_${viewingId}`;
+
+                // 更新 SLA deadline（核可後24小時內需完成帶看）
+                const deadline = new Date(scheduleDate + ' ' + scheduleTime);
+                deadline.setHours(deadline.getHours() + 24);
+                report.sla_deadline_at = deadline.toISOString().slice(0, 16).replace('T', ' ');
+            }
+
+            closeApproveModal();
+            showApprovalSuccess(report);
+        }
+
+        function showApprovalSuccess(report) {
+            const content = document.getElementById('content');
+
+            content.innerHTML = `
+                <div class="fade-in max-w-md mx-auto">
+                    <div class="bg-white rounded-3xl p-8 border border-slate-200 text-center">
+                        <!-- Success Icon -->
+                        <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+
+                        <h2 class="text-2xl font-black text-slate-900 mb-2">核可成功！</h2>
+                        <p class="text-slate-500 text-sm mb-8">已排定帶看時間並生成 QR Code</p>
+
+                        <!-- Report Info Card -->
+                        <div class="bg-slate-50 rounded-2xl p-5 text-left mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="font-bold text-slate-900 text-lg mb-1">${maskName(report.buyer_name)}</h3>
+                                    <p class="text-xs text-slate-500">${report.broker_store}</p>
+                                </div>
+                                <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
+                                    ✓ 已核可
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">排定時間</p>
+                                    <p class="text-sm font-bold text-slate-900">${report.scheduled_date}</p>
+                                    <p class="text-sm font-bold text-slate-900">${report.scheduled_time}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">QR Code</p>
+                                    <p class="text-xs font-bold text-blue-600 break-all">${report.viewing_qr_code}</p>
+                                    <p class="text-xs text-green-600 mt-1">✓ 已發送給仲介</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- QR Code Notification -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6 text-left">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold text-slate-900 mb-1">QR Code 已生成</p>
+                                    <p class="text-xs text-slate-600">仲介將在帶看時出示此 QR Code，請現場掃描確認</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Next Step Info -->
+                        <div class="bg-purple-50 border border-purple-200 rounded-2xl p-4 mb-6 text-left">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <span class="text-white font-black text-lg">!</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold text-slate-900 mb-2">接下來的流程</p>
+                                    <ol class="text-xs text-slate-600 space-y-1 list-decimal list-inside">
+                                        <li>等待 <span class="font-bold text-purple-600">${report.scheduled_date} ${report.scheduled_time}</span> 帶看</li>
+                                        <li>仲介會在現場出示 QR Code</li>
+                                        <li>使用「QR 掃描」功能掃描確認</li>
+                                        <li>掃描後登錄買方進度（不合適/洽談中/洽談失敗）</li>
+                                    </ol>
+                                    <p class="text-xs text-purple-600 font-bold mt-3">💡 完成掃描才會計入帶看 KPI</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="space-y-3">
+                            <button onclick="renderReportList()" class="w-full bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold hover:bg-slate-200 active:scale-95 transition-all">
+                                返回報備列表
+                            </button>
+                            <button onclick="renderHome()" class="w-full text-slate-500 py-3 text-sm font-bold hover:text-slate-700">
+                                返回首頁
+                            </button>
+                        </div>
+
+                        <!-- Quick Access -->
+                        <div class="mt-6 pt-6 border-t border-slate-200">
+                            <button onclick="renderQRScanner()" class="text-sm text-blue-600 hover:text-blue-700 font-bold">
+                                前往 QR 掃描 →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function rejectReport(reportId) {
+            event.stopPropagation();
+
+            if (confirm('確定要拒絕此報備嗎？')) {
+                const report = reports.find(r => r.id === reportId);
+                if (report) {
+                    report.status = 'rejected';
+                }
+                showToast('已拒絕報備');
+                renderReportList();
+            }
+        }
+
+        function showReportDetail(reportId) {
+            const report = reports.find(r => r.id === reportId);
+            const content = document.getElementById('content');
+
+            content.innerHTML = `
+                <div class="fade-in">
+                    <button onclick="renderReportList()" class="flex items-center gap-2 text-slate-500 mb-6 font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        返回列表
+                    </button>
+
+                    <div class="bg-white rounded-3xl p-6 border border-slate-100 mb-6">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <h2 class="text-2xl font-black text-slate-900 mb-1">${report.buyer_name}</h2>
+                                <p class="text-slate-500">${report.buyer_phone}</p>
+                            </div>
+                            <span class="px-4 py-2 ${getStatusColor(report)} rounded-full text-sm font-bold">${getStatusText(report)}</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between py-3 border-b border-slate-100">
+                                <span class="text-slate-500">仲介</span>
+                                <span class="font-bold text-slate-900">${report.broker_store}</span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-slate-100">
+                                <span class="text-slate-500">業務</span>
+                                <span class="font-bold text-slate-900">${report.broker_agent}</span>
+                            </div>
+                            <div class="flex justify-between py-3 border-b border-slate-100">
+                                <span class="text-slate-500">報備時間</span>
+                                <span class="font-bold text-slate-900">${report.created_at}</span>
+                            </div>
+                            ${report.scheduled_date ? `
+                                <div class="flex justify-between py-3 border-b border-slate-100">
+                                    <span class="text-slate-500">帶看時間</span>
+                                    <span class="font-bold text-blue-600">${report.scheduled_date} ${report.scheduled_time}</span>
+                                </div>
+                            ` : ''}
+                            ${report.status === 'cancelled_after_approved' ? `
+                                <div class="flex justify-between py-3 border-b border-slate-100">
+                                    <span class="text-slate-500">取消時間</span>
+                                    <span class="font-bold text-amber-600">${report.cancelled_at}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Cancel Information Detail -->
+                    ${report.status === 'cancelled_after_approved' ? `
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-6">
+                            <div class="flex items-start gap-3 mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-amber-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                <div class="flex-1">
+                                    <h4 class="text-sm font-bold text-amber-900 mb-2">仲介取消報備資訊</h4>
+                                    <div class="space-y-2">
+                                        <div>
+                                            <p class="text-xs text-amber-700 font-bold">取消原因</p>
+                                            <p class="text-sm text-amber-900">${getCancelReasonText(report.cancel_reason)}</p>
+                                        </div>
+                                        ${report.cancel_note ? `
+                                            <div>
+                                                <p class="text-xs text-amber-700 font-bold">補充說明</p>
+                                                <p class="text-sm text-amber-900">${report.cancel_note}</p>
+                                            </div>
+                                        ` : ''}
+                                        <div class="pt-2 border-t border-amber-200">
+                                            <p class="text-xs text-amber-600">
+                                                <span class="font-bold">核可時間：</span>${report.approved_at || ''}
+                                            </p>
+                                            <p class="text-xs text-amber-600">
+                                                <span class="font-bold">取消時間：</span>${report.cancelled_at}
+                                            </p>
+                                            <p class="text-xs text-amber-600 mt-1">
+                                                💡 仲介於核可後主動取消，此報備不計入業績統計
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- 洽談紀錄 -->
+                    ${report.notes && report.notes.length > 0 ? `
+                        <div class="bg-white rounded-3xl p-6 border border-slate-100 mb-6">
+                            <h3 class="text-lg font-bold text-slate-900 mb-4">洽談紀錄</h3>
+                            <div class="space-y-3">
+                                ${report.notes.map(note => `
+                                    <div class="p-4 bg-slate-50 rounded-xl">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="text-xs font-bold text-slate-600">【${note.actor}】</span>
+                                            <span class="text-xs text-slate-400">${note.time}</span>
+                                        </div>
+                                        <p class="text-sm text-slate-800">${note.text}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${report.viewing_completed && !report.progress_status ? `
+                        <button onclick="showProgressUpdate('${report.id}')" class="w-full bg-purple-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl hover:bg-purple-700 active:scale-95 transition-all">
+                            更新買方進度
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // ===== [B-03] 進度登錄 =====
+        function showProgressUpdate(reportId) {
+            const report = reports.find(r => r.id === reportId);
+            const content = document.getElementById('content');
+
+            content.innerHTML = `
+                <div class="fade-in">
+                    <button onclick="renderReportList()" class="flex items-center gap-2 text-slate-500 mb-6 font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        返回
+                    </button>
+
+                    <div class="bg-white rounded-3xl p-6 border border-slate-100 mb-6">
+                        <h2 class="text-2xl font-black text-slate-900 mb-6">更新買方進度</h2>
+
+                        <div class="mb-6">
+                            <h3 class="font-bold text-slate-900">${report.buyer_name} ${maskPhone(report.buyer_phone)}</h3>
+                            <p class="text-sm text-slate-500 mt-1">${report.broker_store} - ${report.broker_agent}</p>
+                            <p class="text-xs text-slate-400 mt-2">目前狀態：${report.progress_status ? getProgressText(report.progress_status) : '已帶看'}</p>
+                        </div>
+
+                        <form onsubmit="submitProgressUpdate(event, '${report.id}')" class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-600 mb-3">選擇進度 *</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-all">
+                                        <input type="radio" name="progress" value="not_suitable" required class="mr-3 w-5 h-5 text-purple-600">
+                                        <span class="font-bold text-slate-900">不合適</span>
+                                    </label>
+                                    <label class="flex items-center p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-all">
+                                        <input type="radio" name="progress" value="negotiating" required class="mr-3 w-5 h-5 text-purple-600">
+                                        <span class="font-bold text-slate-900">洽談中</span>
+                                    </label>
+                                    <label class="flex items-center p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-all">
+                                        <input type="radio" name="progress" value="failed" required class="mr-3 w-5 h-5 text-purple-600">
+                                        <span class="font-bold text-slate-900">洽談失敗</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-600 mb-2">洽談紀錄 *</label>
+                                <textarea id="note-text" required rows="5" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm outline-none resize-none" placeholder="請詳細記錄洽談情況...（送出後不可修改）"></textarea>
+                                <p class="text-xs text-slate-400 mt-2">⚠️ 此紀錄送出後無法修改，請確實填寫</p>
+                            </div>
+
+                            <button type="submit" class="w-full bg-purple-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl hover:bg-purple-700 active:scale-95 transition-all">
+                                確認送出
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        function submitProgressUpdate(event, reportId) {
+            event.preventDefault();
+
+            const progress = document.querySelector('input[name="progress"]:checked').value;
+            const noteText = document.getElementById('note-text').value;
+
+            const report = reports.find(r => r.id === reportId);
+            if (report) {
+                report.progress_status = progress;
+                if (!report.notes) report.notes = [];
+                report.notes.push({
+                    time: new Date().toISOString().slice(0, 16).replace('T', ' '),
+                    actor: '代銷',
+                    text: noteText
+                });
+            }
+
+            showToast('✅ 進度已更新');
+            setTimeout(() => renderReportList(), 1500);
+        }
+
+        // 工具函數
+        function maskName(name) {
+            if (name.length <= 1) return name;
+            return name[0] + '○'.repeat(name.length - 1);
+        }
+
+        function maskPhone(phone) {
+            return phone.replace(/(\d{4})-(\d{3})-(\d{3})/, '****-***-$3');
+        }
+
+        function getStatusText(report) {
+            if (report.status === 'pending') return '已報備・待核可';
+            if (report.status === 'approved' && !report.progress_status) return '已核可';
+            if (report.status === 'rejected') return '已拒絕';
+            if (report.status === 'cancelled_after_approved') return '已核可後取消';
+            if (report.progress_status) return getProgressText(report.progress_status);
+            return '未知狀態';
+        }
+
+        function getProgressText(status) {
+            const map = {
+                'not_suitable': '不合適',
+                'negotiating': '洽談中',
+                'failed': '洽談失敗',
+                'deposited': '已收訂',
+                'closed': '已成交'
+            };
+            return map[status] || status;
+        }
+
+        function getStatusColor(report) {
+            if (report.status === 'pending') return 'bg-orange-100 text-orange-700';
+            if (report.status === 'approved') return 'bg-blue-100 text-blue-700';
+            if (report.status === 'rejected') return 'bg-red-100 text-red-700';
+            if (report.status === 'cancelled_after_approved') return 'bg-amber-100 text-amber-700';
+            if (report.progress_status === 'not_suitable') return 'bg-slate-100 text-slate-600';
+            if (report.progress_status === 'negotiating') return 'bg-yellow-100 text-yellow-700';
+            if (report.progress_status === 'failed') return 'bg-red-100 text-red-700';
+            if (report.progress_status === 'deposited') return 'bg-purple-100 text-purple-700';
+            if (report.progress_status === 'closed') return 'bg-green-100 text-green-700';
+            return 'bg-slate-100 text-slate-600';
+        }
+
+        // Helper function to get cancel reason text
+        function getCancelReasonText(reason) {
+            const reasonMap = {
+                'buyer_changed_mind': '買方改變心意',
+                'buyer_unreachable': '買方無法聯絡',
+                'schedule_conflict': '時間衝突',
+                'bought_elsewhere': '買方已購買其他物件',
+                'conditions_not_met': '條件不符',
+                'other': '其他原因'
+            };
+            return reasonMap[reason] || reason;
+        }
+
+    </script>
+</body>
+</html>
