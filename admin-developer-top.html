@@ -1,0 +1,3335 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鏈居 - 代銷端管理後台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #7c3aed;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* 登入/註冊頁面 */
+        .auth-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .auth-wrapper.hidden {
+            display: none;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 480px;
+            padding: 48px 40px;
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-logo h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .auth-logo p {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--border-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .step.active .step-label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .auth-form-section {
+            display: none;
+        }
+
+        .auth-form-section.active {
+            display: block;
+        }
+
+        .auth-form-group {
+            margin-bottom: 24px;
+        }
+
+        .auth-form-label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .auth-form-label .required {
+            color: var(--danger-color);
+            margin-left: 2px;
+        }
+
+        .auth-form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .auth-form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .auth-form-control.error {
+            border-color: var(--danger-color);
+        }
+
+        .auth-form-control.success {
+            border-color: var(--success-color);
+        }
+
+        .auth-error-message {
+            color: var(--danger-color);
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .auth-error-message.show {
+            display: block;
+        }
+
+        .auth-success-message {
+            color: var(--success-color);
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .auth-success-message.show {
+            display: block;
+        }
+
+        .auth-helper-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .auth-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .auth-input-group .auth-form-control {
+            flex: 1;
+        }
+
+        .auth-btn-secondary {
+            padding: 12px 20px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .auth-btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .auth-btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .password-requirements {
+            background: var(--bg-color);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .password-requirements ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .password-requirements li {
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+
+        .password-requirements li.met {
+            color: var(--success-color);
+        }
+
+        .auth-btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 16px;
+        }
+
+        .auth-btn-primary:hover {
+            background: #6d28d9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+
+        .auth-btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .auth-btn-primary:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .auth-btn-outline {
+            flex: 1;
+            padding: 14px;
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .auth-btn-outline:hover {
+            background: var(--bg-color);
+        }
+
+        .auth-divider {
+            text-align: center;
+            margin: 32px 0;
+            position: relative;
+        }
+
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .auth-divider span {
+            position: relative;
+            background: white;
+            padding: 0 16px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .auth-link {
+            text-align: center;
+        }
+
+        .auth-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        .success-container {
+            text-align: center;
+            padding: 32px 0;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 48px;
+            color: white;
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .success-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .container.hidden {
+            display: none;
+        }
+
+        /* 側邊欄 */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .logo p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 0 16px;
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-color);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        /* 主內容區 */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 24px;
+        }
+
+        /* 頂部欄 */
+        .header {
+            background: var(--card-bg);
+            padding: 20px 32px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* 頁面內容 */
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 卡片 */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* 統計卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-change {
+            font-size: 12px;
+            margin-top: 8px;
+            color: var(--success-color);
+        }
+
+        /* 案場卡片 */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.15);
+            border-color: var(--primary-color);
+        }
+
+        .project-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .project-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .project-status {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .project-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .project-stat-item {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-color);
+            border-radius: 8px;
+        }
+
+        .project-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .project-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        /* 表格 */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-color);
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: var(--bg-color);
+        }
+
+        /* 徽章 */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-primary { background: #ede9fe; color: var(--primary-color); }
+        .badge-success { background: #d1fae5; color: var(--success-color); }
+        .badge-warning { background: #fed7aa; color: var(--warning-color); }
+        .badge-danger { background: #fee2e2; color: var(--danger-color); }
+        .badge-info { background: #cffafe; color: var(--info-color); }
+        .badge-secondary { background: #f1f5f9; color: var(--text-secondary); }
+
+        /* 按鈕 */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #6d28d9;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-color);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* 標籤頁 */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: -2px;
+        }
+
+        .tab:hover {
+            color: var(--primary-color);
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        /* 表單 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        /* QR 掃描器 */
+        .qr-scanner {
+            background: var(--bg-color);
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .qr-scanner-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            background: var(--primary-color);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-scanner-icon svg {
+            width: 80px;
+            height: 80px;
+            color: white;
+        }
+
+        .qr-scanner-text {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* 搜尋欄 */
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* 日誌項目 */
+        .log-item {
+            padding: 16px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .log-action {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .log-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .log-details {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .log-user {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-right: 12px;
+        }
+
+        /* 遮罩文字 */
+        .masked-text {
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+        }
+
+        /* 警告框 */
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning-color);
+            color: #92400e;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-left: 4px solid var(--info-color);
+            color: #1e3a8a;
+        }
+
+        /* 響應式 */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+        }
+
+        /* 待處理數量徽章 */
+        .pending-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            padding: 0 8px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        /* 通知系統 */
+        .notification-wrapper {
+            position: relative;
+        }
+
+        .notification-btn {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-btn:hover {
+            background: var(--bg-color);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--danger-color);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+        }
+
+        .notification-panel {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 400px;
+            max-height: 500px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .notification-panel.active {
+            display: block;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notification-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .btn-text {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .btn-text:hover {
+            background: var(--bg-color);
+        }
+
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .notification-item:hover {
+            background: var(--bg-color);
+        }
+
+        .notification-item.unread {
+            background: #faf5ff;
+        }
+
+        .notification-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .notification-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .notification-footer {
+            padding: 12px 20px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .notification-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .notification-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登入/註冊頁面 -->
+    <div class="auth-wrapper" id="authWrapper">
+        <div class="auth-container">
+            <!-- 登入頁面 -->
+            <div id="loginPage" class="auth-form-section active">
+                <div class="auth-logo">
+                    <h1>鏈居</h1>
+                    <p>代銷端管理系統</p>
+                </div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="auth-form-group">
+                        <label class="auth-form-label">公司代碼（帳號）</label>
+                        <input
+                            type="text"
+                            class="auth-form-control"
+                            id="loginCompanyCode"
+                            placeholder="請輸入公司代碼"
+                            required
+                        >
+                        <p class="auth-helper-text">隨便輸入即可登入（測試用）</p>
+                    </div>
+
+                    <div class="auth-form-group">
+                        <label class="auth-form-label">密碼</label>
+                        <input
+                            type="password"
+                            class="auth-form-control"
+                            id="loginPassword"
+                            placeholder="請輸入密碼"
+                            required
+                        >
+                    </div>
+
+                    <div class="auth-error-message" id="loginErrorMessage">
+                        帳號或密碼錯誤，請重新輸入
+                    </div>
+
+                    <button type="submit" class="auth-btn-primary">
+                        登入
+                    </button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>還沒有帳號？</span>
+                </div>
+
+                <div class="auth-link">
+                    <a onclick="showRegisterPage()">註冊代銷公司帳號</a>
+                </div>
+            </div>
+
+            <!-- 註冊頁面 -->
+            <div id="registerPage" class="auth-form-section">
+                <div class="auth-logo">
+                    <h1>鏈居</h1>
+                    <p>代銷端帳號註冊</p>
+                </div>
+
+                <div class="step-indicator">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">公司驗證</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">個人資料</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">手機驗證</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-label">設定密碼</div>
+                    </div>
+                </div>
+
+                <!-- Step 1: 公司代碼驗證 -->
+                <div class="auth-form-section active" id="regStep1">
+                    <form onsubmit="handleRegCompanyCode(event)">
+                        <div class="auth-form-group">
+                            <label class="auth-form-label">公司代碼<span class="required">*</span></label>
+                            <input
+                                type="text"
+                                class="auth-form-control"
+                                id="regCompanyCode"
+                                placeholder="請輸入您的公司代碼"
+                                required
+                            >
+                            <p class="auth-helper-text">請向您的公司管理員索取公司代碼</p>
+                            <p class="auth-error-message" id="regCompanyCodeError">公司代碼不存在或已被註冊</p>
+                            <p class="auth-success-message" id="regCompanyCodeSuccess">公司代碼驗證成功</p>
+                        </div>
+                        <button type="submit" class="auth-btn-primary">驗證並繼續</button>
+                    </form>
+                </div>
+
+                <!-- Step 2: 個人資料 -->
+                <div class="auth-form-section" id="regStep2">
+                    <form onsubmit="handleRegPersonalInfo(event)">
+                        <div class="auth-form-group">
+                            <label class="auth-form-label">真實姓名<span class="required">*</span></label>
+                            <input
+                                type="text"
+                                class="auth-form-control"
+                                id="regRealName"
+                                placeholder="請輸入真實姓名"
+                                required
+                            >
+                            <p class="auth-helper-text">請輸入與身分證相符的真實姓名</p>
+                        </div>
+
+                        <div class="auth-form-group">
+                            <label class="auth-form-label">身分證字號<span class="required">*</span></label>
+                            <input
+                                type="text"
+                                class="auth-form-control"
+                                id="regIdNumber"
+                                placeholder="請輸入身分證字號"
+                                maxlength="10"
+                                required
+                            >
+                            <p class="auth-helper-text">身分證字號將加密儲存，僅用於身份驗證</p>
+                            <p class="auth-error-message" id="regIdNumberError">身分證格式不正確</p>
+                        </div>
+
+                        <div class="auth-btn-group">
+                            <button type="button" class="auth-btn-outline" onclick="regPrevStep()">上一步</button>
+                            <button type="submit" class="auth-btn-primary" style="margin-top: 0;">下一步</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 3: 手機驗證 -->
+                <div class="auth-form-section" id="regStep3">
+                    <form onsubmit="handleRegPhoneVerification(event)">
+                        <div class="auth-form-group">
+                            <label class="auth-form-label">手機號碼<span class="required">*</span></label>
+                            <div class="auth-input-group">
+                                <input
+                                    type="tel"
+                                    class="auth-form-control"
+                                    id="regPhoneNumber"
+                                    placeholder="請輸入手機號碼"
+                                    maxlength="10"
+                                    required
+                                >
+                                <button
+                                    type="button"
+                                    class="auth-btn-secondary"
+                                    id="sendSmsBtn"
+                                    onclick="sendVerificationCode()"
+                                >
+                                    發送驗證碼
+                                </button>
+                            </div>
+                            <p class="auth-helper-text">請輸入 10 碼手機號碼（例：0912345678）</p>
+                            <p class="auth-error-message" id="regPhoneError">手機號碼格式不正確</p>
+                        </div>
+
+                        <div class="auth-form-group" id="smsCodeGroup" style="display: none;">
+                            <label class="auth-form-label">簡訊驗證碼<span class="required">*</span></label>
+                            <input
+                                type="text"
+                                class="auth-form-control"
+                                id="regSmsCode"
+                                placeholder="請輸入 6 位數驗證碼"
+                                maxlength="6"
+                            >
+                            <p class="auth-helper-text" id="smsTimer">驗證碼已發送，5 分鐘內有效</p>
+                            <p class="auth-error-message" id="regSmsCodeError">驗證碼錯誤或已過期</p>
+                        </div>
+
+                        <div class="auth-btn-group">
+                            <button type="button" class="auth-btn-outline" onclick="regPrevStep()">上一步</button>
+                            <button type="submit" class="auth-btn-primary" style="margin-top: 0;" id="verifyPhoneBtn">驗證並繼續</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 4: 設定密碼 -->
+                <div class="auth-form-section" id="regStep4">
+                    <form onsubmit="handleRegPasswordSetup(event)">
+                        <div class="auth-form-group">
+                            <label class="auth-form-label">設定密碼<span class="required">*</span></label>
+                            <input
+                                type="password"
+                                class="auth-form-control"
+                                id="regPassword"
+                                placeholder="請輸入密碼"
+                                required
+                                oninput="checkPasswordStrength()"
+                            >
+                            <div class="password-requirements">
+                                <div style="font-weight: 600; color: var(--text-primary);">密碼需符合以下條件：</div>
+                                <ul>
+                                    <li id="req-length">至少 8 個字元</li>
+                                    <li id="req-letter">包含英文字母</li>
+                                    <li id="req-number">包含數字</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="auth-form-group">
+                            <label class="auth-form-label">確認密碼<span class="required">*</span></label>
+                            <input
+                                type="password"
+                                class="auth-form-control"
+                                id="regConfirmPassword"
+                                placeholder="請再次輸入密碼"
+                                required
+                                oninput="checkPasswordMatch()"
+                            >
+                            <p class="auth-error-message" id="passwordMatchError">兩次輸入的密碼不一致</p>
+                        </div>
+
+                        <div class="auth-btn-group">
+                            <button type="button" class="auth-btn-outline" onclick="regPrevStep()">上一步</button>
+                            <button type="submit" class="auth-btn-primary" style="margin-top: 0;" id="submitBtn">完成註冊</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 5: 註冊成功 -->
+                <div class="auth-form-section" id="regStep5">
+                    <div class="success-container">
+                        <div class="success-icon">✓</div>
+                        <div class="success-title">註冊成功！</div>
+                        <div class="success-text">
+                            您的帳號已成功建立<br>
+                            請使用公司代碼和密碼登入系統
+                        </div>
+                        <button class="auth-btn-primary" onclick="backToLogin()">前往登入</button>
+                    </div>
+                </div>
+
+                <div class="auth-link" style="margin-top: 24px;">
+                    <a onclick="showLoginPage()">已有帳號？立即登入</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container hidden" id="mainApp">
+        <!-- 側邊欄 -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>鏈居</h1>
+                <p>代銷端管理後台</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" data-page="dashboard">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        案場總覽
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="bookings">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                        報備審核管理
+                        <span class="pending-badge" id="pending-count">8</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="sla-monitor">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        SLA監控
+                        <span class="pending-badge" id="sla-overdue-count">5</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="deal-management">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        收訂成交管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="cancelled-after-approved">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        核可後取消專區
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="qr-verify">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                        </svg>
+                        QR 例外核驗
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="project-management">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        案場管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="staff-management">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        代銷人員管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="audit-log">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        稽核日誌
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- 主內容 -->
+        <main class="main-content">
+            <!-- 頂部欄 -->
+            <div class="header">
+                <div class="header-left">
+                    <h2 id="page-title">案場總覽</h2>
+                    <p id="page-subtitle">掌握所有案場與報備壓力</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 24px;">
+                    <!-- 通知圖標 -->
+                    <div class="notification-wrapper">
+                        <button class="notification-btn" onclick="toggleNotifications()">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                            <span class="notification-badge">5</span>
+                        </button>
+
+                        <!-- 通知面板 -->
+                        <div class="notification-panel" id="notificationPanel">
+                            <div class="notification-header">
+                                <h3>主管通知中心</h3>
+                                <button class="btn-text" onclick="markAllRead()">全部已讀</button>
+                            </div>
+                            <div class="notification-list">
+                                <!-- 高優先級警示 -->
+                                <div class="notification-item unread" onclick="viewNotification('sla', 'BR202601005')" style="border-left: 3px solid #ef4444;">
+                                    <div class="notification-icon" style="background: #ef4444;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">🚨 SLA嚴重逾期</div>
+                                        <div class="notification-text">報備 #BR202601005 已逾期3天未更新，請立即聯繫仲介</div>
+                                        <div class="notification-time">剛剛</div>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item unread" onclick="viewNotification('reschedule', 'reschedule_pending')">
+                                    <div class="notification-icon" style="background: #f59e0b;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">改期申請待審核</div>
+                                        <div class="notification-text">3 筆改期申請待審核，請盡快處理</div>
+                                        <div class="notification-time">10分鐘前</div>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item unread" onclick="viewNotification('pending', 'bookings')">
+                                    <div class="notification-icon" style="background: #f59e0b;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">待審核報備</div>
+                                        <div class="notification-text">您有 8 筆報備待審核，請盡快處理</div>
+                                        <div class="notification-time">30分鐘前</div>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item unread" onclick="viewNotification('settlement', 'deal-management')">
+                                    <div class="notification-icon" style="background: #10b981;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">佣金待結算</div>
+                                        <div class="notification-text">2 筆成交案件待核可結算，總金額 NT$ 540,000</div>
+                                        <div class="notification-time">1小時前</div>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item unread" onclick="viewNotification('deal', 'deal-management')">
+                                    <div class="notification-icon" style="background: #10b981;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">新收訂案件</div>
+                                        <div class="notification-text">報備 #BR202601020 已收訂，請確認成交</div>
+                                        <div class="notification-time">1小時前</div>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item unread" onclick="viewNotification('cancel', 'cancelled-after-approved')">
+                                    <div class="notification-icon" style="background: #ef4444;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">核可後取消</div>
+                                        <div class="notification-text">報備 #BR202601015 核可後被取消，請關注取消原因</div>
+                                        <div class="notification-time">2小時前</div>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item unread" onclick="viewNotification('viewing', 'dashboard')">
+                                    <div class="notification-icon" style="background: #7c3aed;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">今日帶看提醒</div>
+                                        <div class="notification-text">今日安排 6 場帶看，請注意時間</div>
+                                        <div class="notification-time">3小時前</div>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item" onclick="viewNotification('qr', 'qr-verify')">
+                                    <div class="notification-icon" style="background: #0ea5e9;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">例外核驗記錄</div>
+                                        <div class="notification-text">林專員使用短碼完成 #BR202601024 核驗</div>
+                                        <div class="notification-time">昨天</div>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item unread" onclick="viewNotification(5)">
+                                    <div class="notification-icon" style="background: #0ea5e9;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">系統通知</div>
+                                        <div class="notification-text">案場「信義之星」新增 3 筆報備</div>
+                                        <div class="notification-time">3小時前</div>
+                                    </div>
+                                </div>
+
+                                <div class="notification-item" onclick="viewNotification(6)">
+                                    <div class="notification-icon" style="background: #64748b;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">審核完成</div>
+                                        <div class="notification-text">您已完成 5 筆報備審核</div>
+                                        <div class="notification-time">昨天</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notification-footer">
+                                <a href="#" onclick="viewAllNotifications()">查看全部通知</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-info">
+                        <div class="user-avatar">張</div>
+                        <div class="user-details">
+                            <div class="user-name">張主管</div>
+                            <div class="user-role">代銷主管</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面1: 案場總覽 -->
+            <div id="dashboard" class="page-content active">
+                <!-- 整體統計 -->
+                <div class="stats-grid">
+                    <div class="stat-card" style="border-left-color: #7c3aed;">
+                        <div class="stat-label">管理案場數</div>
+                        <div class="stat-value">5</div>
+                        <div class="stat-change">目前進行中</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: #f59e0b;">
+                        <div class="stat-label">待核可報備</div>
+                        <div class="stat-value">8</div>
+                        <div class="stat-change" style="color: var(--warning-color);">需立即處理</div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: #06b6d4;">
+                        <div class="stat-label">今日帶看</div>
+                        <div class="stat-value">6</div>
+                        <div class="stat-change">本週共 23 場</div>
+                    </div>
+                </div>
+
+                <!-- 案場列表 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">案場列表</h3>
+                    </div>
+                    <div class="project-grid">
+                        <!-- 案場卡片1 -->
+                        <div class="project-card" onclick="viewProjectDetail('信義之星')">
+                            <div class="project-card-header">
+                                <h4 class="project-name">信義之星</h4>
+                                <span class="badge badge-success">進行中</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">信義區忠孝東路五段</p>
+                            <div class="project-stats">
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">待核可</div>
+                                    <div class="project-stat-value" style="color: var(--warning-color);">3</div>
+                                </div>
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">今日帶看</div>
+                                    <div class="project-stat-value">2</div>
+                                </div>
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">本週成交</div>
+                                    <div class="project-stat-value" style="color: var(--success-color);">1</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 案場卡片2 -->
+                        <div class="project-card" onclick="viewProjectDetail('松山新城')">
+                            <div class="project-card-header">
+                                <h4 class="project-name">松山新城</h4>
+                                <span class="badge badge-success">進行中</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">松山區南京東路四段</p>
+                            <div class="project-stats">
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">待核可</div>
+                                    <div class="project-stat-value" style="color: var(--warning-color);">2</div>
+                                </div>
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">今日帶看</div>
+                                    <div class="project-stat-value">1</div>
+                                </div>
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">本週成交</div>
+                                    <div class="project-stat-value" style="color: var(--success-color);">2</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 案場卡片3 -->
+                        <div class="project-card" onclick="viewProjectDetail('大安華廈')">
+                            <div class="project-card-header">
+                                <h4 class="project-name">大安華廈</h4>
+                                <span class="badge badge-success">進行中</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">大安區復興南路一段</p>
+                            <div class="project-stats">
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">待核可</div>
+                                    <div class="project-stat-value" style="color: var(--warning-color);">1</div>
+                                </div>
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">今日帶看</div>
+                                    <div class="project-stat-value">2</div>
+                                </div>
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">本週成交</div>
+                                    <div class="project-stat-value" style="color: var(--success-color);">1</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 案場卡片4 -->
+                        <div class="project-card" onclick="viewProjectDetail('內湖科技園區')">
+                            <div class="project-card-header">
+                                <h4 class="project-name">內湖科技園區</h4>
+                                <span class="badge badge-success">進行中</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">內湖區瑞光路</p>
+                            <div class="project-stats">
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">待核可</div>
+                                    <div class="project-stat-value" style="color: var(--warning-color);">2</div>
+                                </div>
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">今日帶看</div>
+                                    <div class="project-stat-value">1</div>
+                                </div>
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">本週成交</div>
+                                    <div class="project-stat-value" style="color: var(--success-color);">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 案場卡片5 -->
+                        <div class="project-card" onclick="viewProjectDetail('南港經貿')">
+                            <div class="project-card-header">
+                                <h4 class="project-name">南港經貿</h4>
+                                <span class="badge badge-secondary">籌備中</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">南港區經貿二路</p>
+                            <div class="project-stats">
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">待核可</div>
+                                    <div class="project-stat-value">0</div>
+                                </div>
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">今日帶看</div>
+                                    <div class="project-stat-value">0</div>
+                                </div>
+                                <div class="project-stat-item">
+                                    <div class="project-stat-label">本週成交</div>
+                                    <div class="project-stat-value">0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面2: 報備審核管理 -->
+            <div id="bookings" class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">報備審核管理</h3>
+                    </div>
+
+                    <!-- 提醒 -->
+                    <div class="alert alert-warning">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <span>您有 <strong>8 筆</strong>報備待處理，請盡快審核</span>
+                    </div>
+
+                    <!-- 狀態分頁 -->
+                    <div class="tabs">
+                        <button class="tab active" data-tab="pending">待審核 (8)</button>
+                        <button class="tab" data-tab="reschedule_pending">改期待審核 (3)</button>
+                        <button class="tab" data-tab="approved">已核可 (24)</button>
+                        <button class="tab" data-tab="rejected">已拒絕 (5)</button>
+                        <button class="tab" data-tab="all">全部 (37)</button>
+                    </div>
+
+                    <!-- 搜尋欄 -->
+                    <div class="search-bar">
+                        <select class="form-control" style="width: auto;">
+                            <option value="">全部案場</option>
+                            <option value="project1">信義之星</option>
+                            <option value="project2">松山新城</option>
+                            <option value="project3">大安華廈</option>
+                            <option value="project4">內湖科技園區</option>
+                        </select>
+                        <input type="text" class="search-input" placeholder="搜尋報備編號、買方姓名...">
+                        <button class="btn btn-primary">搜尋</button>
+                    </div>
+
+                    <!-- 報備列表 -->
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>報備編號</th>
+                                    <th>案場名稱</th>
+                                    <th>買方姓名</th>
+                                    <th>買方電話</th>
+                                    <th>仲介業務</th>
+                                    <th>仲介門店</th>
+                                    <th>報備時間</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#BR202601001</td>
+                                    <td>信義之星</td>
+                                    <td class="masked-text">王**</td>
+                                    <td class="masked-text">0912-***-678</td>
+                                    <td>李小華</td>
+                                    <td>信義門店</td>
+                                    <td>2026/01/18 09:30</td>
+                                    <td><span class="badge badge-warning">待審核</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" onclick="approveBooking('BR202601001')">核可</button>
+                                        <button class="btn btn-danger btn-sm" onclick="rejectBooking('BR202601001')">拒絕</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#BR202601002</td>
+                                    <td>松山新城</td>
+                                    <td class="masked-text">陳**</td>
+                                    <td class="masked-text">0923-***-234</td>
+                                    <td>陳建國</td>
+                                    <td>信義門店</td>
+                                    <td>2026/01/18 10:15</td>
+                                    <td><span class="badge badge-warning">待審核</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" onclick="approveBooking('BR202601002')">核可</button>
+                                        <button class="btn btn-danger btn-sm" onclick="rejectBooking('BR202601002')">拒絕</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#BR202601003</td>
+                                    <td>大安華廈</td>
+                                    <td class="masked-text">林**</td>
+                                    <td class="masked-text">0934-***-789</td>
+                                    <td>張美玲</td>
+                                    <td>信義門店</td>
+                                    <td>2026/01/18 11:20</td>
+                                    <td><span class="badge badge-warning">待審核</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" onclick="approveBooking('BR202601003')">核可</button>
+                                        <button class="btn btn-danger btn-sm" onclick="rejectBooking('BR202601003')">拒絕</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#BR202601004</td>
+                                    <td>信義之星</td>
+                                    <td class="masked-text">黃**</td>
+                                    <td class="masked-text">0956-***-456</td>
+                                    <td>劉志明</td>
+                                    <td>信義門店</td>
+                                    <td>2026/01/18 13:45</td>
+                                    <td><span class="badge badge-warning">待審核</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" onclick="approveBooking('BR202601004')">核可</button>
+                                        <button class="btn btn-danger btn-sm" onclick="rejectBooking('BR202601004')">拒絕</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#BR202601005</td>
+                                    <td>內湖科技園區</td>
+                                    <td class="masked-text">吳**</td>
+                                    <td class="masked-text">0987-***-321</td>
+                                    <td>李小華</td>
+                                    <td>信義門店</td>
+                                    <td>2026/01/18 14:20</td>
+                                    <td><span class="badge badge-warning">待審核</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" onclick="approveBooking('BR202601005')">核可</button>
+                                        <button class="btn btn-danger btn-sm" onclick="rejectBooking('BR202601005')">拒絕</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面3: QR Code 核驗 -->
+            <div id="qr-verify" class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">QR Code 帶看核驗</h3>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>請掃描業務出示的帶看 QR Code 以完成帶看核驗</span>
+                    </div>
+
+                    <!-- QR 掃描區 -->
+                    <div class="qr-scanner">
+                        <div class="qr-scanner-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                            </svg>
+                        </div>
+                        <p class="qr-scanner-text">點擊下方按鈕啟動相機掃描</p>
+                        <button class="btn btn-primary" onclick="startQRScan()">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            啟動掃描
+                        </button>
+                    </div>
+
+                    <!-- 例外核驗 -->
+                    <div class="card" style="background: var(--bg-color); box-shadow: none;">
+                        <div class="card-header">
+                            <h4 class="card-title">例外核驗（主管權限）</h4>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 14px;">
+                            若 QR Code 無法掃描，可使用短碼進行手動核驗
+                        </p>
+                        <div style="display: flex; gap: 12px;">
+                            <input type="text" class="form-control" placeholder="請輸入 6 位數核驗碼" id="verify-code" maxlength="6">
+                            <button class="btn btn-primary" onclick="verifyByCode()">核驗</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 今日帶看記錄 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">今日帶看記錄</h3>
+                        <span class="badge badge-info">共 6 場</span>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>報備編號</th>
+                                    <th>案場名稱</th>
+                                    <th>仲介業務</th>
+                                    <th>預約時間</th>
+                                    <th>核驗時間</th>
+                                    <th>狀態</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#BR202601010</td>
+                                    <td>信義之星</td>
+                                    <td>李小華</td>
+                                    <td>2026/01/18 10:00</td>
+                                    <td>2026/01/18 10:05</td>
+                                    <td><span class="badge badge-success">已完成</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#BR202601011</td>
+                                    <td>松山新城</td>
+                                    <td>陳建國</td>
+                                    <td>2026/01/18 14:00</td>
+                                    <td>2026/01/18 14:03</td>
+                                    <td><span class="badge badge-success">已完成</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#BR202601012</td>
+                                    <td>大安華廈</td>
+                                    <td>張美玲</td>
+                                    <td>2026/01/18 15:30</td>
+                                    <td>-</td>
+                                    <td><span class="badge badge-warning">待帶看</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#BR202601013</td>
+                                    <td>信義之星</td>
+                                    <td>劉志明</td>
+                                    <td>2026/01/18 16:00</td>
+                                    <td>-</td>
+                                    <td><span class="badge badge-warning">待帶看</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面4: 操作日誌 -->
+            <div id="logs" class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">操作日誌</h3>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <span>所有操作記錄皆不可刪改，確保流程透明可追溯</span>
+                    </div>
+
+                    <!-- 篩選器 -->
+                    <div class="search-bar">
+                        <select class="form-control" style="width: auto;">
+                            <option value="">全部操作類型</option>
+                            <option value="approve">核可報備</option>
+                            <option value="reject">拒絕報備</option>
+                            <option value="verify">帶看核驗</option>
+                            <option value="cancel">取消報備</option>
+                        </select>
+                        <select class="form-control" style="width: auto;">
+                            <option value="">全部案場</option>
+                            <option value="project1">信義之星</option>
+                            <option value="project2">松山新城</option>
+                            <option value="project3">大安華廈</option>
+                        </select>
+                        <input type="date" class="form-control" style="width: auto;" value="2026-01-18">
+                        <button class="btn btn-primary">查詢</button>
+                    </div>
+
+                    <!-- 日誌列表 -->
+                    <div style="margin-top: 24px;">
+                        <div class="log-item" style="border-left-color: #10b981;">
+                            <div class="log-header">
+                                <div class="log-action">
+                                    <span class="badge badge-success" style="margin-right: 8px;">核可報備</span>
+                                    報備編號：#BR202601008
+                                </div>
+                                <div class="log-time">2026/01/18 15:30:22</div>
+                            </div>
+                            <div class="log-details">
+                                <span class="log-user">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                    張主管
+                                </span>
+                                <span>案場：信義之星</span>
+                                <span style="margin-left: 12px;">核可帶看時間：2026/01/19 10:00</span>
+                            </div>
+                        </div>
+
+                        <div class="log-item" style="border-left-color: #ef4444;">
+                            <div class="log-header">
+                                <div class="log-action">
+                                    <span class="badge badge-danger" style="margin-right: 8px;">拒絕報備</span>
+                                    報備編號：#BR202601007
+                                </div>
+                                <div class="log-time">2026/01/18 14:15:10</div>
+                            </div>
+                            <div class="log-details">
+                                <span class="log-user">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                    張主管
+                                </span>
+                                <span>案場：松山新城</span>
+                                <span style="margin-left: 12px;">拒絕原因：該時段已有其他帶看安排</span>
+                            </div>
+                        </div>
+
+                        <div class="log-item" style="border-left-color: #06b6d4;">
+                            <div class="log-header">
+                                <div class="log-action">
+                                    <span class="badge badge-info" style="margin-right: 8px;">帶看核驗</span>
+                                    報備編號：#BR202601010
+                                </div>
+                                <div class="log-time">2026/01/18 10:05:33</div>
+                            </div>
+                            <div class="log-details">
+                                <span class="log-user">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                    張主管
+                                </span>
+                                <span>案場：信義之星</span>
+                                <span style="margin-left: 12px;">核驗方式：QR Code 掃描</span>
+                            </div>
+                        </div>
+
+                        <div class="log-item" style="border-left-color: #10b981;">
+                            <div class="log-header">
+                                <div class="log-action">
+                                    <span class="badge badge-success" style="margin-right: 8px;">核可報備</span>
+                                    報備編號：#BR202601006
+                                </div>
+                                <div class="log-time">2026/01/18 09:45:18</div>
+                            </div>
+                            <div class="log-details">
+                                <span class="log-user">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                    張主管
+                                </span>
+                                <span>案場：大安華廈</span>
+                                <span style="margin-left: 12px;">核可帶看時間：2026/01/18 15:30</span>
+                            </div>
+                        </div>
+
+                        <div class="log-item" style="border-left-color: #f59e0b;">
+                            <div class="log-header">
+                                <div class="log-action">
+                                    <span class="badge badge-warning" style="margin-right: 8px;">取消報備</span>
+                                    報備編號：#BR202601005
+                                </div>
+                                <div class="log-time">2026/01/17 16:20:45</div>
+                            </div>
+                            <div class="log-details">
+                                <span class="log-user">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                    李小華（仲介業務）
+                                </span>
+                                <span>案場：內湖科技園區</span>
+                                <span style="margin-left: 12px;">取消原因：客戶臨時有事無法前往</span>
+                            </div>
+                        </div>
+
+                        <div class="log-item" style="border-left-color: #06b6d4;">
+                            <div class="log-header">
+                                <div class="log-action">
+                                    <span class="badge badge-info" style="margin-right: 8px;">帶看核驗</span>
+                                    報備編號：#BR202601011
+                                </div>
+                                <div class="log-time">2026/01/17 14:03:11</div>
+                            </div>
+                            <div class="log-details">
+                                <span class="log-user">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                    張主管
+                                </span>
+                                <span>案場：松山新城</span>
+                                <span style="margin-left: 12px;">核驗方式：例外核驗（短碼）</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面：SLA監控 -->
+            <div id="sla-monitor" class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">SLA逾期監控</h3>
+                        <button class="btn btn-primary" onclick="exportSLAReport()">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            匯出報表
+                        </button>
+                    </div>
+
+                    <!-- 待更新置頂區 -->
+                    <div style="background: #fff3cd; border-left: 4px solid #f59e0b; padding: 16px; margin-bottom: 24px; border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <svg width="24" height="24" fill="#f59e0b" viewBox="0 0 24 24">
+                                <path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <h4 style="font-weight: 600; color: #856404; margin: 0;">⚠️ 待更新案件（置頂）</h4>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>報備編號</th>
+                                        <th>案場</th>
+                                        <th>客戶</th>
+                                        <th>仲介</th>
+                                        <th>狀態</th>
+                                        <th>逾期天數</th>
+                                        <th>最後更新</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background: #fef3c7;">
+                                        <td>#BR202601005</td>
+                                        <td>信義之星</td>
+                                        <td>王*明</td>
+                                        <td>信義門店-李小華</td>
+                                        <td><span class="badge badge-warning">已核可待帶看</span></td>
+                                        <td style="color: var(--danger-color); font-weight: 600;">逾期 3 天</td>
+                                        <td>2026/01/15 10:30</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" onclick="contactAgent('BR202601005')">聯繫仲介</button>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #fef3c7;">
+                                        <td>#BR202601003</td>
+                                        <td>松山新城</td>
+                                        <td>陳*芳</td>
+                                        <td>永慶門店-張大同</td>
+                                        <td><span class="badge badge-info">已帶看</span></td>
+                                        <td style="color: var(--danger-color); font-weight: 600;">逾期 5 天</td>
+                                        <td>2026/01/13 14:20</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" onclick="contactAgent('BR202601003')">聯繫仲介</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 篩選器 -->
+                    <div class="search-bar">
+                        <select class="form-control" style="width: auto;">
+                            <option value="">全部狀態</option>
+                            <option value="approved">已核可待帶看</option>
+                            <option value="viewed">已帶看</option>
+                            <option value="deposit">收訂中</option>
+                        </select>
+                        <select class="form-control" style="width: auto;">
+                            <option value="">全部案場</option>
+                            <option value="project1">信義之星</option>
+                            <option value="project2">松山新城</option>
+                        </select>
+                        <button class="btn btn-primary">查詢</button>
+                    </div>
+
+                    <!-- SLA逾期列表 -->
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>報備編號</th>
+                                    <th>案場</th>
+                                    <th>客戶</th>
+                                    <th>仲介</th>
+                                    <th>狀態</th>
+                                    <th>SLA期限</th>
+                                    <th>逾期天數</th>
+                                    <th>最後更新</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#BR202601001</td>
+                                    <td>大安華廈</td>
+                                    <td>林*偉</td>
+                                    <td>住商門店-王小明</td>
+                                    <td><span class="badge badge-info">已帶看</span></td>
+                                    <td>2026/01/16</td>
+                                    <td style="color: var(--danger-color); font-weight: 600;">逾期 2 天</td>
+                                    <td>2026/01/14 15:30</td>
+                                    <td>
+                                        <button class="btn btn-outline btn-sm" onclick="viewBookingDetail('BR202601001')">查看</button>
+                                        <button class="btn btn-primary btn-sm" onclick="contactAgent('BR202601001')">聯繫</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面：收訂成交管理 -->
+            <div id="deal-management" class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">收訂成交管理</h3>
+                    </div>
+
+                    <!-- 標籤頁 -->
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchDealTab('deposit')">收訂中 (5)</button>
+                        <button class="tab" onclick="switchDealTab('closed')">已成交 (12)</button>
+                        <button class="tab" onclick="switchDealTab('voided')">已作廢 (3)</button>
+                        <button class="tab" onclick="switchDealTab('settlement')">待結算 (2)</button>
+                    </div>
+
+                    <!-- 收訂中 -->
+                    <div id="deal-deposit" class="tab-content active">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>報備編號</th>
+                                        <th>案場</th>
+                                        <th>客戶</th>
+                                        <th>仲介</th>
+                                        <th>收訂金額</th>
+                                        <th>收訂時間</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#BR202601020</td>
+                                        <td>信義之星</td>
+                                        <td>李*華</td>
+                                        <td>信義門店-陳美麗</td>
+                                        <td style="color: var(--primary-color); font-weight: 600;">NT$ 500,000</td>
+                                        <td>2026/01/17 10:30</td>
+                                        <td>
+                                            <button class="btn btn-success btn-sm" onclick="confirmDeal('BR202601020')">確認成交</button>
+                                            <button class="btn btn-danger btn-sm" onclick="voidDeposit('BR202601020')">作廢</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 已成交 -->
+                    <div id="deal-closed" class="tab-content">
+                        <div class="search-bar">
+                            <input type="month" class="form-control" style="width: auto;" value="2026-01">
+                            <button class="btn btn-primary">查詢</button>
+                            <button class="btn btn-outline" onclick="exportDeals()">匯出成交報表</button>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>報備編號</th>
+                                        <th>案場</th>
+                                        <th>客戶</th>
+                                        <th>仲介</th>
+                                        <th>成交金額</th>
+                                        <th>仲介佣金</th>
+                                        <th>成交時間</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#BR202601018</td>
+                                        <td>信義之星</td>
+                                        <td>張*明</td>
+                                        <td>信義門店-李小華</td>
+                                        <td style="font-weight: 600;">NT$ 18,000,000</td>
+                                        <td style="color: var(--success-color); font-weight: 600;">NT$ 360,000</td>
+                                        <td>2026/01/16 15:20</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm" onclick="viewDealDetail('BR202601018')">查看</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 已作廢 -->
+                    <div id="deal-voided" class="tab-content">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>報備編號</th>
+                                        <th>案場</th>
+                                        <th>客戶</th>
+                                        <th>仲介</th>
+                                        <th>作廢原因</th>
+                                        <th>作廢時間</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#BR202601012</td>
+                                        <td>松山新城</td>
+                                        <td>王*芳</td>
+                                        <td>永慶門店-張大同</td>
+                                        <td>客戶違約</td>
+                                        <td>2026/01/15 11:20</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm" onclick="viewVoidDetail('BR202601012')">查看詳情</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 待結算 -->
+                    <div id="deal-settlement" class="tab-content">
+                        <div style="background: #dbeafe; padding: 16px; border-left: 4px solid var(--primary-color); margin-bottom: 16px; border-radius: 8px;">
+                            <div style="font-weight: 600; color: #1e40af; margin-bottom: 4px;">💰 結算說明</div>
+                            <div style="font-size: 14px; color: #1e40af;">成交案件需經主管確認後才能進行佣金結算</div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>報備編號</th>
+                                        <th>案場</th>
+                                        <th>仲介</th>
+                                        <th>成交金額</th>
+                                        <th>應付佣金</th>
+                                        <th>成交時間</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#BR202601018</td>
+                                        <td>信義之星</td>
+                                        <td>信義門店-李小華</td>
+                                        <td>NT$ 18,000,000</td>
+                                        <td style="color: var(--success-color); font-weight: 600;">NT$ 360,000</td>
+                                        <td>2026/01/16 15:20</td>
+                                        <td>
+                                            <button class="btn btn-success btn-sm" onclick="approveSettlement('BR202601018')">核可結算</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面：核可後取消專區 -->
+            <div id="cancelled-after-approved" class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">核可後取消專區</h3>
+                        <button class="btn btn-outline" onclick="exportCancelReport()">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            匯出取消分析
+                        </button>
+                    </div>
+
+                    <!-- 統計卡片 -->
+                    <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px;">
+                        <div class="stat-card" style="border-left-color: #ef4444;">
+                            <div class="stat-label">本月核可後取消</div>
+                            <div class="stat-value">12</div>
+                            <div class="stat-change" style="color: #ef4444;">較上月 +3</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: #f59e0b;">
+                            <div class="stat-label">取消率</div>
+                            <div class="stat-value">8.5%</div>
+                            <div class="stat-change" style="color: #f59e0b;">目標 <5%</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: #7c3aed;">
+                            <div class="stat-label">主要原因</div>
+                            <div class="stat-value" style="font-size: 16px;">客戶改變主意</div>
+                            <div class="stat-change">佔 45%</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: #06b6d4;">
+                            <div class="stat-label">高風險仲介</div>
+                            <div class="stat-value">2</div>
+                            <div class="stat-change">取消率 >15%</div>
+                        </div>
+                    </div>
+
+                    <!-- 篩選器 -->
+                    <div class="search-bar">
+                        <select class="form-control" style="width: auto;">
+                            <option value="">全部原因</option>
+                            <option value="customer_changed_mind">客戶改變主意</option>
+                            <option value="found_other_property">找到其他物件</option>
+                            <option value="budget_issue">預算問題</option>
+                            <option value="schedule_conflict">時間無法配合</option>
+                        </select>
+                        <input type="month" class="form-control" style="width: auto;" value="2026-01">
+                        <button class="btn btn-primary">查詢</button>
+                    </div>
+
+                    <!-- 取消列表 -->
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>報備編號</th>
+                                    <th>案場</th>
+                                    <th>客戶</th>
+                                    <th>仲介</th>
+                                    <th>核可時間</th>
+                                    <th>取消時間</th>
+                                    <th>取消原因</th>
+                                    <th>詳細說明</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#BR202601015</td>
+                                    <td>信義之星</td>
+                                    <td>劉*偉</td>
+                                    <td>信義門店-李小華</td>
+                                    <td>2026/01/15 10:30</td>
+                                    <td>2026/01/16 14:20</td>
+                                    <td><span class="badge badge-danger">客戶改變主意</span></td>
+                                    <td>客戶找到其他更合適的物件</td>
+                                    <td>
+                                        <button class="btn btn-outline btn-sm" onclick="viewCancelDetail('BR202601015')">查看詳情</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面：案場管理 -->
+            <div id="project-management" class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">案場管理</h3>
+                        <button class="btn btn-primary" onclick="openModal('newProjectModal')">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            新增案場
+                        </button>
+                    </div>
+
+                    <!-- 案場列表 -->
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>案場名稱</th>
+                                    <th>地址</th>
+                                    <th>總戶數</th>
+                                    <th>本月報備</th>
+                                    <th>本月成交</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight: 600;">信義之星</td>
+                                    <td>台北市信義區忠孝東路五段</td>
+                                    <td>120</td>
+                                    <td>28</td>
+                                    <td style="color: var(--success-color); font-weight: 600;">5</td>
+                                    <td><span class="badge badge-success">銷售中</span></td>
+                                    <td>
+                                        <button class="btn btn-outline btn-sm" onclick="editProject('信義之星')">編輯</button>
+                                        <button class="btn btn-outline btn-sm" onclick="viewProjectStats('信義之星')">統計</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">松山新城</td>
+                                    <td>台北市松山區南京東路四段</td>
+                                    <td>88</td>
+                                    <td>22</td>
+                                    <td style="color: var(--success-color); font-weight: 600;">3</td>
+                                    <td><span class="badge badge-success">銷售中</span></td>
+                                    <td>
+                                        <button class="btn btn-outline btn-sm" onclick="editProject('松山新城')">編輯</button>
+                                        <button class="btn btn-outline btn-sm" onclick="viewProjectStats('松山新城')">統計</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面：代銷人員管理 -->
+            <div id="staff-management" class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">代銷人員管理</h3>
+                        <button class="btn btn-primary" onclick="openModal('newStaffModal')">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            新增人員
+                        </button>
+                    </div>
+
+                    <!-- 人員列表 -->
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>姓名</th>
+                                    <th>手機</th>
+                                    <th>Email</th>
+                                    <th>角色</th>
+                                    <th>負責案場</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>張主管</td>
+                                    <td>0912-***-345</td>
+                                    <td>zhang@example.com</td>
+                                    <td><span class="badge badge-primary">主管</span></td>
+                                    <td>全部案場</td>
+                                    <td><span class="badge badge-success">在職</span></td>
+                                    <td>
+                                        <button class="btn btn-outline btn-sm" onclick="editStaff('張主管')">編輯</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>林專員</td>
+                                    <td>0923-***-456</td>
+                                    <td>lin@example.com</td>
+                                    <td><span class="badge badge-info">專員</span></td>
+                                    <td>信義之星、松山新城</td>
+                                    <td><span class="badge badge-success">在職</span></td>
+                                    <td>
+                                        <button class="btn btn-outline btn-sm" onclick="editStaff('林專員')">編輯</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面：稽核日誌 -->
+            <div id="audit-log" class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">稽核日誌</h3>
+                        <button class="btn btn-outline" onclick="exportAuditLog()">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            匯出日誌
+                        </button>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <span>所有關鍵操作皆記錄於稽核日誌，不可刪改，確保合規可追溯</span>
+                    </div>
+
+                    <!-- 篩選器 -->
+                    <div class="search-bar">
+                        <select class="form-control" style="width: auto;">
+                            <option value="">全部操作類型</option>
+                            <option value="approve">核可報備</option>
+                            <option value="reject">拒絕報備</option>
+                            <option value="deal">成交確認</option>
+                            <option value="cancel">取消作廢</option>
+                            <option value="qr_verify">QR核驗</option>
+                        </select>
+                        <select class="form-control" style="width: auto;">
+                            <option value="">全部人員</option>
+                            <option value="zhang">張主管</option>
+                            <option value="lin">林專員</option>
+                        </select>
+                        <input type="date" class="form-control" style="width: auto;" value="2026-01-18">
+                        <button class="btn btn-primary">查詢</button>
+                    </div>
+
+                    <!-- 稽核日誌列表 -->
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>時間</th>
+                                    <th>操作人員</th>
+                                    <th>操作類型</th>
+                                    <th>目標對象</th>
+                                    <th>操作內容</th>
+                                    <th>IP位址</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2026/01/18 10:30:45</td>
+                                    <td>張主管</td>
+                                    <td><span class="badge badge-success">核可報備</span></td>
+                                    <td>#BR202601025</td>
+                                    <td>核可報備申請（信義之星）</td>
+                                    <td>118.163.xxx.xxx</td>
+                                </tr>
+                                <tr>
+                                    <td>2026/01/18 10:25:12</td>
+                                    <td>林專員</td>
+                                    <td><span class="badge badge-info">QR核驗</span></td>
+                                    <td>#BR202601024</td>
+                                    <td>例外核驗：短碼核驗（松山新城）</td>
+                                    <td>118.163.xxx.xxx</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal: 核可報備 -->
+    <div id="approveModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">核可報備</h3>
+            </div>
+            <div style="background: var(--bg-color); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin-bottom: 8px; color: var(--text-secondary); font-size: 14px;">報備編號：</p>
+                <p style="font-weight: 600; margin-bottom: 16px;" id="approve-booking-id"></p>
+                <p style="margin-bottom: 8px; color: var(--text-secondary); font-size: 14px;">案場：</p>
+                <p style="font-weight: 600;" id="approve-project-name"></p>
+            </div>
+            <form id="approveForm">
+                <div class="form-group">
+                    <label class="form-label">實際帶看日期 <span style="color: red;">*</span></label>
+                    <input type="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">實際帶看時間 <span style="color: red;">*</span></label>
+                    <input type="time" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">備註</label>
+                    <textarea class="form-control" rows="3" placeholder="選填"></textarea>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('approveModal')">取消</button>
+                <button class="btn btn-success" onclick="submitApprove()">確認核可</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: 拒絕報備 -->
+    <div id="rejectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">拒絕報備</h3>
+            </div>
+            <div style="background: var(--bg-color); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin-bottom: 8px; color: var(--text-secondary); font-size: 14px;">報備編號：</p>
+                <p style="font-weight: 600; margin-bottom: 16px;" id="reject-booking-id"></p>
+                <p style="margin-bottom: 8px; color: var(--text-secondary); font-size: 14px;">案場：</p>
+                <p style="font-weight: 600;" id="reject-project-name"></p>
+            </div>
+            <form id="rejectForm">
+                <div class="form-group">
+                    <label class="form-label">拒絕原因 <span style="color: red;">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">請選擇拒絕原因</option>
+                        <option value="duplicate">重複報備</option>
+                        <option value="schedule">該時段已有其他帶看</option>
+                        <option value="sold">該物件已售出</option>
+                        <option value="maintenance">場地維護中</option>
+                        <option value="other">其他原因</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">詳細說明</label>
+                    <textarea class="form-control" rows="4" placeholder="請詳細說明拒絕原因（必填）" required></textarea>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('rejectModal')">取消</button>
+                <button class="btn btn-danger" onclick="submitReject()">確認拒絕</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: 案場詳情 -->
+    <div id="projectDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="project-detail-name"></h3>
+            </div>
+            <div style="display: grid; gap: 16px;">
+                <div>
+                    <p class="stat-label">地址</p>
+                    <p style="font-weight: 600;" id="project-detail-address"></p>
+                </div>
+                <div>
+                    <p class="stat-label">案場狀態</p>
+                    <span class="badge badge-success">進行中</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px;">
+                    <div style="text-align: center; padding: 16px; background: var(--bg-color); border-radius: 8px;">
+                        <p class="stat-label">總報備數</p>
+                        <p style="font-size: 24px; font-weight: 700; color: var(--primary-color);">28</p>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: var(--bg-color); border-radius: 8px;">
+                        <p class="stat-label">總帶看數</p>
+                        <p style="font-size: 24px; font-weight: 700; color: var(--info-color);">15</p>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: var(--bg-color); border-radius: 8px;">
+                        <p class="stat-label">總成交數</p>
+                        <p style="font-size: 24px; font-weight: 700; color: var(--success-color);">3</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('projectDetailModal')">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 登入/註冊功能 =====
+        let regCurrentStep = 1;
+        let regSmsCodeSent = false;
+        let regSmsTimer = null;
+        const registrationData = {};
+
+        // 顯示登入頁面
+        function showLoginPage() {
+            document.getElementById('loginPage').classList.add('active');
+            document.getElementById('registerPage').classList.remove('active');
+            // 重置註冊流程
+            regCurrentStep = 1;
+            document.querySelectorAll('#registerPage .auth-form-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('regStep1').classList.add('active');
+            document.querySelectorAll('#registerPage .step').forEach(s => {
+                s.classList.remove('active', 'completed');
+            });
+            document.querySelector('#registerPage .step[data-step="1"]').classList.add('active');
+        }
+
+        // 顯示註冊頁面
+        function showRegisterPage() {
+            document.getElementById('loginPage').classList.remove('active');
+            document.getElementById('registerPage').classList.add('active');
+        }
+
+        // 登入（無校驗）
+        function handleLogin(event) {
+            event.preventDefault();
+            // 直接登入，不做任何校驗
+            document.getElementById('authWrapper').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+        }
+
+        // 註冊 Step 1: 公司代碼驗證
+        function handleRegCompanyCode(event) {
+            event.preventDefault();
+            const companyCode = document.getElementById('regCompanyCode').value;
+            registrationData.companyCode = companyCode;
+            regNextStep();
+        }
+
+        // 註冊 Step 2: 個人資料
+        function handleRegPersonalInfo(event) {
+            event.preventDefault();
+            const realName = document.getElementById('regRealName').value;
+            const idNumber = document.getElementById('regIdNumber').value;
+            registrationData.realName = realName;
+            registrationData.idNumber = idNumber;
+            regNextStep();
+        }
+
+        // 註冊 Step 3: 發送驗證碼
+        function sendVerificationCode() {
+            const phoneNumber = document.getElementById('regPhoneNumber').value;
+            const smsCodeGroup = document.getElementById('smsCodeGroup');
+            const verifyBtn = document.getElementById('verifyPhoneBtn');
+
+            // 直接顯示驗證碼輸入框
+            smsCodeGroup.style.display = 'block';
+            verifyBtn.disabled = false;
+            registrationData.phoneNumber = phoneNumber;
+        }
+
+        // 註冊 Step 3: 手機驗證
+        function handleRegPhoneVerification(event) {
+            event.preventDefault();
+            regNextStep();
+        }
+
+        // 註冊 Step 4: 密碼強度檢查（無校驗）
+        function checkPasswordStrength() {
+            // 不做任何校驗
+        }
+
+        function checkPasswordMatch() {
+            // 不做任何校驗
+        }
+
+        function updateSubmitButton() {
+            // 不做任何校驗，按鈕永遠可用
+        }
+
+        // 註冊 Step 4: 完成密碼設定
+        function handleRegPasswordSetup(event) {
+            event.preventDefault();
+            const password = document.getElementById('regPassword').value;
+            registrationData.password = password;
+
+            console.log('Registration Data:', {
+                ...registrationData,
+                password: '***ENCRYPTED***'
+            });
+
+            regNextStep();
+        }
+
+        // 註冊步驟導航
+        function regNextStep() {
+            if (regCurrentStep < 5) {
+                document.getElementById(`regStep${regCurrentStep}`).classList.remove('active');
+
+                if (regCurrentStep < 4) {
+                    document.querySelector(`#registerPage .step[data-step="${regCurrentStep}"]`).classList.remove('active');
+                    document.querySelector(`#registerPage .step[data-step="${regCurrentStep}"]`).classList.add('completed');
+                }
+
+                regCurrentStep++;
+                document.getElementById(`regStep${regCurrentStep}`).classList.add('active');
+
+                if (regCurrentStep <= 4) {
+                    document.querySelector(`#registerPage .step[data-step="${regCurrentStep}"]`).classList.add('active');
+                }
+            }
+        }
+
+        function regPrevStep() {
+            if (regCurrentStep > 1) {
+                document.getElementById(`regStep${regCurrentStep}`).classList.remove('active');
+                document.querySelector(`#registerPage .step[data-step="${regCurrentStep}"]`).classList.remove('active');
+
+                regCurrentStep--;
+                document.getElementById(`regStep${regCurrentStep}`).classList.add('active');
+                document.querySelector(`#registerPage .step[data-step="${regCurrentStep}"]`).classList.remove('completed');
+                document.querySelector(`#registerPage .step[data-step="${regCurrentStep}"]`).classList.add('active');
+            }
+        }
+
+        // 註冊完成，返回登入
+        function backToLogin() {
+            showLoginPage();
+        }
+
+        // ===== 主應用功能 =====
+
+        // 頁面切換
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+
+                this.classList.add('active');
+                const pageId = this.getAttribute('data-page');
+                document.getElementById(pageId).classList.add('active');
+
+                const titles = {
+                    'dashboard': { title: '案場總覽', subtitle: '掌握所有案場與報備壓力' },
+                    'bookings': { title: '報備審核管理', subtitle: '處理仲介報備的核可與拒絕' },
+                    'qr-verify': { title: 'QR Code 核驗', subtitle: '確保帶看真實性' },
+                    'logs': { title: '操作日誌', subtitle: '所有關鍵操作留痕追溯' }
+                };
+
+                if (titles[pageId]) {
+                    document.getElementById('page-title').textContent = titles[pageId].title;
+                    document.getElementById('page-subtitle').textContent = titles[pageId].subtitle;
+                }
+            });
+        });
+
+        // 標籤頁切換
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const parent = this.parentElement;
+                parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Modal 控制
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // 報備審核功能
+        function approveBooking(bookingId) {
+            document.getElementById('approve-booking-id').textContent = bookingId;
+            document.getElementById('approve-project-name').textContent = '信義之星';
+            openModal('approveModal');
+        }
+
+        function submitApprove() {
+            const form = document.getElementById('approveForm');
+            if (!form.checkValidity()) {
+                alert('請填寫必填欄位：實際帶看時間');
+                return;
+            }
+            alert('報備核可成功！系統已通知仲介業務。');
+            closeModal('approveModal');
+            // 更新待處理數量
+            const pendingCount = document.getElementById('pending-count');
+            pendingCount.textContent = parseInt(pendingCount.textContent) - 1;
+        }
+
+        function rejectBooking(bookingId) {
+            document.getElementById('reject-booking-id').textContent = bookingId;
+            document.getElementById('reject-project-name').textContent = '信義之星';
+            openModal('rejectModal');
+        }
+
+        function submitReject() {
+            const form = document.getElementById('rejectForm');
+            if (!form.checkValidity()) {
+                alert('請填寫拒絕原因！');
+                return;
+            }
+            alert('報備已拒絕！系統已通知仲介業務。');
+            closeModal('rejectModal');
+            // 更新待處理數量
+            const pendingCount = document.getElementById('pending-count');
+            pendingCount.textContent = parseInt(pendingCount.textContent) - 1;
+        }
+
+        // QR 核驗功能
+        function startQRScan() {
+            alert('【模擬掃描】\n\n掃描成功！\n報備編號：#BR202601012\n案場：信義之星\n業務：李小華\n\n帶看核驗完成！');
+        }
+
+        function verifyByCode() {
+            const code = document.getElementById('verify-code').value;
+            if (code.length !== 6) {
+                alert('請輸入完整的 6 位數核驗碼');
+                return;
+            }
+            alert('【例外核驗】\n\n核驗成功！\n核驗碼：' + code + '\n報備編號：#BR202601013\n案場：松山新城\n\n帶看核驗完成！');
+            document.getElementById('verify-code').value = '';
+        }
+
+        // 案場詳情
+        function viewProjectDetail(projectName) {
+            const projectData = {
+                '信義之星': { address: '信義區忠孝東路五段' },
+                '松山新城': { address: '松山區南京東路四段' },
+                '大安華廈': { address: '大安區復興南路一段' },
+                '內湖科技園區': { address: '內湖區瑞光路' },
+                '南港經貿': { address: '南港區經貿二路' }
+            };
+
+            const data = projectData[projectName];
+            document.getElementById('project-detail-name').textContent = projectName;
+            document.getElementById('project-detail-address').textContent = data.address;
+            openModal('projectDetailModal');
+        }
+
+        // 點擊 modal 外部關閉
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // 通知功能
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationPanel');
+            panel.classList.toggle('active');
+        }
+
+        function markAllRead() {
+            document.querySelectorAll('.notification-item.unread').forEach(item => {
+                item.classList.remove('unread');
+            });
+            document.querySelector('.notification-badge').textContent = '0';
+            document.querySelector('.notification-badge').style.display = 'none';
+            alert('已將所有通知標記為已讀');
+        }
+
+        function viewNotification(type, target) {
+            // 標記為已讀
+            if (event && event.target) {
+                event.target.closest('.notification-item').classList.remove('unread');
+            }
+            updateNotificationCount();
+
+            // 關閉通知面板
+            toggleNotifications();
+
+            // 根據通知類型跳轉到對應頁面
+            if (target) {
+                setTimeout(() => {
+                    if (type === 'sla') {
+                        switchPage('sla-monitor');
+                    } else if (type === 'reschedule') {
+                        switchPage('bookings');
+                    } else if (type === 'pending') {
+                        switchPage('bookings');
+                    } else if (type === 'settlement' || type === 'deal') {
+                        switchPage('deal-management');
+                    } else if (type === 'cancel') {
+                        switchPage('cancelled-after-approved');
+                    } else if (type === 'qr') {
+                        switchPage('qr-verify');
+                    } else if (target) {
+                        switchPage(target);
+                    }
+                }, 200);
+            }
+        }
+
+        function viewAllNotifications() {
+            alert('跳轉到通知中心頁面');
+            toggleNotifications();
+        }
+
+        function updateNotificationCount() {
+            const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+            const badge = document.querySelector('.notification-badge');
+            badge.textContent = unreadCount;
+            if (unreadCount === 0) {
+                badge.style.display = 'none';
+            }
+        }
+
+        // 點擊外部關閉通知面板
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notificationPanel');
+            const btn = document.querySelector('.notification-btn');
+            if (panel && !panel.contains(e.target) && !btn.contains(e.target)) {
+                panel.classList.remove('active');
+            }
+        });
+
+        // ===== 收訂成交管理 =====
+        function switchDealTab(tabName) {
+            // 隱藏所有tab-content
+            document.querySelectorAll('#deal-management .tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // 移除所有tab active
+            document.querySelectorAll('#deal-management .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // 顯示選中的內容
+            document.getElementById('deal-' + tabName).classList.add('active');
+
+            // 設置tab為active
+            event.target.classList.add('active');
+        }
+
+        function confirmDeal(bookingId) {
+            if (confirm('確定要確認此案件成交嗎？')) {
+                alert('✓ 成交確認成功\n\n報備編號：' + bookingId + '\n已轉入「已成交」列表');
+            }
+        }
+
+        function voidDeposit(bookingId) {
+            const reason = prompt('請輸入作廢原因：');
+            if (reason) {
+                alert('✓ 訂金已作廢\n\n報備編號：' + bookingId + '\n作廢原因：' + reason);
+            }
+        }
+
+        function approveSettlement(bookingId) {
+            if (confirm('確定要核可此佣金結算嗎？')) {
+                alert('✓ 結算核可成功\n\n報備編號：' + bookingId + '\n佣金將於3個工作天內撥款');
+            }
+        }
+
+        function viewDealDetail(bookingId) {
+            alert('查看成交詳情：' + bookingId);
+        }
+
+        function viewVoidDetail(bookingId) {
+            alert('查看作廢詳情：' + bookingId);
+        }
+
+        function exportDeals() {
+            alert('匯出成交報表功能\n實際應用中會生成Excel檔案');
+        }
+
+        // ===== SLA監控 =====
+        function contactAgent(bookingId) {
+            if (confirm('確定要發送提醒通知給仲介嗎？')) {
+                alert('✓ 已發送提醒通知\n\n報備編號：' + bookingId + '\n仲介將收到簡訊及站內通知');
+            }
+        }
+
+        function exportSLAReport() {
+            alert('匯出SLA逾期報表功能\n實際應用中會生成Excel檔案');
+        }
+
+        // ===== 核可後取消專區 =====
+        function viewCancelDetail(bookingId) {
+            alert('查看取消詳情：' + bookingId);
+        }
+
+        function exportCancelReport() {
+            alert('匯出取消分析報表功能\n實際應用中會生成分析報告');
+        }
+
+        // ===== 案場管理 =====
+        function editProject(projectName) {
+            alert('編輯案場：' + projectName);
+        }
+
+        function viewProjectStats(projectName) {
+            alert('查看案場統計：' + projectName);
+        }
+
+        // ===== 代銷人員管理 =====
+        function editStaff(staffName) {
+            alert('編輯人員：' + staffName);
+        }
+
+        // ===== 稽核日誌 =====
+        function exportAuditLog() {
+            alert('匯出稽核日誌功能\n實際應用中會生成Excel檔案');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,4103 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鏈居 - 仲介端管理後台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* 登入/註冊頁面 */
+        .auth-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .auth-wrapper.hidden {
+            display: none;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 480px;
+            padding: 48px 40px;
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-logo h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .auth-logo p {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--border-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .step.active .step-label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .auth-form-section {
+            display: none;
+        }
+
+        .auth-form-section.active {
+            display: block;
+        }
+
+        .auth-form-group {
+            margin-bottom: 24px;
+        }
+
+        .auth-form-label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .auth-form-label .required {
+            color: var(--danger-color);
+            margin-left: 2px;
+        }
+
+        .auth-form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .auth-form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .auth-form-control.error {
+            border-color: var(--danger-color);
+        }
+
+        .auth-form-control.success {
+            border-color: var(--success-color);
+        }
+
+        .auth-error-message {
+            color: var(--danger-color);
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .auth-error-message.show {
+            display: block;
+        }
+
+        .auth-success-message {
+            color: var(--success-color);
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .auth-success-message.show {
+            display: block;
+        }
+
+        .auth-helper-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .auth-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .auth-input-group .auth-form-control {
+            flex: 1;
+        }
+
+        .auth-btn-secondary {
+            padding: 12px 20px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .auth-btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .auth-btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .password-requirements {
+            background: var(--bg-color);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .password-requirements ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .password-requirements li {
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+
+        .password-requirements li.met {
+            color: var(--success-color);
+        }
+
+        .auth-btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 16px;
+        }
+
+        .auth-btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .auth-btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .auth-btn-primary:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .auth-btn-outline {
+            flex: 1;
+            padding: 14px;
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .auth-btn-outline:hover {
+            background: var(--bg-color);
+        }
+
+        .auth-divider {
+            text-align: center;
+            margin: 32px 0;
+            position: relative;
+        }
+
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .auth-divider span {
+            position: relative;
+            background: white;
+            padding: 0 16px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .auth-link {
+            text-align: center;
+        }
+
+        .auth-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        .success-container {
+            text-align: center;
+            padding: 32px 0;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 48px;
+            color: white;
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .success-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .container.hidden {
+            display: none;
+        }
+
+        /* 左側固定導覽 */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #1e293b;
+            border-right: 1px solid #0f172a;
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid #334155;
+            margin-bottom: 24px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            color: #60a5fa;
+            font-weight: 700;
+        }
+
+        .logo p {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 0 16px;
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        /* 主內容區 */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 24px;
+        }
+
+        /* 頂部欄 */
+        .header {
+            background: var(--card-bg);
+            padding: 20px 32px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        /* 通知系統 */
+        .notification-wrapper {
+            position: relative;
+        }
+
+        .notification-btn {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-btn:hover {
+            background: var(--bg-color);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--danger-color);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+        }
+
+        .notification-panel {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 400px;
+            max-height: 500px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .notification-panel.active {
+            display: block;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notification-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .btn-text {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .btn-text:hover {
+            background: var(--bg-color);
+        }
+
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .notification-item:hover {
+            background: var(--bg-color);
+        }
+
+        .notification-item.unread {
+            background: #eff6ff;
+        }
+
+        .notification-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .notification-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* 頁面內容 */
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 卡片 */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* 統計卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-change {
+            font-size: 12px;
+            margin-top: 6px;
+            color: var(--success-color);
+        }
+
+        /* 案場輪播 */
+        .carousel {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            height: 300px;
+            margin-bottom: 24px;
+        }
+
+        .carousel-item {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            color: white;
+        }
+
+        .carousel-item.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .carousel-item h3 {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .carousel-item p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .carousel-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .carousel-dot.active {
+            background: white;
+            width: 30px;
+            border-radius: 5px;
+        }
+
+        /* 公告卡片 */
+        .announcement-item {
+            padding: 16px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .announcement-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .announcement-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .announcement-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* 排行榜 */
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .ranking-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .ranking-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            margin-right: 16px;
+        }
+
+        .ranking-number.top1 {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #000;
+        }
+
+        .ranking-number.top2 {
+            background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+            color: #000;
+        }
+
+        .ranking-number.top3 {
+            background: linear-gradient(135deg, #cd7f32, #e8a87c);
+            color: #fff;
+        }
+
+        .ranking-info {
+            flex: 1;
+        }
+
+        .ranking-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .ranking-stats {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .ranking-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        /* 表格 */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-color);
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: var(--bg-color);
+        }
+
+        /* 徽章 */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-primary { background: #dbeafe; color: var(--primary-color); }
+        .badge-success { background: #d1fae5; color: var(--success-color); }
+        .badge-warning { background: #fed7aa; color: var(--warning-color); }
+        .badge-danger { background: #fee2e2; color: var(--danger-color); }
+        .badge-secondary { background: #f1f5f9; color: var(--text-secondary); }
+        .badge-info { background: #cffafe; color: #0891b2; }
+
+        /* 按鈕 */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* 標籤頁 */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: -2px;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: var(--primary-color);
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 遮罩文字 */
+        .masked-text {
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+        }
+
+        /* 業務分組 */
+        .agent-group {
+            margin-bottom: 32px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .agent-group-header {
+            background: var(--bg-color);
+            padding: 16px 20px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .agent-group-header:hover {
+            background: #e2e8f0;
+        }
+
+        .agent-group-body {
+            padding: 20px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        /* 表單 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* 搜尋欄 */
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* 時間軸樣式 */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 16px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .timeline-icon {
+            position: absolute;
+            left: -28px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            z-index: 1;
+        }
+
+        .timeline-icon.success {
+            background: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .timeline-icon.warning {
+            background: var(--warning-color);
+            border-color: var(--warning-color);
+        }
+
+        .timeline-icon.danger {
+            background: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
+        .timeline-icon.info {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .timeline-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .timeline-content {
+            background: var(--bg-color);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid var(--border-color);
+        }
+
+        .timeline-content.success {
+            border-left-color: var(--success-color);
+        }
+
+        .timeline-content.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .timeline-content.danger {
+            border-left-color: var(--danger-color);
+        }
+
+        .timeline-content.info {
+            border-left-color: var(--primary-color);
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .timeline-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .timeline-note {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 4px;
+            font-size: 13px;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        /* 響應式 */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 登入/註冊頁面 -->
+    <div class="auth-wrapper" id="authWrapper">
+        <div class="auth-container">
+            <!-- 登入頁面 -->
+            <div id="loginPage" class="auth-form-section active">
+                <div class="auth-logo">
+                    <h1>鏈居</h1>
+                    <p>仲介端管理系統</p>
+                </div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="auth-form-group">
+                        <label class="auth-form-label">門店代碼（帳號）</label>
+                        <input
+                            type="text"
+                            class="auth-form-control"
+                            id="loginStoreCode"
+                            placeholder="請輸入門店代碼"
+                            required
+                        >
+                        <p class="auth-helper-text">隨便輸入即可登入（測試用）</p>
+                    </div>
+
+                    <div class="auth-form-group">
+                        <label class="auth-form-label">密碼</label>
+                        <input
+                            type="password"
+                            class="auth-form-control"
+                            id="loginPassword"
+                            placeholder="請輸入密碼"
+                            required
+                        >
+                    </div>
+
+                    <div class="auth-error-message" id="loginErrorMessage">
+                        帳號或密碼錯誤，請重新輸入
+                    </div>
+
+                    <button type="submit" class="auth-btn-primary">
+                        登入
+                    </button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>還沒有帳號？</span>
+                </div>
+
+                <div class="auth-link">
+                    <a onclick="showRegisterPage()">註冊門店帳號</a>
+                </div>
+            </div>
+
+            <!-- 註冊頁面 -->
+            <div id="registerPage" class="auth-form-section">
+                <div class="auth-logo">
+                    <h1>鏈居</h1>
+                    <p>仲介端帳號註冊</p>
+                </div>
+
+                <div class="step-indicator">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">門店驗證</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">個人資料</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">手機驗證</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-label">設定密碼</div>
+                    </div>
+                </div>
+
+                <!-- Step 1: 門店代碼驗證 -->
+                <div class="auth-form-section active" id="regStep1">
+                    <form onsubmit="handleRegStoreCode(event)">
+                        <div class="auth-form-group">
+                            <label class="auth-form-label">門店代碼<span class="required">*</span></label>
+                            <input
+                                type="text"
+                                class="auth-form-control"
+                                id="regStoreCode"
+                                placeholder="請輸入您的門店代碼"
+                                required
+                            >
+                            <p class="auth-helper-text">請向您的門店管理員索取門店代碼</p>
+                            <p class="auth-error-message" id="regStoreCodeError">門店代碼不存在或已被註冊</p>
+                            <p class="auth-success-message" id="regStoreCodeSuccess">門店代碼驗證成功</p>
+                        </div>
+                        <button type="submit" class="auth-btn-primary">驗證並繼續</button>
+                    </form>
+                </div>
+
+                <!-- Step 2: 個人資料 -->
+                <div class="auth-form-section" id="regStep2">
+                    <form onsubmit="handleRegPersonalInfo(event)">
+                        <div class="auth-form-group">
+                            <label class="auth-form-label">真實姓名<span class="required">*</span></label>
+                            <input
+                                type="text"
+                                class="auth-form-control"
+                                id="regRealName"
+                                placeholder="請輸入真實姓名"
+                                required
+                            >
+                            <p class="auth-helper-text">請輸入與身分證相符的真實姓名</p>
+                        </div>
+
+                        <div class="auth-form-group">
+                            <label class="auth-form-label">身分證字號<span class="required">*</span></label>
+                            <input
+                                type="text"
+                                class="auth-form-control"
+                                id="regIdNumber"
+                                placeholder="請輸入身分證字號"
+                                maxlength="10"
+                                required
+                            >
+                            <p class="auth-helper-text">身分證字號將加密儲存，僅用於身份驗證</p>
+                            <p class="auth-error-message" id="regIdNumberError">身分證格式不正確</p>
+                        </div>
+
+                        <div class="auth-btn-group">
+                            <button type="button" class="auth-btn-outline" onclick="regPrevStep()">上一步</button>
+                            <button type="submit" class="auth-btn-primary" style="margin-top: 0;">下一步</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 3: 手機驗證 -->
+                <div class="auth-form-section" id="regStep3">
+                    <form onsubmit="handleRegPhoneVerification(event)">
+                        <div class="auth-form-group">
+                            <label class="auth-form-label">手機號碼<span class="required">*</span></label>
+                            <div class="auth-input-group">
+                                <input
+                                    type="tel"
+                                    class="auth-form-control"
+                                    id="regPhoneNumber"
+                                    placeholder="請輸入手機號碼"
+                                    maxlength="10"
+                                    required
+                                >
+                                <button
+                                    type="button"
+                                    class="auth-btn-secondary"
+                                    id="sendSmsBtn"
+                                    onclick="sendVerificationCode()"
+                                >
+                                    發送驗證碼
+                                </button>
+                            </div>
+                            <p class="auth-helper-text">請輸入 10 碼手機號碼（例：0912345678）</p>
+                            <p class="auth-error-message" id="regPhoneError">手機號碼格式不正確</p>
+                        </div>
+
+                        <div class="auth-form-group" id="smsCodeGroup" style="display: none;">
+                            <label class="auth-form-label">簡訊驗證碼<span class="required">*</span></label>
+                            <input
+                                type="text"
+                                class="auth-form-control"
+                                id="regSmsCode"
+                                placeholder="請輸入 6 位數驗證碼"
+                                maxlength="6"
+                            >
+                            <p class="auth-helper-text" id="smsTimer">驗證碼已發送，5 分鐘內有效</p>
+                            <p class="auth-error-message" id="regSmsCodeError">驗證碼錯誤或已過期</p>
+                        </div>
+
+                        <div class="auth-btn-group">
+                            <button type="button" class="auth-btn-outline" onclick="regPrevStep()">上一步</button>
+                            <button type="submit" class="auth-btn-primary" style="margin-top: 0;" id="verifyPhoneBtn">驗證並繼續</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 4: 設定密碼 -->
+                <div class="auth-form-section" id="regStep4">
+                    <form onsubmit="handleRegPasswordSetup(event)">
+                        <div class="auth-form-group">
+                            <label class="auth-form-label">設定密碼<span class="required">*</span></label>
+                            <input
+                                type="password"
+                                class="auth-form-control"
+                                id="regPassword"
+                                placeholder="請輸入密碼"
+                                required
+                                oninput="checkPasswordStrength()"
+                            >
+                            <div class="password-requirements">
+                                <div style="font-weight: 600; color: var(--text-primary);">密碼需符合以下條件：</div>
+                                <ul>
+                                    <li id="req-length">至少 8 個字元</li>
+                                    <li id="req-letter">包含英文字母</li>
+                                    <li id="req-number">包含數字</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="auth-form-group">
+                            <label class="auth-form-label">確認密碼<span class="required">*</span></label>
+                            <input
+                                type="password"
+                                class="auth-form-control"
+                                id="regConfirmPassword"
+                                placeholder="請再次輸入密碼"
+                                required
+                                oninput="checkPasswordMatch()"
+                            >
+                            <p class="auth-error-message" id="passwordMatchError">兩次輸入的密碼不一致</p>
+                        </div>
+
+                        <div class="auth-btn-group">
+                            <button type="button" class="auth-btn-outline" onclick="regPrevStep()">上一步</button>
+                            <button type="submit" class="auth-btn-primary" style="margin-top: 0;" id="submitBtn">完成註冊</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 5: 註冊成功 -->
+                <div class="auth-form-section" id="regStep5">
+                    <div class="success-container">
+                        <div class="success-icon">✓</div>
+                        <div class="success-title">註冊成功！</div>
+                        <div class="success-text">
+                            您的帳號已成功建立<br>
+                            請使用門店代碼和密碼登入系統
+                        </div>
+                        <button class="auth-btn-primary" onclick="backToLogin()">前往登入</button>
+                    </div>
+                </div>
+
+                <div class="auth-link" style="margin-top: 24px;">
+                    <a onclick="showLoginPage()">已有帳號？立即登入</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container hidden" id="mainApp">
+        <!-- 左側導覽 -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>鏈居</h1>
+                <p>信義門店</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" data-page="dashboard">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        儀表板
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="bookings">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                        報備管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="performance">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        業績管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="commission">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        佣金管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="permissions">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        權限管理
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- 主內容區 -->
+        <main class="main-content">
+            <!-- 頂部欄 -->
+            <div class="header">
+                <div class="header-left">
+                    <h2 id="page-title">儀表板</h2>
+                    <p id="page-subtitle">掌握門店營運狀況</p>
+                </div>
+                <div class="header-right">
+                    <!-- 通知圖標 -->
+                    <div class="notification-wrapper">
+                        <button class="notification-btn" onclick="toggleNotifications()">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                            <span class="notification-badge">3</span>
+                        </button>
+
+                        <!-- 通知面板 -->
+                        <div class="notification-panel" id="notificationPanel">
+                            <div class="notification-header">
+                                <h3>站內通知</h3>
+                                <button class="btn-text" onclick="markAllRead()">全部已讀</button>
+                            </div>
+
+                            <!-- 通知過濾標籤 -->
+                            <div style="padding: 12px 20px; border-bottom: 1px solid var(--border-color);">
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <button class="badge badge-primary" style="cursor: pointer; border: none;" onclick="filterNotifications('all')">全部</button>
+                                    <button class="badge badge-secondary" style="cursor: pointer; border: none;" onclick="filterNotifications('booking')">報備</button>
+                                    <button class="badge badge-secondary" style="cursor: pointer; border: none;" onclick="filterNotifications('viewing')">帶看</button>
+                                    <button class="badge badge-secondary" style="cursor: pointer; border: none;" onclick="filterNotifications('system')">系統</button>
+                                </div>
+                            </div>
+
+                            <div class="notification-list">
+                                <!-- 報備核可通知 -->
+                                <div class="notification-item unread" data-type="booking" onclick="viewNotificationDetail('BR202601015')">
+                                    <div class="notification-icon" style="background: #10b981;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">報備已核可</div>
+                                        <div class="notification-text">您的報備 #BR202601015（信義之星）已通過審核，可安排帶看</div>
+                                        <div class="notification-time">5分鐘前</div>
+                                    </div>
+                                </div>
+
+                                <!-- 帶看提醒 -->
+                                <div class="notification-item unread" data-type="viewing" onclick="viewNotificationDetail('BR202601012')">
+                                    <div class="notification-icon" style="background: #f59e0b;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">帶看提醒</div>
+                                        <div class="notification-text">今日下午3點有帶看行程（松山新城-王先生）</div>
+                                        <div class="notification-time">1小時前</div>
+                                    </div>
+                                </div>
+
+                                <!-- 改期請求 -->
+                                <div class="notification-item unread" data-type="booking">
+                                    <div class="notification-icon" style="background: #f59e0b;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">客戶改期請求</div>
+                                        <div class="notification-text">#BR202601010 客戶申請改期至明天下午2點</div>
+                                        <div class="notification-time">2小時前</div>
+                                    </div>
+                                </div>
+
+                                <!-- 平台公告 -->
+                                <div class="notification-item unread" data-type="system">
+                                    <div class="notification-icon" style="background: #2563eb;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">平台公告</div>
+                                        <div class="notification-text">新案場「信義之星」已上架，歡迎報備</div>
+                                        <div class="notification-time">3小時前</div>
+                                    </div>
+                                </div>
+
+                                <!-- 成交通知 -->
+                                <div class="notification-item" data-type="booking">
+                                    <div class="notification-icon" style="background: #10b981;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">恭喜成交</div>
+                                        <div class="notification-text">#BR202601008 大安華廈已成交，佣金NT$180,000</div>
+                                        <div class="notification-time">昨天</div>
+                                    </div>
+                                </div>
+
+                                <!-- SLA逾期警告 -->
+                                <div class="notification-item" data-type="booking">
+                                    <div class="notification-icon" style="background: #ef4444;">
+                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                            <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">SLA逾期提醒</div>
+                                        <div class="notification-text">#BR202601005 已逾期未帶看，請儘速聯繫客戶</div>
+                                        <div class="notification-time">昨天</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-info">
+                        <div class="user-avatar">陳</div>
+                        <div class="user-details">
+                            <div class="user-name">陳店長</div>
+                            <div class="user-role">門店管理員</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面1: 儀表板 -->
+            <div id="dashboard" class="page-content active">
+                <!-- 案場輪播 -->
+                <div class="carousel">
+                    <div class="carousel-item active">
+                        <h3>信義之星</h3>
+                        <p>📍 信義區忠孝東路五段</p>
+                        <p>💰 1房 1200萬起 | 2房 1800萬起</p>
+                        <p>🏗️ 預計2026年Q4交屋</p>
+                    </div>
+                    <div class="carousel-item">
+                        <h3>松山新城</h3>
+                        <p>📍 松山區南京東路四段</p>
+                        <p>💰 2房 1500萬起 | 3房 2300萬起</p>
+                        <p>🏗️ 預計2027年Q2交屋</p>
+                    </div>
+                    <div class="carousel-item">
+                        <h3>大安華廈</h3>
+                        <p>📍 大安區復興南路一段</p>
+                        <p>💰 3房 2800萬起 | 4房 3500萬起</p>
+                        <p>🏗️ 預計2027年Q1交屋</p>
+                    </div>
+                    <div class="carousel-controls">
+                        <div class="carousel-dot active" onclick="showSlide(0)"></div>
+                        <div class="carousel-dot" onclick="showSlide(1)"></div>
+                        <div class="carousel-dot" onclick="showSlide(2)"></div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                    <!-- 中央主內容 -->
+                    <div>
+                        <!-- 門店數據總覽 -->
+                        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                            <div class="stat-card" style="border-left-color: #2563eb;">
+                                <div class="stat-label">本月報備數</div>
+                                <div class="stat-value">28</div>
+                                <div class="stat-change">↑ 較上月 +15%</div>
+                            </div>
+                            <div class="stat-card" style="border-left-color: #10b981;">
+                                <div class="stat-label">本月成交數</div>
+                                <div class="stat-value">5</div>
+                                <div class="stat-change">↑ 較上月 +25%</div>
+                            </div>
+                            <div class="stat-card" style="border-left-color: #f59e0b;">
+                                <div class="stat-label">業績金額</div>
+                                <div class="stat-value">9,200萬</div>
+                                <div class="stat-change">本月累計</div>
+                            </div>
+                        </div>
+
+                        <!-- 平台公告 -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">平台公告</h3>
+                            </div>
+                            <div class="announcement-item">
+                                <div class="announcement-title">
+                                    <span class="badge badge-danger">重要</span>
+                                    系統維護通知
+                                </div>
+                                <div class="announcement-time">2026/01/18 10:00</div>
+                                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
+                                    本週六凌晨2:00-4:00進行系統維護，期間暫停服務
+                                </p>
+                            </div>
+                            <div class="announcement-item">
+                                <div class="announcement-title">
+                                    <span class="badge badge-success">新建案</span>
+                                    信義之星正式上架
+                                </div>
+                                <div class="announcement-time">2026/01/17 15:30</div>
+                                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
+                                    信義區精華地段全新建案，現已開放報備
+                                </p>
+                            </div>
+                            <div class="announcement-item">
+                                <div class="announcement-title">
+                                    <span class="badge badge-info">活動</span>
+                                    1月業績達標獎勵方案
+                                </div>
+                                <div class="announcement-time">2026/01/15 09:00</div>
+                                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">
+                                    本月成交3件以上享額外獎金，詳情請洽店長
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- A案排行 (全平台) -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">A案成交排行 TOP 5（全平台）</h3>
+                                <span class="badge badge-primary">本月統計</span>
+                            </div>
+                            <div class="ranking-item">
+                                <div class="ranking-number top1">1</div>
+                                <div class="ranking-info">
+                                    <div class="ranking-name">王大明 - 永慶房屋</div>
+                                    <div class="ranking-stats">成交 8 件 | 業績 1.2億</div>
+                                </div>
+                                <div class="ranking-value">8件</div>
+                            </div>
+                            <div class="ranking-item">
+                                <div class="ranking-number top2">2</div>
+                                <div class="ranking-info">
+                                    <div class="ranking-name">李小華 - 信義房屋</div>
+                                    <div class="ranking-stats">成交 6 件 | 業績 9500萬</div>
+                                </div>
+                                <div class="ranking-value">6件</div>
+                            </div>
+                            <div class="ranking-item">
+                                <div class="ranking-number top3">3</div>
+                                <div class="ranking-info">
+                                    <div class="ranking-name">張美玲 - 住商不動產</div>
+                                    <div class="ranking-stats">成交 5 件 | 業績 8200萬</div>
+                                </div>
+                                <div class="ranking-value">5件</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側邊欄 -->
+                    <div>
+                        <!-- 門店總覽 -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">門店總覽</h3>
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <div class="stat-label">門店名稱</div>
+                                <div style="font-weight: 600; font-size: 18px;">信義門店</div>
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <div class="stat-label">在職業務</div>
+                                <div style="font-weight: 600; font-size: 18px;">8人</div>
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <div class="stat-label">本月報備</div>
+                                <div style="font-weight: 600; font-size: 18px;">28件</div>
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <div class="stat-label">本月成交</div>
+                                <div style="font-weight: 600; font-size: 18px; color: var(--success-color);">5件</div>
+                            </div>
+                            <div>
+                                <div class="stat-label">本月業績</div>
+                                <div style="font-weight: 700; font-size: 24px; color: var(--primary-color);">9,200萬</div>
+                            </div>
+                        </div>
+
+                        <!-- 門店Top業務 -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">門店Top業務</h3>
+                            </div>
+                            <div class="ranking-item">
+                                <div class="ranking-number top1">1</div>
+                                <div class="ranking-info">
+                                    <div class="ranking-name">李小華</div>
+                                    <div class="ranking-stats">成交 2 件</div>
+                                </div>
+                            </div>
+                            <div class="ranking-item">
+                                <div class="ranking-number top2">2</div>
+                                <div class="ranking-info">
+                                    <div class="ranking-name">陳建國</div>
+                                    <div class="ranking-stats">成交 1 件</div>
+                                </div>
+                            </div>
+                            <div class="ranking-item">
+                                <div class="ranking-number top3">3</div>
+                                <div class="ranking-info">
+                                    <div class="ranking-name">張美玲</div>
+                                    <div class="ranking-stats">成交 1 件</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面2: 報備管理 -->
+            <div id="bookings" class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">報備管理</h3>
+                        <button class="btn btn-primary" onclick="openModal('newBookingModal')">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            新增報備
+                        </button>
+                    </div>
+
+                    <!-- 9個狀態標籤（依序固定） -->
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('pending')">待核可 (5)</button>
+                        <button class="tab" onclick="switchTab('approved')">已核可待帶看 (8)</button>
+                        <button class="tab" onclick="switchTab('reschedule_pending')">改期待審核 (2)</button>
+                        <button class="tab" onclick="switchTab('viewed')">已帶看 (12)</button>
+                        <button class="tab" onclick="switchTab('deposit')">收訂中 (3)</button>
+                        <button class="tab" onclick="switchTab('closed')">已成交 (5)</button>
+                        <button class="tab" onclick="switchTab('cancelled')">已取消 (2)</button>
+                        <button class="tab" onclick="switchTab('cancelled_after_approved')">核可後取消 (3)</button>
+                        <button class="tab" onclick="switchTab('rejected')">已拒絕 (1)</button>
+                    </div>
+
+                    <!-- 搜尋欄 -->
+                    <div class="search-bar">
+                        <select class="form-control" style="width: auto;">
+                            <option value="">全部案場</option>
+                            <option value="project1">信義之星</option>
+                            <option value="project2">松山新城</option>
+                            <option value="project3">大安華廈</option>
+                        </select>
+                        <input type="text" class="search-input" placeholder="搜尋報備編號、客戶姓名...">
+                        <button class="btn btn-primary">搜尋</button>
+                    </div>
+
+                    <!-- 以業務分組顯示 -->
+                    <div id="pending" class="tab-content active">
+                        <!-- 業務分組1 -->
+                        <div class="agent-group">
+                            <div class="agent-group-header">
+                                <span>👤 李小華（3件）</span>
+                                <span class="badge badge-warning">待核可</span>
+                            </div>
+                            <div class="agent-group-body">
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>報備編號</th>
+                                                <th>案場名稱</th>
+                                                <th>客戶姓名</th>
+                                                <th>客戶電話</th>
+                                                <th>報備時間</th>
+                                                <th>狀態</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>#BR202601001</td>
+                                                <td>信義之星</td>
+                                                <td class="masked-text">王**</td>
+                                                <td class="masked-text">0912-***-678</td>
+                                                <td>2026/01/18 09:30</td>
+                                                <td><span class="badge badge-warning">待核可</span></td>
+                                                <td>
+                                                    <button class="btn btn-outline btn-sm" onclick="viewBookingDetail('BR202601001')">查看</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>#BR202601002</td>
+                                                <td>松山新城</td>
+                                                <td class="masked-text">陳**</td>
+                                                <td class="masked-text">0923-***-234</td>
+                                                <td>2026/01/18 10:15</td>
+                                                <td><span class="badge badge-warning">待核可</span></td>
+                                                <td>
+                                                    <button class="btn btn-outline btn-sm" onclick="viewBookingDetail('BR202601002')">查看</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>#BR202601003</td>
+                                                <td>大安華廈</td>
+                                                <td class="masked-text">林**</td>
+                                                <td class="masked-text">0934-***-789</td>
+                                                <td>2026/01/18 11:20</td>
+                                                <td><span class="badge badge-warning">待核可</span></td>
+                                                <td>
+                                                    <button class="btn btn-outline btn-sm" onclick="viewBookingDetail('BR202601003')">查看</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 業務分組2 -->
+                        <div class="agent-group">
+                            <div class="agent-group-header">
+                                <span>👤 陳建國（2件）</span>
+                                <span class="badge badge-warning">待核可</span>
+                            </div>
+                            <div class="agent-group-body">
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>報備編號</th>
+                                                <th>案場名稱</th>
+                                                <th>客戶姓名</th>
+                                                <th>客戶電話</th>
+                                                <th>報備時間</th>
+                                                <th>狀態</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>#BR202601004</td>
+                                                <td>信義之星</td>
+                                                <td class="masked-text">黃**</td>
+                                                <td class="masked-text">0956-***-456</td>
+                                                <td>2026/01/18 13:45</td>
+                                                <td><span class="badge badge-warning">待核可</span></td>
+                                                <td>
+                                                    <button class="btn btn-outline btn-sm" onclick="viewBookingDetail('BR202601004')">查看</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>#BR202601005</td>
+                                                <td>內湖科技園區</td>
+                                                <td class="masked-text">吳**</td>
+                                                <td class="masked-text">0987-***-321</td>
+                                                <td>2026/01/18 14:20</td>
+                                                <td><span class="badge badge-warning">待核可</span></td>
+                                                <td>
+                                                    <button class="btn btn-outline btn-sm" onclick="viewBookingDetail('BR202601005')">查看</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="approved" class="tab-content">
+                        <p style="text-align: center; padding: 40px; color: var(--text-secondary);">已核可待帶看：8筆報備</p>
+                    </div>
+
+                    <div id="viewed" class="tab-content">
+                        <p style="text-align: center; padding: 40px; color: var(--text-secondary);">已帶看：12筆報備</p>
+                    </div>
+
+                    <div id="deposit" class="tab-content">
+                        <p style="text-align: center; padding: 40px; color: var(--text-secondary);">收訂中：3筆報備</p>
+                    </div>
+
+                    <div id="closed" class="tab-content">
+                        <p style="text-align: center; padding: 40px; color: var(--text-secondary);">已成交：5筆報備</p>
+                    </div>
+
+                    <div id="reschedule_pending" class="tab-content">
+                        <div class="agent-group">
+                            <div class="agent-group-header">
+                                <span>👤 李小華（2件）</span>
+                                <span class="badge badge-warning">改期待審核</span>
+                            </div>
+                            <div class="agent-group-body">
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>報備編號</th>
+                                                <th>案場名稱</th>
+                                                <th>客戶姓名</th>
+                                                <th>原帶看時間</th>
+                                                <th>新帶看時間</th>
+                                                <th>改期原因</th>
+                                                <th>狀態</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>#BR202601010</td>
+                                                <td>信義之星</td>
+                                                <td>陳*華</td>
+                                                <td>2026/01/16 14:00</td>
+                                                <td>2026/01/18 14:00</td>
+                                                <td>客戶臨時有事</td>
+                                                <td><span class="badge badge-warning">待審核</span></td>
+                                                <td>
+                                                    <button class="btn btn-outline btn-sm" onclick="viewBookingDetail('BR202601010')">查看</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>#BR202601008</td>
+                                                <td>松山新城</td>
+                                                <td>林*芳</td>
+                                                <td>2026/01/15 10:00</td>
+                                                <td>2026/01/17 10:00</td>
+                                                <td>時間衝突</td>
+                                                <td><span class="badge badge-warning">待審核</span></td>
+                                                <td>
+                                                    <button class="btn btn-outline btn-sm" onclick="viewBookingDetail('BR202601008')">查看</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="cancelled" class="tab-content">
+                        <p style="text-align: center; padding: 40px; color: var(--text-secondary);">已取消：2筆報備（報備提交後、核可前的取消）</p>
+                    </div>
+
+                    <div id="cancelled_after_approved" class="tab-content">
+                        <div class="agent-group">
+                            <div class="agent-group-header">
+                                <span>👤 李小華（1件）</span>
+                                <span class="badge badge-danger">核可後取消</span>
+                            </div>
+                            <div class="agent-group-body">
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>報備編號</th>
+                                                <th>案場名稱</th>
+                                                <th>客戶姓名</th>
+                                                <th>核可時間</th>
+                                                <th>取消時間</th>
+                                                <th>取消原因</th>
+                                                <th>詳細說明</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>#BR202601005</td>
+                                                <td>大安華廈</td>
+                                                <td>王*明</td>
+                                                <td>2026/01/13 11:00</td>
+                                                <td>2026/01/14 16:30</td>
+                                                <td>客戶改變主意</td>
+                                                <td>客戶找到其他更合適的物件</td>
+                                                <td>
+                                                    <button class="btn btn-outline btn-sm" onclick="viewBookingDetail('BR202601005')">查看</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="agent-group">
+                            <div class="agent-group-header">
+                                <span>👤 張大同（2件）</span>
+                                <span class="badge badge-danger">核可後取消</span>
+                            </div>
+                            <div class="agent-group-body">
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>報備編號</th>
+                                                <th>案場名稱</th>
+                                                <th>客戶姓名</th>
+                                                <th>核可時間</th>
+                                                <th>取消時間</th>
+                                                <th>取消原因</th>
+                                                <th>詳細說明</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>#BR202601003</td>
+                                                <td>信義之星</td>
+                                                <td>劉*偉</td>
+                                                <td>2026/01/12 09:30</td>
+                                                <td>2026/01/13 10:15</td>
+                                                <td>預算問題</td>
+                                                <td>客戶資金尚未到位，暫緩購屋計畫</td>
+                                                <td>
+                                                    <button class="btn btn-outline btn-sm" onclick="viewBookingDetail('BR202601003')">查看</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>#BR202601001</td>
+                                                <td>松山新城</td>
+                                                <td>陳*華</td>
+                                                <td>2026/01/11 14:00</td>
+                                                <td>2026/01/12 11:00</td>
+                                                <td>時間無法配合</td>
+                                                <td>客戶工作調動，近期無法看房</td>
+                                                <td>
+                                                    <button class="btn btn-outline btn-sm" onclick="viewBookingDetail('BR202601001')">查看</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 16px; background: #fff3cd; border-left: 4px solid #f59e0b; border-radius: 8px;">
+                            <div style="font-weight: 600; color: #856404; margin-bottom: 8px;">⚠️ 重要說明</div>
+                            <ul style="margin-left: 20px; color: #856404; font-size: 14px;">
+                                <li>「核可後取消」為終態狀態，取消後無法恢復</li>
+                                <li>此類取消會納入業績統計，影響成交率計算</li>
+                                <li>取消原因為必填項目，供後續分析使用</li>
+                                <li>建議在取消前與客戶充分溝通，降低取消率</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="rejected" class="tab-content">
+                        <p style="text-align: center; padding: 40px; color: var(--text-secondary);">已拒絕：1筆報備</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面3: 業績管理 (2層結構) -->
+            <div id="performance" class="page-content">
+                <!-- 第1層：總覽 -->
+                <div id="performance-summary">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">門店業績總覽</h3>
+                            <div>
+                                <select class="form-control" style="width: auto; display: inline-block;">
+                                    <option>2026年1月</option>
+                                    <option>2025年12月</option>
+                                    <option>2025年11月</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 門店整體數據 -->
+                        <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+                            <div class="stat-card" style="border-left-color: #2563eb;">
+                                <div class="stat-label">總報備數</div>
+                                <div class="stat-value">28</div>
+                            </div>
+                            <div class="stat-card" style="border-left-color: #10b981;">
+                                <div class="stat-label">總成交數</div>
+                                <div class="stat-value">5</div>
+                            </div>
+                            <div class="stat-card" style="border-left-color: #f59e0b;">
+                                <div class="stat-label">成交率</div>
+                                <div class="stat-value">17.9%</div>
+                            </div>
+                            <div class="stat-card" style="border-left-color: #7c3aed;">
+                                <div class="stat-label">總業績</div>
+                                <div class="stat-value">9,200萬</div>
+                            </div>
+                        </div>
+
+                        <!-- 各業務業績表 -->
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>排名</th>
+                                        <th>業務姓名</th>
+                                        <th>報備數</th>
+                                        <th>帶看數</th>
+                                        <th>成交數</th>
+                                        <th>成交率</th>
+                                        <th>業績金額</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>李小華</td>
+                                        <td>10</td>
+                                        <td>8</td>
+                                        <td>2</td>
+                                        <td>20%</td>
+                                        <td style="font-weight: 700; color: var(--success-color);">3,800萬</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm" onclick="viewPerformanceDetail('李小華')">查看明細</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>陳建國</td>
+                                        <td>7</td>
+                                        <td>5</td>
+                                        <td>1</td>
+                                        <td>14.3%</td>
+                                        <td style="font-weight: 700; color: var(--success-color);">2,100萬</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm" onclick="viewPerformanceDetail('陳建國')">查看明細</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>張美玲</td>
+                                        <td>6</td>
+                                        <td>4</td>
+                                        <td>1</td>
+                                        <td>16.7%</td>
+                                        <td style="font-weight: 700; color: var(--success-color);">1,800萬</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm" onclick="viewPerformanceDetail('張美玲')">查看明細</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>劉志明</td>
+                                        <td>5</td>
+                                        <td>3</td>
+                                        <td>1</td>
+                                        <td>20%</td>
+                                        <td style="font-weight: 700; color: var(--success-color);">1,500萬</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm" onclick="viewPerformanceDetail('劉志明')">查看明細</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第2層：業務明細（點擊後顯示） -->
+                <div id="performance-detail" style="display: none;">
+                    <button class="btn btn-outline" onclick="backToPerformanceSummary()" style="margin-bottom: 20px;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        返回總覽
+                    </button>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title" id="agent-detail-name">李小華 - 業績明細</h3>
+                            <span class="badge badge-success">本月成交 2 件</span>
+                        </div>
+
+                        <!-- 業務個人統計 -->
+                        <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+                            <div class="stat-card">
+                                <div class="stat-label">報備數</div>
+                                <div class="stat-value">10</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">帶看數</div>
+                                <div class="stat-value">8</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">成交數</div>
+                                <div class="stat-value">2</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">業績金額</div>
+                                <div class="stat-value">3,800萬</div>
+                            </div>
+                        </div>
+
+                        <!-- 成交明細表 -->
+                        <h4 style="margin: 24px 0 16px; font-size: 16px; font-weight: 600;">成交明細</h4>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>報備編號</th>
+                                        <th>案場名稱</th>
+                                        <th>客戶姓名</th>
+                                        <th>成交日期</th>
+                                        <th>成交總價</th>
+                                        <th>預估佣金</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#BR202601020</td>
+                                        <td>信義之星</td>
+                                        <td class="masked-text">王**</td>
+                                        <td>2026/01/15</td>
+                                        <td style="font-weight: 700;">2,100萬</td>
+                                        <td style="font-weight: 700; color: var(--success-color);">42萬</td>
+                                    </tr>
+                                    <tr>
+                                        <td>#BR202601018</td>
+                                        <td>松山新城</td>
+                                        <td class="masked-text">陳**</td>
+                                        <td>2026/01/10</td>
+                                        <td style="font-weight: 700;">1,700萬</td>
+                                        <td style="font-weight: 700; color: var(--success-color);">34萬</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面4: 佣金管理 (平台→agency，2層結構) -->
+            <div id="commission" class="page-content">
+                <!-- 第1層：總覽 -->
+                <div id="commission-summary">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">佣金管理（平台→門店）</h3>
+                            <div>
+                                <select class="form-control" style="width: auto; display: inline-block;">
+                                    <option>2026年1月</option>
+                                    <option>2025年12月</option>
+                                    <option>2025年11月</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <p style="margin-bottom: 20px; color: var(--text-secondary); font-size: 14px;">
+                            註：本頁面僅顯示平台支付給門店的佣金，不含門店內部拆帳
+                        </p>
+
+                        <!-- 佣金統計 -->
+                        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                            <div class="stat-card" style="border-left-color: #2563eb;">
+                                <div class="stat-label">應收總額</div>
+                                <div class="stat-value">368萬</div>
+                            </div>
+                            <div class="stat-card" style="border-left-color: #10b981;">
+                                <div class="stat-label">已收金額</div>
+                                <div class="stat-value">276萬</div>
+                            </div>
+                            <div class="stat-card" style="border-left-color: #f59e0b;">
+                                <div class="stat-label">未收金額</div>
+                                <div class="stat-value">92萬</div>
+                            </div>
+                        </div>
+
+                        <!-- 佣金清單 -->
+                        <div class="tabs" style="margin-top: 24px;">
+                            <button class="tab active" onclick="switchCommissionTab('all')">全部 (5)</button>
+                            <button class="tab" onclick="switchCommissionTab('paid')">已收款 (3)</button>
+                            <button class="tab" onclick="switchCommissionTab('pending')">未收款 (2)</button>
+                        </div>
+
+                        <div id="comm-all" class="tab-content active">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>成交編號</th>
+                                            <th>案場名稱</th>
+                                            <th>業務姓名</th>
+                                            <th>成交日期</th>
+                                            <th>成交總價</th>
+                                            <th>佣金金額</th>
+                                            <th>收款狀態</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>#TX202601005</td>
+                                            <td>信義之星</td>
+                                            <td>李小華</td>
+                                            <td>2026/01/15</td>
+                                            <td>2,100萬</td>
+                                            <td style="font-weight: 700; color: var(--success-color);">42萬</td>
+                                            <td><span class="badge badge-warning">未收款</span></td>
+                                            <td>
+                                                <button class="btn btn-outline btn-sm" onclick="viewCommissionDetail('TX202601005')">查看明細</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#TX202601004</td>
+                                            <td>松山新城</td>
+                                            <td>李小華</td>
+                                            <td>2026/01/10</td>
+                                            <td>1,700萬</td>
+                                            <td style="font-weight: 700; color: var(--success-color);">34萬</td>
+                                            <td><span class="badge badge-success">已收款</span></td>
+                                            <td>
+                                                <button class="btn btn-outline btn-sm" onclick="viewCommissionDetail('TX202601004')">查看明細</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#TX202601003</td>
+                                            <td>大安華廈</td>
+                                            <td>張美玲</td>
+                                            <td>2026/01/08</td>
+                                            <td>1,800萬</td>
+                                            <td style="font-weight: 700; color: var(--success-color);">36萬</td>
+                                            <td><span class="badge badge-success">已收款</span></td>
+                                            <td>
+                                                <button class="btn btn-outline btn-sm" onclick="viewCommissionDetail('TX202601003')">查看明細</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#TX202601002</td>
+                                            <td>內湖科技園區</td>
+                                            <td>陳建國</td>
+                                            <td>2026/01/05</td>
+                                            <td>2,500萬</td>
+                                            <td style="font-weight: 700; color: var(--success-color);">50萬</td>
+                                            <td><span class="badge badge-warning">未收款</span></td>
+                                            <td>
+                                                <button class="btn btn-outline btn-sm" onclick="viewCommissionDetail('TX202601002')">查看明細</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#TX202601001</td>
+                                            <td>信義之星</td>
+                                            <td>劉志明</td>
+                                            <td>2026/01/03</td>
+                                            <td>1,500萬</td>
+                                            <td style="font-weight: 700; color: var(--success-color);">30萬</td>
+                                            <td><span class="badge badge-success">已收款</span></td>
+                                            <td>
+                                                <button class="btn btn-outline btn-sm" onclick="viewCommissionDetail('TX202601001')">查看明細</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="comm-paid" class="tab-content">
+                            <p style="text-align: center; padding: 40px; color: var(--text-secondary);">已收款：3筆</p>
+                        </div>
+
+                        <div id="comm-pending" class="tab-content">
+                            <p style="text-align: center; padding: 40px; color: var(--text-secondary);">未收款：2筆</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第2層：佣金明細 -->
+                <div id="commission-detail" style="display: none;">
+                    <button class="btn btn-outline" onclick="backToCommissionSummary()" style="margin-bottom: 20px;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        返回列表
+                    </button>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title" id="commission-detail-title">佣金明細 #TX202601005</h3>
+                            <span class="badge badge-warning">未收款</span>
+                        </div>
+
+                        <div style="background: var(--bg-color); padding: 20px; border-radius: 8px; margin-bottom: 24px;">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                                <div>
+                                    <div class="stat-label">成交編號</div>
+                                    <div style="font-weight: 600; margin-bottom: 12px;">#TX202601005</div>
+                                </div>
+                                <div>
+                                    <div class="stat-label">案場名稱</div>
+                                    <div style="font-weight: 600; margin-bottom: 12px;">信義之星</div>
+                                </div>
+                                <div>
+                                    <div class="stat-label">業務姓名</div>
+                                    <div style="font-weight: 600; margin-bottom: 12px;">李小華</div>
+                                </div>
+                                <div>
+                                    <div class="stat-label">成交日期</div>
+                                    <div style="font-weight: 600; margin-bottom: 12px;">2026/01/15</div>
+                                </div>
+                                <div>
+                                    <div class="stat-label">成交總價</div>
+                                    <div style="font-weight: 700; font-size: 20px; color: var(--primary-color);">2,100萬</div>
+                                </div>
+                                <div>
+                                    <div class="stat-label">平台佣金（2%）</div>
+                                    <div style="font-weight: 700; font-size: 20px; color: var(--success-color);">42萬</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 style="margin: 24px 0 16px; font-size: 16px; font-weight: 600;">收款記錄</h4>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>付款日期</th>
+                                        <th>付款金額</th>
+                                        <th>付款方式</th>
+                                        <th>付款憑證</th>
+                                        <th>備註</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; color: var(--text-secondary);">尚未收款</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 頁面5: 權限管理 -->
+            <div id="permissions" class="page-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">業務帳號管理</h3>
+                        <button class="btn btn-primary" onclick="openModal('newAgentModal')">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            新增業務
+                        </button>
+                    </div>
+
+                    <!-- 4種狀態標籤 -->
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchPermTab('approved')">已核可 (8)</button>
+                        <button class="tab" onclick="switchPermTab('pending')">待核可 (2)</button>
+                        <button class="tab" onclick="switchPermTab('suspended')">已停權 (1)</button>
+                        <button class="tab" onclick="switchPermTab('resigned')">已離職 (3)</button>
+                    </div>
+
+                    <!-- 搜尋欄 -->
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="搜尋業務姓名、手機號碼...">
+                        <button class="btn btn-primary">搜尋</button>
+                    </div>
+
+                    <!-- 已核可 -->
+                    <div id="perm-approved" class="tab-content active">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>業務姓名</th>
+                                        <th>手機號碼</th>
+                                        <th>加入日期</th>
+                                        <th>本月報備</th>
+                                        <th>本月成交</th>
+                                        <th>狀態</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- 動態渲染 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="perm-pending" class="tab-content">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>業務姓名</th>
+                                        <th>手機號碼</th>
+                                        <th>申請日期</th>
+                                        <th>本月報備</th>
+                                        <th>本月成交</th>
+                                        <th>狀態</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- 動態渲染 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="perm-suspended" class="tab-content">
+                        <p style="text-align: center; padding: 40px; color: var(--text-secondary);">已停權：1位業務</p>
+                    </div>
+
+                    <div id="perm-resigned" class="tab-content">
+                        <p style="text-align: center; padding: 40px; color: var(--text-secondary);">已離職：3位業務</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal: 新增報備 -->
+    <div id="newBookingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">新增報備</h3>
+            </div>
+            <form>
+                <div class="form-group">
+                    <label class="form-label">選擇案場</label>
+                    <select class="form-control" required>
+                        <option value="">請選擇案場</option>
+                        <option>信義之星</option>
+                        <option>松山新城</option>
+                        <option>大安華廈</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">客戶姓名</label>
+                    <input type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">客戶電話</label>
+                    <input type="tel" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">意向帶看日期</label>
+                    <input type="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">意向帶看時間</label>
+                    <input type="time" class="form-control" required>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('newBookingModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitNewBooking()">送出報備</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 報備詳情Modal -->
+    <div id="bookingDetailModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="detailBookingId">報備詳情 #BR202601015</h3>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+                <!-- 左側：基本資訊與時間軸 -->
+                <div>
+                    <!-- 基本資訊 -->
+                    <div style="margin-bottom: 24px; padding: 16px; background: var(--bg-color); border-radius: 8px;">
+                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">基本資訊</h4>
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 12px 16px; font-size: 14px;">
+                            <div style="color: var(--text-secondary);">案場名稱</div>
+                            <div id="detailProjectName">信義之星</div>
+                            <div style="color: var(--text-secondary);">客戶姓名</div>
+                            <div id="detailCustomerName">王*明</div>
+                            <div style="color: var(--text-secondary);">聯絡電話</div>
+                            <div id="detailCustomerPhone" class="masked-text">0912-***-678</div>
+                            <div style="color: var(--text-secondary);">報備時間</div>
+                            <div id="detailCreatedAt">2026/01/15 10:30</div>
+                            <div style="color: var(--text-secondary);">狀態</div>
+                            <div><span id="detailStatus" class="badge badge-success">已核可待帶看</span></div>
+                        </div>
+                    </div>
+
+                    <!-- SLA與下一步提示 -->
+                    <div id="slaAlert" style="margin-bottom: 24px; padding: 16px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; display: none;">
+                        <div style="display: flex; align-items: start; gap: 12px;">
+                            <svg width="20" height="20" fill="#f59e0b" viewBox="0 0 24 24">
+                                <path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div>
+                                <div style="font-weight: 600; color: #856404; margin-bottom: 4px;">下一步提示</div>
+                                <div id="slaMessage" style="font-size: 14px; color: #856404;">請於 2026/01/17 前完成帶看，否則報備將過期</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 時間軸 -->
+                    <div>
+                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">進度時間軸</h4>
+                        <div id="bookingTimeline">
+                            <!-- 時間軸項目會動態插入 -->
+                        </div>
+                    </div>
+
+                    <!-- 追加洽談記錄 -->
+                    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-color);">
+                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">追加洽談記錄</h4>
+                        <div class="form-group">
+                            <textarea id="newDiscussionNote" class="form-control" rows="3" placeholder="輸入洽談記錄..."></textarea>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="addDiscussionNote()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            新增記錄
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 右側：QR Code與操作 -->
+                <div>
+                    <!-- QR Code區域（核可後顯示） -->
+                    <div id="qrcodeSection" style="display: none; margin-bottom: 24px; padding: 20px; background: var(--bg-color); border-radius: 8px; text-align: center;">
+                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">帶看QR Code</h4>
+                        <div style="background: white; padding: 16px; border-radius: 8px; display: inline-block; margin-bottom: 12px;">
+                            <div id="qrcode" style="width: 200px; height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border-color);">
+                                <!-- QR Code會在這裡生成 -->
+                                <svg width="180" height="180" viewBox="0 0 100 100">
+                                    <rect width="100" height="100" fill="white"/>
+                                    <rect x="10" y="10" width="10" height="10" fill="black"/>
+                                    <rect x="30" y="10" width="10" height="10" fill="black"/>
+                                    <rect x="50" y="10" width="10" height="10" fill="black"/>
+                                    <rect x="70" y="10" width="10" height="10" fill="black"/>
+                                    <rect x="10" y="30" width="10" height="10" fill="black"/>
+                                    <rect x="70" y="30" width="10" height="10" fill="black"/>
+                                    <rect x="10" y="50" width="10" height="10" fill="black"/>
+                                    <rect x="30" y="50" width="10" height="10" fill="black"/>
+                                    <rect x="50" y="50" width="10" height="10" fill="black"/>
+                                    <rect x="70" y="50" width="10" height="10" fill="black"/>
+                                    <rect x="10" y="70" width="10" height="10" fill="black"/>
+                                    <rect x="30" y="70" width="10" height="10" fill="black"/>
+                                    <rect x="50" y="70" width="10" height="10" fill="black"/>
+                                    <rect x="70" y="70" width="10" height="10" fill="black"/>
+                                </svg>
+                            </div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">客戶可掃描此QR Code查看帶看資訊</div>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="downloadQRCode()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            下載QR Code
+                        </button>
+                    </div>
+
+                    <!-- 狀態變更操作 -->
+                    <div style="padding: 20px; background: var(--bg-color); border-radius: 8px;">
+                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">狀態操作</h4>
+
+                        <!-- 根據當前狀態顯示不同操作 -->
+                        <div id="statusActions">
+                            <button class="btn btn-success" style="width: 100%; margin-bottom: 8px;" onclick="updateBookingStatus('viewed')">
+                                標記為已帶看
+                            </button>
+                            <button class="btn btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="updateBookingStatus('deposit')">
+                                標記為收訂中
+                            </button>
+                            <button class="btn btn-warning" style="width: 100%; margin-bottom: 8px;" onclick="openRescheduleForm()">
+                                申請改期
+                            </button>
+                            <button class="btn btn-danger" style="width: 100%;" onclick="openCancelForm()">
+                                取消報備
+                            </button>
+                        </div>
+
+                        <!-- 改期表單（隱藏） -->
+                        <div id="rescheduleForm" style="display: none; margin-top: 16px;">
+                            <div class="form-group">
+                                <label class="form-label">新的帶看日期</label>
+                                <input type="date" id="rescheduleDate" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">新的帶看時間</label>
+                                <input type="time" id="rescheduleTime" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">改期原因</label>
+                                <textarea id="rescheduleReason" class="form-control" rows="2" placeholder="請說明改期原因..."></textarea>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="submitReschedule()">確認改期</button>
+                            <button class="btn btn-outline btn-sm" onclick="closeRescheduleForm()">取消</button>
+                        </div>
+
+                        <!-- 取消表單（隱藏） -->
+                        <div id="cancelForm" style="display: none; margin-top: 16px;">
+                            <div class="form-group">
+                                <label class="form-label">取消原因<span style="color: var(--danger-color);">*</span></label>
+                                <select id="cancelReason" class="form-control" required>
+                                    <option value="">請選擇取消原因</option>
+                                    <option value="customer_changed_mind">客戶改變主意</option>
+                                    <option value="found_other_property">找到其他物件</option>
+                                    <option value="budget_issue">預算問題</option>
+                                    <option value="schedule_conflict">時間無法配合</option>
+                                    <option value="other">其他原因</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">詳細說明</label>
+                                <textarea id="cancelReasonDetail" class="form-control" rows="3" placeholder="請詳細說明取消原因..."></textarea>
+                            </div>
+                            <button class="btn btn-danger btn-sm" onclick="submitCancel()">確認取消</button>
+                            <button class="btn btn-outline btn-sm" onclick="closeCancelForm()">返回</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('bookingDetailModal')">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 業務帳號管理Modal -->
+    <div id="agentManageModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="agentManageTitle">管理業務帳號</h3>
+            </div>
+
+            <div style="margin-bottom: 24px; padding: 16px; background: var(--bg-color); border-radius: 8px;">
+                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">基本資訊</h4>
+                <div style="display: grid; grid-template-columns: auto 1fr; gap: 12px 16px; font-size: 14px;">
+                    <div style="color: var(--text-secondary);">業務姓名</div>
+                    <div id="agentManageName">李小華</div>
+                    <div style="color: var(--text-secondary);">手機號碼</div>
+                    <div id="agentManagePhone">0912-***-345</div>
+                    <div style="color: var(--text-secondary);">加入日期</div>
+                    <div id="agentManageJoinDate">2024/03/15</div>
+                    <div style="color: var(--text-secondary);">當前狀態</div>
+                    <div><span id="agentManageStatus" class="badge badge-success">正常</span></div>
+                </div>
+            </div>
+
+            <!-- 操作標籤頁 -->
+            <div class="tabs" style="border-bottom: none; margin-bottom: 16px;">
+                <button class="tab active" onclick="switchAgentManageTab('info')">編輯資訊</button>
+                <button class="tab" onclick="switchAgentManageTab('password')">重置密碼</button>
+                <button class="tab" onclick="switchAgentManageTab('status')">狀態管理</button>
+            </div>
+
+            <!-- 編輯資訊 -->
+            <div id="agentManageInfo" class="tab-content active">
+                <div class="form-group">
+                    <label class="form-label">業務姓名</label>
+                    <input type="text" id="editAgentName" class="form-control" value="李小華">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">手機號碼</label>
+                    <input type="tel" id="editAgentPhone" class="form-control" value="0912345678">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">電子郵件</label>
+                    <input type="email" id="editAgentEmail" class="form-control" value="lixiaohua@example.com">
+                </div>
+                <button class="btn btn-primary" onclick="updateAgentInfo()">儲存變更</button>
+            </div>
+
+            <!-- 重置密碼 -->
+            <div id="agentManagePassword" class="tab-content">
+                <div style="padding: 16px; background: #fff3cd; border-left: 4px solid #f59e0b; border-radius: 8px; margin-bottom: 16px;">
+                    <div style="font-weight: 600; color: #856404; margin-bottom: 4px;">⚠️ 重置密碼須知</div>
+                    <div style="font-size: 13px; color: #856404;">
+                        重置後系統將產生新密碼並發送至業務手機，業務需使用新密碼登入後自行修改。
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">重置方式</label>
+                    <select id="resetPasswordMethod" class="form-control">
+                        <option value="sms">簡訊發送新密碼</option>
+                        <option value="email">Email發送新密碼</option>
+                        <option value="manual">手動設定臨時密碼</option>
+                    </select>
+                </div>
+
+                <div id="manualPasswordGroup" class="form-group" style="display: none;">
+                    <label class="form-label">臨時密碼</label>
+                    <input type="text" id="manualPassword" class="form-control" placeholder="輸入臨時密碼（至少8碼）">
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">
+                        業務首次登入後需強制修改密碼
+                    </p>
+                </div>
+
+                <button class="btn btn-warning" onclick="resetAgentPassword()">確認重置密碼</button>
+            </div>
+
+            <!-- 狀態管理 -->
+            <div id="agentManageStatus_content" class="tab-content">
+                <div id="agentStatusNormal" style="display: block;">
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">停用帳號</h4>
+
+                    <div style="padding: 16px; background: #fee2e2; border-left: 4px solid #ef4444; border-radius: 8px; margin-bottom: 16px;">
+                        <div style="font-weight: 600; color: #991b1b; margin-bottom: 4px;">⚠️ 停用警告</div>
+                        <div style="font-size: 13px; color: #991b1b;">
+                            停用後該業務將無法登入系統，但歷史報備記錄仍會保留。
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">停用原因<span style="color: var(--danger-color);">*</span></label>
+                        <select id="suspendReason" class="form-control">
+                            <option value="">請選擇停用原因</option>
+                            <option value="violation">違反規定</option>
+                            <option value="performance">業績不佳</option>
+                            <option value="resigned">已離職</option>
+                            <option value="temporary">暫時停用</option>
+                            <option value="other">其他原因</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">詳細說明</label>
+                        <textarea id="suspendReasonDetail" class="form-control" rows="3" placeholder="請詳細說明停用原因..."></textarea>
+                    </div>
+
+                    <button class="btn btn-danger" onclick="suspendAgent()">停用帳號</button>
+                </div>
+
+                <div id="agentStatusSuspended" style="display: none;">
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">啟用帳號</h4>
+
+                    <div style="padding: 16px; background: var(--bg-color); border-radius: 8px; margin-bottom: 16px;">
+                        <div style="font-size: 14px; margin-bottom: 8px;">
+                            <span style="font-weight: 600; color: var(--text-secondary);">停用原因：</span>
+                            <span id="currentSuspendReason">已離職</span>
+                        </div>
+                        <div style="font-size: 14px;">
+                            <span style="font-weight: 600; color: var(--text-secondary);">停用時間：</span>
+                            <span id="currentSuspendTime">2025/12/20 14:30</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">啟用說明</label>
+                        <textarea id="activateReasonDetail" class="form-control" rows="2" placeholder="請說明啟用原因..."></textarea>
+                    </div>
+
+                    <button class="btn btn-success" onclick="activateAgent()">啟用帳號</button>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('agentManageModal')">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增業務Modal -->
+    <div id="newAgentModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">新增業務帳號</h3>
+            </div>
+
+            <form id="newAgentForm">
+                <div class="form-group">
+                    <label class="form-label">真實姓名<span style="color: var(--danger-color);">*</span></label>
+                    <input type="text" id="newAgentName" class="form-control" placeholder="請輸入真實姓名" required>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">
+                        請輸入與身分證相符的真實姓名
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">身分證字號<span style="color: var(--danger-color);">*</span></label>
+                    <input type="text" id="newAgentIdNumber" class="form-control" placeholder="請輸入身分證字號" maxlength="10" required>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">
+                        身分證字號將加密儲存，僅用於身份驗證
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">手機號碼<span style="color: var(--danger-color);">*</span></label>
+                    <input type="tel" id="newAgentPhone" class="form-control" placeholder="請輸入手機號碼" maxlength="10" required>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">
+                        請輸入 10 碼手機號碼（例：0912345678）
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">電子郵件</label>
+                    <input type="email" id="newAgentEmail" class="form-control" placeholder="請輸入電子郵件">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">初始密碼<span style="color: var(--danger-color);">*</span></label>
+                    <input type="password" id="newAgentPassword" class="form-control" placeholder="請輸入初始密碼（至少8碼）" required>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">
+                        業務首次登入後需強制修改密碼
+                    </p>
+                </div>
+
+                <div style="padding: 16px; background: #dbeafe; border-left: 4px solid var(--primary-color); border-radius: 8px; margin-top: 16px;">
+                    <div style="font-weight: 600; color: #1e40af; margin-bottom: 4px;">💡 新增業務須知</div>
+                    <ul style="margin-left: 20px; color: #1e40af; font-size: 13px; margin-top: 8px;">
+                        <li>業務帳號新增後需由店長進行核可才能使用</li>
+                        <li>系統將發送簡訊通知業務初始密碼</li>
+                        <li>業務首次登入後必須修改密碼</li>
+                    </ul>
+                </div>
+            </form>
+
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('newAgentModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitNewAgent()">新增業務</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 登入/註冊功能 =====
+        let regCurrentStep = 1;
+        let regSmsCodeSent = false;
+        let regSmsTimer = null;
+        const registrationData = {};
+
+        // 顯示登入頁面
+        function showLoginPage() {
+            document.getElementById('loginPage').classList.add('active');
+            document.getElementById('registerPage').classList.remove('active');
+            // 重置註冊流程
+            regCurrentStep = 1;
+            document.querySelectorAll('#registerPage .auth-form-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('regStep1').classList.add('active');
+            document.querySelectorAll('#registerPage .step').forEach(s => {
+                s.classList.remove('active', 'completed');
+            });
+            document.querySelector('#registerPage .step[data-step="1"]').classList.add('active');
+        }
+
+        // 顯示註冊頁面
+        function showRegisterPage() {
+            document.getElementById('loginPage').classList.remove('active');
+            document.getElementById('registerPage').classList.add('active');
+        }
+
+        // 登入（無校驗）
+        function handleLogin(event) {
+            event.preventDefault();
+            // 直接登入，不做任何校驗
+            document.getElementById('authWrapper').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+        }
+
+        // 註冊 Step 1: 門店代碼驗證
+        function handleRegStoreCode(event) {
+            event.preventDefault();
+            const storeCode = document.getElementById('regStoreCode').value;
+            registrationData.storeCode = storeCode;
+            regNextStep();
+        }
+
+        // 註冊 Step 2: 個人資料
+        function handleRegPersonalInfo(event) {
+            event.preventDefault();
+            const realName = document.getElementById('regRealName').value;
+            const idNumber = document.getElementById('regIdNumber').value;
+            registrationData.realName = realName;
+            registrationData.idNumber = idNumber;
+            regNextStep();
+        }
+
+        // 註冊 Step 3: 發送驗證碼
+        function sendVerificationCode() {
+            const phoneNumber = document.getElementById('regPhoneNumber').value;
+            const smsCodeGroup = document.getElementById('smsCodeGroup');
+            const verifyBtn = document.getElementById('verifyPhoneBtn');
+
+            // 直接顯示驗證碼輸入框
+            smsCodeGroup.style.display = 'block';
+            verifyBtn.disabled = false;
+            registrationData.phoneNumber = phoneNumber;
+        }
+
+        // 註冊 Step 3: 手機驗證
+        function handleRegPhoneVerification(event) {
+            event.preventDefault();
+            regNextStep();
+        }
+
+        // 註冊 Step 4: 密碼強度檢查（無校驗）
+        function checkPasswordStrength() {
+            // 不做任何校驗
+        }
+
+        function checkPasswordMatch() {
+            // 不做任何校驗
+        }
+
+        function updateSubmitButton() {
+            // 不做任何校驗，按鈕永遠可用
+        }
+
+        // 註冊 Step 4: 完成密碼設定
+        function handleRegPasswordSetup(event) {
+            event.preventDefault();
+            const password = document.getElementById('regPassword').value;
+            registrationData.password = password;
+
+            console.log('Registration Data:', {
+                ...registrationData,
+                password: '***ENCRYPTED***'
+            });
+
+            regNextStep();
+        }
+
+        // 註冊步驟導航
+        function regNextStep() {
+            if (regCurrentStep < 5) {
+                document.getElementById(`regStep${regCurrentStep}`).classList.remove('active');
+
+                if (regCurrentStep < 4) {
+                    document.querySelector(`#registerPage .step[data-step="${regCurrentStep}"]`).classList.remove('active');
+                    document.querySelector(`#registerPage .step[data-step="${regCurrentStep}"]`).classList.add('completed');
+                }
+
+                regCurrentStep++;
+                document.getElementById(`regStep${regCurrentStep}`).classList.add('active');
+
+                if (regCurrentStep <= 4) {
+                    document.querySelector(`#registerPage .step[data-step="${regCurrentStep}"]`).classList.add('active');
+                }
+            }
+        }
+
+        function regPrevStep() {
+            if (regCurrentStep > 1) {
+                document.getElementById(`regStep${regCurrentStep}`).classList.remove('active');
+                document.querySelector(`#registerPage .step[data-step="${regCurrentStep}"]`).classList.remove('active');
+
+                regCurrentStep--;
+                document.getElementById(`regStep${regCurrentStep}`).classList.add('active');
+                document.querySelector(`#registerPage .step[data-step="${regCurrentStep}"]`).classList.remove('completed');
+                document.querySelector(`#registerPage .step[data-step="${regCurrentStep}"]`).classList.add('active');
+            }
+        }
+
+        // 註冊完成，返回登入
+        function backToLogin() {
+            showLoginPage();
+        }
+
+        // ===== 主應用功能 =====
+
+        // 頁面切換
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+
+                this.classList.add('active');
+                const pageId = this.getAttribute('data-page');
+                document.getElementById(pageId).classList.add('active');
+
+                const titles = {
+                    'dashboard': { title: '儀表板', subtitle: '掌握門店營運狀況' },
+                    'bookings': { title: '報備管理', subtitle: '管理所有報備與客戶資訊' },
+                    'performance': { title: '業績管理', subtitle: '追蹤門店與業務業績表現' },
+                    'commission': { title: '佣金管理', subtitle: '查看平台佣金收款狀況' },
+                    'permissions': { title: '權限管理', subtitle: '管理業務帳號與權限' }
+                };
+
+                if (titles[pageId]) {
+                    document.getElementById('page-title').textContent = titles[pageId].title;
+                    document.getElementById('page-subtitle').textContent = titles[pageId].subtitle;
+                }
+            });
+        });
+
+        // 案場輪播
+        let currentSlide = 0;
+        function showSlide(index) {
+            const slides = document.querySelectorAll('.carousel-item');
+            const dots = document.querySelectorAll('.carousel-dot');
+
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                dots[i].classList.remove('active');
+            });
+
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentSlide = index;
+        }
+
+        // 自動輪播
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % 3;
+            showSlide(currentSlide);
+        }, 5000);
+
+        // 報備管理標籤切換
+        function switchTab(tabId) {
+            document.querySelectorAll('#bookings .tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#bookings .tab-content').forEach(c => c.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // 佣金管理標籤切換
+        function switchCommissionTab(tabId) {
+            document.querySelectorAll('#commission-summary .tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#commission-summary .tab-content').forEach(c => c.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById('comm-' + tabId).classList.add('active');
+        }
+
+        // 權限管理標籤切換
+        function switchPermTab(tabId) {
+            document.querySelectorAll('#permissions .tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#permissions .tab-content').forEach(c => c.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById('perm-' + tabId).classList.add('active');
+        }
+
+        // 業績明細查看
+        function viewPerformanceDetail(agentName) {
+            document.getElementById('performance-summary').style.display = 'none';
+            document.getElementById('performance-detail').style.display = 'block';
+            document.getElementById('agent-detail-name').textContent = agentName + ' - 業績明細';
+        }
+
+        function backToPerformanceSummary() {
+            document.getElementById('performance-summary').style.display = 'block';
+            document.getElementById('performance-detail').style.display = 'none';
+        }
+
+        // 佣金明細查看
+        function viewCommissionDetail(txId) {
+            document.getElementById('commission-summary').style.display = 'none';
+            document.getElementById('commission-detail').style.display = 'block';
+            document.getElementById('commission-detail-title').textContent = '佣金明細 ' + txId;
+        }
+
+        function backToCommissionSummary() {
+            document.getElementById('commission-summary').style.display = 'block';
+            document.getElementById('commission-detail').style.display = 'none';
+        }
+
+        // Modal 控制
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // 點擊 modal 外部關閉
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // 通知功能
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationPanel');
+            panel.classList.toggle('active');
+        }
+
+        function markAllRead() {
+            document.querySelectorAll('.notification-item.unread').forEach(item => {
+                item.classList.remove('unread');
+            });
+            const badge = document.querySelector('.notification-badge');
+            if (badge) {
+                badge.style.display = 'none';
+            }
+            alert('已將所有通知標記為已讀');
+        }
+
+        // 通知過濾功能
+        function filterNotifications(type) {
+            const allItems = document.querySelectorAll('.notification-item');
+            const filterBtns = document.querySelectorAll('#notificationPanel .badge');
+
+            // 更新按鈕樣式
+            filterBtns.forEach(btn => {
+                btn.classList.remove('badge-primary');
+                btn.classList.add('badge-secondary');
+            });
+            event.target.classList.remove('badge-secondary');
+            event.target.classList.add('badge-primary');
+
+            // 過濾通知
+            allItems.forEach(item => {
+                if (type === 'all' || item.dataset.type === type) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // 查看通知詳情（跳轉到報備詳情）
+        function viewNotificationDetail(bookingId) {
+            // 標記為已讀
+            event.currentTarget.classList.remove('unread');
+
+            // 更新未讀數量
+            updateUnreadCount();
+
+            // 如果是報備相關通知，跳轉到報備管理並打開詳情
+            if (bookingId) {
+                switchPage('bookings');
+                setTimeout(() => {
+                    viewBookingDetail(bookingId);
+                }, 300);
+            }
+        }
+
+        // 更新未讀數量
+        function updateUnreadCount() {
+            const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+            const badge = document.querySelector('.notification-badge');
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
+        // 點擊外部關閉通知面板
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notificationPanel');
+            const btn = document.querySelector('.notification-btn');
+            if (panel && !panel.contains(e.target) && !btn.contains(e.target)) {
+                panel.classList.remove('active');
+            }
+        });
+
+        // 報備查看
+        // 模擬報備數據
+        const bookingData = {
+            'BR202601015': {
+                id: 'BR202601015',
+                projectName: '信義之星',
+                customerName: '王*明',
+                customerPhone: '0912-***-678',
+                createdAt: '2026/01/15 10:30',
+                status: 'approved',
+                statusText: '已核可待帶看',
+                viewingDate: '2026/01/17 15:00',
+                slaDeadline: '2026/01/17',
+                timeline: [
+                    {
+                        type: 'success',
+                        title: '報備已核可',
+                        text: '代銷端已審核通過，可安排帶看',
+                        time: '2026/01/15 11:30',
+                        note: '核可人：張經理'
+                    },
+                    {
+                        type: 'info',
+                        title: '報備已提交',
+                        text: '已向代銷端提交報備，等待審核',
+                        time: '2026/01/15 10:30',
+                        note: '業務：李小華'
+                    }
+                ],
+                discussions: [
+                    {
+                        text: '客戶對2房格局很感興趣，預算約1800萬',
+                        time: '2026/01/15 14:20',
+                        author: '李小華'
+                    }
+                ]
+            },
+            'BR202601012': {
+                id: 'BR202601012',
+                projectName: '松山新城',
+                customerName: '陳*芳',
+                customerPhone: '0923-***-456',
+                createdAt: '2026/01/14 09:15',
+                status: 'viewed',
+                statusText: '已帶看',
+                timeline: [
+                    {
+                        type: 'success',
+                        title: '已完成帶看',
+                        text: '帶看已完成，客戶反應良好',
+                        time: '2026/01/15 15:30',
+                        note: '業務：李小華'
+                    },
+                    {
+                        type: 'success',
+                        title: '報備已核可',
+                        text: '代銷端已審核通過',
+                        time: '2026/01/14 10:00'
+                    },
+                    {
+                        type: 'info',
+                        title: '報備已提交',
+                        text: '已向代銷端提交報備',
+                        time: '2026/01/14 09:15'
+                    }
+                ],
+                discussions: [
+                    {
+                        text: '客戶希望看3房格局，已安排明天下午2點帶看',
+                        time: '2026/01/14 10:30',
+                        author: '李小華'
+                    },
+                    {
+                        text: '客戶帶看後很滿意，考慮下訂',
+                        time: '2026/01/15 16:00',
+                        author: '李小華'
+                    }
+                ]
+            }
+        };
+
+        function viewBookingDetail(bookingId) {
+            const booking = bookingData[bookingId] || bookingData['BR202601015'];
+
+            // 填充基本資訊
+            document.getElementById('detailBookingId').textContent = `報備詳情 #${booking.id}`;
+            document.getElementById('detailProjectName').textContent = booking.projectName;
+            document.getElementById('detailCustomerName').textContent = booking.customerName;
+            document.getElementById('detailCustomerPhone').textContent = booking.customerPhone;
+            document.getElementById('detailCreatedAt').textContent = booking.createdAt;
+
+            // 更新狀態badge
+            const statusBadge = document.getElementById('detailStatus');
+            statusBadge.textContent = booking.statusText;
+            statusBadge.className = 'badge';
+            if (booking.status === 'approved') {
+                statusBadge.classList.add('badge-success');
+            } else if (booking.status === 'pending') {
+                statusBadge.classList.add('badge-warning');
+            } else if (booking.status === 'viewed') {
+                statusBadge.classList.add('badge-info');
+            } else if (booking.status === 'deposit') {
+                statusBadge.classList.add('badge-primary');
+            } else if (booking.status === 'closed') {
+                statusBadge.classList.add('badge-success');
+            }
+
+            // 顯示/隱藏 QR Code（僅核可後顯示）
+            const qrcodeSection = document.getElementById('qrcodeSection');
+            if (booking.status === 'approved' || booking.status === 'viewed' || booking.status === 'deposit' || booking.status === 'closed') {
+                qrcodeSection.style.display = 'block';
+            } else {
+                qrcodeSection.style.display = 'none';
+            }
+
+            // SLA提示（僅已核可待帶看狀態）
+            const slaAlert = document.getElementById('slaAlert');
+            if (booking.status === 'approved' && booking.slaDeadline) {
+                slaAlert.style.display = 'block';
+                document.getElementById('slaMessage').textContent = `請於 ${booking.slaDeadline} 前完成帶看，否則報備將過期`;
+            } else {
+                slaAlert.style.display = 'none';
+            }
+
+            // 渲染時間軸
+            renderTimeline(booking.timeline, booking.discussions);
+
+            // 打開Modal
+            openModal('bookingDetailModal');
+        }
+
+        function renderTimeline(timeline, discussions) {
+            const timelineContainer = document.getElementById('bookingTimeline');
+            timelineContainer.innerHTML = '<div class="timeline"></div>';
+            const timelineEl = timelineContainer.querySelector('.timeline');
+
+            // 渲染時間軸事件
+            timeline.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'timeline-item';
+
+                const iconColor = item.type || 'info';
+                let iconSvg = '';
+
+                if (iconColor === 'success') {
+                    iconSvg = '<svg fill="white" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+                } else if (iconColor === 'warning') {
+                    iconSvg = '<svg fill="white" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+                } else if (iconColor === 'danger') {
+                    iconSvg = '<svg fill="white" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>';
+                } else {
+                    iconSvg = '<svg fill="white" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+                }
+
+                itemEl.innerHTML = `
+                    <div class="timeline-icon ${iconColor}">
+                        ${iconSvg}
+                    </div>
+                    <div class="timeline-content ${iconColor}">
+                        <div class="timeline-title">${item.title}</div>
+                        <div class="timeline-text">${item.text}</div>
+                        <div class="timeline-time">${item.time}</div>
+                        ${item.note ? `<div class="timeline-note">${item.note}</div>` : ''}
+                    </div>
+                `;
+
+                timelineEl.appendChild(itemEl);
+            });
+
+            // 渲染洽談記錄
+            if (discussions && discussions.length > 0) {
+                discussions.forEach(discussion => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'timeline-item';
+
+                    itemEl.innerHTML = `
+                        <div class="timeline-icon" style="background: var(--secondary-color); border-color: var(--secondary-color);">
+                            <svg fill="white" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                <path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                            </svg>
+                        </div>
+                        <div class="timeline-content" style="border-left-color: var(--secondary-color);">
+                            <div class="timeline-title">洽談記錄</div>
+                            <div class="timeline-text">${discussion.text}</div>
+                            <div class="timeline-time">${discussion.time} - ${discussion.author}</div>
+                        </div>
+                    `;
+
+                    timelineEl.appendChild(itemEl);
+                });
+            }
+        }
+
+        function addDiscussionNote() {
+            const noteText = document.getElementById('newDiscussionNote').value.trim();
+            if (!noteText) {
+                alert('請輸入洽談記錄');
+                return;
+            }
+
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            // 在時間軸中添加新記錄
+            const timelineEl = document.querySelector('#bookingTimeline .timeline');
+            const itemEl = document.createElement('div');
+            itemEl.className = 'timeline-item';
+
+            itemEl.innerHTML = `
+                <div class="timeline-icon" style="background: var(--secondary-color); border-color: var(--secondary-color);">
+                    <svg fill="white" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                        <path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                    </svg>
+                </div>
+                <div class="timeline-content" style="border-left-color: var(--secondary-color);">
+                    <div class="timeline-title">洽談記錄</div>
+                    <div class="timeline-text">${noteText}</div>
+                    <div class="timeline-time">${timeStr} - 陳店長</div>
+                </div>
+            `;
+
+            timelineEl.appendChild(itemEl);
+
+            // 清空輸入框
+            document.getElementById('newDiscussionNote').value = '';
+
+            alert('洽談記錄已新增');
+        }
+
+        function updateBookingStatus(newStatus) {
+            const statusNames = {
+                'viewed': '已帶看',
+                'deposit': '收訂中',
+                'closed': '已成交'
+            };
+
+            if (confirm(`確定要將此報備標記為「${statusNames[newStatus]}」嗎？`)) {
+                alert(`報備狀態已更新為「${statusNames[newStatus]}」`);
+                closeModal('bookingDetailModal');
+            }
+        }
+
+        function openRescheduleForm() {
+            document.getElementById('statusActions').style.display = 'none';
+            document.getElementById('rescheduleForm').style.display = 'block';
+        }
+
+        function closeRescheduleForm() {
+            document.getElementById('statusActions').style.display = 'block';
+            document.getElementById('rescheduleForm').style.display = 'none';
+        }
+
+        function submitReschedule() {
+            const date = document.getElementById('rescheduleDate').value;
+            const time = document.getElementById('rescheduleTime').value;
+            const reason = document.getElementById('rescheduleReason').value;
+
+            if (!date || !time) {
+                alert('請選擇新的帶看日期和時間');
+                return;
+            }
+
+            if (confirm('確定要提交改期申請嗎？')) {
+                alert('改期申請已提交，等待代銷端審核');
+                closeModal('bookingDetailModal');
+                closeRescheduleForm();
+            }
+        }
+
+        function openCancelForm() {
+            document.getElementById('statusActions').style.display = 'none';
+            document.getElementById('cancelForm').style.display = 'block';
+        }
+
+        function closeCancelForm() {
+            document.getElementById('statusActions').style.display = 'block';
+            document.getElementById('cancelForm').style.display = 'none';
+        }
+
+        function submitCancel() {
+            const reason = document.getElementById('cancelReason').value;
+            const detail = document.getElementById('cancelReasonDetail').value;
+
+            if (!reason) {
+                alert('請選擇取消原因');
+                return;
+            }
+
+            if (confirm('確定要取消此報備嗎？此操作無法撤銷')) {
+                alert('報備已取消，原因已記錄');
+                closeModal('bookingDetailModal');
+                closeCancelForm();
+            }
+        }
+
+        function downloadQRCode() {
+            alert('QR Code下載功能開發中\n實際應用中會生成並下載QR Code圖片');
+        }
+
+        // 新增報備
+        // 模擬已有的報備數據（用於防重複檢查）
+        const existingBookings = [
+            { phone: '0912345678', date: '2026-01-15', projectName: '信義之星' },
+            { phone: '0923456789', date: '2026-01-15', projectName: '松山新城' }
+        ];
+
+        function submitNewBooking() {
+            // 獲取表單數據
+            const projectSelect = document.querySelector('#newBookingModal select');
+            const customerNameInput = document.querySelector('#newBookingModal input[type="text"]');
+            const customerPhoneInput = document.querySelector('#newBookingModal input[type="tel"]');
+            const viewingDateInput = document.querySelector('#newBookingModal input[type="date"]');
+
+            const projectName = projectSelect.value;
+            const customerName = customerNameInput.value.trim();
+            const customerPhone = customerPhoneInput.value.trim();
+            const viewingDate = viewingDateInput.value;
+
+            // 基本驗證
+            if (!projectName || !customerName || !customerPhone || !viewingDate) {
+                alert('請填寫所有必填欄位');
+                return;
+            }
+
+            // 驗證電話格式
+            const phoneRegex = /^09\d{8}$/;
+            if (!phoneRegex.test(customerPhone)) {
+                alert('請輸入正確的手機號碼格式（例：0912345678）');
+                return;
+            }
+
+            // 防重複驗證：檢查同買方同日是否已有報備
+            const today = new Date().toISOString().split('T')[0];
+            const duplicateBooking = existingBookings.find(booking =>
+                booking.phone === customerPhone && booking.date === viewingDate
+            );
+
+            if (duplicateBooking) {
+                alert(`⚠️ 報備失敗\n\n該客戶（${customerPhone.substring(0, 4)}-***-${customerPhone.substring(7)}）已於 ${viewingDate} 報備過「${duplicateBooking.projectName}」案場。\n\n系統規則：同一買方同一日僅能報備一次，以維護報備品質。\n\n建議：\n1. 如需改為其他案場，請先取消原報備\n2. 如需不同日期，請選擇其他日期\n3. 如有疑問，請聯繫客服`);
+                return;
+            }
+
+            // 添加到已有報備列表（模擬）
+            existingBookings.push({
+                phone: customerPhone,
+                date: viewingDate,
+                projectName: projectName
+            });
+
+            alert(`✓ 報備已送出！\n\n案場：${projectName}\n客戶：${customerName}\n電話：${customerPhone.substring(0, 4)}-***-${customerPhone.substring(7)}\n帶看日期：${viewingDate}\n\n等待代銷端審核，預計1小時內回覆。`);
+
+            // 清空表單
+            projectSelect.value = '';
+            customerNameInput.value = '';
+            customerPhoneInput.value = '';
+            viewingDateInput.value = '';
+
+            closeModal('newBookingModal');
+        }
+
+        // 業務管理
+        function manageAgent(agentName) {
+            // 從已核可列表中查找業務
+            const agent = approvedAgents.find(a => a.name === agentName);
+
+            if (!agent) {
+                alert('找不到業務資料');
+                return;
+            }
+
+            // 填充基本資訊
+            document.getElementById('agentManageTitle').textContent = `管理業務帳號 - ${agent.name}`;
+            document.getElementById('agentManageName').textContent = agent.name;
+
+            // 處理手機號碼顯示
+            const phoneDisplay = agent.phone.includes('***') ? agent.phone :
+                (agent.phone.substring(0, 4) + '-***-' + agent.phone.substring(7));
+            document.getElementById('agentManagePhone').textContent = phoneDisplay;
+            document.getElementById('agentManageJoinDate').textContent = agent.joinDate;
+
+            // 更新狀態badge
+            const statusBadge = document.getElementById('agentManageStatus');
+            const status = agent.status || 'active';
+            const statusText = agent.statusText || '正常';
+            statusBadge.textContent = statusText;
+
+            if (status === 'active') {
+                statusBadge.className = 'badge badge-success';
+            } else if (status === 'suspended') {
+                statusBadge.className = 'badge badge-danger';
+            }
+
+            // 填充編輯表單（使用原始手機號碼，如果有的話）
+            document.getElementById('editAgentName').value = agent.name;
+            document.getElementById('editAgentPhone').value = agent.phone.replace(/-/g, '').replace(/\*/g, '0');
+            document.getElementById('editAgentEmail').value = agent.email || `${agent.name.toLowerCase()}@example.com`;
+
+            // 根據狀態顯示/隱藏停用/啟用區域
+            if (status === 'active') {
+                document.getElementById('agentStatusNormal').style.display = 'block';
+                document.getElementById('agentStatusSuspended').style.display = 'none';
+            } else {
+                document.getElementById('agentStatusNormal').style.display = 'none';
+                document.getElementById('agentStatusSuspended').style.display = 'block';
+                if (agent.suspendReason) {
+                    document.getElementById('currentSuspendReason').textContent = agent.suspendReason;
+                }
+                if (agent.suspendTime) {
+                    document.getElementById('currentSuspendTime').textContent = agent.suspendTime;
+                }
+            }
+
+            // 重置到第一個標籤
+            switchAgentManageTab('info');
+
+            // 打開Modal
+            openModal('agentManageModal');
+        }
+
+        function switchAgentManageTab(tabName) {
+            // 更新標籤按鈕
+            const tabs = document.querySelectorAll('#agentManageModal .tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // 更新內容
+            document.getElementById('agentManageInfo').classList.remove('active');
+            document.getElementById('agentManagePassword').classList.remove('active');
+            document.getElementById('agentManageStatus_content').classList.remove('active');
+
+            if (tabName === 'info') {
+                document.getElementById('agentManageInfo').classList.add('active');
+            } else if (tabName === 'password') {
+                document.getElementById('agentManagePassword').classList.add('active');
+            } else if (tabName === 'status') {
+                document.getElementById('agentManageStatus_content').classList.add('active');
+            }
+        }
+
+        function updateAgentInfo() {
+            const name = document.getElementById('editAgentName').value.trim();
+            const phone = document.getElementById('editAgentPhone').value.trim();
+            const email = document.getElementById('editAgentEmail').value.trim();
+
+            if (!name || !phone || !email) {
+                alert('請填寫所有欄位');
+                return;
+            }
+
+            // 驗證電話格式
+            const phoneRegex = /^09\d{8}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('請輸入正確的手機號碼格式（例：0912345678）');
+                return;
+            }
+
+            // 驗證Email格式
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('請輸入正確的Email格式');
+                return;
+            }
+
+            if (confirm('確定要更新業務資訊嗎？')) {
+                alert('業務資訊已更新');
+                closeModal('agentManageModal');
+            }
+        }
+
+        function resetAgentPassword() {
+            const method = document.getElementById('resetPasswordMethod').value;
+
+            if (method === 'manual') {
+                const password = document.getElementById('manualPassword').value;
+                if (!password || password.length < 8) {
+                    alert('臨時密碼至少需要8個字元');
+                    return;
+                }
+            }
+
+            if (confirm('確定要重置業務密碼嗎？\n業務將收到新密碼並需要重新登入')) {
+                if (method === 'sms') {
+                    alert('✓ 新密碼已透過簡訊發送至業務手機\n業務需使用新密碼登入後自行修改');
+                } else if (method === 'email') {
+                    alert('✓ 新密碼已透過Email發送至業務信箱\n業務需使用新密碼登入後自行修改');
+                } else {
+                    alert('✓ 臨時密碼已設定\n請將密碼告知業務，業務登入後需強制修改');
+                }
+                closeModal('agentManageModal');
+            }
+        }
+
+        function suspendAgent() {
+            const reason = document.getElementById('suspendReason').value;
+            const detail = document.getElementById('suspendReasonDetail').value;
+
+            if (!reason) {
+                alert('請選擇停用原因');
+                return;
+            }
+
+            if (confirm('⚠️ 確定要停用此業務帳號嗎？\n\n停用後該業務將無法登入系統\n歷史報備記錄仍會保留\n\n此操作可以恢復')) {
+                alert('✓ 業務帳號已停用\n停用原因已記錄');
+                closeModal('agentManageModal');
+            }
+        }
+
+        function activateAgent() {
+            const detail = document.getElementById('activateReasonDetail').value;
+
+            if (confirm('確定要啟用此業務帳號嗎？\n啟用後該業務即可正常登入系統')) {
+                alert('✓ 業務帳號已啟用\n該業務現在可以正常使用系統');
+                closeModal('agentManageModal');
+            }
+        }
+
+        // 全局業務列表
+        const pendingAgents = [];
+        const approvedAgents = [
+            { name: '李小華', phone: '0912-***-345', joinDate: '2024/03/15', bookings: 10, deals: 2 },
+            { name: '張大同', phone: '0923-***-456', joinDate: '2024/05/20', bookings: 8, deals: 1 },
+            { name: '王小明', phone: '0934-***-567', joinDate: '2024/06/10', bookings: 12, deals: 3 },
+            { name: '陳美麗', phone: '0945-***-678', joinDate: '2024/07/01', bookings: 5, deals: 1 },
+            { name: '林大偉', phone: '0956-***-789', joinDate: '2024/08/15', bookings: 15, deals: 4 },
+            { name: '黃志明', phone: '0967-***-890', joinDate: '2024/09/20', bookings: 7, deals: 2 },
+            { name: '劉雅婷', phone: '0978-***-901', joinDate: '2024/10/05', bookings: 9, deals: 1 },
+            { name: '鄭家豪', phone: '0989-***-012', joinDate: '2024/11/12', bookings: 6, deals: 1 }
+        ];
+
+        // 新增業務（移除所有校驗）
+        function submitNewAgent() {
+            const name = document.getElementById('newAgentName').value.trim();
+            const phone = document.getElementById('newAgentPhone').value.trim();
+
+            // 添加到待核可列表
+            const newAgent = {
+                name: name || '未命名',
+                phone: phone || '0900-000-000',
+                joinDate: new Date().toISOString().split('T')[0].replace(/-/g, '/')
+            };
+
+            pendingAgents.push(newAgent);
+
+            alert(`✓ 業務帳號已新增\n\n姓名：${newAgent.name}\n\n帳號已進入「待核可」狀態`);
+
+            // 清空表單
+            document.getElementById('newAgentName').value = '';
+            document.getElementById('newAgentIdNumber').value = '';
+            document.getElementById('newAgentPhone').value = '';
+            document.getElementById('newAgentEmail').value = '';
+            document.getElementById('newAgentPassword').value = '';
+
+            closeModal('newAgentModal');
+
+            // 刷新待核可列表
+            renderPendingAgents();
+        }
+
+        // 渲染待核可業務列表
+        function renderPendingAgents() {
+            const container = document.querySelector('#perm-pending tbody');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            pendingAgents.forEach((agent, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${agent.name}</td>
+                    <td>${agent.phone}</td>
+                    <td>${agent.joinDate}</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td><span class="badge badge-warning">待核可</span></td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="approveAgentFromList(${index})">核可</button>
+                        <button class="btn btn-danger btn-sm" onclick="rejectAgentFromList(${index})">拒絕</button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // 核可業務
+        function approveAgentFromList(index) {
+            const agent = pendingAgents[index];
+            if (confirm(`確定要核可業務「${agent.name}」嗎？`)) {
+                approvedAgents.push({
+                    ...agent,
+                    bookings: 0,
+                    deals: 0
+                });
+                pendingAgents.splice(index, 1);
+                alert(`✓ 已核可業務「${agent.name}」`);
+                renderPendingAgents();
+                renderApprovedAgents();
+            }
+        }
+
+        // 拒絕業務
+        function rejectAgentFromList(index) {
+            const agent = pendingAgents[index];
+            if (confirm(`確定要拒絕業務「${agent.name}」嗎？`)) {
+                pendingAgents.splice(index, 1);
+                alert(`已拒絕業務「${agent.name}」`);
+                renderPendingAgents();
+            }
+        }
+
+        // 渲染已核可業務列表
+        function renderApprovedAgents() {
+            const container = document.querySelector('#perm-approved tbody');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            approvedAgents.forEach(agent => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${agent.name}</td>
+                    <td class="masked-text">${agent.phone}</td>
+                    <td>${agent.joinDate}</td>
+                    <td>${agent.bookings}</td>
+                    <td style="color: var(--success-color); font-weight: 600;">${agent.deals}</td>
+                    <td><span class="badge badge-success">正常</span></td>
+                    <td>
+                        <button class="btn btn-outline btn-sm" onclick="manageAgent('${agent.name}')">管理</button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // 初始化列表
+        document.addEventListener('DOMContentLoaded', function() {
+            renderApprovedAgents();
+            renderPendingAgents();
+        });
+
+        // 監聽重置密碼方式變更
+        document.addEventListener('DOMContentLoaded', function() {
+            const resetMethodSelect = document.getElementById('resetPasswordMethod');
+            if (resetMethodSelect) {
+                resetMethodSelect.addEventListener('change', function() {
+                    const manualGroup = document.getElementById('manualPasswordGroup');
+                    if (this.value === 'manual') {
+                        manualGroup.style.display = 'block';
+                    } else {
+                        manualGroup.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+    </script>
+</body>
+</html>
