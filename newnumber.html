@@ -20,6 +20,8 @@
       --ok:#047857;
       --chip:#eef6f8;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+
+      /* ✅ 修正：CSS 裡不能用 <!-- -->，並補上 --sans */
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
     *{box-sizing:border-box}
@@ -31,10 +33,14 @@
     }
     .app{
       display:grid;
-      grid-template-columns: 280px 1fr;
+
+      /* ✅ 修正：拿掉 sidebar 後只剩一欄 */
+      grid-template-columns: 1fr;
+
       min-height:100vh;
     }
-    /* Sidebar */
+
+    /* Sidebar（保留樣式也沒差，但已不使用） */
     .sidebar{
       background:var(--sidebar);
       color:#fff;
@@ -101,9 +107,12 @@
       color:#fff;
     }
     .logout:hover{background:rgba(255,255,255,.10)}
+
     /* Main */
     .main{
       padding:18px 22px 40px;
+      max-width: 1200px;   /* ✅ 可選：讓內容在大螢幕不會太散 */
+      margin: 0 auto;      /* ✅ 可選：置中 */
     }
     .page-title{
       font-size:34px;
@@ -292,35 +301,8 @@
 </head>
 <body>
 <div class="app">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="welcome">
-      Welcome ! <span style="font-weight:900">Ice</span>
-      <span class="badge">1</span>
-    </div>
 
-    <div class="section-title">Customer BOM Service</div>
-    <nav class="nav">
-      <a href="#" onclick="return false;"><span class="icon">📄</span> BOM Search</a>
-      <a href="#" onclick="return false;"><span class="icon">🔁</span> Part Number Mapping</a>
-    </nav>
-
-    <div class="section-title">Supplier PO Service</div>
-    <nav class="nav">
-      <a href="#" onclick="return false;"><span class="icon">🧾</span> Purchase Orders</a>
-      <a href="#" onclick="return false;"><span class="icon">📦</span> Carton Information</a>
-      <a href="#" onclick="return false;"><span class="icon">🏷️</span> Label Generation</a>
-    </nav>
-
-    <div class="section-title">Account Management</div>
-    <nav class="nav">
-      <a href="#" onclick="return false;"><span class="icon">👤</span> User Management</a>
-      <a href="#" onclick="return false;"><span class="icon">🛡️</span> Role Management</a>
-      <a class="active" href="#" onclick="return false;"><span class="icon">➕</span> New Part Number</a>
-    </nav>
-
-    <div class="logout" onclick="alert('Demo only 🙂');">LOG OUT</div>
-  </aside>
+  <!-- ✅ Sidebar 整段移除，只保留 main -->
 
   <!-- Main -->
   <main class="main">
@@ -784,7 +766,6 @@
     const errs2 = validateModel(model.group, model.values);
     if (errs2.length){
       showAlert("bad", "送 SAP 前驗證失敗", errs2[0], "請重新選擇屬性值後再按 Confirm。");
-      // In real system: rollback serial occupation (policy). Here we keep counter forward.
       return;
     }
 
