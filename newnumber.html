@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>New Part Number Creation - 京永</title>
+  <style>
+    :root{
+      --sidebar:#0b6f8a;
+      --sidebar-dark:#075a70;
+      --bg:#f5f7fa;
+      --card:#ffffff;
+      --line:#d9e1ea;
+      --text:#1a2b3c;
+      --muted:#6c7a89;
+      --btn:#0b6f8a;
+      --btn-hover:#075a70;
+      --warn:#b45309;
+      --danger:#b91c1c;
+      --ok:#047857;
+      --chip:#eef6f8;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background:var(--bg);
+      color:var(--text);
+    }
+    .app{
+      display:grid;
+      grid-template-columns: 280px 1fr;
+      min-height:100vh;
+    }
+    /* Sidebar */
+    .sidebar{
+      background:var(--sidebar);
+      color:#fff;
+      padding:18px 16px;
+    }
+    .welcome{
+      font-size:20px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:4px 4px 14px 4px;
+      border-bottom:1px solid rgba(255,255,255,.25);
+      margin-bottom:14px;
+    }
+    .badge{
+      background:#ffcc00;
+      color:#1a2b3c;
+      font-weight:800;
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:12px;
+      line-height:18px;
+    }
+    .section-title{
+      margin:18px 6px 10px;
+      font-size:18px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .nav a{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 10px;
+      margin:4px 6px;
+      border-radius:8px;
+      color:#eaf6fb;
+      text-decoration:none;
+      font-weight:600;
+      opacity:.95;
+    }
+    .nav a:hover{background:rgba(255,255,255,.12)}
+    .nav a.active{background:rgba(255,255,255,.18)}
+    .nav .icon{
+      width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;
+      border:1px solid rgba(255,255,255,.35);
+      border-radius:4px;
+      font-size:12px;
+    }
+    .logout{
+      position:sticky;
+      top: calc(100vh - 88px);
+      margin:18px 6px 0;
+      border:2px solid rgba(255,255,255,.6);
+      border-radius:10px;
+      text-align:center;
+      padding:12px 10px;
+      font-weight:900;
+      letter-spacing:.5px;
+      cursor:pointer;
+      user-select:none;
+      background:transparent;
+      color:#fff;
+    }
+    .logout:hover{background:rgba(255,255,255,.10)}
+    /* Main */
+    .main{
+      padding:18px 22px 40px;
+    }
+    .page-title{
+      font-size:34px;
+      font-weight:900;
+      margin:6px 0 16px;
+      letter-spacing:.2px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:12px;
+      box-shadow:0 1px 0 rgba(16,24,40,.03);
+      padding:14px 14px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:12px 16px;
+      align-items:end;
+    }
+    .field label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+      font-weight:700;
+    }
+    .field input,.field select, .field textarea{
+      width:100%;
+      padding:10px 10px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      outline:none;
+      font-size:14px;
+    }
+    .field textarea{min-height:40px; resize:vertical}
+    .field input[readonly], .field select[disabled]{
+      background:#f2f4f7;
+      color:#475467;
+    }
+    .actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      padding-top:8px;
+    }
+    .btn{
+      border:1px solid transparent;
+      background:var(--btn);
+      color:#fff;
+      padding:10px 18px;
+      border-radius:10px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .btn:hover{background:var(--btn-hover)}
+    .btn.secondary{
+      background:#fff;
+      color:var(--btn);
+      border:1px solid var(--btn);
+    }
+    .btn.secondary:hover{
+      background:#f0fbff;
+    }
+    .btn.danger{
+      background:var(--danger);
+    }
+    .btn.danger:hover{filter:brightness(.95)}
+    .row{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .chips{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .chip{
+      background:var(--chip);
+      border:1px solid #cfe7ee;
+      color:#0b6f8a;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:12px;
+    }
+    .mono{font-family:var(--mono)}
+    .divider{height:1px;background:var(--line); margin:12px 0}
+    /* Table */
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+      margin-top:10px;
+    }
+    th, td{
+      border-bottom:1px solid var(--line);
+      padding:10px 10px;
+      text-align:left;
+      vertical-align:top;
+    }
+    th{
+      font-size:12px;
+      color:#475467;
+      font-weight:900;
+      background:#fafbfc;
+    }
+    tr:hover td{background:#fcfdff}
+    .expander{
+      width:44px;
+      color:#0b6f8a;
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+    }
+    .subrow{
+      background:#fbfdff;
+    }
+    .subgrid{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap:12px;
+      padding:12px;
+    }
+    .panel{
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fff;
+      padding:12px;
+    }
+    .panel h3{
+      margin:0 0 10px;
+      font-size:14px;
+      font-weight:900;
+      color:#0b6f8a;
+    }
+    .kv{
+      display:grid;
+      grid-template-columns: 160px 1fr;
+      gap:8px 10px;
+      font-size:13px;
+    }
+    .k{color:#667085;font-weight:800}
+    .v{color:#111827}
+    /* Toast/alerts */
+    .alert{
+      border-radius:12px;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      background:#fff;
+      margin-top:12px;
+      display:none;
+    }
+    .alert.show{display:block}
+    .alert.ok{border-color:#a7f3d0;background:#ecfdf5}
+    .alert.warn{border-color:#fde68a;background:#fffbeb}
+    .alert.bad{border-color:#fecaca;background:#fef2f2}
+    .alert .title{
+      font-weight:900;
+      margin-bottom:4px;
+    }
+    .small{font-size:12px;color:#475467}
+    .toggle{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:10px 12px;
+      border:1px dashed #cfe7ee;
+      border-radius:12px;
+      background:#f7fcfe;
+      margin-top:12px;
+    }
+    .toggle input{transform:scale(1.1)}
+    /* Responsive */
+    @media (max-width: 1080px){
+      .app{grid-template-columns: 1fr}
+      .sidebar{position:sticky;top:0;z-index:10}
+      .main{padding:16px}
+      .grid{grid-template-columns: 1fr}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="welcome">
+      Welcome ! <span style="font-weight:900">Ice</span>
+      <span class="badge">1</span>
+    </div>
+
+    <div class="section-title">Customer BOM Service</div>
+    <nav class="nav">
+      <a href="#" onclick="return false;"><span class="icon">📄</span> BOM Search</a>
+      <a href="#" onclick="return false;"><span class="icon">🔁</span> Part Number Mapping</a>
+    </nav>
+
+    <div class="section-title">Supplier PO Service</div>
+    <nav class="nav">
+      <a href="#" onclick="return false;"><span class="icon">🧾</span> Purchase Orders</a>
+      <a href="#" onclick="return false;"><span class="icon">📦</span> Carton Information</a>
+      <a href="#" onclick="return false;"><span class="icon">🏷️</span> Label Generation</a>
+    </nav>
+
+    <div class="section-title">Account Management</div>
+    <nav class="nav">
+      <a href="#" onclick="return false;"><span class="icon">👤</span> User Management</a>
+      <a href="#" onclick="return false;"><span class="icon">🛡️</span> Role Management</a>
+      <a class="active" href="#" onclick="return false;"><span class="icon">➕</span> New Part Number</a>
+    </nav>
+
+    <div class="logout" onclick="alert('Demo only 🙂');">LOG OUT</div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="page-title">New Part Number Creation</div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div class="chips">
+          <span class="chip">本系統產生料號 → 寫入 SAP（模擬）</span>
+          <span class="chip">含「屬性定義值」異動驗證</span>
+        </div>
+        <div class="chips">
+          <span class="chip mono" id="serialInfo">SERIAL: (not generated)</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Top form -->
+      <div class="grid">
+        <div class="field">
+          <label>Creation Method</label>
+          <select id="creationMethod">
+            <option value="blank">A. Create Blank Data</option>
+            <option value="copy">B. Copy Existing BOM</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Existing BOM (for Copy)</label>
+          <select id="existingBom" disabled>
+            <option value="">-- Select BOM --</option>
+            <option value="BOM-1001">BOM-1001 / Model A / Origin: Korea</option>
+            <option value="BOM-1002">BOM-1002 / Model A (Rev.B) / Origin: Korea</option>
+            <option value="BOM-2001">BOM-2001 / Model B / Origin: Vietnam</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Attribute Group</label>
+          <select id="attrGroup">
+            <option value="GRP-A">GRP-A（1-2-2-1-5）</option>
+            <option value="GRP-B">GRP-B（1-2-2-1-4）</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Part Name</label>
+          <input id="partName" placeholder="e.g., Model A - New Variant" />
+        </div>
+
+        <div class="field">
+          <label>Spec / Description</label>
+          <input id="partSpec" placeholder="e.g., 24&quot; x 12.5&quot; / Packaging note" />
+        </div>
+
+        <div class="field">
+          <label>Preview New Part No (read-only)</label>
+          <input id="previewPartNo" class="mono" readonly placeholder="(Generate on Confirm)" />
+        </div>
+      </div>
+
+      <div class="toggle">
+        <input type="checkbox" id="sapFailToggle" />
+        <div>
+          <div style="font-weight:900;color:#0b6f8a;">模擬 SAP 寫入失敗</div>
+          <div class="small">打勾後按 Confirm，會走失敗回滾分支（不成立新料號）。</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Attribute inputs -->
+      <div class="row" style="justify-content:space-between; align-items:flex-end;">
+        <div>
+          <div style="font-weight:900; font-size:14px; color:#0b6f8a;">Attributes</div>
+          <div class="small">變更 Attribute Group 會清空已選屬性值並載入新清單（順序/位數）。</div>
+        </div>
+        <div class="row">
+          <button class="btn secondary" id="btnReset">Reset</button>
+          <button class="btn" id="btnConfirm">Confirm</button>
+        </div>
+      </div>
+
+      <table id="attrTable">
+        <thead>
+          <tr>
+            <th style="width:44px;">Seq</th>
+            <th style="width:180px;">Attribute Code</th>
+            <th>Meaning</th>
+            <th style="width:120px;">Length</th>
+            <th style="width:220px;">Value (Editable)</th>
+            <th style="width:160px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- rows injected -->
+        </tbody>
+      </table>
+
+      <div id="alertBox" class="alert">
+        <div class="title" id="alertTitle"></div>
+        <div id="alertMsg"></div>
+        <div class="small" id="alertHint" style="margin-top:6px;"></div>
+      </div>
+    </div>
+
+    <!-- Demo "Existing BOM list" -->
+    <div class="card" style="margin-top:14px;">
+      <div style="font-weight:900; font-size:14px; color:#0b6f8a;">Demo: Existing BOMs (for Copy)</div>
+      <div class="small">這區純展示：你可以在 Copy 模式選 BOM，系統會預帶屬性組/屬性值/品名描述。</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:44px;"></th>
+            <th>BOM No</th>
+            <th>Final Product</th>
+            <th>Origin</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody id="bomList"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script>
+  /**
+   * Demo data structures
+   * - attribute group defines segments & serial length
+   * - attribute codes define length & options (editable by admin in real system)
+   */
+  const GROUPS = {
+    "GRP-A": {
+      label: "GRP-A（1-2-2-1-5）",
+      segments: [
+        { seq: 1, code: "IDENT", meaning: "識別碼", length: 1, type: "select", options: ["5","6","7"], required:true },
+        { seq: 2, code: "PART", meaning: "零件類型", length: 2, type: "select", options: ["A0","B0","C0"], required:true },
+        { seq: 3, code: "CUST", meaning: "客戶碼", length: 2, type: "select", options: ["00","01","02"], required:true },
+        { seq: 4, code: "RSV",  meaning: "預留碼", length: 1, type: "input",  placeholder:"0", required:true },
+        { seq: 5, code: "SERIAL", meaning: "流水碼（系統產生）", length: 5, type: "system", required:true },
+      ],
+      serialLen: 5
+    },
+    "GRP-B": {
+      label: "GRP-B（1-2-2-1-4）",
+      segments: [
+        { seq: 1, code: "IDENT", meaning: "識別碼", length: 1, type: "select", options: ["5","6","7"], required:true },
+        { seq: 2, code: "PART", meaning: "零件類型", length: 2, type: "select", options: ["A0","B0","C0"], required:true },
+        { seq: 3, code: "CUST", meaning: "客戶碼", length: 2, type: "select", options: ["00","01","02"], required:true },
+        { seq: 4, code: "RSV",  meaning: "預留碼", length: 1, type: "input",  placeholder:"0", required:true },
+        { seq: 5, code: "SERIAL", meaning: "流水碼（系統產生）", length: 4, type: "system", required:true },
+      ],
+      serialLen: 4
+    }
+  };
+
+  // "Admin" can disable options (simulate attribute value status change)
+  // Map: code -> option -> active boolean
+  const OPTION_STATUS = {
+    IDENT: { "5": true, "6": true, "7": true },
+    PART:  { "A0": true, "B0": true, "C0": true },
+    CUST:  { "00": true, "01": true, "02": true }
+  };
+
+  // Existing BOM presets for Copy
+  const BOM_PRESETS = {
+    "BOM-1001": {
+      attrGroup: "GRP-A",
+      values: { IDENT:"5", PART:"A0", CUST:"01", RSV:"0" },
+      partName: "Model A",
+      partSpec: "24\" x 12.5\" / Korea"
+    },
+    "BOM-1002": {
+      attrGroup: "GRP-A",
+      values: { IDENT:"5", PART:"A0", CUST:"01", RSV:"0" },
+      partName: "Model A (Rev.B)",
+      partSpec: "24\" x 12.5\" / Korea / ECN"
+    },
+    "BOM-2001": {
+      attrGroup: "GRP-B",
+      values: { IDENT:"6", PART:"B0", CUST:"02", RSV:"0" },
+      partName: "Model B",
+      partSpec: "Vietnam line"
+    }
+  };
+
+  // UI elements
+  const creationMethod = document.getElementById("creationMethod");
+  const existingBom = document.getElementById("existingBom");
+  const attrGroup = document.getElementById("attrGroup");
+  const partName = document.getElementById("partName");
+  const partSpec = document.getElementById("partSpec");
+  const previewPartNo = document.getElementById("previewPartNo");
+  const attrTableBody = document.querySelector("#attrTable tbody");
+  const btnConfirm = document.getElementById("btnConfirm");
+  const btnReset = document.getElementById("btnReset");
+  const serialInfo = document.getElementById("serialInfo");
+  const sapFailToggle = document.getElementById("sapFailToggle");
+
+  const alertBox = document.getElementById("alertBox");
+  const alertTitle = document.getElementById("alertTitle");
+  const alertMsg = document.getElementById("alertMsg");
+  const alertHint = document.getElementById("alertHint");
+
+  // Current working model
+  let model = {
+    group: attrGroup.value,
+    values: {},
+    serial: "",
+    preview: ""
+  };
+
+  function showAlert(kind, title, msg, hint=""){
+    alertBox.className = "alert show " + (kind || "");
+    alertTitle.textContent = title;
+    alertMsg.textContent = msg;
+    alertHint.textContent = hint;
+  }
+  function hideAlert(){
+    alertBox.className = "alert";
+    alertTitle.textContent = "";
+    alertMsg.textContent = "";
+    alertHint.textContent = "";
+  }
+
+  function padSerial(n, len){
+    const s = String(n);
+    return s.length >= len ? s : "0".repeat(len - s.length) + s;
+  }
+
+  function serialKey(group){ return `SERIAL_COUNTER_${group}`; }
+
+  function getNextSerial(group){
+    // simulate DB lock by doing read-update-write in one sync step (front-end only)
+    const len = GROUPS[group].serialLen;
+    const key = serialKey(group);
+    const curr = Number(localStorage.getItem(key) || "0");
+    const next = curr + 1;
+    localStorage.setItem(key, String(next));
+    return padSerial(next, len);
+  }
+
+  function buildPreview(group, values, serial){
+    const segs = GROUPS[group].segments;
+    let out = "";
+    for (const seg of segs){
+      if (seg.code === "SERIAL") out += (serial || "");
+      else out += (values[seg.code] ?? "");
+    }
+    return out;
+  }
+
+  function validateModel(group, values){
+    const segs = GROUPS[group].segments;
+    const errors = [];
+    for (const seg of segs){
+      if (seg.code === "SERIAL") continue; // generated later
+      const v = (values[seg.code] ?? "").trim();
+      if (seg.required && !v){
+        errors.push(`缺少必填屬性：${seg.code}（${seg.meaning}）`);
+        continue;
+      }
+      if (v && v.length !== seg.length){
+        errors.push(`${seg.code} 位數需為 ${seg.length}，目前為 ${v.length}`);
+      }
+      // option active check for select types
+      if (seg.type === "select" && v){
+        const statusMap = OPTION_STATUS[seg.code] || {};
+        if (statusMap[v] === false){
+          errors.push(`${seg.code} 選項「${v}」已停用，請重新選擇`);
+        }
+      }
+    }
+    // part name/spec basic
+    if (!partName.value.trim()) errors.push("Part Name 不可為空");
+    return errors;
+  }
+
+  function renderAttrTable(){
+    const group = model.group;
+    const segs = GROUPS[group].segments;
+
+    attrTableBody.innerHTML = "";
+    segs.forEach(seg => {
+      const tr = document.createElement("tr");
+
+      const tdSeq = document.createElement("td");
+      tdSeq.textContent = String(seg.seq);
+      tdSeq.style.fontWeight = "900";
+      tr.appendChild(tdSeq);
+
+      const tdCode = document.createElement("td");
+      tdCode.innerHTML = `<span class="mono" style="font-weight:900;">${seg.code}</span>`;
+      tr.appendChild(tdCode);
+
+      const tdMeaning = document.createElement("td");
+      tdMeaning.textContent = seg.meaning;
+      tr.appendChild(tdMeaning);
+
+      const tdLen = document.createElement("td");
+      tdLen.textContent = String(seg.length);
+      tr.appendChild(tdLen);
+
+      const tdVal = document.createElement("td");
+
+      if (seg.type === "system"){
+        const input = document.createElement("input");
+        input.className = "mono";
+        input.value = model.serial ? model.serial : "";
+        input.placeholder = "(Generate on Confirm)";
+        input.readOnly = true;
+        input.style.width = "100%";
+        input.style.padding = "10px";
+        input.style.border = "1px solid var(--line)";
+        input.style.borderRadius = "8px";
+        input.style.background = "#f2f4f7";
+        tdVal.appendChild(input);
+      } else if (seg.type === "select"){
+        const sel = document.createElement("select");
+        sel.style.width="100%";
+        sel.style.padding="10px";
+        sel.style.border="1px solid var(--line)";
+        sel.style.borderRadius="8px";
+        sel.innerHTML = `<option value="">-- Select --</option>` + seg.options.map(o=>{
+          const active = (OPTION_STATUS[seg.code]?.[o] !== false);
+          const label = active ? o : `${o}（已停用）`;
+          return `<option value="${o}" ${active ? "" : "disabled"}>${label}</option>`;
+        }).join("");
+        sel.value = model.values[seg.code] ?? "";
+        sel.addEventListener("change", () => {
+          model.values[seg.code] = sel.value;
+          hideAlert();
+        });
+        tdVal.appendChild(sel);
+      } else {
+        const input = document.createElement("input");
+        input.placeholder = seg.placeholder || "";
+        input.value = model.values[seg.code] ?? "";
+        input.addEventListener("input", () => {
+          model.values[seg.code] = input.value;
+          hideAlert();
+        });
+        input.style.width="100%";
+        input.style.padding="10px";
+        input.style.border="1px solid var(--line)";
+        input.style.borderRadius="8px";
+        tdVal.appendChild(input);
+      }
+      tr.appendChild(tdVal);
+
+      const tdStatus = document.createElement("td");
+      if (seg.type === "system"){
+        tdStatus.innerHTML = `<span class="chip">系統產生</span>`;
+      } else if (seg.type === "select"){
+        const v = model.values[seg.code];
+        const active = v ? (OPTION_STATUS[seg.code]?.[v] !== false) : true;
+        tdStatus.innerHTML = active ? `<span class="chip">啟用</span>` : `<span class="chip" style="color:#b91c1c;border-color:#fecaca;background:#fef2f2;">已停用</span>`;
+      } else {
+        tdStatus.innerHTML = `<span class="chip">可編輯</span>`;
+      }
+      tr.appendChild(tdStatus);
+
+      attrTableBody.appendChild(tr);
+    });
+
+    // preview info
+    serialInfo.textContent = `SERIAL: ${model.serial ? model.serial : "(not generated)"}`;
+    previewPartNo.value = model.preview || "";
+  }
+
+  function resetForm(toGroup){
+    hideAlert();
+    model.group = toGroup || attrGroup.value;
+    model.values = {};
+    model.serial = "";
+    model.preview = "";
+    previewPartNo.value = "";
+    serialInfo.textContent = "SERIAL: (not generated)";
+    renderAttrTable();
+  }
+
+  function applyPreset(bomNo){
+    const preset = BOM_PRESETS[bomNo];
+    if (!preset) return;
+
+    // Set group first (will trigger reload)
+    attrGroup.value = preset.attrGroup;
+    model.group = preset.attrGroup;
+
+    // Pre-fill values
+    model.values = { ...preset.values };
+    partName.value = preset.partName;
+    partSpec.value = preset.partSpec;
+
+    model.serial = "";
+    model.preview = "";
+    previewPartNo.value = "";
+    renderAttrTable();
+  }
+
+  // Event: creation method change
+  creationMethod.addEventListener("change", () => {
+    const mode = creationMethod.value;
+    existingBom.disabled = (mode !== "copy");
+    if (mode !== "copy"){
+      existingBom.value = "";
+      partName.value = "";
+      partSpec.value = "";
+      resetForm(attrGroup.value);
+      showAlert("warn", "提示", "目前為「新增空白」模式。請選擇屬性組、填寫屬性值與品名後按 Confirm。");
+    } else {
+      showAlert("warn", "提示", "目前為「複製既有 BOM」模式。請先選擇 Existing BOM 以預帶資料。");
+    }
+  });
+
+  // Event: select existing BOM (copy)
+  existingBom.addEventListener("change", () => {
+    const bomNo = existingBom.value;
+    if (!bomNo) return;
+    applyPreset(bomNo);
+    showAlert("ok", "已預帶資料", `已從 ${bomNo} 預帶屬性組、屬性值與品名/規格。`, "若你修改 Attribute Group，系統會清空屬性值並要求重選。");
+  });
+
+  // Event: attribute group change (clear values & reload list)
+  attrGroup.addEventListener("change", () => {
+    const newGroup = attrGroup.value;
+    // Clear selected attribute values (as spec)
+    model.group = newGroup;
+    model.values = {};
+    model.serial = "";
+    model.preview = "";
+    previewPartNo.value = "";
+    renderAttrTable();
+    showAlert("warn", "屬性組已變更", "已清空所有屬性值並載入新屬性清單，請重新選擇屬性值。");
+  });
+
+  // Confirm
+  btnConfirm.addEventListener("click", () => {
+    hideAlert();
+
+    // Validation #1
+    const errs = validateModel(model.group, model.values);
+    if (errs.length){
+      showAlert("bad", "驗證失敗", errs[0], errs.length>1 ? `另有 ${errs.length-1} 項問題，請逐一修正。` : "");
+      return;
+    }
+
+    // Lock + generate serial (local)
+    const serial = getNextSerial(model.group);
+    model.serial = serial;
+
+    // Build preview
+    const preview = buildPreview(model.group, model.values, model.serial);
+    model.preview = preview;
+    previewPartNo.value = preview;
+    serialInfo.textContent = `SERIAL: ${serial}`;
+
+    // Validation #2 (before SAP) - re-check option still active
+    const errs2 = validateModel(model.group, model.values);
+    if (errs2.length){
+      showAlert("bad", "送 SAP 前驗證失敗", errs2[0], "請重新選擇屬性值後再按 Confirm。");
+      // In real system: rollback serial occupation (policy). Here we keep counter forward.
+      return;
+    }
+
+    // "Write to SAP" simulation
+    const fail = sapFailToggle.checked;
+    if (fail){
+      showAlert("bad", "SAP 寫入失敗（模擬）",
+        "SAP 回傳建立失敗，系統已回滾此筆建立（不成立新料號）。",
+        "注意：流水碼回收策略需在規格明確定義（建議：不占號 / 回收）。"
+      );
+      return;
+    }
+
+    showAlert("ok", "建立成功",
+      `新料號已產生：${preview}`,
+      "下一步：寫入 SAP（此版本為模擬），並落地關聯資料與操作日誌。"
+    );
+    renderAttrTable();
+  });
+
+  // Reset
+  btnReset.addEventListener("click", () => {
+    partName.value = "";
+    partSpec.value = "";
+    previewPartNo.value = "";
+    resetForm(attrGroup.value);
+    showAlert("warn", "已重置", "已清空畫面資料（不影響已產生的流水碼計數）。");
+  });
+
+  // Render BOM list (demo)
+  const bomList = document.getElementById("bomList");
+  function renderBomList(){
+    const rows = [
+      {bom:"BOM-1001", product:"Model A", origin:"Korea", note:"Base"},
+      {bom:"BOM-1002", product:"Model A", origin:"Korea", note:"Rev.B / ECN"},
+      {bom:"BOM-2001", product:"Model B", origin:"Vietnam", note:"Different serial length group"},
+    ];
+    bomList.innerHTML = rows.map(r=>`
+      <tr>
+        <td class="expander">›</td>
+        <td class="mono">${r.bom}</td>
+        <td>${r.product}</td>
+        <td>${r.origin}</td>
+        <td>${r.note}</td>
+      </tr>
+    `).join("");
+  }
+
+  // Initialize
+  renderBomList();
+  resetForm(attrGroup.value);
+  showAlert("warn", "提示", "這是本地可開啟的原型（純前端）。Confirm 會依屬性組規則產生流水碼與新料號，並模擬寫入 SAP。");
+</script>
+</body>
+</html>
