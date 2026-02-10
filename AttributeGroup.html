@@ -1,0 +1,1605 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Attribute Group Maintenance - 京永</title>
+  <style>
+    :root{
+      --sidebar:#0b6f8a;
+      --sidebar-dark:#075a70;
+      --bg:#f5f7fa;
+      --card:#ffffff;
+      --line:#d9e1ea;
+      --text:#1a2b3c;
+      --muted:#6c7a89;
+      --btn:#0b6f8a;
+      --btn-hover:#075a70;
+      --warn:#b45309;
+      --danger:#b91c1c;
+      --ok:#047857;
+      --chip:#eef6f8;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background:var(--bg);
+      color:var(--text);
+    }
+    .main{
+      padding:18px 22px 40px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .page-title{
+      font-size:34px;
+      font-weight:900;
+      margin:6px 0 10px;
+      letter-spacing:.2px;
+    }
+    .sub-title{
+      color:var(--muted);
+      font-weight:700;
+      margin:0 0 16px;
+      line-height:1.5;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:12px;
+      box-shadow:0 1px 0 rgba(16,24,40,.03);
+      padding:14px 14px;
+      margin-top:12px;
+    }
+    .row{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .divider{height:1px;background:var(--line); margin:12px 0}
+    .chips{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .chip{
+      background:var(--chip);
+      border:1px solid #cfe7ee;
+      color:#0b6f8a;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:12px;
+    }
+    .mono{font-family:var(--mono)}
+    .btn{
+      border:1px solid transparent;
+      background:var(--btn);
+      color:#fff;
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .btn:hover{background:var(--btn-hover)}
+    .btn.secondary{
+      background:#fff;
+      color:var(--btn);
+      border:1px solid var(--btn);
+    }
+    .btn.secondary:hover{background:#f0fbff}
+    .btn.danger{background:var(--danger)}
+    .btn.danger:hover{filter:brightness(.95)}
+    .btn.small{
+      padding:7px 10px;
+      border-radius:9px;
+      font-weight:900;
+      font-size:12px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap:12px 16px;
+      align-items:end;
+    }
+    .field label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+      font-weight:800;
+    }
+    .field input,.field select,.field textarea{
+      width:100%;
+      padding:10px 10px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      outline:none;
+      font-size:14px;
+    }
+    .field textarea{min-height:40px; resize:vertical}
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+      margin-top:10px;
+    }
+    th, td{
+      border-bottom:1px solid var(--line);
+      padding:10px 10px;
+      text-align:left;
+      vertical-align:top;
+    }
+    th{
+      font-size:12px;
+      color:#475467;
+      font-weight:900;
+      background:#fafbfc;
+    }
+    tr:hover td{background:#fcfdff}
+    .muted{color:#667085}
+    .right{margin-left:auto}
+
+    .alert{
+      border-radius:12px;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      background:#fff;
+      margin-top:12px;
+      display:none;
+    }
+    .alert.show{display:block}
+    .alert.ok{border-color:#a7f3d0;background:#ecfdf5}
+    .alert.warn{border-color:#fde68a;background:#fffbeb}
+    .alert.bad{border-color:#fecaca;background:#fef2f2}
+    .alert .title{font-weight:900;margin-bottom:4px;}
+    .small{font-size:12px;color:#475467}
+
+    /* modal */
+    .overlay{
+      position:fixed; inset:0;
+      background:rgba(15,23,42,.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:50;
+    }
+    .overlay.show{display:flex}
+    .modal{
+      width:min(1100px, 100%);
+      max-height: 92vh;
+      overflow:auto;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      box-shadow:0 18px 60px rgba(0,0,0,.18);
+      padding:14px;
+    }
+    .modal h2{
+      margin:0;
+      font-size:18px;
+      font-weight:900;
+      color:#0b6f8a;
+    }
+    .two-col{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap:12px;
+      margin-top:12px;
+    }
+    .panel{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      background:#fff;
+    }
+    .panel h3{
+      margin:0 0 8px;
+      font-size:14px;
+      font-weight:900;
+      color:#0b6f8a;
+    }
+
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+      .two-col{grid-template-columns: 1fr}
+      .right{margin-left:0}
+    }
+  </style>
+</head>
+<body>
+  <main class="main">
+    <div class="row" style="justify-content:space-between;">
+      <div>
+        <div class="page-title" id="t_pageTitle">Attribute Group Maintenance</div>
+        <div class="sub-title" id="t_subTitle">
+          用於維護「屬性組 / 屬性代碼定義值 / 流水碼規則」。此頁為 Demo（純前端 localStorage）。
+        </div>
+      </div>
+
+      <div class="row" style="align-items:flex-end;">
+        <div class="field" style="width:180px;">
+          <label id="t_langLabel">Language</label>
+          <select id="langSel">
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+
+        <div class="field" style="width:220px;">
+          <label id="t_sapModelTopLabel">SAP Model</label>
+          <select id="sapModelTopSel"></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div class="chips">
+          <span class="chip" id="t_chip1">屬性代碼定義值：可新增 / 啟用 / 停用</span>
+          <span class="chip" id="t_chip2">SAP Model 用於切換模板（本頁先提供下拉＋歸屬）</span>
+          <span class="chip mono" id="storeKeyInfo">STORE: (not loaded)</span>
+        </div>
+        <div class="row">
+          <button class="btn secondary" id="btnExport">Export JSON</button>
+          <button class="btn secondary" id="btnImport">Import JSON</button>
+          <button class="btn" id="btnNewGroup">+ New Group</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid">
+        <div class="field">
+          <label id="t_searchLabel">Search Group</label>
+          <input id="search" placeholder="Type keyword e.g., GRP-A / 1-2-2-1-5" />
+        </div>
+        <div class="field">
+          <label id="t_showLabel">Show</label>
+          <select id="filter">
+            <option value="all" id="t_filterAll">All Groups</option>
+            <option value="active" id="t_filterActive">Active Only</option>
+            <option value="inactive" id="t_filterInactive">Inactive Only</option>
+          </select>
+        </div>
+        <div class="field">
+          <label id="t_quickLabel">Quick Actions</label>
+          <div class="row">
+            <button class="btn secondary small" id="btnSeed">Reset Demo Data</button>
+            <button class="btn danger small" id="btnClear">Clear Storage</button>
+          </div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:160px;" id="t_thGroupCode">Group Code</th>
+            <th id="t_thLabelNote">Label / Note</th>
+            <th style="width:180px;" id="t_thSapModel">SAP Model</th>
+            <th style="width:160px;" id="t_thPattern">Pattern</th>
+            <th style="width:120px;" id="t_thSerialLen">Serial Len</th>
+            <th style="width:120px;" id="t_thStatus">Status</th>
+            <th style="width:280px;" id="t_thActions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="groupTbody"></tbody>
+      </table>
+
+      <div id="alertBox" class="alert">
+        <div class="title" id="alertTitle"></div>
+        <div id="alertMsg"></div>
+        <div class="small" id="alertHint" style="margin-top:6px;"></div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="overlay" id="overlay">
+      <div class="modal">
+        <div class="row" style="justify-content:space-between;">
+          <h2 id="modalTitle">Edit Group</h2>
+          <div class="row">
+            <button class="btn secondary" id="btnClose">Close</button>
+            <button class="btn" id="btnSave">Save</button>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <!-- Left -->
+          <div class="panel">
+            <h3 id="t_groupInfoTitle">Group Info</h3>
+            <div class="grid" style="grid-template-columns: 1fr 1fr;">
+              <div class="field">
+                <label id="t_gCodeLabel">Group Code (unique)</label>
+                <input id="gCode" class="mono" placeholder="e.g., GRP-A" />
+              </div>
+              <div class="field">
+                <label id="t_gActiveLabel">Status</label>
+                <select id="gActive">
+                  <option value="true" id="t_statusActive">Active</option>
+                  <option value="false" id="t_statusInactive">Inactive</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label id="t_gSapModelLabel">SAP Model</label>
+                <select id="gSapModel"></select>
+              </div>
+
+              <div class="field">
+                <label id="t_gSerialLenLabel">Serial Length</label>
+                <input id="gSerialLen" type="number" min="1" max="12" value="5" />
+              </div>
+
+              <div class="field" style="grid-column:1/-1;">
+                <label id="t_gLabelLabel">Label</label>
+                <input id="gLabel" placeholder="e.g., GRP-A（1-2-2-1-5）" />
+              </div>
+
+              <div class="field" style="grid-column:1/-1;">
+                <label id="t_gNoteLabel">Note</label>
+                <textarea id="gNote" placeholder="Short note for admin..."></textarea>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="row" style="justify-content:space-between;align-items:flex-end;">
+              <div>
+                <div style="font-weight:900;color:#0b6f8a;" id="t_segmentsTitle">Segments</div>
+                <div class="small" id="t_segmentsHint">依序決定料號組碼（最後一段通常是 SERIAL / 系統產生）。</div>
+              </div>
+              <div class="row">
+                <button class="btn secondary small" id="btnAddSeg">+ Add Segment</button>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:56px;" id="t_segSeq">Seq</th>
+                  <th style="width:160px;" id="t_segCode">Code</th>
+                  <th id="t_segMeaning">Meaning</th>
+                  <th style="width:92px;" id="t_segLen">Len</th>
+                  <th style="width:120px;" id="t_segType">Type</th>
+                  <th style="width:260px;" id="t_segOpt">Options / Placeholder</th>
+                  <th style="width:140px;" id="t_segAct">Action</th>
+                </tr>
+              </thead>
+              <tbody id="segTbody"></tbody>
+            </table>
+
+            <div class="divider"></div>
+
+            <div class="row" style="justify-content:space-between;">
+              <div class="chips">
+                <span class="chip mono" id="previewPattern">PATTERN: -</span>
+                <span class="chip mono" id="previewPartNo">PREVIEW: -</span>
+              </div>
+              <button class="btn secondary" id="btnReSeq">Auto Re-Seq</button>
+            </div>
+            <div class="small" style="margin-top:8px;" id="t_previewHint">
+              Preview 規則：對於 select/input 段用示例值，SERIAL 段用 0 補齊。正式取號仍以後端流水碼為準。
+            </div>
+          </div>
+
+          <!-- Right -->
+          <div class="panel">
+            <h3 id="t_dictTitle">Attribute Value Dictionary (Editable)</h3>
+            <div class="small" id="t_dictHint">
+              維護 select 類型 segment 的可選值（可新增、啟用/停用）。停用的值建議在新料號建立頁阻擋使用。
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="row">
+              <div class="field" style="flex:1;">
+                <label id="t_dictCodeLabel">Attribute Code</label>
+                <select id="dictCode"></select>
+              </div>
+              <button class="btn secondary" id="btnAddOption">+ Add Option</button>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:200px;" id="t_optOpt">Option</th>
+                  <th style="width:120px;" id="t_optActive">Active</th>
+                  <th id="t_optDesc">Description</th>
+                  <th style="width:160px;" id="t_optActions">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="dictTbody"></tbody>
+            </table>
+
+            <div class="divider"></div>
+
+            <div class="small" id="t_dictFooter">
+              ⚠️ 建議：送 SAP 前做二次驗證，若選項已停用則阻擋送出，避免 SAP 主檔污染。
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <input id="fileInput" type="file" accept="application/json" style="display:none;" />
+  </main>
+
+<script>
+  /**
+   * Additions in this version:
+   * - Language dropdown (EN/ZH) with instant UI text update
+   * - SAP Model dropdown:
+   *    - Top filter (list groups by SAP Model)
+   *    - Each group belongs to a SAP Model (saved in db.groups[code].sapModel)
+   *    - Modal has SAP Model selector; New Group defaults to current top SAP Model
+   */
+
+  const STORE_KEY = "JY_ATTR_GROUPS_V2_I18N_SAPMODEL";
+
+  // You can rename / replace with real SAP template codes later
+  const SAP_MODELS = [
+    { key: "ALL", zh: "全部", en: "All" },
+    { key: "SAP_MODEL_A", zh: "SAP 模板 A", en: "SAP Model A" },
+    { key: "SAP_MODEL_B", zh: "SAP 模板 B", en: "SAP Model B" },
+    { key: "SAP_MODEL_C", zh: "SAP 模板 C", en: "SAP Model C" }
+  ];
+
+  const I18N = {
+    zh: {
+      pageTitle: "屬性組維護",
+      subTitle: "用於維護「屬性組 / 屬性代碼定義值 / 流水碼規則」。此頁為 Demo（純前端 localStorage）。",
+      langLabel: "語言",
+      sapModelTopLabel: "SAP Model（模板）",
+      chip1: "屬性代碼定義值：可新增 / 啟用 / 停用",
+      chip2: "SAP Model 用於切換模板（本頁先提供下拉＋歸屬）",
+      searchLabel: "搜尋屬性組",
+      showLabel: "顯示",
+      quickLabel: "快速操作",
+      filterAll: "全部",
+      filterActive: "僅啟用",
+      filterInactive: "僅停用",
+      btnExport: "匯出 JSON",
+      btnImport: "匯入 JSON",
+      btnNewGroup: "+ 新增屬性組",
+      btnSeed: "重置 Demo 資料",
+      btnClear: "清空 Storage",
+      thGroupCode: "屬性組代碼",
+      thLabelNote: "名稱 / 備註",
+      thSapModel: "SAP Model",
+      thPattern: "位數樣式",
+      thSerialLen: "流水碼長度",
+      thStatus: "狀態",
+      thActions: "操作",
+      actEdit: "編輯",
+      actCopy: "複製",
+      actDisable: "停用",
+      actEnable: "啟用",
+      actDelete: "刪除",
+      statusActive: "啟用",
+      statusInactive: "停用",
+      modalNew: "新增屬性組",
+      modalEdit: "編輯屬性組",
+      modalCopyFrom: "複製屬性組：",
+      close: "關閉",
+      save: "儲存",
+      groupInfoTitle: "屬性組資訊",
+      gCodeLabel: "屬性組代碼（唯一）",
+      gActiveLabel: "狀態",
+      gSapModelLabel: "SAP Model",
+      gSerialLenLabel: "流水碼長度",
+      gLabelLabel: "顯示名稱",
+      gNoteLabel: "備註",
+      segmentsTitle: "Segments（組碼段）",
+      segmentsHint: "依序決定料號組碼（最後一段通常是 SERIAL / 系統產生）。",
+      btnAddSeg: "+ 新增段",
+      segSeq: "序",
+      segCode: "代碼",
+      segMeaning: "定義",
+      segLen: "長度",
+      segType: "型態",
+      segOpt: "選項 / Placeholder",
+      segAct: "操作",
+      up: "上移",
+      down: "下移",
+      remove: "移除",
+      btnReSeq: "自動重排序",
+      previewHint: "Preview 規則：對於 select/input 段用示例值，SERIAL 段用 0 補齊。正式取號仍以後端流水碼為準。",
+      dictTitle: "屬性值字典（可維護）",
+      dictHint: "維護 select 類型 segment 的可選值（可新增、啟用/停用）。停用的值建議在新料號建立頁阻擋使用。",
+      dictCodeLabel: "屬性代碼",
+      btnAddOption: "+ 新增選項",
+      optOpt: "選項",
+      optActive: "啟用",
+      optDesc: "說明",
+      optActions: "操作",
+      dictFooter: "⚠️ 建議：送 SAP 前做二次驗證，若選項已停用則阻擋送出，避免 SAP 主檔污染。",
+      msgDeleted: "已刪除",
+      msgSaved: "已儲存",
+      msgImported: "已匯入",
+      msgExported: "已匯出",
+      msgReset: "已重置 Demo",
+      msgCleared: "已清空並重置為 Demo"
+    },
+    en: {
+      pageTitle: "Attribute Group Maintenance",
+      subTitle: "Maintain attribute groups / dictionaries / serial rules. This is a demo (front-end only, localStorage).",
+      langLabel: "Language",
+      sapModelTopLabel: "SAP Model (Template)",
+      chip1: "Attribute values: add / enable / disable",
+      chip2: "SAP Model drives template switching (this page provides dropdown + ownership)",
+      searchLabel: "Search Group",
+      showLabel: "Show",
+      quickLabel: "Quick Actions",
+      filterAll: "All",
+      filterActive: "Active Only",
+      filterInactive: "Inactive Only",
+      btnExport: "Export JSON",
+      btnImport: "Import JSON",
+      btnNewGroup: "+ New Group",
+      btnSeed: "Reset Demo Data",
+      btnClear: "Clear Storage",
+      thGroupCode: "Group Code",
+      thLabelNote: "Label / Note",
+      thSapModel: "SAP Model",
+      thPattern: "Pattern",
+      thSerialLen: "Serial Len",
+      thStatus: "Status",
+      thActions: "Actions",
+      actEdit: "Edit",
+      actCopy: "Copy",
+      actDisable: "Disable",
+      actEnable: "Enable",
+      actDelete: "Delete",
+      statusActive: "Active",
+      statusInactive: "Inactive",
+      modalNew: "New Group",
+      modalEdit: "Edit Group",
+      modalCopyFrom: "Copy Group from: ",
+      close: "Close",
+      save: "Save",
+      groupInfoTitle: "Group Info",
+      gCodeLabel: "Group Code (unique)",
+      gActiveLabel: "Status",
+      gSapModelLabel: "SAP Model",
+      gSerialLenLabel: "Serial Length",
+      gLabelLabel: "Label",
+      gNoteLabel: "Note",
+      segmentsTitle: "Segments",
+      segmentsHint: "Segments define the part number composition (last segment is typically SERIAL/system-generated).",
+      btnAddSeg: "+ Add Segment",
+      segSeq: "Seq",
+      segCode: "Code",
+      segMeaning: "Meaning",
+      segLen: "Len",
+      segType: "Type",
+      segOpt: "Options / Placeholder",
+      segAct: "Action",
+      up: "Up",
+      down: "Down",
+      remove: "Remove",
+      btnReSeq: "Auto Re-Seq",
+      previewHint: "Preview: sample values for select/input; SERIAL uses zero-padding. Real serial should be generated server-side.",
+      dictTitle: "Attribute Value Dictionary (Editable)",
+      dictHint: "Maintain options for select-type segments (add/enable/disable). Disabled values should be blocked in New Part Number creation.",
+      dictCodeLabel: "Attribute Code",
+      btnAddOption: "+ Add Option",
+      optOpt: "Option",
+      optActive: "Active",
+      optDesc: "Description",
+      optActions: "Actions",
+      dictFooter: "⚠️ Recommendation: validate again before sending to SAP; block disabled options to avoid master data pollution.",
+      msgDeleted: "Deleted",
+      msgSaved: "Saved",
+      msgImported: "Imported",
+      msgExported: "Exported",
+      msgReset: "Demo reset",
+      msgCleared: "Storage cleared and reset to demo"
+    }
+  };
+
+  // Demo seed (now includes sapModel on groups)
+  const SEED = {
+    groups: {
+      "GRP-A": {
+        code:"GRP-A",
+        sapModel:"SAP_MODEL_A",
+        label:"GRP-A（1-2-2-1-5）",
+        note:"Demo group A",
+        serialLen:5,
+        active:true,
+        segments:[
+          {seq:1, code:"IDENT", meaning:"識別碼", length:1, type:"select", options:["5","6","7"], required:true},
+          {seq:2, code:"PART",  meaning:"零件類型", length:2, type:"select", options:["A0","B0","C0"], required:true},
+          {seq:3, code:"CUST",  meaning:"客戶碼",   length:2, type:"select", options:["00","01","02"], required:true},
+          {seq:4, code:"RSV",   meaning:"預留碼",   length:1, type:"input", placeholder:"0", required:true},
+          {seq:5, code:"SERIAL",meaning:"流水碼（系統產生）", length:5, type:"system", required:true}
+        ]
+      },
+      "GRP-B": {
+        code:"GRP-B",
+        sapModel:"SAP_MODEL_B",
+        label:"GRP-B（1-2-2-1-4）",
+        note:"Demo group B",
+        serialLen:4,
+        active:true,
+        segments:[
+          {seq:1, code:"IDENT", meaning:"識別碼", length:1, type:"select", options:["5","6","7"], required:true},
+          {seq:2, code:"PART",  meaning:"零件類型", length:2, type:"select", options:["A0","B0","C0"], required:true},
+          {seq:3, code:"CUST",  meaning:"客戶碼",   length:2, type:"select", options:["00","01","02"], required:true},
+          {seq:4, code:"RSV",   meaning:"預留碼",   length:1, type:"input", placeholder:"0", required:true},
+          {seq:5, code:"SERIAL",meaning:"流水碼（系統產生）", length:4, type:"system", required:true}
+        ]
+      }
+    },
+    dict: {
+      "IDENT": { options: { "5":{active:true, desc:""}, "6":{active:true, desc:""}, "7":{active:true, desc:""} } },
+      "PART":  { options: { "A0":{active:true, desc:""}, "B0":{active:true, desc:""}, "C0":{active:true, desc:""} } },
+      "CUST":  { options: { "00":{active:true, desc:""}, "01":{active:true, desc:""}, "02":{active:true, desc:""} } }
+    },
+    settings: {
+      lang: "zh",
+      sapModelTop: "ALL"
+    }
+  };
+
+  // Elements
+  const storeKeyInfo = document.getElementById("storeKeyInfo");
+  const groupTbody = document.getElementById("groupTbody");
+  const searchEl = document.getElementById("search");
+  const filterEl = document.getElementById("filter");
+  const btnNewGroup = document.getElementById("btnNewGroup");
+  const btnExport = document.getElementById("btnExport");
+  const btnImport = document.getElementById("btnImport");
+  const btnSeed = document.getElementById("btnSeed");
+  const btnClear = document.getElementById("btnClear");
+
+  const alertBox = document.getElementById("alertBox");
+  const alertTitle = document.getElementById("alertTitle");
+  const alertMsg = document.getElementById("alertMsg");
+  const alertHint = document.getElementById("alertHint");
+
+  const overlay = document.getElementById("overlay");
+  const modalTitle = document.getElementById("modalTitle");
+  const btnClose = document.getElementById("btnClose");
+  const btnSave = document.getElementById("btnSave");
+
+  const gCode = document.getElementById("gCode");
+  const gActive = document.getElementById("gActive");
+  const gLabel = document.getElementById("gLabel");
+  const gSerialLen = document.getElementById("gSerialLen");
+  const gNote = document.getElementById("gNote");
+  const gSapModel = document.getElementById("gSapModel");
+
+  const segTbody = document.getElementById("segTbody");
+  const btnAddSeg = document.getElementById("btnAddSeg");
+  const btnReSeq = document.getElementById("btnReSeq");
+
+  const dictCode = document.getElementById("dictCode");
+  const dictTbody = document.getElementById("dictTbody");
+  const btnAddOption = document.getElementById("btnAddOption");
+
+  const previewPattern = document.getElementById("previewPattern");
+  const previewPartNo = document.getElementById("previewPartNo");
+
+  const fileInput = document.getElementById("fileInput");
+
+  const langSel = document.getElementById("langSel");
+  const sapModelTopSel = document.getElementById("sapModelTopSel");
+
+  // i18n nodes
+  const T_NODES = {
+    pageTitle: document.getElementById("t_pageTitle"),
+    subTitle: document.getElementById("t_subTitle"),
+    langLabel: document.getElementById("t_langLabel"),
+    sapModelTopLabel: document.getElementById("t_sapModelTopLabel"),
+    chip1: document.getElementById("t_chip1"),
+    chip2: document.getElementById("t_chip2"),
+    searchLabel: document.getElementById("t_searchLabel"),
+    showLabel: document.getElementById("t_showLabel"),
+    quickLabel: document.getElementById("t_quickLabel"),
+    filterAll: document.getElementById("t_filterAll"),
+    filterActive: document.getElementById("t_filterActive"),
+    filterInactive: document.getElementById("t_filterInactive"),
+    thGroupCode: document.getElementById("t_thGroupCode"),
+    thLabelNote: document.getElementById("t_thLabelNote"),
+    thSapModel: document.getElementById("t_thSapModel"),
+    thPattern: document.getElementById("t_thPattern"),
+    thSerialLen: document.getElementById("t_thSerialLen"),
+    thStatus: document.getElementById("t_thStatus"),
+    thActions: document.getElementById("t_thActions"),
+    groupInfoTitle: document.getElementById("t_groupInfoTitle"),
+    gCodeLabel: document.getElementById("t_gCodeLabel"),
+    gActiveLabel: document.getElementById("t_gActiveLabel"),
+    gSapModelLabel: document.getElementById("t_gSapModelLabel"),
+    gSerialLenLabel: document.getElementById("t_gSerialLenLabel"),
+    gLabelLabel: document.getElementById("t_gLabelLabel"),
+    gNoteLabel: document.getElementById("t_gNoteLabel"),
+    segmentsTitle: document.getElementById("t_segmentsTitle"),
+    segmentsHint: document.getElementById("t_segmentsHint"),
+    segSeq: document.getElementById("t_segSeq"),
+    segCode: document.getElementById("t_segCode"),
+    segMeaning: document.getElementById("t_segMeaning"),
+    segLen: document.getElementById("t_segLen"),
+    segType: document.getElementById("t_segType"),
+    segOpt: document.getElementById("t_segOpt"),
+    segAct: document.getElementById("t_segAct"),
+    previewHint: document.getElementById("t_previewHint"),
+    dictTitle: document.getElementById("t_dictTitle"),
+    dictHint: document.getElementById("t_dictHint"),
+    dictCodeLabel: document.getElementById("t_dictCodeLabel"),
+    optOpt: document.getElementById("t_optOpt"),
+    optActive: document.getElementById("t_optActive"),
+    optDesc: document.getElementById("t_optDesc"),
+    optActions: document.getElementById("t_optActions"),
+    dictFooter: document.getElementById("t_dictFooter"),
+    statusActive: document.getElementById("t_statusActive"),
+    statusInactive: document.getElementById("t_statusInactive")
+  };
+
+  // State
+  let db = loadDB();
+  let editing = {
+    mode: "new",
+    originalCode: null,
+    group: null
+  };
+
+  storeKeyInfo.textContent = `STORE: ${STORE_KEY}`;
+
+  function deepCopy(obj){ return JSON.parse(JSON.stringify(obj)); }
+
+  function showAlert(kind, title, msg, hint=""){
+    alertBox.className = "alert show " + (kind || "");
+    alertTitle.textContent = title;
+    alertMsg.textContent = msg;
+    alertHint.textContent = hint;
+  }
+  function hideAlert(){
+    alertBox.className = "alert";
+    alertTitle.textContent = "";
+    alertMsg.textContent = "";
+    alertHint.textContent = "";
+  }
+
+  function loadDB(){
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return deepCopy(SEED);
+    try{
+      const parsed = JSON.parse(raw);
+      if (!parsed.groups || !parsed.dict) return deepCopy(SEED);
+      if (!parsed.settings) parsed.settings = deepCopy(SEED.settings);
+      return parsed;
+    }catch{
+      return deepCopy(SEED);
+    }
+  }
+  function saveDB(){
+    localStorage.setItem(STORE_KEY, JSON.stringify(db, null, 2));
+  }
+
+  function getLang(){
+    return db?.settings?.lang || "zh";
+  }
+  function t(){
+    return I18N[getLang()];
+  }
+
+  function getSapModelTop(){
+    return db?.settings?.sapModelTop || "ALL";
+  }
+
+  function renderSapModelSelects(){
+    // Top filter includes ALL
+    sapModelTopSel.innerHTML = SAP_MODELS.map(m=>{
+      const label = getLang()==="zh" ? m.zh : m.en;
+      return `<option value="${escapeAttr(m.key)}">${escapeHtml(label)}</option>`;
+    }).join("");
+    sapModelTopSel.value = getSapModelTop();
+
+    // Modal selector excludes ALL
+    const modelsNoAll = SAP_MODELS.filter(x=>x.key!=="ALL");
+    gSapModel.innerHTML = modelsNoAll.map(m=>{
+      const label = getLang()==="zh" ? m.zh : m.en;
+      return `<option value="${escapeAttr(m.key)}">${escapeHtml(label)}</option>`;
+    }).join("");
+  }
+
+  function applyI18n(){
+    const L = t();
+
+    T_NODES.pageTitle.textContent = L.pageTitle;
+    T_NODES.subTitle.textContent = L.subTitle;
+    T_NODES.langLabel.textContent = L.langLabel;
+    T_NODES.sapModelTopLabel.textContent = L.sapModelTopLabel;
+
+    T_NODES.chip1.textContent = L.chip1;
+    T_NODES.chip2.textContent = L.chip2;
+
+    T_NODES.searchLabel.textContent = L.searchLabel;
+    T_NODES.showLabel.textContent = L.showLabel;
+    T_NODES.quickLabel.textContent = L.quickLabel;
+
+    T_NODES.filterAll.textContent = L.filterAll;
+    T_NODES.filterActive.textContent = L.filterActive;
+    T_NODES.filterInactive.textContent = L.filterInactive;
+
+    btnExport.textContent = L.btnExport;
+    btnImport.textContent = L.btnImport;
+    btnNewGroup.textContent = L.btnNewGroup;
+    btnSeed.textContent = L.btnSeed;
+    btnClear.textContent = L.btnClear;
+
+    T_NODES.thGroupCode.textContent = L.thGroupCode;
+    T_NODES.thLabelNote.textContent = L.thLabelNote;
+    T_NODES.thSapModel.textContent = L.thSapModel;
+    T_NODES.thPattern.textContent = L.thPattern;
+    T_NODES.thSerialLen.textContent = L.thSerialLen;
+    T_NODES.thStatus.textContent = L.thStatus;
+    T_NODES.thActions.textContent = L.thActions;
+
+    btnClose.textContent = L.close;
+    btnSave.textContent = L.save;
+
+    T_NODES.groupInfoTitle.textContent = L.groupInfoTitle;
+    T_NODES.gCodeLabel.textContent = L.gCodeLabel;
+    T_NODES.gActiveLabel.textContent = L.gActiveLabel;
+    T_NODES.gSapModelLabel.textContent = L.gSapModelLabel;
+    T_NODES.gSerialLenLabel.textContent = L.gSerialLenLabel;
+    T_NODES.gLabelLabel.textContent = L.gLabelLabel;
+    T_NODES.gNoteLabel.textContent = L.gNoteLabel;
+
+    T_NODES.segmentsTitle.textContent = L.segmentsTitle;
+    T_NODES.segmentsHint.textContent = L.segmentsHint;
+    btnAddSeg.textContent = L.btnAddSeg;
+
+    T_NODES.segSeq.textContent = L.segSeq;
+    T_NODES.segCode.textContent = L.segCode;
+    T_NODES.segMeaning.textContent = L.segMeaning;
+    T_NODES.segLen.textContent = L.segLen;
+    T_NODES.segType.textContent = L.segType;
+    T_NODES.segOpt.textContent = L.segOpt;
+    T_NODES.segAct.textContent = L.segAct;
+
+    btnReSeq.textContent = L.btnReSeq;
+    T_NODES.previewHint.textContent = L.previewHint;
+
+    T_NODES.dictTitle.textContent = L.dictTitle;
+    T_NODES.dictHint.textContent = L.dictHint;
+    T_NODES.dictCodeLabel.textContent = L.dictCodeLabel;
+    btnAddOption.textContent = L.btnAddOption;
+
+    T_NODES.optOpt.textContent = L.optOpt;
+    T_NODES.optActive.textContent = L.optActive;
+    T_NODES.optDesc.textContent = L.optDesc;
+    T_NODES.optActions.textContent = L.optActions;
+
+    T_NODES.dictFooter.textContent = L.dictFooter;
+
+    // status options text
+    T_NODES.statusActive.textContent = L.statusActive;
+    T_NODES.statusInactive.textContent = L.statusInactive;
+
+    renderSapModelSelects();
+    renderGroupTable();
+    if (overlay.classList.contains("show")) {
+      // refresh modal title language (if open)
+      refreshModalTitle();
+      renderSegments();
+      renderDictCodeOptions();
+      refreshPreview();
+    }
+  }
+
+  function refreshModalTitle(){
+    const L = t();
+    if (editing.mode === "new") modalTitle.textContent = L.modalNew;
+    else if (editing.mode === "edit") modalTitle.textContent = `${L.modalEdit}: ${editing.originalCode || ""}`;
+    else modalTitle.textContent = `${L.modalCopyFrom}${editing.originalCode || ""}`;
+  }
+
+  function clearStorage(){
+    localStorage.removeItem(STORE_KEY);
+    db = deepCopy(SEED);
+    saveDB();
+    renderAll();
+    showAlert("warn", t().msgCleared, t().msgCleared);
+  }
+
+  function seedStorage(){
+    db = deepCopy(SEED);
+    saveDB();
+    renderAll();
+    showAlert("ok", t().msgReset, t().msgReset);
+  }
+
+  function getGroupsList(){
+    const q = (searchEl.value || "").trim().toLowerCase();
+    const filter = filterEl.value;
+    const sapModelTop = getSapModelTop();
+
+    let items = Object.values(db.groups);
+
+    if (filter === "active") items = items.filter(g => !!g.active);
+    if (filter === "inactive") items = items.filter(g => !g.active);
+
+    if (sapModelTop && sapModelTop !== "ALL"){
+      items = items.filter(g => (g.sapModel || "SAP_MODEL_A") === sapModelTop);
+    }
+
+    if (q){
+      items = items.filter(g => {
+        const hay = `${g.code} ${g.label} ${g.note || ""} ${patternText(g)} ${(g.sapModel||"")}`.toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    items.sort((a,b)=> a.code.localeCompare(b.code));
+    return items;
+  }
+
+  function patternText(group){
+    const lens = (group.segments || []).map(s => s.length).join("-");
+    return lens || "-";
+  }
+
+  function sapModelLabel(key){
+    const m = SAP_MODELS.find(x=>x.key===key);
+    if (!m) return key || "-";
+    return getLang()==="zh" ? m.zh : m.en;
+  }
+
+  function renderAll(){
+    hideAlert();
+    renderSapModelSelects();
+    applyI18n();
+    renderGroupTable();
+  }
+
+  function renderGroupTable(){
+    const list = getGroupsList();
+    const L = t();
+
+    groupTbody.innerHTML = list.map(g => {
+      const statusChip = g.active
+        ? `<span class="chip">${escapeHtml(L.statusActive)}</span>`
+        : `<span class="chip" style="color:#b91c1c;border-color:#fecaca;background:#fef2f2;">${escapeHtml(L.statusInactive)}</span>`;
+
+      const actions = `
+        <button class="btn secondary small" onclick="UI.openEdit('${escapeAttr(g.code)}')">${escapeHtml(L.actEdit)}</button>
+        <button class="btn secondary small" onclick="UI.openCopy('${escapeAttr(g.code)}')">${escapeHtml(L.actCopy)}</button>
+        <button class="btn secondary small" onclick="UI.toggleActive('${escapeAttr(g.code)}')">${escapeHtml(g.active ? L.actDisable : L.actEnable)}</button>
+        <button class="btn danger small" onclick="UI.deleteGroup('${escapeAttr(g.code)}')">${escapeHtml(L.actDelete)}</button>
+      `;
+
+      return `
+        <tr>
+          <td class="mono" style="font-weight:900;">${escapeHtml(g.code)}</td>
+          <td>
+            <div style="font-weight:900;">${escapeHtml(g.label || "")}</div>
+            <div class="small">${escapeHtml(g.note || "")}</div>
+          </td>
+          <td>${escapeHtml(sapModelLabel(g.sapModel || "SAP_MODEL_A"))}</td>
+          <td class="mono">${escapeHtml(patternText(g))}</td>
+          <td class="mono">${escapeHtml(String(g.serialLen ?? ""))}</td>
+          <td>${statusChip}</td>
+          <td>${actions}</td>
+        </tr>
+      `;
+    }).join("");
+
+    if (!list.length){
+      groupTbody.innerHTML = `<tr><td colspan="7" class="muted">No result.</td></tr>`;
+    }
+  }
+
+  // ---------- Modal ----------
+  function openModal(){
+    overlay.classList.add("show");
+  }
+  function closeModal(){
+    overlay.classList.remove("show");
+    editing = { mode:"new", originalCode:null, group:null };
+  }
+
+  function setModalFromGroup(group){
+    gCode.value = group.code || "";
+    gActive.value = String(!!group.active);
+    gLabel.value = group.label || "";
+    gSerialLen.value = String(group.serialLen ?? 5);
+    gNote.value = group.note || "";
+    gSapModel.value = group.sapModel || defaultModalSapModel();
+    renderSegments();
+    renderDictCodeOptions();
+    refreshPreview();
+  }
+
+  function defaultModalSapModel(){
+    const top = getSapModelTop();
+    if (top && top !== "ALL") return top;
+    return "SAP_MODEL_A";
+  }
+
+  function normalizeGroup(group){
+    group.code = (group.code || "").trim();
+    group.label = (group.label || "").trim();
+    group.note = (group.note || "").trim();
+    group.serialLen = Number(group.serialLen || 0);
+    group.active = !!group.active;
+    group.sapModel = (group.sapModel || defaultModalSapModel()).trim();
+    group.segments = Array.isArray(group.segments) ? group.segments : [];
+    group.segments.forEach(s=>{
+      s.seq = Number(s.seq || 0);
+      s.code = (s.code || "").trim();
+      s.meaning = (s.meaning || "").trim();
+      s.length = Number(s.length || 0);
+      s.type = (s.type || "input").trim();
+      s.required = (s.required !== false);
+      if (s.type === "select"){
+        s.options = Array.isArray(s.options) ? s.options : [];
+        s.options = s.options.map(x=>String(x).trim()).filter(Boolean);
+      }else{
+        delete s.options;
+      }
+      if (s.type === "input"){
+        s.placeholder = (s.placeholder || "").trim();
+      }else{
+        delete s.placeholder;
+      }
+    });
+    return group;
+  }
+
+  function validateGroup(group){
+    const errs = [];
+    if (!group.code) errs.push("Group Code is required.");
+    if (!/^[A-Za-z0-9_-]+$/.test(group.code)) errs.push("Group Code should use letters/numbers/_/-.");
+    if (!group.label) errs.push("Label is required.");
+    if (!Number.isFinite(group.serialLen) || group.serialLen <= 0) errs.push("Serial Length must be a positive integer.");
+    if (!group.segments.length) errs.push("At least 1 segment is required.");
+
+    const codes = new Set();
+    group.segments.forEach((s, idx)=>{
+      if (!s.code) errs.push(`Segment#${idx+1} Code is required.`);
+      if (!s.meaning) errs.push(`Segment#${idx+1} Meaning is required.`);
+      if (!Number.isFinite(s.length) || s.length <= 0) errs.push(`Segment#${idx+1} Length must be positive.`);
+      if (!["select","input","system"].includes(s.type)) errs.push(`Segment#${idx+1} Type invalid.`);
+      if (codes.has(s.code) && s.code !== "SERIAL") errs.push(`Duplicate segment code: ${s.code}`);
+      codes.add(s.code);
+
+      if (s.type === "select"){
+        if (!Array.isArray(s.options) || !s.options.length) errs.push(`Segment ${s.code} is select but options empty.`);
+        (s.options||[]).forEach(o=>{
+          if (String(o).length !== s.length){
+            errs.push(`Segment ${s.code} option "${o}" length(${String(o).length}) != ${s.length}`);
+          }
+        });
+      }
+    });
+
+    const serialSeg = group.segments.find(x=>x.code === "SERIAL");
+    if (serialSeg && serialSeg.length !== group.serialLen){
+      errs.push(`SERIAL segment length(${serialSeg.length}) should equal Serial Length(${group.serialLen}).`);
+    }
+    return errs;
+  }
+
+  function renderSegments(){
+    const g = editing.group;
+    const L = t();
+
+    segTbody.innerHTML = (g.segments || []).map((s, idx)=>{
+      const typeOptions = `
+        <option value="select" ${s.type==="select"?"selected":""}>select</option>
+        <option value="input" ${s.type==="input"?"selected":""}>input</option>
+        <option value="system" ${s.type==="system"?"selected":""}>system</option>
+      `;
+
+      const optionsOrPlaceholder = (()=>{
+        if (s.type === "select"){
+          const val = (s.options || []).join(", ");
+          return `<input data-idx="${idx}" data-k="options" placeholder="e.g., 5,6,7" value="${escapeAttr(val)}" />`;
+        }
+        if (s.type === "input"){
+          return `<input data-idx="${idx}" data-k="placeholder" placeholder="e.g., 0" value="${escapeAttr(s.placeholder || "")}" />`;
+        }
+        return `<span class="muted">—</span>`;
+      })();
+
+      return `
+        <tr>
+          <td><input class="mono" data-idx="${idx}" data-k="seq" value="${escapeAttr(String(s.seq ?? idx+1))}" style="width:56px;padding:8px;border:1px solid var(--line);border-radius:8px;" /></td>
+          <td><input class="mono" data-idx="${idx}" data-k="code" value="${escapeAttr(s.code||"")}" style="width:160px;padding:8px;border:1px solid var(--line);border-radius:8px;" /></td>
+          <td><input data-idx="${idx}" data-k="meaning" value="${escapeAttr(s.meaning||"")}" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;" /></td>
+          <td><input class="mono" data-idx="${idx}" data-k="length" value="${escapeAttr(String(s.length||""))}" style="width:92px;padding:8px;border:1px solid var(--line);border-radius:8px;" /></td>
+          <td>
+            <select data-idx="${idx}" data-k="type" style="width:120px;padding:8px;border:1px solid var(--line);border-radius:8px;">
+              ${typeOptions}
+            </select>
+          </td>
+          <td>${optionsOrPlaceholder}</td>
+          <td>
+            <button class="btn secondary small" onclick="UI.moveSeg(${idx},-1)">${escapeHtml(L.up)}</button>
+            <button class="btn secondary small" onclick="UI.moveSeg(${idx},1)">${escapeHtml(L.down)}</button>
+            <button class="btn danger small" onclick="UI.removeSeg(${idx})">${escapeHtml(L.remove)}</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    segTbody.querySelectorAll("input,select").forEach(el=>{
+      el.addEventListener("input", onSegChange);
+      el.addEventListener("change", onSegChange);
+    });
+
+    renderDictCodeOptions();
+  }
+
+  function onSegChange(e){
+    const el = e.target;
+    const idx = Number(el.getAttribute("data-idx"));
+    const k = el.getAttribute("data-k");
+    const g = editing.group;
+    const s = g.segments[idx];
+    if (!s) return;
+
+    if (k === "seq") s.seq = Number(el.value || 0);
+    if (k === "code") s.code = (el.value || "").trim().toUpperCase();
+    if (k === "meaning") s.meaning = el.value || "";
+    if (k === "length") s.length = Number(el.value || 0);
+
+    if (k === "type"){
+      s.type = el.value;
+      if (s.type === "select"){
+        s.options = s.options || [];
+        delete s.placeholder;
+      } else if (s.type === "input"){
+        s.placeholder = s.placeholder || "";
+        delete s.options;
+      } else {
+        delete s.options;
+        delete s.placeholder;
+      }
+      renderSegments();
+    }
+
+    if (k === "options"){
+      const arr = (el.value || "").split(",").map(x=>x.trim()).filter(Boolean);
+      s.options = arr;
+      ensureDictForSegment(s);
+      renderDictCodeOptions();
+      renderDictTable();
+    }
+
+    if (k === "placeholder"){
+      s.placeholder = el.value || "";
+    }
+
+    ensureDictForSegment(s);
+    refreshPreview();
+  }
+
+  function ensureDictForSegment(seg){
+    if (seg.type !== "select") return;
+    const code = (seg.code || "").trim();
+    if (!code) return;
+    if (!db.dict[code]) db.dict[code] = { options:{} };
+    (seg.options || []).forEach(o=>{
+      if (!db.dict[code].options[o]){
+        db.dict[code].options[o] = { active:true, desc:"" };
+      }
+    });
+  }
+
+  function refreshPreview(){
+    const g = editing.group;
+    g.code = (gCode.value || "").trim().toUpperCase();
+    g.active = (gActive.value === "true");
+    g.label = (gLabel.value || "").trim();
+    g.serialLen = Number(gSerialLen.value || 0);
+    g.note = gNote.value || "";
+    g.sapModel = gSapModel.value || defaultModalSapModel();
+
+    const lens = (g.segments || []).map(s => s.length).join("-");
+    previewPattern.textContent = `PATTERN: ${lens || "-"}`;
+
+    const serialSeg = (g.segments||[]).find(s=>s.code==="SERIAL");
+    const serialLen = serialSeg ? serialSeg.length : (g.serialLen || 0);
+    const serial = serialLen ? "0".repeat(serialLen) : "";
+
+    let preview = "";
+    for (const s of (g.segments||[])){
+      if (s.type === "system"){
+        preview += (s.code === "SERIAL") ? serial : "X".repeat(Math.max(1, s.length||1));
+      } else if (s.type === "select"){
+        const code = s.code || "";
+        const options = s.options || [];
+        let picked = options[0] || "";
+        for (const o of options){
+          const st = db.dict?.[code]?.options?.[o]?.active;
+          if (st !== false){ picked = o; break; }
+        }
+        preview += picked || "?".repeat(Math.max(1, s.length||1));
+      } else {
+        const ph = (s.placeholder || "").trim();
+        preview += ph ? ph.padEnd(s.length, "0").slice(0,s.length) : "0".repeat(Math.max(1, s.length||1));
+      }
+    }
+    previewPartNo.textContent = `PREVIEW: ${preview || "-"}`;
+
+    renderDictCodeOptions();
+    renderDictTable();
+  }
+
+  function renderDictCodeOptions(){
+    const g = editing.group;
+    const codes = new Set();
+    (g?.segments || []).forEach(s=>{
+      if (s.type === "select" && s.code) codes.add(s.code);
+    });
+
+    const arr = Array.from(codes).sort();
+    if (!arr.length){
+      dictCode.innerHTML = `<option value="">(No select segment)</option>`;
+      dictCode.disabled = true;
+      btnAddOption.disabled = true;
+      dictTbody.innerHTML = `<tr><td colspan="4" class="muted">No dictionary items.</td></tr>`;
+      return;
+    }
+    dictCode.disabled = false;
+    btnAddOption.disabled = false;
+
+    const curr = dictCode.value;
+    dictCode.innerHTML = arr.map(c=>`<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`).join("");
+    if (arr.includes(curr)) dictCode.value = curr;
+  }
+
+  function renderDictTable(){
+    if (dictCode.disabled) return;
+    const code = dictCode.value;
+    if (!code){
+      dictTbody.innerHTML = `<tr><td colspan="4" class="muted">No dictionary items.</td></tr>`;
+      return;
+    }
+    if (!db.dict[code]) db.dict[code] = { options:{} };
+
+    const entries = Object.entries(db.dict[code].options || {});
+    entries.sort((a,b)=> a[0].localeCompare(b[0]));
+    const L = t();
+
+    if (!entries.length){
+      dictTbody.innerHTML = `<tr><td colspan="4" class="muted">No options for ${escapeHtml(code)}.</td></tr>`;
+      return;
+    }
+
+    dictTbody.innerHTML = entries.map(([opt, meta])=>{
+      const checked = meta.active !== false ? "checked" : "";
+      const statusText = meta.active !== false ? (getLang()==="zh" ? "啟用" : "Enabled") : (getLang()==="zh" ? "停用" : "Disabled");
+      return `
+        <tr>
+          <td class="mono" style="font-weight:900;">${escapeHtml(opt)}</td>
+          <td>
+            <label class="row" style="gap:8px;">
+              <input type="checkbox" ${checked} onchange="UI.toggleOption('${escapeAttr(code)}','${escapeAttr(opt)}', this.checked)" />
+              <span class="small">${escapeHtml(statusText)}</span>
+            </label>
+          </td>
+          <td>
+            <input value="${escapeAttr(meta.desc || "")}" placeholder="description..." style="width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;"
+              oninput="UI.editOptionDesc('${escapeAttr(code)}','${escapeAttr(opt)}', this.value)" />
+          </td>
+          <td>
+            <button class="btn danger small" onclick="UI.removeOption('${escapeAttr(code)}','${escapeAttr(opt)}')">${escapeHtml(L.actDelete)}</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  // Public actions
+  window.UI = {
+    openEdit(code){
+      const g = db.groups[code];
+      if (!g){
+        showAlert("bad","Not Found",`Group ${code} not found.`);
+        return;
+      }
+      editing.mode = "edit";
+      editing.originalCode = code;
+      editing.group = deepCopy(g);
+      refreshModalTitle();
+      setModalFromGroup(editing.group);
+      openModal();
+    },
+    openCopy(code){
+      const g = db.groups[code];
+      if (!g){
+        showAlert("bad","Not Found",`Group ${code} not found.`);
+        return;
+      }
+      editing.mode = "copy";
+      editing.originalCode = code;
+      editing.group = deepCopy(g);
+      editing.group.code = "";
+      refreshModalTitle();
+      setModalFromGroup(editing.group);
+      openModal();
+    },
+    toggleActive(code){
+      const g = db.groups[code];
+      if (!g) return;
+      g.active = !g.active;
+      saveDB();
+      renderGroupTable();
+      showAlert("ok", t().msgSaved, `${code} → ${g.active ? t().statusActive : t().statusInactive}`);
+    },
+    deleteGroup(code){
+      if (!db.groups[code]) return;
+      const ok = confirm(`Delete group ${code}?`);
+      if (!ok) return;
+      delete db.groups[code];
+      saveDB();
+      renderGroupTable();
+      showAlert("warn", t().msgDeleted, `${t().msgDeleted}: ${code}`);
+    },
+    moveSeg(idx, delta){
+      const segs = editing.group.segments;
+      const ni = idx + delta;
+      if (ni < 0 || ni >= segs.length) return;
+      const tmp = segs[idx];
+      segs[idx] = segs[ni];
+      segs[ni] = tmp;
+      renderSegments();
+      refreshPreview();
+    },
+    removeSeg(idx){
+      const segs = editing.group.segments;
+      segs.splice(idx,1);
+      renderSegments();
+      refreshPreview();
+    },
+    toggleOption(code,opt,on){
+      if (!db.dict[code]) db.dict[code] = { options:{} };
+      if (!db.dict[code].options[opt]) db.dict[code].options[opt] = { active:true, desc:"" };
+      db.dict[code].options[opt].active = !!on;
+      saveDB();
+      refreshPreview();
+    },
+    editOptionDesc(code,opt,val){
+      if (!db.dict[code]) db.dict[code] = { options:{} };
+      if (!db.dict[code].options[opt]) db.dict[code].options[opt] = { active:true, desc:"" };
+      db.dict[code].options[opt].desc = val || "";
+      saveDB();
+    },
+    removeOption(code,opt){
+      const ok = confirm(`Delete option ${opt} under ${code}?`);
+      if (!ok) return;
+      if (db.dict?.[code]?.options?.[opt]) delete db.dict[code].options[opt];
+
+      // remove from current editing group segment options
+      const g = editing.group;
+      (g.segments||[]).forEach(s=>{
+        if (s.type==="select" && s.code===code){
+          s.options = (s.options||[]).filter(x=>x!==opt);
+        }
+      });
+
+      saveDB();
+      renderSegments();
+      refreshPreview();
+    }
+  };
+
+  // Events
+  btnNewGroup.addEventListener("click", ()=>{
+    editing.mode = "new";
+    editing.originalCode = null;
+
+    // default group uses top SAP model (if not ALL, otherwise Model A)
+    const defaultSapModel = defaultModalSapModel();
+
+    editing.group = {
+      code:"",
+      sapModel: defaultSapModel,
+      label:"",
+      note:"",
+      serialLen:5,
+      active:true,
+      segments:[
+        {seq:1, code:"IDENT", meaning:"識別碼", length:1, type:"select", options:["5","6","7"], required:true},
+        {seq:2, code:"PART", meaning:"零件類型", length:2, type:"select", options:["A0","B0","C0"], required:true},
+        {seq:3, code:"CUST", meaning:"客戶碼", length:2, type:"select", options:["00","01","02"], required:true},
+        {seq:4, code:"RSV", meaning:"預留碼", length:1, type:"input", placeholder:"0", required:true},
+        {seq:5, code:"SERIAL", meaning:"流水碼（系統產生）", length:5, type:"system", required:true}
+      ]
+    };
+
+    refreshModalTitle();
+    setModalFromGroup(editing.group);
+    openModal();
+  });
+
+  btnClose.addEventListener("click", closeModal);
+
+  [gCode,gActive,gLabel,gSerialLen,gNote,gSapModel].forEach(el=>{
+    el.addEventListener("input", refreshPreview);
+    el.addEventListener("change", refreshPreview);
+  });
+
+  btnAddSeg.addEventListener("click", ()=>{
+    const segs = editing.group.segments;
+    const next = segs.length + 1;
+    segs.push({seq:next, code:"", meaning:"", length:1, type:"input", placeholder:"", required:true});
+    renderSegments();
+    refreshPreview();
+  });
+
+  btnReSeq.addEventListener("click", ()=>{
+    (editing.group.segments||[]).forEach((s,i)=> s.seq = i+1);
+    renderSegments();
+    refreshPreview();
+  });
+
+  dictCode.addEventListener("change", renderDictTable);
+
+  btnAddOption.addEventListener("click", ()=>{
+    if (dictCode.disabled) return;
+    const code = dictCode.value;
+    const opt = prompt(`Add new option for ${code}:`, "");
+    if (!opt) return;
+    const o = opt.trim();
+    if (!o) return;
+
+    if (!db.dict[code]) db.dict[code] = { options:{} };
+    if (db.dict[code].options[o]){
+      showAlert("warn","Exists",`${code} option "${o}" already exists.`);
+      return;
+    }
+    db.dict[code].options[o] = { active:true, desc:"" };
+    saveDB();
+
+    // also add to current segment options
+    const g = editing.group;
+    (g.segments||[]).forEach(s=>{
+      if (s.type==="select" && s.code===code){
+        s.options = s.options || [];
+        if (!s.options.includes(o)) s.options.push(o);
+      }
+    });
+
+    renderSegments();
+    refreshPreview();
+  });
+
+  btnSave.addEventListener("click", ()=>{
+    refreshPreview();
+
+    const g = normalizeGroup(deepCopy(editing.group));
+    const errs = validateGroup(g);
+    if (errs.length){
+      showAlert("bad","Save Failed", errs[0], errs.length>1 ? `+${errs.length-1} more issues.` : "");
+      return;
+    }
+
+    if (editing.mode !== "edit"){
+      if (db.groups[g.code]){
+        showAlert("bad","Save Failed",`Group Code "${g.code}" already exists.`);
+        return;
+      }
+    } else {
+      if (editing.originalCode !== g.code && db.groups[g.code]){
+        showAlert("bad","Save Failed",`Group Code "${g.code}" already exists.`);
+        return;
+      }
+    }
+
+    (g.segments||[]).forEach(s=> ensureDictForSegment(s));
+
+    if (editing.mode === "edit" && editing.originalCode && editing.originalCode !== g.code){
+      delete db.groups[editing.originalCode];
+    }
+    db.groups[g.code] = g;
+
+    saveDB();
+    renderGroupTable();
+    closeModal();
+    showAlert("ok", t().msgSaved, `${t().msgSaved}: ${g.code}`, `SAP Model: ${sapModelLabel(g.sapModel)}`);
+  });
+
+  btnExport.addEventListener("click", ()=>{
+    const blob = new Blob([JSON.stringify(db, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "attribute_groups.json";
+    a.click();
+    URL.revokeObjectURL(url);
+    showAlert("ok", t().msgExported, t().msgExported);
+  });
+
+  btnImport.addEventListener("click", ()=>{
+    fileInput.value = "";
+    fileInput.click();
+  });
+
+  fileInput.addEventListener("change", async ()=>{
+    const f = fileInput.files?.[0];
+    if (!f) return;
+    try{
+      const text = await f.text();
+      const parsed = JSON.parse(text);
+      if (!parsed.groups || !parsed.dict) throw new Error("Invalid structure: need {groups, dict}");
+      if (!parsed.settings) parsed.settings = deepCopy(SEED.settings);
+      db = parsed;
+      saveDB();
+      renderAll();
+      showAlert("ok", t().msgImported, t().msgImported);
+    }catch(err){
+      showAlert("bad", "Import Failed", String(err?.message || err));
+    }
+  });
+
+  btnSeed.addEventListener("click", ()=>{
+    const ok = confirm("Reset to demo data? This will overwrite localStorage.");
+    if (!ok) return;
+    seedStorage();
+  });
+  btnClear.addEventListener("click", ()=>{
+    const ok = confirm("Clear storage? This will reset to demo.");
+    if (!ok) return;
+    clearStorage();
+  });
+
+  searchEl.addEventListener("input", renderGroupTable);
+  filterEl.addEventListener("change", renderGroupTable);
+
+  // language change
+  langSel.addEventListener("change", ()=>{
+    db.settings.lang = langSel.value;
+    saveDB();
+    applyI18n();
+  });
+
+  // sap model top filter
+  sapModelTopSel.addEventListener("change", ()=>{
+    db.settings.sapModelTop = sapModelTopSel.value;
+    saveDB();
+    renderGroupTable();
+  });
+
+  // utils
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+  }
+  function escapeAttr(s){
+    return escapeHtml(s).replaceAll("\n"," ");
+  }
+
+  // Init
+  saveDB();
+  // load saved settings into selects
+  langSel.value = getLang();
+  renderSapModelSelects();
+  applyI18n();
+  renderGroupTable();
+
+  // expose for debugging
+  window.__ATTR_DB__ = ()=> db;
+</script>
+</body>
+</html>
