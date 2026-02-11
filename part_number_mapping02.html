@@ -468,8 +468,8 @@
       chipA: "本系統產生料號 → 寫入 SAP（模擬）",
       chipB: "含「屬性定義值」異動驗證",
       creationMethod: "建立方式",
-      optBlank: "A. 新增空白資料",
-      optCopy: "B. 複製既有 BOM",
+      optBlank: "A. 建立全新品號",
+      optCopy: "B. 複製現有品號",
       existingBom: "既有 BOM（複製用）",
       optSelectBom: "-- 選擇 BOM --",
       attrGroup: "屬性組",
@@ -501,7 +501,7 @@
       initHintTitle: "提示",
       initHintMsg: "這是本地可開啟的原型（純前端）。Confirm 會依屬性組規則產生流水碼與新料號，並模擬寫入 SAP。",
       modeBlankMsg: "目前為「新增空白」模式。請選擇屬性組、填寫屬性值與品名後按 Confirm。",
-      modeCopyMsg: "目前為「複製既有 BOM」模式。請先選擇 Existing BOM 以預帶資料。",
+      modeCopyMsg: "目前為「複製現有品號 BOM」模式。請先選擇 Existing BOM 以預帶資料。",
       copiedTitle: "已預帶資料",
       copiedHint: "若你修改 Attribute Group，系統會清空屬性值並要求重選。",
       groupChangedTitle: "屬性組已變更",
@@ -596,7 +596,7 @@
     "GRP-A": {
       label: "GRP-A（1-2-2-1-5）",
       segments: [
-        { seq: 1, code: "IDENT", meaning: "識別碼", length: 1, type: "select", options: ["5","6","7"], required:true },
+        { seq: 1, code: "IDENT", meaning: "識別碼", length: 1, type: "select", options: ["5-手機","6-平板","7"], required:true },
         { seq: 2, code: "PART", meaning: "零件類型", length: 2, type: "select", options: ["A0","B0","C0"], required:true },
         { seq: 3, code: "CUST", meaning: "客戶碼", length: 2, type: "select", options: ["00","01","02"], required:true },
         { seq: 4, code: "RSV",  meaning: "預留碼", length: 1, type: "input",  placeholder:"0", required:true },
@@ -607,7 +607,7 @@
     "GRP-B": {
       label: "GRP-B（1-2-2-1-4）",
       segments: [
-        { seq: 1, code: "IDENT", meaning: "識別碼", length: 1, type: "select", options: ["5","6","7"], required:true },
+        { seq: 1, code: "IDENT", meaning: "識別碼", length: 1, type: "select", options: ["5-手機","6-平板","7"], required:true },
         { seq: 2, code: "PART", meaning: "零件類型", length: 2, type: "select", options: ["A0","B0","C0"], required:true },
         { seq: 3, code: "CUST", meaning: "客戶碼", length: 2, type: "select", options: ["00","01","02"], required:true },
         { seq: 4, code: "RSV",  meaning: "預留碼", length: 1, type: "input",  placeholder:"0", required:true },
@@ -618,7 +618,7 @@
   };
 
   const OPTION_STATUS = {
-    IDENT: { "5": true, "6": true, "7": true },
+    IDENT: { "5-手機": true, "6-平板": true, "7": true },
     PART:  { "A0": true, "B0": true, "C0": true },
     CUST:  { "00": true, "01": true, "02": true }
   };
@@ -626,19 +626,19 @@
   const BOM_PRESETS = {
     "BOM-1001": {
       attrGroup: "GRP-A",
-      values: { IDENT:"5", PART:"A0", CUST:"01", RSV:"0" },
+      values: { IDENT:"5-手機", PART:"A0", CUST:"01", RSV:"0" },
       partName: "Model A",
       partSpec: "24\" x 12.5\" / Korea"
     },
     "BOM-1002": {
       attrGroup: "GRP-A",
-      values: { IDENT:"5", PART:"A0", CUST:"01", RSV:"0" },
+      values: { IDENT:"5-手機", PART:"A0", CUST:"01", RSV:"0" },
       partName: "Model A (Rev.B)",
       partSpec: "24\" x 12.5\" / Korea / ECN"
     },
     "BOM-2001": {
       attrGroup: "GRP-B",
-      values: { IDENT:"6", PART:"B0", CUST:"02", RSV:"0" },
+      values: { IDENT:"6-平板", PART:"B0", CUST:"02", RSV:"0" },
       partName: "Model B",
       partSpec: "Vietnam line"
     }
