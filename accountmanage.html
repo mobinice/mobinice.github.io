@@ -541,11 +541,11 @@
       </div>
       <div class="modal-body">
         <div class="field">
-          <label>新密碼</label>
+          <label id="lbNewPwd">新密碼</label>
           <input id="fNewPwd" type="password" class="input" style="width:100%" placeholder="請輸入新密碼" />
         </div>
         <div class="field">
-          <label>確認新密碼</label>
+          <label id="lbConfirmPwd">確認新密碼</label>
           <input id="fConfirmPwd" type="password" class="input" style="width:100%" placeholder="請再次輸入新密碼" />
         </div>
         <div id="pwdError" style="color:var(--danger);font-size:12px;display:none;margin-top:4px;"></div>
@@ -570,6 +570,25 @@
       <div class="modal-body">
         <ul id="scopeViewList"
             style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 確認 Dialog -->
+  <div class="overlay" id="confirmOverlay" role="dialog" aria-modal="true">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-head">
+        <div class="modal-title">
+          <h2 id="confirmTitle">確認</h2>
+        </div>
+        <button class="btn secondary small" id="btnConfirmClose" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMsg" style="margin:0;font-size:14px;line-height:1.6"></p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn secondary" id="btnConfirmCancel" type="button">取消</button>
+        <button class="btn danger" id="btnConfirmOk" type="button">確認</button>
       </div>
     </div>
   </div>
@@ -600,29 +619,79 @@
         edit: "編輯", disable: "停用", enable: "啟用", resetPwd: "重設密碼",
         modalCreate: "新增帳號", modalEdit: "編輯帳號", modalHint: "直接設定客戶代碼與登入密碼。",
         secBasic: "基本資料", lbCustCode: "客戶代碼 *", lbPassword: "密碼 *", lbEmail: "聯絡 Email",
-        lbOrg: "公司/單位 *", lbType: "類型 *", lbContactName: "聯絡人", secScope: "BOM 權限範圍",
+        lbOrg: "公司/單位 *", lbType: "類型 *", lbContactName: "聯絡人", secScope: "BOM 權限範圍（必填）",
         previewPrefix: "權限概覽：", previewEmpty: "至少需設定一種範圍",
         msgSaved: "帳號已儲存", msgDisabled: "已停用", msgEnabled: "已啟用",
         msgPwdUpdated: "密碼已更新", confirmReset: "請輸入新密碼：",
         save: "保存",
         errRequired: "請填寫必填欄位", errUnique: "此代碼帳號已存在", errScope: "請設定權限範圍",
         viewScope: "查看",
+        delete: "刪除",
+        confirmDeleteTitle: "確認刪除", confirmDeleteMsg: "確定要刪除此帳號？此動作無法復原。",
+        confirmDisableTitle: "確認停用", confirmDisableMsg: "確定要停用此帳號？",
+        msgDeleted: "帳號已刪除",
+        hintCustCode: "由 SAP 資料自動帶入",
+        fPasswordPH: "請設定初始密碼", fOrgPH: "系統自動帶入或手動輸入",
+        fOptionalPH: "非必填", fNotesPH: "額外記錄欄位",
+        lbNotes: "備註 (Memo)", lbEnabled: "初始狀態",
+        scopeSearchPH: "輸入關鍵字搜尋 BOM 權限...",
+        cancel: "取消",
+        pwdModalTitle: "重設密碼",
+        lbNewPwd: "新密碼", lbConfirmPwd: "確認新密碼",
+        fNewPwdPH: "請輸入新密碼", fConfirmPwdPH: "請再次輸入新密碼",
+        confirm: "確認",
+        errPwdEmpty: "密碼不可為空", errPwdMismatch: "兩次密碼不一致",
+        itemsSelected: "項已選",
+        scopeViewTitle: "BOM 權限範圍",
         countHint: (n, total)=>`顯示 ${n} / ${total} 筆`
       },
       en: {
-        pageTitle: "Account Management (SAP Code)",
+        pageTitle: "Account Management",
         pageSubtitle: "Admin sets accounts based on SAP codes. Email is optional info.",
         exportCSV: "Export CSV", create: "+ Create",
         searchPH: "Search code / org", clear: "Clear", search: "Search",
         statusAll: "All status", statusEnabled: "Enabled", statusDisabled: "Disabled",
         typeAll: "All types", thStatus: "Status", thCustCode: "Customer Code",
+        thOrg: "Org / Unit", thType: "Type", thScope: "BOM Scope",
+        thLastLogin: "Last Login", thCreatedAt: "Created At",
         thInfo: "Info (Memo)", thActions: "Actions", never: "—",
-        edit: "Edit", resetPwd: "Reset PWD",
-        modalCreate: "New Account", lbCustCode: "Customer Code *", lbPassword: "Password *",
+        enabled: "Enabled", disabled: "Disabled",
+        customer: "Customer", vendor: "Vendor",
+        typeCustomer: "Customer", typeVendor: "Vendor",
+        edit: "Edit", disable: "Disable", enable: "Enable", resetPwd: "Reset PWD",
+        delete: "Delete",
+        modalCreate: "New Account", modalEdit: "Edit Account",
+        modalHint: "Set SAP code credentials and BOM permissions.",
+        secBasic: "Basic Info",
+        lbCustCode: "Customer Code *", lbPassword: "Password *",
+        lbEmail: "Contact Email", lbOrg: "Org / Unit *", lbType: "Type *",
+        lbContactName: "Contact Name",
+        secScope: "BOM Scope (required)", previewEmpty: "At least one scope required",
         msgSaved: "Saved", msgPwdUpdated: "Password updated", confirmReset: "Enter new password:",
+        msgDisabled: "Account disabled", msgEnabled: "Account enabled",
+        msgDeleted: "Account deleted",
+        previewPrefix: "Scope preview:",
+        hintCustCode: "Auto-filled from SAP data",
+        fPasswordPH: "Set initial password", fOrgPH: "Auto-filled or enter manually",
+        fOptionalPH: "Optional", fNotesPH: "Additional notes",
+        lbNotes: "Notes (Memo)", lbEnabled: "Initial Status",
+        scopeSearchPH: "Search BOM permissions...",
+        cancel: "Cancel",
+        pwdModalTitle: "Reset Password",
+        lbNewPwd: "New Password", lbConfirmPwd: "Confirm Password",
+        fNewPwdPH: "Enter new password", fConfirmPwdPH: "Re-enter new password",
+        confirm: "Confirm",
+        errPwdEmpty: "Password cannot be empty", errPwdMismatch: "Passwords do not match",
+        itemsSelected: "items selected",
+        scopeViewTitle: "BOM Scope",
         save: "Save",
         errRequired: "Required fields missing", errScope: "Scope required",
+        errUnique: "This SAP code already exists",
         viewScope: "View",
+        confirmDeleteTitle: "Confirm Delete",
+        confirmDeleteMsg: "Are you sure you want to delete this account? This cannot be undone.",
+        confirmDisableTitle: "Confirm Disable",
+        confirmDisableMsg: "Are you sure you want to disable this account?",
         countHint: (n, total)=>`Showing ${n} / ${total}`
       }
     };
@@ -668,10 +737,12 @@
         ? scope.selected.length
         : (scope.orgIds?.length||0) + (scope.bomIds?.length||0) + (scope.prefix?1:0);
       if(!count) return `<span class="muted">${I18N[state.lang].previewEmpty||"—"}</span>`;
-      return `<div class="mono" style="font-size:11px">&#x2713; ${count} 項已選</div>`;
+      return `<div class="mono" style="font-size:11px">&#x2713; ${count} ${I18N[state.lang].itemsSelected}</div>`;
     }
 
     function applyI18n(){
+      $("#btnZH").classList.toggle("active", state.lang === "zh");
+      $("#btnEN").classList.toggle("active", state.lang === "en");
       $("#pageTitle").textContent = t("pageTitle");
       $("#pageSubtitle").textContent = t("pageSubtitle");
       $("#btnExport").textContent = t("exportCSV");
@@ -687,6 +758,33 @@
       $("#lbEmail").textContent = t("lbEmail");
       $("#lbOrg").textContent = t("lbOrg");
       $("#btnSave").textContent = t("save");
+      $("#scopeViewTitle").textContent = t("scopeViewTitle");
+      // 帳號 Modal
+      $("#modalHint").textContent = t("modalHint");
+      $("#secBasic").textContent = t("secBasic");
+      $("#hintCustCode").textContent = t("hintCustCode");
+      $("#lbType").textContent = t("lbType");
+      $("#fType").innerHTML = `<option value="customer">${t("typeCustomer")}</option><option value="vendor">${t("typeVendor")}</option>`;
+      $("#lbContactName").textContent = t("lbContactName");
+      $("#lbNotes").textContent = t("lbNotes");
+      $("#lbEnabled").textContent = t("lbEnabled");
+      $("#fEnabled").innerHTML = `<option value="enabled">${t("enabled")}</option><option value="disabled">${t("disabled")}</option>`;
+      $("#secScope").textContent = t("secScope");
+      $("#scopeSearchInput").placeholder = t("scopeSearchPH");
+      $("#fPassword").placeholder = t("fPasswordPH");
+      $("#fOrg").placeholder = t("fOrgPH");
+      $("#fEmail").placeholder = t("fOptionalPH");
+      $("#fContactName").placeholder = t("fOptionalPH");
+      $("#fNotes").placeholder = t("fNotesPH");
+      $("#btnCancel").textContent = t("cancel");
+      // 重設密碼 Modal
+      $("#pwdModalTitle").textContent = t("pwdModalTitle");
+      $("#lbNewPwd").textContent = t("lbNewPwd");
+      $("#lbConfirmPwd").textContent = t("lbConfirmPwd");
+      $("#fNewPwd").placeholder = t("fNewPwdPH");
+      $("#fConfirmPwd").placeholder = t("fConfirmPwdPH");
+      $("#btnPwdCancel").textContent = t("cancel");
+      $("#btnPwdConfirm").textContent = t("confirm");
     }
 
     function renderTable(){
@@ -723,6 +821,8 @@
               <div class="row-actions">
                 <button class="btn secondary small" data-act="edit" data-id="${a.id}">${t("edit")}</button>
                 <button class="btn secondary small" data-act="pwd" data-id="${a.id}">${t("resetPwd")}</button>
+                <button class="btn secondary small" data-act="toggle" data-id="${a.id}">${a.status==="enabled"?t("disable"):t("enable")}</button>
+                <button class="btn danger small" data-act="delete" data-id="${a.id}">${t("delete")}</button>
               </div>
             </td>
           </tr>
@@ -740,6 +840,21 @@
             $("#fConfirmPwd").value = "";
             $("#pwdError").style.display = "none";
             $("#pwdOverlay").classList.add("show");
+          }
+          if(btn.dataset.act==="toggle") {
+            if(acc.status === "enabled") {
+              openConfirm(t("confirmDisableTitle"), t("confirmDisableMsg"), ()=>{
+                acc.status = "disabled"; renderTable(); toast(t("msgDisabled"));
+              });
+            } else {
+              acc.status = "enabled"; renderTable(); toast(t("msgEnabled"));
+            }
+          }
+          if(btn.dataset.act==="delete") {
+            openConfirm(t("confirmDeleteTitle"), t("confirmDeleteMsg"), ()=>{
+              state.accounts = state.accounts.filter(a=>a.id!==id);
+              renderTable(); toast(t("msgDeleted"));
+            });
           }
         };
       });
@@ -790,6 +905,7 @@
     function openModal(mode, acc=null){
       state.editingId = mode==="edit" ? acc.id : null;
       $("#overlay").classList.add("show");
+      $("#modalTitle").textContent = t(mode==="edit" ? "modalEdit" : "modalCreate");
       $("#fCustCode").innerHTML = sapCustomers.map(c=>`<option value="${c.code}" data-name="${c.name}">${c.code} (${c.name})</option>`).join("");
       
       if(mode==="edit"){
@@ -797,6 +913,7 @@
         $("#fPassword").value = "********"; $("#fPassword").disabled = true; // 編輯時不改密碼，用重設功能
         $("#fOrg").value = acc.org; $("#fEmail").value = acc.email;
         $("#fContactName").value = acc.contactName;
+        $("#fNotes").value = acc.notes || "";
         const sel = acc.scope.selected
           ? new Set(acc.scope.selected)
           : new Set([...(acc.scope.orgIds||[]), ...(acc.scope.bomIds||[])]);
@@ -806,6 +923,7 @@
       } else {
         $("#fCustCode").disabled = false; $("#fPassword").disabled = false;
         $("#fPassword").value = ""; $("#fOrg").value = ""; $("#fEmail").value = ""; $("#fContactName").value = "";
+        $("#fNotes").value = "";
         state.draftScope = { selected: new Set() };
       }
       renderScopeTags();
@@ -821,11 +939,13 @@
 
       if(!code || (!state.editingId && !pwd) || !org) return toast(t("errRequired"));
       if(!hasScope) return toast(t("errScope"));
+      if(!state.editingId && state.accounts.some(a => a.custCode === code)) return toast(t("errUnique"));
 
       if(state.editingId){
         const acc = state.accounts.find(a=>a.id===state.editingId);
         acc.org = org; acc.email = $("#fEmail").value;
         acc.contactName = $("#fContactName").value;
+        acc.notes = $("#fNotes").value;
         acc.scope = { selected: [...state.draftScope.selected] };
         acc.status = $("#fEnabled").value;
         acc.type = $("#fType").value;
@@ -833,6 +953,7 @@
         state.accounts.unshift({
           id: crypto.randomUUID(), status: $("#fEnabled").value, type: $("#fType").value, custCode:code, password:pwd,
           org, email: $("#fEmail").value, contactName: $("#fContactName").value,
+          notes: $("#fNotes").value,
           scope: { selected: [...state.draftScope.selected] },
           lastLogin: "—", createdAt: "2026-02-11 23:00"
         });
@@ -932,6 +1053,77 @@
 
     $("#btnScopeViewClose").onclick = ()=> $("#scopeViewOverlay").classList.remove("show");
 
+    // ── CSV 匯出 ──────────────────────────────────────────────────────────────
+    $("#btnExport").onclick = ()=>{
+      const cols = ["Status","CustCode","Org","Type","Email","ContactName","LastLogin","CreatedAt"];
+      const header = cols.join(",");
+      const rows = state.accounts.map(a=>[
+        a.status, a.custCode, `"${(a.org||"").replace(/"/g,'""')}"`,
+        a.type, a.email||"", `"${(a.contactName||"").replace(/"/g,'""')}"`,
+        a.lastLogin, a.createdAt
+      ].join(","));
+      const csv = [header, ...rows].join("\r\n");
+      const blob = new Blob(["\uFEFF"+csv], { type:"text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const today = new Date();
+      const d = today.getFullYear().toString()
+        + String(today.getMonth()+1).padStart(2,"0")
+        + String(today.getDate()).padStart(2,"0");
+      a.href = url; a.download = `accounts-${d}.csv`;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+    };
+
+    // ── 確認 Dialog ───────────────────────────────────────────────────────────
+    let _confirmCallback = null;
+    function openConfirm(title, msg, okCallback){
+      $("#confirmTitle").textContent = title;
+      $("#confirmMsg").textContent = msg;
+      _confirmCallback = okCallback;
+      $("#confirmOverlay").classList.add("show");
+      $("#btnConfirmOk").focus();
+    }
+    function closeConfirm(){
+      $("#confirmOverlay").classList.remove("show");
+      _confirmCallback = null;
+    }
+    $("#btnConfirmClose").onclick = closeConfirm;
+    $("#btnConfirmCancel").onclick = closeConfirm;
+    $("#btnConfirmOk").onclick = ()=>{
+      const cb = _confirmCallback;
+      closeConfirm();
+      if(cb) cb();
+    };
+
+    // ── ESC 鍵關閉 Modal ──────────────────────────────────────────────────────
+    document.addEventListener("keydown", e=>{
+      if(e.key !== "Escape") return;
+      if($("#confirmOverlay").classList.contains("show")){ closeConfirm(); return; }
+      if($("#overlay").classList.contains("show")){ $("#overlay").classList.remove("show"); return; }
+      if($("#pwdOverlay").classList.contains("show")){ $("#pwdOverlay").classList.remove("show"); state.resetingId=null; return; }
+      if($("#scopeViewOverlay").classList.contains("show")){ $("#scopeViewOverlay").classList.remove("show"); return; }
+    });
+
+    // ── Focus Trap ────────────────────────────────────────────────────────────
+    function trapFocus(modalEl){
+      modalEl.addEventListener("keydown", e=>{
+        if(e.key !== "Tab") return;
+        const focusable = Array.from(modalEl.querySelectorAll(
+          'button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled])'
+        )).filter(el=>el.offsetParent !== null);
+        if(!focusable.length){ e.preventDefault(); return; }
+        const first = focusable[0], last = focusable[focusable.length-1];
+        if(e.shiftKey){
+          if(document.activeElement === first){ e.preventDefault(); last.focus(); }
+        } else {
+          if(document.activeElement === last){ e.preventDefault(); first.focus(); }
+        }
+      });
+    }
+    [$("#overlay .modal"), $("#pwdOverlay .modal"), $("#scopeViewOverlay .modal"), $("#confirmOverlay .modal")]
+      .forEach(m=>{ if(m) trapFocus(m); });
+
     // 重設密碼 modal 事件
     $("#btnPwdClose").onclick = $("#btnPwdCancel").onclick = ()=>{
       $("#pwdOverlay").classList.remove("show");
@@ -941,8 +1133,8 @@
       const p1 = $("#fNewPwd").value;
       const p2 = $("#fConfirmPwd").value;
       const errEl = $("#pwdError");
-      if(!p1){ errEl.textContent = "密碼不可為空"; errEl.style.display = "block"; return; }
-      if(p1 !== p2){ errEl.textContent = "兩次密碼不一致"; errEl.style.display = "block"; return; }
+      if(!p1){ errEl.textContent = t("errPwdEmpty"); errEl.style.display = "block"; return; }
+      if(p1 !== p2){ errEl.textContent = t("errPwdMismatch"); errEl.style.display = "block"; return; }
       const acc = state.accounts.find(x=>x.id===state.resetingId);
       if(acc) acc.password = p1;
       $("#pwdOverlay").classList.remove("show");
