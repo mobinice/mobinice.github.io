@@ -9,6 +9,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
+        /* 強制保留垂直滾動條，徹底防止切換分頁時的版面左右跳動 */
+        html { overflow-y: scroll; }
+
         :root {
             /* 預設熊貓主題 */
             --primary: #3b82f6;
@@ -19,6 +22,7 @@
             --primary-alpha: rgba(59, 130, 246, 0.15);
             --card-bg: rgba(255, 255, 255, 0.03);
             --card-border: rgba(255, 255, 255, 0.08);
+            --table-border: rgba(255, 255, 255, 0.04);
         }
 
         body {
@@ -29,7 +33,6 @@
             transition: background 0.8s ease, color 0.3s ease;
             background-attachment: fixed;
             overflow-x: hidden;
-            overflow-y: scroll; /* 強制保留垂直滾動條，防止切換分頁時版面跳動 */
         }
 
         /* 品牌工具類 */
@@ -137,10 +140,14 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* 滑鼠拖拉專用 */
+        #theme-scroll-container { cursor: grab; }
+        #theme-scroll-container:active { cursor: grabbing; }
+
         /* 淺色模式 (如日本主題) 適配修正 */
-        .is-light-theme { color: #0f172a; }
+        .is-light-theme { color: #0f172a; --table-border: rgba(0, 0, 0, 0.08); }
         .is-light-theme .glass-card { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .is-light-theme .glass-card:hover { border-color: var(--primary); box-shadow: 0 4px 20px var(--primary-glow); } /* 修正：日本主題懸停框線效果 */
+        .is-light-theme .glass-card:hover { border-color: var(--primary); box-shadow: 0 4px 20px var(--primary-glow); }
         .is-light-theme .bracket-card { background: rgba(255,255,255,0.7); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         .is-light-theme .theme-text-accent { color: #475569; }
         .is-light-theme .odds-btn { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.15); color: #0f172a; }
@@ -153,6 +160,8 @@
         .is-light-theme .tab-active { color: var(--primary) !important; }
         .is-light-theme nav a.theme-text-accent:hover { color: var(--primary); }
 
+        .table-border { border-color: var(--table-border) !important; }
+
         /* 二級切換按鈕 (積分榜/對陣圖) */
         .sub-tab-btn {
             padding: 8px 32px; border-radius: 99px; font-size: 14px; font-weight: 800; color: var(--text-accent); transition: all 0.3s ease; border: 1px solid transparent;
@@ -160,6 +169,112 @@
         .sub-tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 15px var(--primary-glow); border-color: var(--primary); }
         .is-light-theme .sub-tab-btn { color: #64748b; }
         .is-light-theme .sub-tab-btn.active { color: white; }
+
+        /* 積分榜 A~H 分組按鈕樣式與修復 hover 框線 */
+        .group-btn {
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .group-btn:hover {
+            border-color: var(--primary) !important;
+            color: var(--primary) !important;
+        }
+        .group-btn-active {
+            background: var(--primary) !important;
+            color: white !important;
+            border-color: var(--primary) !important;
+            box-shadow: 0 4px 10px var(--primary-glow);
+        }
+
+        /* 輪播圖樣式修正 (改為寬高100% 確保兼容性) */
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+        .carousel-slide.active { opacity: 0.5; }
+
+        /* =========================================
+           冠軍預測 頒獎台 (Podium) 專屬樣式修正
+           ========================================= */
+        .podium-column {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        /* 固定背景，框線隨主題色變化 */
+        .podium-block {
+            height: 60px;
+            background: var(--primary-alpha);
+            border: 2px solid var(--primary);
+            border-bottom: none;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* 懸停或選中時：獎台拔高、框線變色 */
+        .podium-column:hover .podium-block,
+        .podium-column.selected .podium-block {
+            height: 140px;
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+        @media (min-width: 768px) {
+            .podium-block { height: 80px; }
+            .podium-column:hover .podium-block,
+            .podium-column.selected .podium-block { height: 180px; }
+        }
+        /* 冠軍皇冠浮現動畫 */
+        .podium-icon {
+            opacity: 0;
+            transform: translateY(10px) scale(0.5);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .podium-column:hover .podium-icon,
+        .podium-column.selected .podium-icon {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        /* 上方內容連動上浮 */
+        .podium-content {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .podium-column:hover .podium-content,
+        .podium-column.selected .podium-content {
+            transform: translateY(-10px);
+        }
+        /* 賠率按鈕連動選中樣式 */
+        .champion-group-card .odds-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+        }
+        .podium-column.selected .odds-btn,
+        .podium-column:hover .odds-btn {
+            background: var(--primary) !important;
+            color: white !important;
+            border-color: var(--primary) !important;
+            box-shadow: 0 4px 15px var(--primary-glow) !important;
+        }
+        .is-light-theme .podium-column.selected .odds-btn { color: white !important; }
+
+        /* 豎屏文字標籤 (修正A的旋轉問題) */
+        .vertical-text {
+            writing-mode: horizontal-tb;
+        }
+        @media (min-width: 768px) {
+            .vertical-text {
+                writing-mode: vertical-rl;
+                text-orientation: upright; /* 修正：強制字母直立 */
+                letter-spacing: 0.2em;
+            }
+        }
     </style>
 </head>
 <body class="pb-10">
@@ -195,11 +310,11 @@
 
     <!-- Compact Hero Banner -->
     <section class="relative overflow-hidden bg-black h-48 md:h-56 flex items-center">
-        <!-- 修復輪播圖圖片，使用穩定高畫質圖片並替換失效連結 -->
+        <!-- 輪播圖圖片 -->
         <div id="carousel" class="absolute top-0 left-0 w-full h-full">
-            <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=2000')"></div>
-            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=2000')"></div>
-            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&w=2000'); background-position: center 30%;"></div>
+            <div class="carousel-slide active" style="background-image: url('https://images.pexels.com/photos/114296/pexels-photo-114296.jpeg?auto=compress&cs=tinysrgb&w=2000&q=80')"></div>
+            <div class="carousel-slide" style="background-image: url('https://images.pexels.com/photos/399187/pexels-photo-399187.jpeg?auto=compress&cs=tinysrgb&w=2000&q=80')"></div>
+            <div class="carousel-slide" style="background-image: url('https://images.pexels.com/photos/1884574/pexels-photo-1884574.jpeg?auto=compress&cs=tinysrgb&w=2000&q=80'); background-position: center 30%;"></div>
         </div>
         <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/50 to-transparent z-10"></div>
         <div class="relative z-20 max-w-7xl mx-auto px-4 w-full">
@@ -211,7 +326,8 @@
                 </div>
                 <div class="p-3 rounded-3xl flex flex-col items-center gap-2 w-full md:w-auto max-w-[360px] bg-black/40 backdrop-blur-sm border border-white/10">
                     <span class="text-[9px] font-black text-gray-300 uppercase tracking-[0.1em]">切換主題色彩</span>
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar w-full px-2 pb-1 snap-x">
+                    <!-- 支援滑鼠拖曳的主題區塊 -->
+                    <div id="theme-scroll-container" class="flex gap-2 overflow-x-auto no-scrollbar w-full px-2 pb-1 snap-x">
                         <div onclick="setTheme('default', this)" class="theme-orb active bg-white shadow-inner snap-center" title="預設熊貓"><svg viewBox="0 0 100 100" class="w-6 h-6"><circle cx="30" cy="35" r="10" fill="black"/><circle cx="70" cy="35" r="10" fill="black"/><path d="M50 45 C 30 45, 20 65, 50 85 C 80 65, 70 45, 50 45" fill="black"/></svg></div>
                         <div onclick="setTheme('japan', this)" class="theme-orb snap-center" title="日本"><img src="https://flagcdn.com/w160/jp.png"></div>
                         <div onclick="setTheme('usa', this)" class="theme-orb snap-center" title="美國"><img src="https://flagcdn.com/w160/us.png"></div>
@@ -237,7 +353,7 @@
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-4 py-6">
+    <main class="max-w-7xl mx-auto px-4 py-6 min-h-[800px]">
         
         <!-- Tab: 賽程 -->
         <div id="tab-match">
@@ -327,52 +443,120 @@
             </div>
         </div>
 
-        <!-- Tab: 冠軍 -->
-        <div id="tab-champion" class="hidden grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center">
-                <img src="https://flagcdn.com/w160/ar.png" class="w-20 mb-4 rounded-xl shadow-md border border-current/10">
-                <div class="font-black italic mb-1 uppercase text-sm">阿根廷</div>
-                <button onclick="openBetSlip('2026 世界盃總冠軍', '阿根廷', '6.50', this, '')" class="w-full py-2.5 rounded-xl font-black text-sm text-white brand-bg shadow-md hover:brightness-110 transition">6.50</button>
+        <!-- =========================================
+             Tab: 冠軍 (A~H組 全新頒獎台視覺設計)
+             ========================================= -->
+        <div id="tab-champion" class="hidden space-y-12">
+            <!-- A組冠軍 -->
+            <div class="champion-group-card bg-slate-50 text-slate-800 rounded-[2.5rem] p-6 md:p-10 relative overflow-hidden flex flex-col md:flex-row items-center gap-4 md:gap-8 shadow-xl border border-slate-200">
+                <!-- 裝飾背景漸層 -->
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-200/60 pointer-events-none"></div>
+                
+                <!-- 左側/上方 標題 -->
+                <div class="flex flex-row md:flex-col items-center justify-center gap-3 md:gap-6 border-b md:border-b-0 md:border-r border-slate-200 pb-6 md:pb-0 md:pr-8 w-full md:w-auto shrink-0 relative z-10">
+                    <i class="fas fa-trophy text-3xl md:text-5xl text-yellow-400 drop-shadow-md"></i>
+                    <h2 class="text-2xl md:text-3xl font-black brand-text uppercase tracking-widest text-center vertical-text">A組 冠軍預測</h2>
+                </div>
+
+                <!-- 右側 頒獎台容器 (6個國家)，增加 pt-16 高度防止皇冠被切斷 -->
+                <div class="flex-1 flex justify-start md:justify-center items-end gap-3 md:gap-5 h-[380px] md:h-[420px] pt-16 pb-4 relative z-10 px-2 overflow-x-auto no-scrollbar w-full">
+                    
+                    <!-- 隊伍 1: 墨西哥 -->
+                    <div class="podium-column flex flex-col items-center justify-end w-[64px] md:w-24 shrink-0 group" onclick="openBetSlip('A組冠軍預測', '墨西哥', '2.10', this, '')">
+                        <i class="fas fa-crown text-yellow-400 text-3xl md:text-4xl mb-2 podium-icon drop-shadow-[0_0_12px_rgba(250,204,21,0.9)]"></i>
+                        <div class="podium-content flex flex-col items-center w-full">
+                            <img src="https://flagcdn.com/w80/mx.png" class="w-10 md:w-16 h-7 md:h-10 rounded shadow-sm mb-2 object-cover border border-black/5">
+                            <span class="text-[11px] md:text-sm font-black mb-2 whitespace-nowrap">墨西哥</span>
+                        </div>
+                        <div class="podium-block w-full rounded-t-xl relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
+                        </div>
+                        <div class="mt-3 odds-btn py-1.5 md:py-2.5 rounded-xl font-black text-[11px] md:text-sm w-full text-center shadow-sm transition-colors">
+                            2.10
+                        </div>
+                    </div>
+
+                    <!-- 隊伍 2: 德國 -->
+                    <div class="podium-column flex flex-col items-center justify-end w-[64px] md:w-24 shrink-0 group" onclick="openBetSlip('A組冠軍預測', '德國', '2.80', this, '')">
+                        <i class="fas fa-crown text-yellow-400 text-3xl md:text-4xl mb-2 podium-icon drop-shadow-[0_0_12px_rgba(250,204,21,0.9)]"></i>
+                        <div class="podium-content flex flex-col items-center w-full">
+                            <img src="https://flagcdn.com/w80/de.png" class="w-10 md:w-16 h-7 md:h-10 rounded shadow-sm mb-2 object-cover border border-black/5">
+                            <span class="text-[11px] md:text-sm font-black mb-2 whitespace-nowrap">德國</span>
+                        </div>
+                        <div class="podium-block w-full rounded-t-xl relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
+                        </div>
+                        <div class="mt-3 odds-btn py-1.5 md:py-2.5 rounded-xl font-black text-[11px] md:text-sm w-full text-center shadow-sm transition-colors">
+                            2.80
+                        </div>
+                    </div>
+
+                    <!-- 隊伍 3: 美國 -->
+                    <div class="podium-column flex flex-col items-center justify-end w-[64px] md:w-24 shrink-0 group" onclick="openBetSlip('A組冠軍預測', '美國', '4.50', this, '')">
+                        <i class="fas fa-crown text-yellow-400 text-3xl md:text-4xl mb-2 podium-icon drop-shadow-[0_0_12px_rgba(250,204,21,0.9)]"></i>
+                        <div class="podium-content flex flex-col items-center w-full">
+                            <img src="https://flagcdn.com/w80/us.png" class="w-10 md:w-16 h-7 md:h-10 rounded shadow-sm mb-2 object-cover border border-black/5">
+                            <span class="text-[11px] md:text-sm font-black mb-2 whitespace-nowrap">美國</span>
+                        </div>
+                        <div class="podium-block w-full rounded-t-xl relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
+                        </div>
+                        <div class="mt-3 odds-btn py-1.5 md:py-2.5 rounded-xl font-black text-[11px] md:text-sm w-full text-center shadow-sm transition-colors">
+                            4.50
+                        </div>
+                    </div>
+
+                    <!-- 隊伍 4: 日本 -->
+                    <div class="podium-column flex flex-col items-center justify-end w-[64px] md:w-24 shrink-0 group" onclick="openBetSlip('A組冠軍預測', '日本', '8.00', this, '')">
+                        <i class="fas fa-crown text-yellow-400 text-3xl md:text-4xl mb-2 podium-icon drop-shadow-[0_0_12px_rgba(250,204,21,0.9)]"></i>
+                        <div class="podium-content flex flex-col items-center w-full">
+                            <img src="https://flagcdn.com/w80/jp.png" class="w-10 md:w-16 h-7 md:h-10 rounded shadow-sm mb-2 object-cover border border-black/5">
+                            <span class="text-[11px] md:text-sm font-black mb-2 whitespace-nowrap">日本</span>
+                        </div>
+                        <div class="podium-block w-full rounded-t-xl relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
+                        </div>
+                        <div class="mt-3 odds-btn py-1.5 md:py-2.5 rounded-xl font-black text-[11px] md:text-sm w-full text-center shadow-sm transition-colors">
+                            8.00
+                        </div>
+                    </div>
+
+                    <!-- 隊伍 5: 南非 -->
+                    <div class="podium-column flex flex-col items-center justify-end w-[64px] md:w-24 shrink-0 group" onclick="openBetSlip('A組冠軍預測', '南非', '15.00', this, '')">
+                        <i class="fas fa-crown text-yellow-400 text-3xl md:text-4xl mb-2 podium-icon drop-shadow-[0_0_12px_rgba(250,204,21,0.9)]"></i>
+                        <div class="podium-content flex flex-col items-center w-full">
+                            <img src="https://flagcdn.com/w80/za.png" class="w-10 md:w-16 h-7 md:h-10 rounded shadow-sm mb-2 object-cover border border-black/5">
+                            <span class="text-[11px] md:text-sm font-black mb-2 whitespace-nowrap">南非</span>
+                        </div>
+                        <div class="podium-block w-full rounded-t-xl relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
+                        </div>
+                        <div class="mt-3 odds-btn py-1.5 md:py-2.5 rounded-xl font-black text-[11px] md:text-sm w-full text-center shadow-sm transition-colors">
+                            15.00
+                        </div>
+                    </div>
+
+                    <!-- 隊伍 6: 加拿大 -->
+                    <div class="podium-column flex flex-col items-center justify-end w-[64px] md:w-24 shrink-0 group" onclick="openBetSlip('A組冠軍預測', '加拿大', '21.00', this, '')">
+                        <i class="fas fa-crown text-yellow-400 text-3xl md:text-4xl mb-2 podium-icon drop-shadow-[0_0_12px_rgba(250,204,21,0.9)]"></i>
+                        <div class="podium-content flex flex-col items-center w-full">
+                            <img src="https://flagcdn.com/w80/ca.png" class="w-10 md:w-16 h-7 md:h-10 rounded shadow-sm mb-2 object-cover border border-black/5">
+                            <span class="text-[11px] md:text-sm font-black mb-2 whitespace-nowrap">加拿大</span>
+                        </div>
+                        <div class="podium-block w-full rounded-t-xl relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
+                        </div>
+                        <div class="mt-3 odds-btn py-1.5 md:py-2.5 rounded-xl font-black text-[11px] md:text-sm w-full text-center shadow-sm transition-colors">
+                            21.00
+                        </div>
+                    </div>
+                    
+                </div>
             </div>
-            <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center">
-                <img src="https://flagcdn.com/w160/br.png" class="w-20 mb-4 rounded-xl shadow-md border border-current/10">
-                <div class="font-black italic mb-1 uppercase text-sm">巴西</div>
-                <button onclick="openBetSlip('2026 世界盃總冠軍', '巴西', '4.50', this, '')" class="w-full py-2.5 rounded-xl font-black text-sm text-white brand-bg shadow-md hover:brightness-110 transition">4.50</button>
-            </div>
-            <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center">
-                <img src="https://flagcdn.com/w160/fr.png" class="w-20 mb-4 rounded-xl shadow-md border border-current/10">
-                <div class="font-black italic mb-1 uppercase text-sm">法國</div>
-                <button onclick="openBetSlip('2026 世界盃總冠軍', '法國', '5.50', this, '')" class="w-full py-2.5 rounded-xl font-black text-sm text-white brand-bg shadow-md hover:brightness-110 transition">5.50</button>
-            </div>
-            <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center">
-                <img src="https://flagcdn.com/w160/gb.png" class="w-20 mb-4 rounded-xl shadow-md border border-current/10">
-                <div class="font-black italic mb-1 uppercase text-sm">英國</div>
-                <button onclick="openBetSlip('2026 世界盃總冠軍', '英國', '8.00', this, '')" class="w-full py-2.5 rounded-xl font-black text-sm text-white brand-bg shadow-md hover:brightness-110 transition">8.00</button>
-            </div>
-            <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center">
-                <img src="https://flagcdn.com/w160/de.png" class="w-20 mb-4 rounded-xl shadow-md border border-current/10">
-                <div class="font-black italic mb-1 uppercase text-sm">德國</div>
-                <button onclick="openBetSlip('2026 世界盃總冠軍', '德國', '11.00', this, '')" class="w-full py-2.5 rounded-xl font-black text-sm text-white brand-bg shadow-md hover:brightness-110 transition">11.00</button>
-            </div>
-            <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center">
-                <img src="https://flagcdn.com/w160/jp.png" class="w-20 mb-4 rounded-xl shadow-md border border-current/10">
-                <div class="font-black italic mb-1 uppercase text-sm">日本</div>
-                <button onclick="openBetSlip('2026 世界盃總冠軍', '日本', '15.00', this, '')" class="w-full py-2.5 rounded-xl font-black text-sm text-white brand-bg shadow-md hover:brightness-110 transition">15.00</button>
-            </div>
-            <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center">
-                <img src="https://flagcdn.com/w160/us.png" class="w-20 mb-4 rounded-xl shadow-md border border-current/10">
-                <div class="font-black italic mb-1 uppercase text-sm">美國</div>
-                <button onclick="openBetSlip('2026 世界盃總冠軍', '美國', '18.00', this, '')" class="w-full py-2.5 rounded-xl font-black text-sm text-white brand-bg shadow-md hover:brightness-110 transition">18.00</button>
-            </div>
-            <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center">
-                <img src="https://flagcdn.com/w160/mx.png" class="w-20 mb-4 rounded-xl shadow-md border border-current/10">
-                <div class="font-black italic mb-1 uppercase text-sm">墨西哥</div>
-                <button onclick="openBetSlip('2026 世界盃總冠軍', '墨西哥', '26.00', this, '')" class="w-full py-2.5 rounded-xl font-black text-sm text-white brand-bg shadow-md hover:brightness-110 transition">26.00</button>
-            </div>
-            <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center">
-                <img src="https://flagcdn.com/w160/ca.png" class="w-20 mb-4 rounded-xl shadow-md border border-current/10">
-                <div class="font-black italic mb-1 uppercase text-sm">加拿大</div>
-                <button onclick="openBetSlip('2026 世界盃總冠軍', '加拿大', '34.00', this, '')" class="w-full py-2.5 rounded-xl font-black text-sm text-white brand-bg shadow-md hover:brightness-110 transition">34.00</button>
+            
+            <!-- 可依此類推增加 B~H 組... 這裡以A組為示範重點 -->
+            <div class="glass-card rounded-[2rem] p-6 flex justify-center items-center opacity-50">
+                <span class="font-bold tracking-widest">B ~ H 組 預測版塊鎖定中...</span>
             </div>
         </div>
 
@@ -386,27 +570,39 @@
                 </div>
             </div>
 
-            <!-- 子分頁: 積分榜 (已修復表頭排版與字體大小) -->
+            <!-- 子分頁: 積分榜 -->
             <div id="sub-tab-league" class="space-y-8">
+                <!-- 分組選擇：A~H 恢復 -->
+                <div class="flex justify-center gap-2 overflow-x-auto no-scrollbar pb-2 px-4 snap-x">
+                    <button onclick="selectGroupBtn(this)" class="group-btn w-10 h-10 min-w-[40px] rounded-full glass-card brand-text brand-border font-black flex items-center justify-center text-xs snap-center group-btn-active">A</button>
+                    <button onclick="selectGroupBtn(this)" class="group-btn w-10 h-10 min-w-[40px] rounded-full glass-card theme-text-accent font-black flex items-center justify-center text-xs snap-center transition-colors">B</button>
+                    <button onclick="selectGroupBtn(this)" class="group-btn w-10 h-10 min-w-[40px] rounded-full glass-card theme-text-accent font-black flex items-center justify-center text-xs snap-center transition-colors">C</button>
+                    <button onclick="selectGroupBtn(this)" class="group-btn w-10 h-10 min-w-[40px] rounded-full glass-card theme-text-accent font-black flex items-center justify-center text-xs snap-center transition-colors">D</button>
+                    <button onclick="selectGroupBtn(this)" class="group-btn w-10 h-10 min-w-[40px] rounded-full glass-card theme-text-accent font-black flex items-center justify-center text-xs snap-center transition-colors">E</button>
+                    <button onclick="selectGroupBtn(this)" class="group-btn w-10 h-10 min-w-[40px] rounded-full glass-card theme-text-accent font-black flex items-center justify-center text-xs snap-center transition-colors">F</button>
+                    <button onclick="selectGroupBtn(this)" class="group-btn w-10 h-10 min-w-[40px] rounded-full glass-card theme-text-accent font-black flex items-center justify-center text-xs snap-center transition-colors">G</button>
+                    <button onclick="selectGroupBtn(this)" class="group-btn w-10 h-10 min-w-[40px] rounded-full glass-card theme-text-accent font-black flex items-center justify-center text-xs snap-center transition-colors">H</button>
+                </div>
+
                 <div class="glass-card rounded-2xl overflow-hidden group">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left min-w-[700px]">
                             <!-- 統一在 thead 中排列，並將 A組 文字放大對齊底線 -->
-                            <thead class="theme-text-accent border-b border-current/10 bg-black/5">
+                            <thead class="theme-text-accent border-b table-border bg-black/5">
                                 <tr>
-                                    <th colspan="2" class="p-4 pl-8 text-[32px] font-black brand-text tracking-widest uppercase align-bottom">A組</th>
-                                    <th class="p-4 text-center whitespace-nowrap align-bottom pb-5 font-bold text-[13px]">場次</th>
-                                    <th class="p-4 text-center whitespace-nowrap align-bottom pb-5 font-bold text-[13px]">勝/平/負</th>
-                                    <th class="p-4 text-center whitespace-nowrap align-bottom pb-5 font-bold text-[13px]">進球</th>
-                                    <th class="p-4 text-center whitespace-nowrap align-bottom pb-5 font-bold text-[13px]">失球</th>
-                                    <th class="p-4 text-center whitespace-nowrap align-bottom pb-5 font-bold text-[13px]">淨勝</th>
-                                    <th class="p-4 text-center whitespace-nowrap align-bottom pb-5 font-bold text-[13px]">積分</th>
-                                    <th class="p-4 text-center whitespace-nowrap align-bottom pb-5 font-bold text-[13px]">最近3場</th>
+                                    <th colspan="2" class="p-4 pl-8 text-[32px] font-black brand-text tracking-widest uppercase align-middle">A組</th>
+                                    <th class="p-4 text-center whitespace-nowrap align-middle font-bold text-[14px]">場次</th>
+                                    <th class="p-4 text-center whitespace-nowrap align-middle font-bold text-[14px]">勝/平/負</th>
+                                    <th class="p-4 text-center whitespace-nowrap align-middle font-bold text-[14px]">進球</th>
+                                    <th class="p-4 text-center whitespace-nowrap align-middle font-bold text-[14px]">失球</th>
+                                    <th class="p-4 text-center whitespace-nowrap align-middle font-bold text-[14px]">淨勝</th>
+                                    <th class="p-4 text-center whitespace-nowrap align-middle font-bold text-[14px]">積分</th>
+                                    <th class="p-4 text-center whitespace-nowrap align-middle font-bold text-[14px]">最近3場</th>
                                 </tr>
                             </thead>
                             <tbody class="text-[15px] font-bold">
                                 <!-- 1. 晉級區 -->
-                                <tr class="border-b border-current/5 bg-blue-500/5 relative hover:bg-blue-500/10 transition">
+                                <tr class="border-b table-border bg-blue-500/5 relative hover:bg-blue-500/10 transition">
                                     <td class="p-4 pl-8 text-center relative w-20">
                                         <div class="absolute left-0 top-0 text-[10px] bg-blue-500 text-white px-2 py-0.5 rounded-br-lg font-black">晉級區</div>
                                         <i class="fas fa-medal text-yellow-400 text-3xl drop-shadow-md mt-3 block"></i>
@@ -417,7 +613,7 @@
                                     <td class="p-4 text-center"><div class="flex justify-center gap-1.5"><span class="record-dot loss">L</span><span class="record-dot draw">D</span><span class="record-dot win">W</span></div></td>
                                 </tr>
                                 <!-- 2. 晉級區 -->
-                                <tr class="border-b border-current/5 bg-blue-500/5 hover:bg-blue-500/10 transition">
+                                <tr class="border-b table-border bg-blue-500/5 hover:bg-blue-500/10 transition">
                                     <td class="p-4 pl-8 text-center relative w-20">
                                         <i class="fas fa-medal text-slate-300 text-3xl drop-shadow-md block"></i>
                                     </td>
@@ -427,7 +623,7 @@
                                     <td class="p-4 text-center"><div class="flex justify-center gap-1.5"><span class="record-dot loss">L</span><span class="record-dot win">W</span><span class="record-dot win">W</span></div></td>
                                 </tr>
                                 <!-- 3. 晉級待定區 -->
-                                <tr class="border-b border-current/5 bg-red-500/5 relative hover:bg-red-500/10 transition">
+                                <tr class="border-b table-border bg-red-500/5 relative hover:bg-red-500/10 transition">
                                     <td class="p-4 pl-8 text-center relative w-20">
                                         <div class="absolute left-0 top-0 text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-br-lg font-black">晉級待定區</div>
                                         <div class="text-[15px] font-bold text-red-500 mt-4 block">3</div>
@@ -631,6 +827,39 @@
     </div>
 
     <script>
+        // 滑鼠拖拉專用 JS (支援主題切換區左右拖曳)
+        const themeSlider = document.getElementById('theme-scroll-container');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        window.isDraggingTheme = false;
+
+        themeSlider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            window.isDraggingTheme = false;
+            themeSlider.style.cursor = 'grabbing';
+            startX = e.pageX - themeSlider.offsetLeft;
+            scrollLeft = themeSlider.scrollLeft;
+        });
+        themeSlider.addEventListener('mouseleave', () => {
+            isDown = false;
+            themeSlider.style.cursor = 'grab';
+        });
+        themeSlider.addEventListener('mouseup', () => {
+            isDown = false;
+            themeSlider.style.cursor = 'grab';
+            setTimeout(() => window.isDraggingTheme = false, 50);
+        });
+        themeSlider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - themeSlider.offsetLeft;
+            const walk = (x - startX) * 2;
+            if (Math.abs(walk) > 5) { window.isDraggingTheme = true; }
+            themeSlider.scrollLeft = scrollLeft - walk;
+        });
+
+        // 輪播圖邏輯
         const carouselData = [
             "2026 全球盛宴，最準確的數據分析，助您在每一場博弈中旗開得勝",
             "巔峰對決一觸即發，即刻預測您的心水球隊，贏在起跑點！",
@@ -654,12 +883,16 @@
         let currentOdds = 5.70;
         
         function openBetSlip(match, selection, odds, btn, timeStr) {
-            document.querySelectorAll('.odds-btn, .brand-bg').forEach(b => b.classList.remove('selected'));
-            if (btn) btn.classList.add('selected');
+            document.querySelectorAll('.odds-btn, .brand-bg, .podium-column').forEach(b => b.classList.remove('selected'));
+            if (btn) {
+                btn.classList.add('selected');
+                const innerOdds = btn.querySelector('.odds-btn');
+                if (innerOdds) innerOdds.classList.add('selected');
+            }
             
             currentOdds = parseFloat(odds);
             
-            if (match.includes("總冠軍")) {
+            if (match.includes("冠軍")) {
                 document.getElementById('bs-title').innerText = "2026 世界盃專題預測";
                 document.getElementById('bs-market').innerText = "預測項目";
                 document.getElementById('bs-time').style.display = 'none';
@@ -680,7 +913,7 @@
         function closeBetSlip() {
             const slip = document.getElementById('bet-slip');
             if (slip) slip.classList.remove('open');
-            document.querySelectorAll('.odds-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('.odds-btn, .podium-column').forEach(b => b.classList.remove('selected'));
         }
 
         function addAmount(val) {
@@ -724,6 +957,15 @@
             if (activeEl) activeEl.classList.remove('hidden');
             if (activeBtn) activeBtn.classList.add('active');
         }
+        
+        function selectGroupBtn(el) {
+            document.querySelectorAll('.group-btn').forEach(b => {
+                b.classList.remove('group-btn-active', 'brand-text', 'brand-border');
+                b.classList.add('theme-text-accent');
+            });
+            el.classList.add('group-btn-active', 'brand-text', 'brand-border');
+            el.classList.remove('theme-text-accent');
+        }
 
         function showResultPopup(el) {
             const popup = document.getElementById('result-popup');
@@ -734,6 +976,8 @@
         }
 
         function setTheme(country, el) {
+            if (window.isDraggingTheme) return; // 防止拖曳時觸發點擊
+
             const root = document.documentElement;
             const themes = {
                 'default': { primary: '#3b82f6', glow: 'rgba(59, 130, 246, 0.4)', from: '#0f172a', to: '#1e293b', accent: '#94a3b8', light: false },
