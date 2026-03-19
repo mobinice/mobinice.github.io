@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>体育投注 - 合并单关合买</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 自定义滚动条样式 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* 隐藏数字输入框默认的上下箭头 */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
+        .active-bet-btn {
+            background-color: #1e88e5 !important;
+            color: white !important;
+            border-color: #1e88e5 !important;
+        }
+
+        /* 步进器按钮样式 */
+        .stepper-btn {
+            color: #93c5fd; /* light blue */
+            width: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        .stepper-btn:hover { background-color: #f1f5f9; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans h-screen flex overflow-hidden">
+
+    <!-- 左侧：投注单区域 -->
+    <aside class="w-[300px] bg-white border-r border-gray-200 flex flex-col h-full z-10 shadow-sm relative">
+        
+        <!-- 用户信息 -->
+        <div class="p-3 bg-blue-50/50 border-b border-gray-200">
+            <div class="text-xs text-gray-500">Hi, Ice</div>
+            <div class="text-blue-600 font-bold text-lg flex items-center justify-between">
+                2,105.30 
+                <svg class="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            </div>
+        </div>
+
+        <!-- 菜单栏 -->
+        <div class="flex flex-col border-b border-gray-200">
+            <div class="flex items-center p-3 cursor-pointer text-gray-800 font-medium">
+                <span class="mr-2 text-white font-bold bg-blue-500 w-5 h-5 flex items-center justify-center rounded text-xs">合</span> 合买大厅
+                <span class="ml-auto text-gray-800 font-bold text-sm">27</span>
+            </div>
+        </div>
+
+        <!-- 步骤0 球种菜单 -->
+        <div id="left-step-0-menu" class="flex flex-col flex-1 min-h-0 bg-slate-50">
+            <!-- 早盘/今日 切换 -->
+            <div class="p-3 bg-white border-b border-gray-100 flex-shrink-0">
+                <div class="flex bg-gray-100 rounded-full p-1 w-full relative border border-gray-200">
+                    <button class="flex-1 text-sm py-1.5 rounded-full text-gray-600 font-medium hover:text-blue-500 transition-colors">今日</button>
+                    <button class="flex-1 text-sm py-1.5 rounded-full bg-[#1e88e5] text-white font-bold shadow-sm transition-colors">早盘</button>
+                </div>
+            </div>
+            <!-- 列表 -->
+            <div class="flex-1 overflow-y-auto p-2 space-y-1">
+                <button onclick="selectSport('football')" class="w-full flex items-center justify-between p-2.5 rounded bg-blue-50 border border-blue-100 text-[#1e88e5] transition-colors">
+                    <div class="flex items-center gap-2 font-bold text-sm">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm-1.5-6.5l-3-1.5 1.5-3 3 1.5-1.5 3zm4.5 0l-1.5-3 3-1.5 1.5 3-3 1.5z"></path></svg>
+                        足球
+                    </div>
+                    <div class="text-xs font-medium">1151</div>
+                </button>
+                <button onclick="selectSport('basketball')" class="w-full flex items-center justify-between p-2.5 rounded hover:bg-blue-50 border border-transparent hover:border-blue-100 text-gray-700 hover:text-[#1e88e5] transition-colors">
+                    <div class="flex items-center gap-2 font-medium text-sm">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.12.23-2.19.65-3.14L9 13v-2l-3-3v-.86c1.33-1.32 3.16-2.14 5.14-2.14 1.77 0 3.4.58 4.7 1.56l-3.35 3.35 1.41 1.41 3.35-3.35A7.957 7.957 0 0120 12c0 4.41-3.59 8-8 8zm4.36-12.72l-1.41 1.41 1.41 1.41 1.41-1.41-1.41-1.41zm-8.72 0l-1.41 1.41 1.41 1.41 1.41-1.41-1.41-1.41z"></path></svg>
+                        篮球
+                    </div>
+                    <div class="text-xs font-medium text-gray-400">129</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- 步骤1(表单)包含顶部返回按钮 -->
+        <div id="left-step-1-betslip" class="hidden flex-col flex-1 min-h-0 w-full z-10">
+            <!-- 投注类型切换 (激活单关) -->
+            <div class="p-2 flex items-center justify-center border-b border-gray-200 bg-gray-50/50 relative">
+                <!-- 左上角返回球种选单按钮 -->
+                <button onclick="showStep(0)" class="absolute left-2 w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-white shadow-sm transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                
+                <div class="flex bg-gray-100 rounded-full p-0.5 w-48 relative border border-gray-200">
+                    <button class="flex-1 text-sm py-1 rounded-full bg-white text-blue-500 font-bold shadow-sm transition-colors relative">
+                        单关 <span id="slip-count" class="hidden absolute top-1/2 -translate-y-1/2 right-3 bg-blue-500 text-white rounded-full w-4 h-4 text-[10px] inline-flex items-center justify-center">1</span>
+                    </button>
+                    <button class="flex-1 text-sm py-1 rounded-full text-gray-500 hover:text-blue-500 transition-colors">串关</button>
+                </div>
+            </div>
+
+            <!-- 已选投注项列表 -->
+            <div id="selected-bets-container" class="flex-1 overflow-y-auto p-2 bg-slate-50 min-h-[100px]">
+                <div id="empty-state" class="text-center text-gray-400 text-sm mt-10">
+                    请在右侧选择投注项
+                </div>
+            </div>
+
+            <!-- 底部合买表单区域 -->
+            <div id="bet-form-container" class="bg-white border-t border-gray-200 p-3 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.05)] flex flex-col gap-3 overflow-y-auto flex-shrink min-h-0 max-h-[65vh]">
+                
+                <!-- 合买金额 -->
+                <div>
+                    <div class="text-sm text-gray-700 mb-1">合买</div>
+                    <div class="flex items-center bg-[#f4f7fb] border border-[#e2e8f0] rounded overflow-hidden focus-within:border-blue-400 transition-colors">
+                        <div id="target-multiplier" class="bg-[#eef2f6] px-3 py-2 text-sm font-bold text-gray-500 border-r border-[#e2e8f0] hidden"></div>
+                        <input type="number" id="target-amount" class="w-full bg-transparent p-2 text-sm focus:outline-none" placeholder="限额">
+                    </div>
+                </div>
+
+                <!-- 认购金额 -->
+                <div>
+                    <div class="text-sm text-gray-700 mb-1">认购</div>
+                    <div class="flex items-center bg-[#f4f7fb] border border-[#e2e8f0] rounded overflow-hidden focus-within:border-blue-400 transition-colors">
+                        <div id="sub-multiplier" class="bg-[#eef2f6] px-3 py-2 text-sm font-bold text-gray-500 border-r border-[#e2e8f0] hidden"></div>
+                        <input type="number" id="subscribe-amount" class="w-full bg-transparent p-2 text-sm focus:outline-none" placeholder="限额">
+                    </div>
+                </div>
+
+                <!-- 合买喜好折叠面板 -->
+                <div class="border border-[#e2e8f0] rounded bg-[#f8fafc] overflow-hidden">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center p-2 cursor-pointer bg-white" onclick="togglePreferences()">
+                        <div class="text-blue-500 font-medium text-sm">合买喜好</div>
+                        <svg id="pref-arrow" class="w-4 h-4 text-blue-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                    
+                    <!-- Content (展开的详细设置) -->
+                    <div id="pref-content" class="p-3 pt-1 space-y-3 hidden text-xs text-gray-600 bg-white border-t border-[#f1f5f9] max-h-[250px] overflow-y-auto">
+                        
+                        <!-- 合买展示 -->
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-1">合买展示 <span class="w-3 h-3 rounded-full bg-gray-300 text-white flex items-center justify-center text-[8px] font-bold">i</span></div>
+                            <div class="relative">
+                                <select class="w-full appearance-none bg-transparent text-gray-700 font-medium text-right pr-4 focus:outline-none cursor-pointer">
+                                    <option>无条件公开</option>
+                                    <option>认购后可查看</option>
+                                    <option>开奖后公开</option>
+                                </select>
+                                <svg class="w-3 h-3 text-blue-500 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+
+                        <!-- 认购最低限额 -->
+                        <div class="flex flex-col gap-1 mt-2">
+                            <div class="flex items-center gap-1">认购最低限额 <span class="w-3 h-3 rounded-full bg-gray-300 text-white flex items-center justify-center text-[8px] font-bold">i</span></div>
+                            <div class="flex items-center bg-[#f8fafc] border border-gray-100 rounded h-8">
+                                <div class="stepper-btn">-</div>
+                                <input type="text" class="flex-1 bg-transparent text-center text-gray-700 font-medium focus:outline-none" value="2" readonly>
+                                <div class="stepper-btn">+</div>
+                            </div>
+                        </div>
+
+                        <!-- 佣金 -->
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-1">佣金 <span class="w-3 h-3 rounded-full bg-gray-300 text-white flex items-center justify-center text-[8px] font-bold">i</span></div>
+                            <div class="flex items-center bg-[#f8fafc] border border-gray-100 rounded h-8">
+                                <div class="stepper-btn">-</div>
+                                <input type="text" class="flex-1 bg-transparent text-center text-gray-700 font-medium focus:outline-none" value="5%" readonly>
+                                <div class="stepper-btn">+</div>
+                            </div>
+                        </div>
+
+                        <!-- 赔率变动撤单范围 -->
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-1">赔率变动撤单范围 <span class="w-3 h-3 rounded-full bg-gray-300 text-white flex items-center justify-center text-[8px] font-bold">i</span></div>
+                            <div class="flex items-center bg-[#f8fafc] border border-gray-100 rounded h-8">
+                                <div class="stepper-btn">-</div>
+                                <input type="text" class="flex-1 bg-transparent text-center text-gray-700 font-medium focus:outline-none" value="0.16" readonly>
+                                <div class="stepper-btn">+</div>
+                            </div>
+                        </div>
+
+                        <!-- 最终截止时间 -->
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1">最终截止时间 <span class="w-3 h-3 rounded-full bg-gray-300 text-white flex items-center justify-center text-[8px] font-bold">i</span></div>
+                                <label class="flex items-center gap-1 cursor-pointer">
+                                    自定义 <input type="checkbox" class="rounded text-blue-500 w-3 h-3 border-gray-300">
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between mt-1">
+                                <span class="text-gray-500">赛事开赛前</span>
+                                <div class="flex items-center gap-2">
+                                    <div class="flex items-center bg-[#f8fafc] border border-gray-100 rounded h-7 w-20">
+                                        <div class="stepper-btn text-gray-300">-</div>
+                                        <input type="text" class="flex-1 bg-transparent text-center text-gray-700 font-medium focus:outline-none" value="5" readonly>
+                                        <div class="stepper-btn text-gray-300">+</div>
+                                    </div>
+                                    <span class="text-gray-500">分钟</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 发起人保底 -->
+                        <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+                            <div class="flex items-center gap-1">发起人保底 <span class="w-3 h-3 rounded-full bg-gray-300 text-white flex items-center justify-center text-[8px] font-bold">i</span></div>
+                            <input type="checkbox" id="guarantee-checkbox" class="rounded text-blue-500 focus:ring-blue-500 w-4 h-4 border-gray-300 cursor-pointer">
+                        </div>
+
+                        <!-- 占比与预估 -->
+                        <div class="flex flex-col gap-1 mt-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500">发起人占比</span>
+                                <span id="ratio-display" class="font-medium text-gray-800">0%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500">预估70%金额</span>
+                                <span id="guarantee-display" class="font-medium text-gray-800">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作按钮 -->
+                <button id="submit-btn" class="w-full bg-[#1e88e5] hover:bg-blue-600 text-white font-medium py-2.5 rounded shadow-sm transition-colors opacity-50 cursor-not-allowed">
+                    发起合买投注
+                </button>
+                <button id="clear-btn" class="w-full bg-[#f4f7fb] hover:bg-gray-200 text-gray-600 font-medium py-2.5 rounded transition-colors text-sm">
+                    取消合买
+                </button>
+            </div>
+        </div>
+
+        <!-- 步骤2 确认合买界面 -->
+        <div id="step-2-confirm" class="hidden flex-col flex-1 min-h-0 bg-slate-50 w-full z-20 overflow-hidden">
+            <div class="flex-1 overflow-y-auto p-3" id="confirm-details-container">
+                <!-- 动态生成的确认明细将放在这里 -->
+            </div>
+            <!-- 底部确认操作按钮区 -->
+            <div class="bg-white border-t border-gray-200 p-3 pt-2 flex flex-col gap-2 flex-shrink-0 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.05)]">
+                <button id="real-submit-btn" class="w-full bg-[#1e88e5] hover:bg-blue-600 text-white font-medium py-2.5 rounded shadow-sm transition-colors">
+                    确认合买
+                </button>
+                <button id="cancel-confirm-btn" class="w-full bg-[#f4f7fb] hover:bg-gray-200 text-gray-600 font-medium py-2.5 rounded transition-colors text-sm">
+                    取消
+                </button>
+            </div>
+        </div>
+
+        <!-- 步骤3 成功提示界面 (根据截图完全重构) -->
+        <div id="step-3-success" class="hidden flex-col flex-1 min-h-0 bg-white w-full z-30 overflow-hidden">
+            
+            <!-- 顶部进行中/已完成 Tab -->
+            <div class="flex px-3 pt-3 bg-white border-b border-gray-100 flex-shrink-0">
+                <button class="flex-1 bg-[#1e88e5] text-white text-sm py-2 rounded-t-md font-bold">进行中</button>
+                <button class="flex-1 bg-white border border-gray-200 border-b-0 text-gray-500 text-sm py-2 rounded-t-md">已完成</button>
+            </div>
+
+            <!-- 动态生成的成功明细 -->
+            <div class="flex-1 overflow-y-auto p-4" id="success-details-container">
+                <!-- JS 动态填充 -->
+            </div>
+            
+            <!-- 底部确认操作按钮区 -->
+            <div class="bg-white border-t border-gray-100 p-3 pt-2 flex flex-col gap-2 flex-shrink-0 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.05)] relative z-10">
+                <button id="success-confirm-btn" class="w-full bg-[#1e88e5] hover:bg-blue-600 text-white font-medium py-2.5 rounded shadow-sm transition-colors">
+                    确定
+                </button>
+                <button id="keep-options-btn" class="w-full bg-[#f4f7fb] hover:bg-gray-200 text-gray-600 font-medium py-2.5 rounded transition-colors text-sm">
+                    保留选项，继续投注
+                </button>
+                <div class="flex justify-between items-center mt-1">
+                    <button id="cancel-order-btn" class="text-gray-500 hover:text-gray-700 text-sm px-2">撤单</button>
+                    <button class="bg-[#1e88e5] hover:bg-blue-600 text-white font-medium py-2 px-4 rounded transition-colors text-sm">去合买大厅追踪</button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 右侧：赛事列表区域 -->
+    <main class="flex-1 flex flex-col h-full bg-gray-50 overflow-hidden">
+        <header class="bg-white border-b border-gray-200">
+            <div class="h-14 flex items-center px-6 gap-6 text-sm font-medium text-gray-600">
+                <div class="text-blue-600 font-bold text-lg mr-4 italic">PANDA SPORTS</div>
+                <a href="#" class="hover:text-blue-600">体育投注</a>
+                <a href="#" class="hover:text-blue-600">电子竞技</a>
+                <a href="#" class="hover:text-blue-600">VR体育</a>
+                <a href="#" class="text-blue-600 border-b-2 border-blue-600 pb-[18px] pt-[18px]">合买大厅</a>
+            </div>
+            <div class="bg-blue-50/50 border-t border-gray-100 py-1.5 px-6 text-xs text-gray-500 flex items-center">
+                <span class="border border-blue-300 text-blue-500 rounded px-1 text-[10px] mr-2">公告</span>
+                <marquee class="flex-1" scrollamount="4">选择多个投注项进入合并单关模式，左侧输入框将自动增加 Nx 标识。展开“合买喜好”并勾选“发起人保底”可查看自动计算的保底金额。</marquee>
+            </div>
+        </header>
+
+        <!-- 包含空状态与赛事的相对定位容器 -->
+        <div class="flex-1 relative flex flex-col overflow-hidden">
+            
+            <!-- 占位空状态 (一开始显示) -->
+            <div id="right-empty-state" class="absolute inset-0 z-10 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+                <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <p class="text-lg font-medium">请在左侧选择球种</p>
+                <p class="text-sm mt-1">选择后将在此处展示赛事列表</p>
+            </div>
+
+            <!-- 原赛事列表区 (一开始隐藏) -->
+            <div id="right-match-content" class="flex-1 overflow-y-auto p-4 hidden">
+                <div class="bg-white rounded-t-lg border-b border-gray-200 p-3 flex justify-between items-center shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <h2 class="font-bold text-gray-800">今日 (足球)</h2>
+                        <span class="text-blue-500 text-sm">未开赛 128</span>
+                    </div>
+                    <div class="flex gap-2 text-xs">
+                        <button class="border border-gray-200 bg-gray-50 px-3 py-1 rounded text-gray-600 hover:bg-white">选择联赛 全部</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-b-lg shadow-sm mb-4">
+                    <div class="bg-blue-50/30 p-2 flex items-center text-sm border-b border-gray-200 cursor-pointer">
+                        <svg class="w-4 h-4 text-gray-500 mr-2 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <span class="font-bold text-gray-700">欧洲联赛</span>
+                        <span class="text-gray-400 ml-2 text-xs">7</span>
+                    </div>
+                    <!-- 赛事列表容器 -->
+                    <div id="match-list-container"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- 模拟赛事数据 ---
+        const matches = [
+            {
+                id: 'm1', teamH: '费雷堡', teamC: '亨克', time: '03-20 01:45(GMT+8)',
+                odds: {
+                    win: { id: 'm1-winH', name: '主胜', value: 1.60, type: '全场独赢' },
+                    draw: { id: 'm1-draw', name: '平局', value: 4.25, type: '全场独赢' },
+                    winC: { id: 'm1-winC', name: '客胜', value: 5.10, type: '全场独赢' }
+                }
+            },
+            {
+                id: 'm2', teamH: '米迪兰特', teamC: '诺定咸森林', time: '03-20 01:45(GMT+8)',
+                odds: {
+                    win: { id: 'm2-winH', name: '主胜', value: 2.90, type: '全场独赢' },
+                    draw: { id: 'm2-draw', name: '平局', value: 3.70, type: '全场独赢' },
+                    winC: { id: 'm2-winC', name: '客胜', value: 2.28, type: '全场独赢' }
+                }
+            },
+            {
+                id: 'm3', teamH: '里昂', teamC: '切尔达', time: '03-20 01:45(GMT+8)',
+                odds: {
+                    win: { id: 'm3-winH', name: '主胜', value: 2.18, type: '全场独赢' },
+                    draw: { id: 'm3-draw', name: '平局', value: 3.30, type: '全场独赢' },
+                    winC: { id: 'm3-winC', name: '客胜', value: 3.35, type: '全场独赢' }
+                }
+            }
+        ];
+
+        let selectedBets = {}; // 存储选中项
+
+        // --- DOM 元素引用 ---
+        const matchListContainer = document.getElementById('match-list-container');
+        const selectedBetsContainer = document.getElementById('selected-bets-container');
+        
+        const targetAmountInput = document.getElementById('target-amount');
+        const subscribeAmountInput = document.getElementById('subscribe-amount');
+        const targetMultiplier = document.getElementById('target-multiplier');
+        const subMultiplier = document.getElementById('sub-multiplier');
+        
+        const ratioDisplay = document.getElementById('ratio-display');
+        const guaranteeCheckbox = document.getElementById('guarantee-checkbox');
+        const guaranteeDisplay = document.getElementById('guarantee-display');
+        const submitBtn = document.getElementById('submit-btn');
+        const clearBtn = document.getElementById('clear-btn');
+
+        // --- 渲染右侧赛事列表 ---
+        function renderMatches() {
+            let html = '';
+            matches.forEach(match => {
+                html += `
+                <div class="border-b border-gray-100 p-3 hover:bg-gray-50 flex flex-col md:flex-row transition-colors">
+                    <div class="w-full md:w-[220px] flex flex-col justify-center border-r border-gray-100 pr-2 mb-2 md:mb-0">
+                        <div class="flex items-center text-sm font-medium text-gray-800 mb-1">
+                            <span class="w-4 h-4 rounded-full bg-gray-200 mr-2 flex items-center justify-center text-[10px] text-gray-600">主</span>
+                            ${match.teamH}
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600 mb-1">
+                            <span class="w-4 h-4 rounded-full bg-blue-100 mr-2 flex items-center justify-center text-[10px] text-blue-500">客</span>
+                            ${match.teamC}
+                        </div>
+                        <div class="text-xs text-gray-400 mt-1">${match.time}</div>
+                    </div>
+                    <div class="flex-1 flex gap-4 pl-0 md:pl-4 items-center">
+                        ${renderOddsButton(match, match.odds.win)}
+                        ${renderOddsButton(match, match.odds.draw)}
+                        ${renderOddsButton(match, match.odds.winC)}
+                    </div>
+                </div>`;
+            });
+            matchListContainer.innerHTML = html;
+        }
+
+        function renderOddsButton(match, oddsItem) {
+            const isSelected = selectedBets[oddsItem.id];
+            const activeClass = isSelected ? 'active-bet-btn' : 'bg-[#f8fafc] hover:bg-blue-50 border-gray-200';
+            const textClass = isSelected ? 'text-white' : 'text-blue-500';
+            const valueClass = isSelected ? 'text-white' : 'text-gray-800';
+            
+            return `
+                <button onclick="toggleBet('${match.id}', '${oddsItem.id}')" id="btn-${oddsItem.id}"
+                    class="h-[36px] flex-1 flex items-center justify-between px-3 border rounded text-sm transition-all ${activeClass}">
+                    <span class="${textClass} text-xs">${oddsItem.name}</span>
+                    <span class="font-bold ${valueClass}">${oddsItem.value.toFixed(2)}</span>
+                </button>
+            `;
+        }
+
+        // --- 核心交互逻辑 ---
+        
+        // 选择球种，展示右侧列表
+        window.selectSport = function(sport) {
+            document.getElementById('right-empty-state').classList.add('hidden');
+            document.getElementById('right-match-content').classList.remove('hidden');
+        };
+
+        window.toggleBet = function(matchId, oddsId) {
+            const match = matches.find(m => m.id === matchId);
+            const oddsItem = Object.values(match.odds).find(o => o.id === oddsId);
+
+            if (selectedBets[oddsId]) {
+                delete selectedBets[oddsId];
+            } else {
+                selectedBets[oddsId] = {
+                    matchId: match.id,
+                    teamH: match.teamH,
+                    teamC: match.teamC,
+                    oddsId: oddsItem.id,
+                    name: oddsItem.name,
+                    value: oddsItem.value,
+                    type: oddsItem.type
+                };
+            }
+
+            updateUI();
+
+            // 若目前在球种选单 (step 0)，点击赔率后自动展开投注单 (step 1)
+            const step0Menu = document.getElementById('left-step-0-menu');
+            if (step0Menu && !step0Menu.classList.contains('hidden') && Object.keys(selectedBets).length > 0) {
+                showStep(1);
+            }
+        };
+
+        function updateUI() {
+            // 1. 刷新右侧按钮状态
+            matches.forEach(match => {
+                Object.values(match.odds).forEach(oddsItem => {
+                    const btn = document.getElementById(`btn-${oddsItem.id}`);
+                    if (btn) {
+                        const isSelected = !!selectedBets[oddsItem.id];
+                        if (isSelected) {
+                            btn.className = "h-[36px] flex-1 flex items-center justify-between px-3 border rounded text-sm transition-all active-bet-btn";
+                            btn.querySelector('span:first-child').className = "text-white text-xs";
+                            btn.querySelector('span:last-child').className = "font-bold text-white";
+                        } else {
+                            btn.className = "h-[36px] flex-1 flex items-center justify-between px-3 border border-gray-200 rounded text-sm transition-all bg-[#f8fafc] hover:bg-blue-50";
+                            btn.querySelector('span:first-child').className = "text-blue-500 text-xs";
+                            btn.querySelector('span:last-child').className = "font-bold text-gray-800";
+                        }
+                    }
+                });
+            });
+
+            // 2. 刷新左侧投注单
+            const betKeys = Object.keys(selectedBets);
+            const betCount = betKeys.length;
+
+            if (betCount === 0) {
+                selectedBetsContainer.innerHTML = `<div id="empty-state" class="text-center text-gray-400 text-sm mt-10">请在右侧选择投注项</div>`;
+            } else {
+                let html = '';
+                betKeys.forEach(key => {
+                    const bet = selectedBets[key];
+                    html += `
+                    <div class="bg-white rounded shadow-sm border border-gray-200 p-2 mb-2 relative group">
+                        <button onclick="toggleBet('${bet.matchId}', '${bet.oddsId}')" class="absolute top-1 right-1 text-gray-300 hover:text-red-500 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                        <div class="text-[11px] text-blue-500 font-medium mb-1 truncate pr-5">[${bet.type}] ${bet.teamH} VS ${bet.teamC}</div>
+                        <div class="flex justify-between items-end">
+                            <div class="text-sm font-bold text-gray-800">${bet.name}</div>
+                            <div class="text-sm font-bold text-red-500">@${bet.value.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    `;
+                });
+                selectedBetsContainer.innerHTML = html;
+            }
+
+            // 更新 "单关" 按钮旁的注单数字 Badge
+            const slipCountBadge = document.getElementById('slip-count');
+            if (slipCountBadge) {
+                if (betCount > 0) {
+                    slipCountBadge.innerText = betCount;
+                    slipCountBadge.classList.remove('hidden');
+                } else {
+                    slipCountBadge.classList.add('hidden');
+                }
+            }
+
+            // 3. 处理 Nx 标识的显示与隐藏 (合并单关)
+            if (betCount > 1) {
+                targetMultiplier.innerText = `${betCount}x`;
+                subMultiplier.innerText = `${betCount}x`;
+                targetMultiplier.classList.remove('hidden');
+                subMultiplier.classList.remove('hidden');
+            } else {
+                targetMultiplier.classList.add('hidden');
+                subMultiplier.classList.add('hidden');
+            }
+
+            // 4. 重新计算金额
+            calculateMoney();
+        }
+
+        // --- 金额计算与发起人保底公式 ---
+        function calculateMoney() {
+            const target = parseFloat(targetAmountInput.value) || 0;
+            const sub = parseFloat(subscribeAmountInput.value) || 0;
+            const hasBets = Object.keys(selectedBets).length > 0;
+
+            // 发起人占比
+            if (target > 0 && sub >= 0) {
+                const ratio = (sub / target) * 100;
+                ratioDisplay.innerText = ratio.toFixed(2) + '%';
+                ratioDisplay.className = sub > target ? "font-medium text-red-500" : "font-medium text-gray-800";
+            } else {
+                ratioDisplay.innerText = '0%';
+                ratioDisplay.className = "font-medium text-gray-800";
+            }
+
+            // 预估70%金额 = 合买金额 * 0.7 - 认购金额 (仅在勾选时计算并展示实际金额)
+            if (guaranteeCheckbox.checked && target > 0) {
+                // 如果认购已经超过70%，则保底为0
+                let guaranteeAmt = (target * 0.7) - sub;
+                guaranteeAmt = guaranteeAmt > 0 ? guaranteeAmt : 0; 
+                guaranteeDisplay.innerText = guaranteeAmt.toFixed(2);
+                guaranteeDisplay.classList.add('text-blue-600', 'font-bold');
+            } else {
+                guaranteeDisplay.innerText = '0.00';
+                guaranteeDisplay.classList.remove('text-blue-600', 'font-bold');
+            }
+
+            // 校验提交按钮状态
+            if (hasBets && target > 0 && sub > 0 && sub <= target) {
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                submitBtn.classList.add('hover:bg-blue-600');
+            } else {
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                submitBtn.classList.remove('hover:bg-blue-600');
+            }
+        }
+
+        // --- 展开/折叠合买喜好 ---
+        window.togglePreferences = function() {
+            const content = document.getElementById('pref-content');
+            const arrow = document.getElementById('pref-arrow');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        };
+
+        // --- 事件监听绑定 ---
+        targetAmountInput.addEventListener('input', calculateMoney);
+        subscribeAmountInput.addEventListener('input', calculateMoney);
+        guaranteeCheckbox.addEventListener('change', calculateMoney);
+        
+        clearBtn.addEventListener('click', () => {
+            selectedBets = {};
+            targetAmountInput.value = '';
+            subscribeAmountInput.value = '';
+            guaranteeCheckbox.checked = false;
+            updateUI();
+        });
+
+        // --- 步骤切换逻辑 ---
+        function showStep(step) {
+            const step0Menu = document.getElementById('left-step-0-menu');
+            const step1Betslip = document.getElementById('left-step-1-betslip');
+            const confirmView = document.getElementById('step-2-confirm');
+            const successView = document.getElementById('step-3-success');
+            
+            // 隐藏所有区域
+            if (step0Menu) { step0Menu.classList.add('hidden'); step0Menu.classList.remove('flex'); }
+            if (step1Betslip) { step1Betslip.classList.add('hidden'); step1Betslip.classList.remove('flex'); }
+            if (confirmView) { confirmView.classList.add('hidden'); confirmView.classList.remove('flex'); }
+            if (successView) { successView.classList.add('hidden'); successView.classList.remove('flex'); }
+
+            if (step === 0 && step0Menu) {
+                step0Menu.classList.remove('hidden');
+                step0Menu.classList.add('flex');
+            } else if (step === 1 && step1Betslip) {
+                step1Betslip.classList.remove('hidden');
+                step1Betslip.classList.add('flex');
+            } else if (step === 2 && confirmView) {
+                confirmView.classList.remove('hidden');
+                confirmView.classList.add('flex');
+                renderConfirmStep();
+            } else if (step === 3 && successView) {
+                successView.classList.remove('hidden');
+                successView.classList.add('flex');
+                renderSuccessStep();
+            }
+        }
+
+        // --- 渲染确认界面 (步骤2) ---
+        function renderConfirmStep() {
+            const target = parseFloat(targetAmountInput.value) || 0;
+            const sub = parseFloat(subscribeAmountInput.value) || 0;
+            const rem = target - sub;
+            const myRatio = ((sub / target) * 100).toFixed(2);
+            const remRatio = ((rem / target) * 100).toFixed(2);
+            
+            const displayPref = document.querySelector('#pref-content select').value;
+            const inputs = document.querySelectorAll('#pref-content input[type="text"]');
+            const minSub = inputs[0].value;
+            const commission = inputs[1].value;
+            const oddsChange = inputs[2].value;
+            const deadline = inputs[3].value;
+            const isGuarantee = document.getElementById('guarantee-checkbox').checked ? '是' : '否';
+
+            let betsHtml = '';
+            Object.values(selectedBets).forEach(bet => {
+                const parentMatch = matches.find(m => m.id === bet.matchId);
+                const matchTime = parentMatch ? parentMatch.time : '';
+                
+                betsHtml += `
+                <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-100 mb-3">
+                    <div class="font-bold text-gray-800 text-sm mb-1">欧洲联赛</div>
+                    <div class="text-[13px] text-gray-800">${bet.teamH} VS ${bet.teamC}</div>
+                    <div class="text-xs text-gray-400 mt-0.5 mb-3">${matchTime}</div>
+                    <div class="bg-[#f4f7fb] rounded p-2 text-[13px]">
+                        <div class="text-[#1e88e5] mb-1">[赛前] ${bet.type} [欧洲盘]</div>
+                        <div class="text-[#1e88e5] mb-1">${bet.name}</div>
+                        <div class="font-bold text-gray-800 text-sm">@${bet.value.toFixed(2)}</div>
+                    </div>
+                </div>
+                `;
+            });
+
+            const summaryHtml = `
+            <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-100 text-[13px] space-y-2.5 text-gray-600 mb-2">
+                <div class="flex justify-between items-center"><span>合买金额</span><span class="text-gray-800">${target}RMB</span></div>
+                <div class="flex justify-between items-center"><span>剩余认购</span><span class="text-gray-800">${rem} (${remRatio}%)</span></div>
+                <div class="flex justify-between items-center"><span>我的认购</span><span class="text-gray-800">${sub} (${myRatio}%)</span></div>
+                <div class="flex justify-between items-center"><span>合买展示</span><span class="text-gray-800">${displayPref}</span></div>
+                <div class="flex justify-between items-center"><span>认购最低限额</span><span class="text-gray-800">${minSub}</span></div>
+                <div class="flex justify-between items-center"><span>佣金</span><span class="text-gray-800">${commission}</span></div>
+                <div class="flex justify-between items-center"><span>赔率变动撤单范围</span><span class="text-gray-800">${oddsChange}</span></div>
+                <div class="flex justify-between items-center"><span>最终截止时间</span><span class="text-gray-800">开赛前${deadline}分钟</span></div>
+                <div class="flex justify-between items-center"><span>发起人保底</span><span class="text-gray-800">${isGuarantee}</span></div>
+            </div>
+            `;
+
+            document.getElementById('confirm-details-container').innerHTML = betsHtml + summaryHtml;
+        }
+
+        // --- 渲染成功界面 (步骤3) ---
+        function renderSuccessStep() {
+            const target = parseFloat(targetAmountInput.value) || 0;
+            const sub = parseFloat(subscribeAmountInput.value) || 0;
+            const rem = target - sub;
+            const myRatio = ((sub / target) * 100).toFixed(2);
+            const remRatio = ((rem / target) * 100).toFixed(2);
+            
+            const displayPref = document.querySelector('#pref-content select').value;
+            const inputs = document.querySelectorAll('#pref-content input[type="text"]');
+            const minSub = inputs[0].value;
+            const commission = inputs[1].value;
+            const oddsChange = inputs[2].value;
+            const deadline = inputs[3].value;
+            const isGuarantee = document.getElementById('guarantee-checkbox').checked ? '是' : '否';
+
+            let betsHtml = '';
+            Object.values(selectedBets).forEach(bet => {
+                const parentMatch = matches.find(m => m.id === bet.matchId);
+                const matchTime = parentMatch ? parentMatch.time : '';
+                
+                betsHtml += `
+                <div class="mb-5">
+                    <div class="font-bold text-gray-800 text-[15px] mb-1">欧洲联赛</div>
+                    <div class="text-[13px] text-gray-800">${bet.teamH} VS ${bet.teamC}</div>
+                    <div class="text-xs text-gray-400 mt-0.5 mb-2">${matchTime}</div>
+                    <div class="bg-[#f4f7fb] rounded p-2 text-[13px] relative border border-[#e2e8f0]">
+                        <div class="text-[#1e88e5] mb-1">[赛前] ${bet.type} [欧洲盘]</div>
+                        <div class="text-[#1e88e5] mb-1">${bet.name}</div>
+                        <div class="font-bold text-gray-800 text-[15px]">@${bet.value.toFixed(2)}</div>
+                        <div class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#1e88e5] text-white text-[11px] px-2 py-0.5 rounded">合买进行中</div>
+                    </div>
+                </div>
+                `;
+            });
+
+            // 模拟随机生成注单号
+            const dateStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
+            const seqNo = 'HM2026' + dateStr + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            const orderNo = Math.floor(Math.random() * 10000000000000000).toString();
+            const subNo = 'RG' + Math.floor(Math.random() * 10000000000000000).toString();
+
+            const copyIcon = `<svg class="w-3.5 h-3.5 text-gray-400 inline ml-1 cursor-pointer hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
+
+            const summaryHtml = `
+            <div class="text-[13px] space-y-2.5 text-gray-600 mb-5 border-b border-gray-100 pb-5">
+                <div class="flex justify-between items-center"><span>合买金额</span><span class="text-gray-800">${target}RMB</span></div>
+                <div class="flex justify-between items-center"><span>剩余认购</span><span class="text-gray-800">${rem} (${remRatio}%)</span></div>
+                <div class="flex justify-between items-center"><span>我的认购</span><span class="text-gray-800">${sub} (${myRatio}%)</span></div>
+                <div class="flex justify-between items-center"><span>合买展示</span><span class="text-gray-800">${displayPref}</span></div>
+                <div class="flex justify-between items-center"><span>认购最低限额</span><span class="text-gray-800">${minSub}</span></div>
+                <div class="flex justify-between items-center"><span>佣金</span><span class="text-gray-800">${commission}</span></div>
+                <div class="flex justify-between items-center"><span>赔率变动撤单范围</span><span class="text-gray-800">${oddsChange}</span></div>
+                <div class="flex justify-between items-center"><span>最终截止时间</span><span class="text-gray-800">开赛前${deadline}分钟</span></div>
+                <div class="flex justify-between items-center"><span>发起人保底</span><span class="text-gray-800">${isGuarantee}</span></div>
+            </div>
+
+            <div class="text-[13px] space-y-3 text-gray-600 mb-6">
+                <div>
+                    <div class="mb-0.5">合买序号</div>
+                    <div class="text-gray-800 font-mono">${seqNo} ${copyIcon}</div>
+                </div>
+                <div>
+                    <div class="mb-0.5">合买单号</div>
+                    <div class="text-gray-800 font-mono">${orderNo} ${copyIcon}</div>
+                </div>
+                <div>
+                    <div class="mb-0.5">认购编号</div>
+                    <div class="text-gray-800 font-mono">${subNo} ${copyIcon}</div>
+                </div>
+            </div>
+
+            <div class="bg-[#e8f5e9] text-[#2e7d32] rounded p-2.5 text-center text-sm font-medium flex items-center justify-center gap-1.5 border border-[#c8e6c9]">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                您的合买发起注单已确认
+            </div>
+            `;
+
+            document.getElementById('success-details-container').innerHTML = betsHtml + summaryHtml;
+        }
+
+        // --- 按钮事件绑定 ---
+        submitBtn.addEventListener('click', () => {
+            if (submitBtn.classList.contains('cursor-not-allowed')) return;
+            showStep(2);
+        });
+
+        document.getElementById('cancel-confirm-btn').addEventListener('click', () => {
+            showStep(1);
+        });
+
+        document.getElementById('real-submit-btn').addEventListener('click', () => {
+            showStep(3);
+        });
+
+        document.getElementById('success-confirm-btn').addEventListener('click', () => {
+            selectedBets = {};
+            targetAmountInput.value = '';
+            subscribeAmountInput.value = '';
+            guaranteeCheckbox.checked = false;
+            updateUI();
+            showStep(0);
+        });
+
+        document.getElementById('keep-options-btn').addEventListener('click', () => {
+            showStep(0);
+        });
+
+        document.getElementById('cancel-order-btn').addEventListener('click', () => {
+            selectedBets = {};
+            targetAmountInput.value = '';
+            subscribeAmountInput.value = '';
+            guaranteeCheckbox.checked = false;
+            updateUI();
+            showStep(0);
+        });
+
+        // 启动渲染
+        renderMatches();
+        // 初始设定为步骤 0
+        showStep(0);
+
+    </script>
+</body>
+</html>
