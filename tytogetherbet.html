@@ -46,13 +46,9 @@
         <!-- 全局 Logo 区 (全新 IceBet 冰块设计) -->
         <div class="h-14 flex items-center justify-start px-4 border-b border-gray-100 bg-white">
             <div class="flex items-center gap-2 text-[#0ea5e9] font-black text-[22px] tracking-wide">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#7dd3fc"/>
-                    <path d="M2 7V17L12 22V12L2 7Z" fill="#0284c7"/>
-                    <path d="M22 7V17L12 22V12L22 7Z" fill="#0ea5e9"/>
-                    <path d="M12 12L12 22" stroke="#f0f9ff" stroke-width="0.5" stroke-linejoin="round"/>
-                    <path d="M2 7L12 12" stroke="#f0f9ff" stroke-width="0.5" stroke-linejoin="round"/>
-                    <path d="M22 7L12 12" stroke="#f0f9ff" stroke-width="0.5" stroke-linejoin="round"/>
+                <!-- 冰块 3D 风格 SVG -->
+                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L2 7.8V16.2L12 22L22 16.2V7.8L12 2ZM12 4.3L19.5 8.7L12 13L4.5 8.7L12 4.3ZM3.5 15.3V9.5L11 13.8V20.1L3.5 15.3ZM13 20.1V13.8L20.5 9.5V15.3L13 20.1Z" />
                 </svg>
                 <span class="italic">IceBet</span>
             </div>
@@ -80,12 +76,12 @@
 
         <!-- 菜单栏 -->
         <div class="flex flex-col border-b border-gray-200">
-            <div id="menu-hall" class="flex items-center p-3 cursor-pointer text-sky-600 font-medium bg-sky-50 border-l-[3px] border-sky-500" onclick="hideHistoryView()">
+            <div id="menu-hall" class="flex items-center p-3 cursor-pointer text-sky-600 font-medium bg-sky-50 border-l-[3px] border-sky-500 transition-colors" onclick="hideHistoryView()">
                 <span class="mr-2 text-white font-bold bg-red-500 w-5 h-5 flex items-center justify-center rounded text-xs">合</span> 合买大厅
                 <span class="ml-auto text-sky-500 font-bold text-[11px] bg-white border border-sky-100 px-1.5 py-[1px] rounded shadow-sm">1</span>
             </div>
             <!-- 合买记录菜单 -->
-            <div id="menu-records" class="flex items-center p-3 hover:bg-gray-50 cursor-pointer text-gray-600 border-l-[3px] border-transparent transition-colors" onclick="showHistoryView()">
+            <div id="menu-records" class="flex items-center p-3 hover:bg-sky-50 cursor-pointer text-gray-600 border-l-[3px] border-transparent transition-colors" onclick="showStep(4)">
                 <span class="mr-2 text-white font-bold bg-[#0ea5e9] w-5 h-5 flex items-center justify-center rounded text-xs">记</span> 合买记录
             </div>
         </div>
@@ -145,7 +141,7 @@
             <!-- 底部合买表单区域 -->
             <div id="bet-form-container" class="bg-white border-t border-gray-200 p-3 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.05)] flex flex-col gap-3 overflow-y-auto flex-shrink min-h-0 max-h-[65vh]">
                 
-                <!-- 合买金额 (修改 Nx 布局) -->
+                <!-- 合买金额 (Nx 布局修正) -->
                 <div class="flex items-center">
                     <div class="text-[13px] text-gray-700 w-10">合买</div>
                     <div class="flex-1 flex items-center bg-[#f4f7fb] border border-[#e2e8f0] rounded focus-within:border-sky-400 transition-colors px-3 py-0.5">
@@ -154,7 +150,7 @@
                     </div>
                 </div>
 
-                <!-- 认购金额 (修改 Nx 布局) -->
+                <!-- 认购金额 (Nx 布局修正) -->
                 <div class="flex items-center">
                     <div class="text-[13px] text-gray-700 w-10">认购</div>
                     <div class="flex-1 flex items-center bg-[#f4f7fb] border border-[#e2e8f0] rounded focus-within:border-sky-400 transition-colors px-3 py-0.5">
@@ -425,32 +421,29 @@
 
     <!-- 右侧：赛事列表区域 -->
     <main class="flex-1 flex flex-col h-full bg-gray-50 overflow-hidden">
-        <!-- 主导航栏，无Logo -->
-        <header class="bg-white border-b border-gray-200">
-            <div class="h-14 flex items-center px-6 gap-6 text-sm font-medium text-gray-600">
-                <a href="#" class="hover:text-sky-600 transition-colors">体育投注</a>
-                <a href="#" class="hover:text-sky-600 transition-colors">电子竞技</a>
-                <a href="#" class="hover:text-sky-600 transition-colors">VR体育</a>
-                <a href="#" class="hover:text-sky-600 transition-colors">注单历史</a>
-                <a href="#" class="hover:text-sky-600 transition-colors">赛果</a>
-                <a href="#" class="hover:text-sky-600 transition-colors">体育竞猜规则</a>
-                <a href="#" class="text-sky-600 border-b-2 border-sky-600 pb-[18px] pt-[18px]">合买大厅</a>
-            </div>
-            <div class="bg-sky-50/50 border-t border-gray-100 py-1.5 px-6 text-xs text-gray-500 flex items-center">
-                <span class="border border-sky-300 text-sky-500 rounded px-1 text-[10px] mr-2">公告</span>
-                <marquee class="flex-1" scrollamount="4">选择多个投注项进入合并单关模式，左侧输入框将自动增加 Nx 标识。展开“合买喜好”并勾选“发起人保底”可查看自动计算的保底金额。</marquee>
-            </div>
+        
+        <!-- 全局顶级导航 (仅保留一行) -->
+        <header id="main-global-header" class="bg-white border-b border-gray-200 h-14 flex items-center px-6 gap-6 text-sm font-medium text-gray-600 flex-shrink-0 transition-all">
+            <a href="#" class="hover:text-sky-600 transition-colors h-full flex items-center">体育投注</a>
+            <a href="#" class="hover:text-sky-600 transition-colors h-full flex items-center">电子竞技</a>
+            <a href="#" class="hover:text-sky-600 transition-colors h-full flex items-center">VR体育</a>
+            <a href="#" class="hover:text-sky-600 transition-colors h-full flex items-center">注单历史</a>
+            <a href="#" class="hover:text-sky-600 transition-colors h-full flex items-center">赛果</a>
+            <a href="#" class="hover:text-sky-600 transition-colors h-full flex items-center">体育竞猜规则</a>
+            <a href="#" class="text-[#0ea5e9] border-b-[3px] border-[#0ea5e9] h-full flex items-center font-bold">合买大厅</a>
         </header>
 
-        <!-- 合买大厅全局顶部栏 -->
-        <div id="main-top-nav" class="bg-white border-b border-gray-200 p-3 px-4 flex justify-between items-center shadow-sm z-20 flex-shrink-0 transition-all">
+        <!-- 合买大厅/历史模式 顶部导航栏 -->
+        <div id="main-top-nav" class="bg-white border-b border-gray-200 px-4 h-[56px] flex justify-between items-center shadow-sm z-20 flex-shrink-0">
             <div class="flex items-center gap-4">
                 
-                <!-- 历史模式的返回箭头 -->
-                <button id="nav-back-btn" onclick="hideHistoryView()" class="hidden items-center text-gray-500 hover:text-sky-500 transition-colors mr-1">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <!-- 历史模式的返回箭头与标题 -->
+                <button id="nav-back-btn" onclick="hideHistoryView()" class="hidden items-center text-gray-800 hover:text-sky-500 transition-colors mr-2">
+                    <svg class="w-5 h-5 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span class="font-bold text-lg">合买大厅</span>
                 </button>
                 
+                <!-- 大厅模式的纯标题 -->
                 <span id="nav-title-hall" class="font-bold text-gray-800 text-lg mr-2">合买大厅</span>
                 
                 <!-- 模式切换 (大厅) -->
@@ -478,22 +471,28 @@
                 </div>
             </div>
             
-            <div class="flex items-center gap-4 text-xs text-gray-400">
-                <a href="#" class="hover:text-sky-500">合买规则</a>
-                <span>|</span>
-                <a href="#" id="nav-btn-history" onclick="showHistoryView(); return false;" class="hover:text-sky-500 transition-colors">合买注单历史</a>
-                <div class="flex items-center bg-white border border-gray-200 rounded-full overflow-hidden ml-2 shadow-sm focus-within:border-sky-400">
-                    <input type="text" placeholder="请输入合买序号搜索" class="bg-transparent px-4 py-1.5 text-xs outline-none w-48 text-gray-700">
-                    <button class="bg-[#0ea5e9] hover:bg-sky-600 text-white px-5 py-1.5 font-medium transition-colors border-l border-[#0ea5e9]">搜索</button>
+            <div class="flex items-center gap-4 text-xs text-gray-500 h-full">
+                <a href="#" class="hover:text-sky-500 transition-colors flex items-center h-full">合买规则</a>
+                <span class="text-gray-300">|</span>
+                <a href="#" id="nav-btn-history" onclick="showHistoryView(); return false;" class="hover:text-sky-500 transition-colors flex items-center h-full border-b-[3px] border-transparent box-border">合买注单历史</a>
+                <div class="flex items-center bg-white border border-gray-200 rounded-full overflow-hidden shadow-sm focus-within:border-sky-400 h-8 ml-2">
+                    <input type="text" placeholder="请输入合买序号搜索" class="bg-transparent px-4 py-1 text-xs outline-none w-48 text-gray-700">
+                    <button class="bg-[#0ea5e9] hover:bg-sky-600 text-white px-5 py-1.5 h-full font-medium transition-colors border-l border-[#0ea5e9]">搜索</button>
                 </div>
             </div>
         </div>
 
-        <!-- 包含空状态与赛事的相对定位容器 -->
+        <!-- 包含公告、空状态与赛事的相对定位容器 -->
         <div class="flex-1 relative flex flex-col overflow-hidden">
             
+            <!-- 公告区 (绑定在内容区顶部) -->
+            <div id="main-announcement" class="bg-sky-50/50 border-b border-gray-100 py-1.5 px-6 text-xs text-gray-500 flex items-center flex-shrink-0">
+                <span class="border border-sky-300 text-sky-500 rounded px-1 text-[10px] mr-2 flex-shrink-0">公告</span>
+                <marquee class="flex-1" scrollamount="4">选择多个投注项进入合并单关模式，左侧输入框将自动增加 Nx 标识。展开“合买喜好”并勾选“发起人保底”可查看自动计算的保底金额。</marquee>
+            </div>
+
             <!-- 占位空状态 (一开始显示) -->
-            <div id="right-empty-state" class="absolute inset-0 z-10 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+            <div id="right-empty-state" class="absolute inset-0 top-[30px] z-10 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
                 <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <p class="text-lg font-medium">请在左侧选择球种</p>
                 <p class="text-sm mt-1">选择后将在此处展示赛事列表</p>
@@ -523,7 +522,7 @@
             </div>
 
             <!-- 参与合买视图区 (初始隐藏，由 Tabs 切换) -->
-            <div id="right-participate-content" class="hidden absolute inset-0 z-30 flex bg-[#f5f7fa] p-4 gap-4 overflow-hidden">
+            <div id="right-participate-content" class="hidden absolute inset-0 top-[30px] z-30 flex bg-[#f5f7fa] p-4 gap-4 overflow-hidden">
                 <!-- 左侧：合买列表 -->
                 <div class="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden">
                     <!-- 筛选区 -->
@@ -660,7 +659,7 @@
             <!-- ============================================== -->
             <!-- 新增：合买注单历史 视图区 -->
             <!-- ============================================== -->
-            <div id="right-history-content" class="hidden absolute inset-0 z-40 flex flex-col bg-[#f5f7fa] overflow-hidden">
+            <div id="right-history-content" class="hidden absolute inset-0 top-[30px] z-40 flex flex-col bg-[#f5f7fa] overflow-hidden">
                 
                 <!-- Main Content -->
                 <div class="flex-1 flex p-4 gap-4 overflow-hidden">
@@ -792,7 +791,7 @@
     </main>
 
     <!-- ============================================== -->
-    <!-- 撤单确认弹窗 (重构版) -->
+    <!-- 撤单确认弹窗 (去重复唯一版) -->
     <!-- ============================================== -->
     <div id="cancel-confirm-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
         <div class="bg-white rounded-xl w-[320px] max-w-[90%] flex flex-col overflow-hidden shadow-2xl transform transition-all scale-100 opacity-100 duration-200 ease-out">
@@ -807,16 +806,13 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- 赛事信息 弹窗 -->
+    <!-- 赛事信息(查看所有选项) 弹窗 (去重复唯一版) -->
     <!-- ============================================== -->
     <div id="match-options-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
         <div class="bg-white rounded-xl w-[360px] max-w-[90%] flex flex-col overflow-hidden shadow-2xl transform transition-all">
-            <!-- 头部 -->
             <div class="py-4 border-b border-gray-100 flex justify-center items-center relative">
                 <h3 class="text-[17px] font-bold text-gray-800 tracking-wide">赛事信息</h3>
             </div>
-            
-            <!-- 内容区 -->
             <div class="p-5 overflow-y-auto max-h-[65vh] bg-white">
                 <div class="space-y-3">
                     <!-- 选项1 -->
@@ -829,8 +825,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- 底部按钮 -->
             <div class="p-4 bg-white">
                 <button onclick="closeMatchOptionsModal()" class="w-full bg-[#0ea5e9] hover:bg-sky-600 text-white font-medium py-3 rounded-full transition-colors text-[15px] tracking-wide shadow-sm">
                     确认
@@ -839,11 +833,12 @@
         </div>
     </div>
 
+    <!-- Script Block -->
     <script>
         // --- 模拟赛事数据 ---
         const matches = [
             {
-                id: 'm1', teamH: '费雷堡', teamC: '亨克', time: '03-20 01:45(GTM+8)',
+                id: 'm1', teamH: '费雷堡', teamC: '亨克', time: '03-20 01:45(GMT+8)',
                 odds: {
                     win: { id: 'm1-winH', name: '主胜', value: 1.60, type: '全场独赢' },
                     draw: { id: 'm1-draw', name: '平局', value: 4.25, type: '全场独赢' },
@@ -851,7 +846,7 @@
                 }
             },
             {
-                id: 'm2', teamH: '米迪兰特', teamC: '诺定咸森林', time: '03-20 01:45(GTM+8)',
+                id: 'm2', teamH: '米迪兰特', teamC: '诺定咸森林', time: '03-20 01:45(GMT+8)',
                 odds: {
                     win: { id: 'm2-winH', name: '主胜', value: 2.90, type: '全场独赢' },
                     draw: { id: 'm2-draw', name: '平局', value: 3.70, type: '全场独赢' },
@@ -859,7 +854,7 @@
                 }
             },
             {
-                id: 'm3', teamH: '里昂', teamC: '切尔达', time: '03-20 01:45(GTM+8)',
+                id: 'm3', teamH: '里昂', teamC: '切尔达', time: '03-20 01:45(GMT+8)',
                 odds: {
                     win: { id: 'm3-winH', name: '主胜', value: 2.18, type: '全场独赢' },
                     draw: { id: 'm3-draw', name: '平局', value: 3.30, type: '全场独赢' },
@@ -868,8 +863,8 @@
             }
         ];
 
-        let selectedBets = {}; // 存储选中项
-        let partState = 1; // 参与合买流程状态：1=输入认购金额，2=确认认购，3=认购成功
+        let selectedBets = {}; 
+        let partState = 1; 
 
         // --- 參與合買清空假資料列表 ---
         let participateOrders = [];
@@ -877,20 +872,18 @@
         // --- 我参与的合买记录本地缓存 ---
         let myRecords = {};
 
-        let currentViewOrderId = null; // 紀錄右側正在預覽的訂單ID
-        let currentProcessingOrder = null; // 紀錄左側正在認購的訂單
-        let currentPartAmt = 0; // 暫存當前準備認購的金額
-        let orderToDeleteId = null; // 當前準備撤單的訂單ID
+        let currentViewOrderId = null; 
+        let currentProcessingOrder = null; 
+        let currentPartAmt = 0; 
+        let orderToDeleteId = null; 
 
         // --- DOM 元素引用 ---
         const matchListContainer = document.getElementById('match-list-container');
         const selectedBetsContainer = document.getElementById('selected-bets-container');
-        
         const targetAmountInput = document.getElementById('target-amount');
         const subscribeAmountInput = document.getElementById('subscribe-amount');
         const targetMultiplier = document.getElementById('target-multiplier');
         const subMultiplier = document.getElementById('sub-multiplier');
-        
         const ratioDisplay = document.getElementById('ratio-display');
         const guaranteeCheckbox = document.getElementById('guarantee-checkbox');
         const guaranteeDisplay = document.getElementById('guarantee-display');
@@ -961,7 +954,7 @@
                         <div class="text-xs text-gray-800 font-medium mb-1">${order.user}</div>
                         <div class="text-[10px] text-gray-400 flex items-center justify-center group hover:text-sky-500 w-full overflow-hidden">
                             <span class="truncate flex-1 text-right">${order.orderNo}</span>
-                            <svg class="w-3 h-3 ml-1 opacity-50 group-hover:opacity-100 inline-block flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <svg class="w-3 h-3 ml-1 opacity-50 group-hover:opacity-100 inline-block flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </div>
                     </div>
                     <!-- 2 胜率 -->
@@ -1018,7 +1011,6 @@
                     <div class="text-[#0ea5e9] text-[12px] mb-1">[足球] 赛前全场独赢 [欧洲盘]</div>
                     <div class="text-[#0ea5e9] text-[12px] mb-1">${record.betName}</div>
                     <div class="flex justify-between items-center mb-3">
-                        <!-- 我的合买记录中赔率也是绿色 -->
                         <div class="font-bold text-[#4caf50] text-[14px]">@${record.odds}</div>
                         <div class="bg-[#0ea5e9] text-white px-1.5 py-0.5 rounded text-[10px]">合买进行中</div>
                     </div>
@@ -1052,7 +1044,7 @@
             container.innerHTML = html;
         }
 
-        // --- 查看详情刷新右侧逻辑 (参与大厅) ---
+        // --- 查看详情刷新右侧逻辑 ---
         window.viewDetails = function(orderId) {
             const order = participateOrders.find(o => o.id === orderId);
             if (!order) return;
@@ -1061,14 +1053,12 @@
             document.getElementById('detail-league').innerText = '[足球] 欧洲联赛';
             document.getElementById('detail-bet-name').innerHTML = `${order.bet.name} <span class="text-[#4caf50] font-bold" id="detail-odds">@${order.odds}</span>`;
             
-            // 轉換假資料的時間格式 (將 03-20 01:45(GTM+8) 轉為 2026-03-24 23:15:00 樣式)
             let formattedTime = `2026-03-24 23:15:00`; // 對齊截圖指定時間
             
             document.getElementById('detail-match-time').innerText = formattedTime;
             document.getElementById('detail-bet-type').innerText = `[赛前] ${order.bet.type} [欧洲盘]`;
             document.getElementById('detail-team-names').innerText = `${order.bet.teamH} VS ${order.bet.teamC}`;
             
-            // 刷新右側合买资讯
             document.getElementById('detail-deadline').innerText = `${formattedTime} (GMT+8)`;
             document.getElementById('detail-total-amt').innerText = order.totalAmt.toFixed(2) + 'RMB';
             document.getElementById('detail-progress-text').innerText = order.progress + '%';
@@ -1081,7 +1071,6 @@
 
         // --- 核心交互逻辑 ---
         
-        // 顶部大类模式切换 (发起合买 vs 参与合买)
         window.switchMainTab = function(mode) {
             const initiateBtn = document.getElementById('tab-initiate');
             const participateBtn = document.getElementById('tab-participate');
@@ -1092,7 +1081,6 @@
             if (historyView) historyView.classList.add('hidden');
 
             if (mode === 'initiate') {
-                // 发起合买状态
                 initiateBtn.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full bg-white text-[#0ea5e9] font-bold shadow-sm transition-colors";
                 participateBtn.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full text-gray-500 hover:text-[#0ea5e9] transition-colors";
                 participateSubTabs.classList.add('hidden');
@@ -1101,7 +1089,6 @@
                 selectSport('football'); // 自動展開選單
                 showStep(0);
             } else {
-                // 参与合买状态
                 participateBtn.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full bg-white text-[#0ea5e9] font-bold shadow-sm transition-colors";
                 initiateBtn.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full text-gray-500 hover:text-[#0ea5e9] transition-colors";
                 participateSubTabs.classList.remove('hidden');
@@ -1110,7 +1097,6 @@
             }
         };
 
-        // 选择球种，展示右侧列表
         window.selectSport = function(sport) {
             document.getElementById('right-empty-state').classList.add('hidden');
             document.getElementById('right-match-content').classList.remove('hidden');
@@ -1137,15 +1123,16 @@
 
             updateUI();
 
-            // 若目前在球种选单 (step 0)，点击赔率后自动展开投注单 (step 1)
             const step0Menu = document.getElementById('left-step-0-menu');
             if (step0Menu && !step0Menu.classList.contains('hidden') && Object.keys(selectedBets).length > 0) {
                 showStep(1);
             }
+            if (Object.keys(selectedBets).length === 0) {
+                showStep(0); // 清空時退回
+            }
         };
 
         function updateUI() {
-            // 1. 刷新右侧按钮状态
             matches.forEach(match => {
                 Object.values(match.odds).forEach(oddsItem => {
                     const btn = document.getElementById(`btn-${oddsItem.id}`);
@@ -1164,7 +1151,6 @@
                 });
             });
 
-            // 2. 刷新左侧投注单
             const betKeys = Object.keys(selectedBets);
             const betCount = betKeys.length;
 
@@ -1183,7 +1169,7 @@
                         <div class="text-[11px] text-gray-500 mb-1">${bet.time}</div>
                         <div class="flex justify-between items-end">
                             <div class="text-sm font-bold text-gray-800">${bet.name}</div>
-                            <!-- 发起合买赔率颜色改为黑色 -->
+                            <!-- 发起合买赔率颜色保持黑色 -->
                             <div class="text-sm font-bold text-black">@${bet.value.toFixed(2)}</div>
                         </div>
                     </div>
@@ -1192,7 +1178,6 @@
                 selectedBetsContainer.innerHTML = html;
             }
 
-            // 更新 "单关" 按钮旁的注单数字 Badge
             const slipCountBadge = document.getElementById('slip-count');
             if (slipCountBadge) {
                 if (betCount > 0) {
@@ -1203,7 +1188,6 @@
                 }
             }
 
-            // 3. 处理 Nx 标识的显示与隐藏 (合并单关)
             if (betCount > 1) {
                 targetMultiplier.innerText = `${betCount}x`;
                 subMultiplier.innerText = `${betCount}x`;
@@ -1214,17 +1198,14 @@
                 subMultiplier.classList.add('hidden');
             }
 
-            // 4. 重新计算金额
             calculateMoney();
         }
 
-        // --- 金额计算与发起人保底公式 ---
         function calculateMoney() {
             const target = parseFloat(targetAmountInput.value) || 0;
             const sub = parseFloat(subscribeAmountInput.value) || 0;
             const hasBets = Object.keys(selectedBets).length > 0;
 
-            // 发起人占比
             if (target > 0 && sub >= 0) {
                 const ratio = (sub / target) * 100;
                 ratioDisplay.innerText = ratio.toFixed(2) + '%';
@@ -1234,9 +1215,7 @@
                 ratioDisplay.className = "font-medium text-gray-800";
             }
 
-            // 预估70%金额 = 合买金额 * 0.7 - 认购金额 (仅在勾选时计算并展示实际金额)
             if (guaranteeCheckbox.checked && target > 0) {
-                // 如果认购已经超过70%，则保底为0
                 let guaranteeAmt = (target * 0.7) - sub;
                 guaranteeAmt = guaranteeAmt > 0 ? guaranteeAmt : 0; 
                 guaranteeDisplay.innerText = guaranteeAmt.toFixed(2);
@@ -1246,7 +1225,6 @@
                 guaranteeDisplay.classList.remove('text-sky-600', 'font-bold');
             }
 
-            // 校验提交按钮状态
             if (hasBets && target > 0 && sub > 0 && sub <= target) {
                 submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                 submitBtn.classList.add('hover:bg-sky-600');
@@ -1256,7 +1234,6 @@
             }
         }
 
-        // --- 展开/折叠合买喜好 ---
         window.togglePreferences = function() {
             const content = document.getElementById('pref-content');
             const arrow = document.getElementById('pref-arrow');
@@ -1269,7 +1246,6 @@
             }
         };
 
-        // --- 事件监听绑定 ---
         targetAmountInput.addEventListener('input', calculateMoney);
         subscribeAmountInput.addEventListener('input', calculateMoney);
         guaranteeCheckbox.addEventListener('change', calculateMoney);
@@ -1280,6 +1256,7 @@
             subscribeAmountInput.value = '';
             guaranteeCheckbox.checked = false;
             updateUI();
+            showStep(0); // 點擊取消合買退回球種清單
         });
 
         // --- 参与合买互动流程 ---
@@ -1288,15 +1265,14 @@
             const order = participateOrders.find(o => o.id === orderId);
             if (!order) return;
             
-            showStep(-1); // 自定义特殊状态，隐藏所有常规区域
+            showStep(-1); 
             
             const partFlow = document.getElementById('left-participate-flow');
             partFlow.classList.remove('hidden');
             partFlow.classList.add('flex');
             
-            let formattedTime = `2026-03-24 23:15:00`; // 對齊截圖時間
+            let formattedTime = `2026-03-24 23:15:00`;
 
-            // Render specific bet item
             const betContainer = document.getElementById('part-flow-bet-container');
             betContainer.innerHTML = `
                 <div class="bg-white rounded p-3 mb-2 shadow-sm border border-gray-100">
@@ -1312,7 +1288,6 @@
                 </div>
             `;
             
-            // Update amounts based on order
             document.getElementById('part-flow-total-amt').innerText = order.totalAmt + 'RMB';
             document.getElementById('part-rem-sub').innerText = `${order.remAmt} (${(order.remAmt/order.totalAmt*100).toFixed(2)}%)`;
             document.getElementById('part-order-no-1').innerText = order.orderNo;
@@ -1320,7 +1295,6 @@
             partState = 1;
             document.getElementById('part-input-wrapper').classList.remove('hidden');
             
-            // 加入已存在認購額的計算判斷
             let mySubAmt = 0;
             if (myRecords[order.id]) {
                 mySubAmt = myRecords[order.id].mySubAmt;
@@ -1341,9 +1315,8 @@
             if (!order) return;
             
             if (partState === 1) {
-                // 进入状态2：确认认购
                 const inputAmtStr = document.getElementById('part-input-amt').value;
-                currentPartAmt = inputAmtStr ? parseFloat(inputAmtStr) : 2; // 若为空默认模拟2
+                currentPartAmt = inputAmtStr ? parseFloat(inputAmtStr) : 2; 
                 
                 let prevMySub = myRecords[order.id] ? myRecords[order.id].mySubAmt : 0;
                 let newMySub = prevMySub + currentPartAmt;
@@ -1358,11 +1331,9 @@
                 partState = 2;
                 
             } else if (partState === 2) {
-                // 进入状态3：认购成功
                 
                 const subNo = 'RG' + Math.floor(Math.random() * 10000000000000000).toString();
                 
-                // Update or create record in myRecords
                 if (myRecords[order.id]) {
                     myRecords[order.id].mySubAmt += currentPartAmt;
                     myRecords[order.id].subs.push({ amt: currentPartAmt, subNo: subNo });
@@ -1378,29 +1349,26 @@
                         totalAmt: order.totalAmt,
                         mySubAmt: currentPartAmt,
                         maxWin: order.totalAmt * parseFloat(order.odds),
-                        seqNo: order.seqNo || order.orderNo, // Ensure fallback if missing
+                        seqNo: order.seqNo || order.orderNo, 
                         orderNo: order.realOrderNo || Math.floor(Math.random() * 10000000000000000).toString(),
                         subs: [{ amt: currentPartAmt, subNo: subNo }]
                     };
                 }
 
-                // Update public list remaining amount and progress
                 order.remAmt -= currentPartAmt;
                 order.progress = Math.floor(((order.totalAmt - order.remAmt) / order.totalAmt) * 100);
                 
-                // Update order internal history for history view
                 order.historySubs.push({
                     time: new Date().toISOString().slice(0,19).replace('T', ' '),
                     subNo: subNo,
                     amt: currentPartAmt,
                     win: currentPartAmt * parseFloat(order.odds),
-                    type: '发起人认购' // 或 参与人认购
+                    type: '发起人认购'
                 });
                 
                 renderParticipateList();
-                renderHistoryList(); // 同步刷新历史表格
+                renderHistoryList();
 
-                // 刷新右側詳情 (若為參與大廳 或 歷史紀錄大廳)
                 if (document.getElementById('right-participate-content').classList.contains('hidden') === false) {
                     viewDetails(order.id);
                 } else if (document.getElementById('right-history-content').classList.contains('hidden') === false) {
@@ -1416,8 +1384,7 @@
                 partState = 3;
                 
             } else if (partState === 3) {
-                // 完成，返回球种菜单
-                showStep(0);
+                hideHistoryView(); 
             }
         };
 
@@ -1438,9 +1405,7 @@
 
         window.confirmCancelOrder = function() {
             if (orderToDeleteId) {
-                // 从列表中移除
                 participateOrders = participateOrders.filter(o => o.id !== orderToDeleteId);
-                // 同步清理本地记录
                 if(myRecords[orderToDeleteId]) {
                     delete myRecords[orderToDeleteId];
                 }
@@ -1448,7 +1413,6 @@
                 renderParticipateList();
                 renderHistoryList();
 
-                // 自动选择第一笔记录，如果已经没有则清空右侧显示
                 if (participateOrders.length > 0) {
                     selectHistoryRow(participateOrders[0].id);
                 } else {
@@ -1462,20 +1426,6 @@
             closeCancelModal();
         };
 
-        // --- 弹窗逻辑 ---
-        window.openMatchOptionsModal = function(e) {
-            if (e) e.preventDefault();
-            const modal = document.getElementById('match-options-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        };
-
-        window.closeMatchOptionsModal = function() {
-            const modal = document.getElementById('match-options-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        };
-
         // --- 步骤切换逻辑 ---
         function showStep(step) {
             const step0Menu = document.getElementById('left-step-0-menu');
@@ -1483,9 +1433,8 @@
             const confirmView = document.getElementById('step-2-confirm');
             const successView = document.getElementById('step-3-success');
             const partFlow = document.getElementById('left-participate-flow');
-            const step4Records = document.getElementById('left-step-4-records'); // 步骤4合买记录
+            const step4Records = document.getElementById('left-step-4-records');
             
-            // 隐藏所有区域
             if (step0Menu) { step0Menu.classList.add('hidden'); step0Menu.classList.remove('flex'); }
             if (step1Betslip) { step1Betslip.classList.add('hidden'); step1Betslip.classList.remove('flex'); }
             if (confirmView) { confirmView.classList.add('hidden'); confirmView.classList.remove('flex'); }
@@ -1493,17 +1442,16 @@
             if (partFlow) { partFlow.classList.add('hidden'); partFlow.classList.remove('flex'); }
             if (step4Records) { step4Records.classList.add('hidden'); step4Records.classList.remove('flex'); }
 
-            // 同步左侧菜单的选中状态
             const menuHall = document.getElementById('menu-hall');
             const menuRecords = document.getElementById('menu-records');
             if (menuHall && menuRecords) {
-                if (step === 4 || step === -2) { // step -2 is history view flag
+                if (step === 4 || step === -2) { 
                     menuHall.className = "flex items-center p-3 hover:bg-sky-50 cursor-pointer text-gray-600 border-l-[3px] border-transparent transition-colors";
-                    menuRecords.className = "flex items-center p-3 cursor-pointer text-white font-bold bg-[#0ea5e9] border-l-[3px] border-[#0ea5e9] shadow-sm";
-                    menuRecords.querySelector('span:first-child').className = "mr-2 text-[#0ea5e9] font-bold bg-white w-5 h-5 flex items-center justify-center rounded text-xs";
+                    menuRecords.className = "flex items-center p-3 cursor-pointer text-[#0ea5e9] font-medium bg-sky-50 border-l-[3px] border-[#0ea5e9]";
+                    menuRecords.querySelector('span:first-child').className = "mr-2 text-white font-bold bg-[#0ea5e9] w-5 h-5 flex items-center justify-center rounded text-xs";
                     menuHall.querySelector('span:first-child').className = "mr-2 text-white font-bold bg-red-500 w-5 h-5 flex items-center justify-center rounded text-xs";
                 } else {
-                    menuHall.className = "flex items-center p-3 cursor-pointer text-[#0ea5e9] font-bold bg-sky-50 border-l-[3px] border-[#0ea5e9]";
+                    menuHall.className = "flex items-center p-3 cursor-pointer text-[#0ea5e9] font-medium bg-sky-50 border-l-[3px] border-[#0ea5e9]";
                     menuRecords.className = "flex items-center p-3 hover:bg-sky-50 cursor-pointer text-gray-600 border-l-[3px] border-transparent transition-colors";
                     menuHall.querySelector('span:first-child').className = "mr-2 text-white font-bold bg-red-500 w-5 h-5 flex items-center justify-center rounded text-xs";
                     menuRecords.querySelector('span:first-child').className = "mr-2 text-white font-bold bg-[#0ea5e9] w-5 h-5 flex items-center justify-center rounded text-xs";
@@ -1529,15 +1477,12 @@
                 step4Records.classList.add('flex');
                 renderMyRecords();
             } else if (step === -1) {
-                // 特殊状态：參與合買左側
             } else if (step === -2) {
-                // 特殊状态：僅為了隱藏左側菜單下方區域 (進入歷史大廳時使用)
             }
         }
 
         // --- 合买注单历史视图 ---
         window.showHistoryView = function() {
-            // Hide main sections and top nav
             document.getElementById('right-empty-state').classList.add('hidden');
             document.getElementById('right-match-content').classList.add('hidden');
             document.getElementById('right-participate-content').classList.add('hidden');
@@ -1549,17 +1494,17 @@
                 renderHistoryList();
             }
             
-            // 隱藏原始大廳按鈕列，切換為歷史導航
             document.getElementById('nav-back-btn').classList.remove('hidden');
             document.getElementById('nav-back-btn').classList.add('flex');
+            document.getElementById('nav-title-hall').classList.add('hidden');
             document.getElementById('nav-tabs-hall').classList.add('hidden');
             document.getElementById('nav-tabs-hall').classList.remove('flex');
             document.getElementById('nav-tabs-history').classList.remove('hidden');
             document.getElementById('nav-tabs-history').classList.add('flex');
-            document.getElementById('nav-btn-history').classList.add('text-[#0ea5e9]', 'font-bold', 'border-b-2', 'border-[#0ea5e9]', 'pb-[18px]', 'pt-[18px]');
+            document.getElementById('nav-btn-history').classList.add('text-[#0ea5e9]', 'font-bold', 'border-b-[3px]', 'border-[#0ea5e9]', 'pt-[15px]', 'pb-[15px]');
             document.getElementById('nav-btn-history').classList.remove('text-gray-400');
             
-            showStep(-2); // 隐藏左侧球种菜单，只保留顶部个人资讯与固定菜单，且高亮合買紀錄
+            showStep(-2); 
         };
 
         window.hideHistoryView = function() {
@@ -1569,17 +1514,17 @@
                 historyView.classList.remove('flex');
             }
             
-            // 恢復大廳導航
             document.getElementById('nav-back-btn').classList.add('hidden');
             document.getElementById('nav-back-btn').classList.remove('flex');
+            document.getElementById('nav-title-hall').classList.remove('hidden');
             document.getElementById('nav-tabs-history').classList.add('hidden');
             document.getElementById('nav-tabs-history').classList.remove('flex');
             document.getElementById('nav-tabs-hall').classList.remove('hidden');
             document.getElementById('nav-tabs-hall').classList.add('flex');
-            document.getElementById('nav-btn-history').classList.remove('text-[#0ea5e9]', 'font-bold', 'border-b-2', 'border-[#0ea5e9]', 'pb-[18px]', 'pt-[18px]');
+            document.getElementById('nav-btn-history').classList.remove('text-[#0ea5e9]', 'font-bold', 'border-b-[3px]', 'border-[#0ea5e9]', 'pt-[15px]', 'pb-[15px]');
             
-            switchMainTab('participate'); // default back to participate
-            showStep(0); // 恢复左侧球种菜单
+            switchMainTab('participate');
+            showStep(0); 
         };
 
         window.switchHistTab = function(tab) {
@@ -1607,28 +1552,24 @@
         };
 
         window.selectHistoryRow = function(id) {
-            // Remove highlight from all
             document.querySelectorAll('.history-main-row').forEach(row => {
-                row.classList.remove('bg-sky-50', 'border-l-[3px]', 'border-[#0ea5e9]');
-                row.classList.add('bg-white');
+                row.classList.remove('bg-sky-50', 'border-[#0ea5e9]');
+                row.classList.add('bg-white', 'border-transparent');
             });
 
-            // Add highlight to selected
             const row = document.getElementById(`main-row-${id}`);
             if (row) {
-                row.classList.remove('bg-white');
-                row.classList.add('bg-sky-50', 'border-l-[3px]', 'border-[#0ea5e9]');
+                row.classList.remove('bg-white', 'border-transparent');
+                row.classList.add('bg-sky-50', 'border-[#0ea5e9]');
             }
             
-            currentViewOrderId = id; // 更新當前查看的 ID
+            currentViewOrderId = id; 
 
-            // Update right sidebar
             const order = participateOrders.find(o => o.id === id);
             if (order) {
                 document.getElementById('hist-detail-league').innerText = '[足球] 欧洲联赛';
                 document.getElementById('hist-detail-bet-name').innerHTML = `${order.bet.name} <span class="text-[#4caf50] font-bold">@${order.odds}</span>`;
                 
-                let matchTimeStr = order.bet.time.replace('(GTM+8)', '').trim(); 
                 let formattedTime = `2026-03-24 23:15:00`;
                 
                 document.getElementById('hist-detail-match-time').innerText = formattedTime;
@@ -1637,8 +1578,8 @@
                 
                 document.getElementById('hist-detail-deadline').innerText = `${formattedTime} (GMT+8)`;
                 document.getElementById('hist-detail-total-amt').innerText = order.totalAmt.toFixed(2) + 'RMB';
-                document.getElementById('hist-detail-odds-start').innerText = `@${order.odds}`; // 黑色
-                document.getElementById('hist-detail-odds-now').innerText = `@${order.odds}`; // 绿色
+                document.getElementById('hist-detail-odds-start').innerText = `@${order.odds}`; 
+                document.getElementById('hist-detail-odds-now').innerText = `@${order.odds}`; 
                 
                 document.getElementById('hist-detail-progress-text').innerText = order.progress + '%';
                 document.getElementById('hist-detail-progress-bar').style.width = order.progress + '%';
@@ -1663,7 +1604,7 @@
                     return `
                     <div class="flex gap-2 border-b border-gray-200 py-3 text-[11px] text-gray-600 text-center items-center hover:bg-gray-100 transition-colors">
                         <div class="w-[40px] border-r border-gray-200">${no} - ${sIdx + 1}</div>
-                        <div class="w-[130px] text-left pl-4 whitespace-nowrap">
+                        <div class="w-[120px] text-left pl-4 whitespace-nowrap">
                             <div class="mb-0.5">${sub.time}</div>
                             <div class="text-gray-400">认购编号: <br>${sub.subNo}</div>
                         </div>
@@ -1676,10 +1617,8 @@
                     `;
                 }).join('');
 
-                let matchTimeStr = order.bet.time.replace('(GTM+8)', '').trim(); 
                 let formattedTime = `2026-03-24 23:15:00`;
 
-                // 根據進度顯示對應樣式的撤單按鈕
                 let cancelBtnHtml = '';
                 if (order.progress < 50) {
                     cancelBtnHtml = `<button class="text-[#0ea5e9] border border-[#0ea5e9] px-3 py-1 rounded-full text-[11px] hover:bg-sky-50 transition-colors shadow-sm" onclick="openCancelModal('${order.id}'); event.stopPropagation();">撤单</button>`;
@@ -1688,24 +1627,20 @@
                 }
 
                 html += `
-                <!-- Main Row -->
                 <div id="main-row-${order.id}" class="flex gap-2 border-b border-gray-200 py-3 bg-white hover:bg-gray-50 transition-colors history-main-row items-center border-l-[3px] border-transparent cursor-pointer" onclick="selectHistoryRow('${order.id}')">
                     <div class="w-[40px] text-center border-r border-gray-100 text-[12px]">${no}</div>
                     
-                    <!-- 投注详情 -->
-                    <div class="w-[130px] text-left text-[11px] pl-2 whitespace-nowrap overflow-hidden">
+                    <div class="w-[120px] text-left text-[11px] pl-2 whitespace-nowrap overflow-hidden">
                         <div class="mb-1 text-gray-800">${order.historySubs.length > 0 ? order.historySubs[0].time : formattedTime}</div>
-                        <div class="text-gray-500 mb-0.5">合买序号: <br><span class="text-gray-800 font-mono text-[11px]">${order.seqNo}</span></div>
-                        <div class="text-gray-500">合买单号: <br><span class="text-gray-800 font-mono text-[11px]">${order.realOrderNo}</span></div>
+                        <div class="text-gray-500 mb-0.5 flex flex-col justify-start">合买序号: <br><span class="text-gray-800 font-mono text-[11px]">${order.seqNo}</span></div>
+                        <div class="text-gray-500 flex flex-col justify-start">合买单号: <br><span class="text-gray-800 font-mono text-[11px]">${order.realOrderNo}</span></div>
                     </div>
                     
-                    <!-- 投注玩法 -->
                     <div class="w-[65px] text-left text-[11px] text-gray-800 whitespace-nowrap pl-1">
                         合买<br>全场独赢
                     </div>
                     
-                    <!-- 选项 -->
-                    <div class="flex-1 text-left text-[11px] space-y-1 pr-2 whitespace-nowrap overflow-hidden min-w-[160px]">
+                    <div class="flex-1 text-left text-[11px] space-y-1 pr-2 whitespace-nowrap overflow-hidden min-w-[120px]">
                         <div class="text-gray-800 font-medium">[足球] 欧洲联赛</div>
                         <div class="text-gray-800">${order.bet.name} <span class="text-[#4caf50] font-bold">@${order.odds}</span></div>
                         <div class="text-gray-500">[赛前] 全场独赢 [欧洲盘]</div>
@@ -1713,18 +1648,15 @@
                         <div class="text-gray-400">${formattedTime}</div>
                     </div>
                     
-                    <!-- 投注额 -->
                     <div class="w-[100px] text-center text-[11px] whitespace-nowrap">
                         <div class="text-gray-800 mb-1">${(order.totalAmt - order.remAmt).toFixed(2)} RMB</div>
                         <div class="text-gray-400">(${order.totalAmt.toFixed(2)} RMB)</div>
                     </div>
                     
-                    <!-- 最高可赢 -->
                     <div class="w-[85px] text-center text-[11px] text-gray-800 whitespace-nowrap">
                         ${(order.totalAmt * parseFloat(order.odds)).toFixed(2)} RMB
                     </div>
                     
-                    <!-- 状态 -->
                     <div class="w-[150px] flex flex-col items-start pl-2 pr-2 text-xs space-y-1.5 whitespace-nowrap">
                         <div class="text-gray-400 text-[10px] w-full text-right">${formattedTime}</div>
                         <div class="w-full relative pt-1">
@@ -1752,7 +1684,6 @@
                     </div>
                 </div>
                 
-                <!-- Sub Rows (Default Hidden) -->
                 <div id="sub-rows-${order.id}" class="hidden bg-gray-50 border-b border-gray-200 shadow-inner">
                     ${subsHtml}
                 </div>
@@ -1768,7 +1699,6 @@
             document.getElementById('hist-total-orders').innerText = totalOrders;
             document.getElementById('hist-total-amt').innerText = totalAmount.toFixed(2);
 
-            // 預設選中第一筆，並顯示其詳情
             if (participateOrders.length > 0) {
                 selectHistoryRow(participateOrders[0].id);
             }
@@ -1798,7 +1728,6 @@
                 
                 finalHtml += `
                 <div class="bg-white rounded-lg shadow-sm border border-gray-100 mb-3 overflow-hidden">
-                    <!-- 投注项资讯 -->
                     <div class="p-3 bg-white">
                         <div class="font-bold text-gray-800 text-[14px] mb-1">欧洲联赛</div>
                         <div class="text-[13px] text-gray-800">${bet.teamH} VS ${bet.teamC}</div>
@@ -1806,12 +1735,10 @@
                         <div class="bg-[#f4f7fb] rounded p-2 text-[12px] relative border border-[#e2e8f0]">
                             <div class="text-[#0ea5e9] mb-1">[赛前] ${bet.type} [欧洲盘]</div>
                             <div class="text-[#0ea5e9] mb-1">${bet.name}</div>
-                            <!-- 赔率颜色改为黑色 -->
                             <div class="font-bold text-black text-[14px]">@${bet.value.toFixed(2)}</div>
                         </div>
                     </div>
                     
-                    <!-- 合买设定摘要 -->
                     <div class="p-3 border-t border-gray-100 text-[12px] space-y-2.5 text-gray-600 bg-gray-50/50">
                         <div class="flex justify-between items-center"><span>合买金额</span><span class="text-gray-800">${target}RMB</span></div>
                         <div class="flex justify-between items-center"><span>剩余认购</span><span class="text-gray-800">${rem} (${remRatio}%)</span></div>
@@ -1851,7 +1778,6 @@
                 const parentMatch = matches.find(m => m.id === bet.matchId);
                 const matchTime = parentMatch ? parentMatch.time : '';
                 
-                // 讀取已經儲存好的單號資訊
                 const seqNo = bet.seqNo;
                 const orderNo = bet.orderNo;
                 const subNo = bet.initSubNo || 'RG' + Math.floor(Math.random() * 10000000000000000).toString();
@@ -1859,7 +1785,6 @@
 
                 finalHtml += `
                 <div class="bg-white rounded-lg shadow-sm border border-gray-100 mb-4 overflow-hidden">
-                    <!-- 投注项资讯 -->
                     <div class="p-3 bg-white">
                         <div class="font-bold text-gray-800 text-[14px] mb-1">欧洲联赛</div>
                         <div class="text-[13px] text-gray-800">${bet.teamH} VS ${bet.teamC}</div>
@@ -1873,7 +1798,6 @@
                         </div>
                     </div>
                     
-                    <!-- 合买设定摘要 -->
                     <div class="p-3 border-t border-gray-100 text-[12px] space-y-2.5 text-gray-600 bg-gray-50/50">
                         <div class="flex justify-between items-center"><span>合买金额</span><span class="text-gray-800">${target}RMB</span></div>
                         <div class="flex justify-between items-center"><span>剩余认购</span><span class="text-gray-800">${rem} (${remRatio}%)</span></div>
@@ -1886,7 +1810,6 @@
                         <div class="flex justify-between items-center"><span>发起人保底</span><span class="text-gray-800">${isGuarantee}</span></div>
                     </div>
 
-                    <!-- 订单单号与成功提示 -->
                     <div class="p-3 border-t border-gray-100 bg-white">
                         <div class="text-[12px] space-y-3 text-gray-600 mb-4">
                             <div>
@@ -1903,7 +1826,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-[#e8f5e9] text-[#2e7d32] rounded p-2.5 text-center text-[13px] font-medium flex items-center justify-center gap-1.5 border border-[#c8e6c9]">
+                        <div class="bg-[#e8f5e9] text-[#2e7d32] rounded p-2.5 text-center text-[13px] font-medium flex items-center justify-center gap-1.5 border border-[#c8e6c9] mt-3">
                             <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                             您的合买发起注单已确认
                         </div>
@@ -1914,7 +1837,6 @@
             document.getElementById('success-details-container').innerHTML = finalHtml;
         }
 
-        // --- 按钮事件绑定 ---
         submitBtn.addEventListener('click', () => {
             if (submitBtn.classList.contains('cursor-not-allowed')) return;
             showStep(2);
@@ -1925,7 +1847,6 @@
         });
 
         document.getElementById('real-submit-btn').addEventListener('click', () => {
-            // 發起合買：根據所選項目產生多筆獨立訂單並存入紀錄
             const target = parseFloat(targetAmountInput.value) || 0;
             const sub = parseFloat(subscribeAmountInput.value) || 0;
             const rem = target - sub;
@@ -1948,7 +1869,7 @@
                     id: orderId,
                     user: 'IceProMax',
                     vip: 'VIP 1',
-                    orderNo: seqNo, // Display as orderNo in public list
+                    orderNo: seqNo,
                     winRate: '0.00%',
                     historySubs: [{
                         time: currTime,
@@ -2006,23 +1927,20 @@
         });
 
         document.getElementById('keep-options-btn').addEventListener('click', () => {
-            // 保留選項，繼續投注：重置金額狀態，但保留選好的賽事退回表單頁
             targetAmountInput.value = '';
             subscribeAmountInput.value = '';
             guaranteeCheckbox.checked = false;
-            updateUI(); // 重新驗證按鈕
+            updateUI();
             showStep(1);
         });
 
         document.getElementById('go-track-btn').addEventListener('click', () => {
-            // 去合买大厅追蹤：清空目前的勾选与输入，切換至參與合買頁面
             selectedBets = {};
             targetAmountInput.value = '';
             subscribeAmountInput.value = '';
             guaranteeCheckbox.checked = false;
             updateUI();
             
-            // 确保隐藏历史记录面板，回到合买大厅的参与列表页
             const historyView = document.getElementById('right-history-content');
             if (historyView) {
                 historyView.classList.add('hidden');
