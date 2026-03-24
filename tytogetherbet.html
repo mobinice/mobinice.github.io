@@ -20,14 +20,14 @@
         }
 
         .active-bet-btn {
-            background-color: #1e88e5 !important;
+            background-color: #0ea5e9 !important;
             color: white !important;
-            border-color: #1e88e5 !important;
+            border-color: #0ea5e9 !important;
         }
 
         /* 步进器按钮样式 */
         .stepper-btn {
-            color: #93c5fd; /* light blue */
+            color: #7dd3fc;
             width: 28px;
             display: flex;
             align-items: center;
@@ -40,27 +40,53 @@
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans h-screen flex overflow-hidden">
 
-    <!-- 左侧：投注单区域 -->
+    <!-- 左侧：全局菜单区域 -->
     <aside class="w-[300px] bg-white border-r border-gray-200 flex flex-col h-full z-10 shadow-sm relative">
         
-        <!-- 用户信息 -->
-        <div class="p-3 bg-blue-50/50 border-b border-gray-200">
-            <div class="text-xs text-gray-500">Hi, IceProMax</div>
-            <div class="text-blue-600 font-bold text-lg flex items-center justify-between">
-                2,105.30 
-                <svg class="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <!-- 全局 Logo 区 (全新 IceBet 冰块设计) -->
+        <div class="h-14 flex items-center justify-start px-4 border-b border-gray-100 bg-white">
+            <div class="flex items-center gap-2 text-[#0ea5e9] font-black text-[22px] tracking-wide">
+                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#7dd3fc"/>
+                    <path d="M2 7V17L12 22V12L2 7Z" fill="#0284c7"/>
+                    <path d="M22 7V17L12 22V12L22 7Z" fill="#0ea5e9"/>
+                    <path d="M12 12L12 22" stroke="#f0f9ff" stroke-width="0.5" stroke-linejoin="round"/>
+                    <path d="M2 7L12 12" stroke="#f0f9ff" stroke-width="0.5" stroke-linejoin="round"/>
+                    <path d="M22 7L12 12" stroke="#f0f9ff" stroke-width="0.5" stroke-linejoin="round"/>
+                </svg>
+                <span class="italic">IceBet</span>
             </div>
+        </div>
+
+        <!-- 全局搜索区 -->
+        <div class="p-3 border-b border-gray-100 bg-white">
+            <div class="flex items-center bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 focus-within:border-sky-400 focus-within:bg-white transition-colors">
+                <input type="text" placeholder="请输入联赛名或球队名" class="bg-transparent text-[11px] w-full outline-none text-gray-700">
+                <svg class="w-4 h-4 text-gray-400 ml-2 cursor-pointer hover:text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+        </div>
+
+        <!-- 用户信息 -->
+        <div class="p-3 bg-sky-50/30 border-b border-gray-100 flex justify-between items-center">
+            <div>
+                <div class="text-[11px] text-gray-800 mb-0.5 font-medium">Hi, IceProMax</div>
+                <div class="text-[#0ea5e9] font-bold text-[14px] flex items-center gap-1">
+                    2,006.76 
+                    <svg class="w-3.5 h-3.5 text-gray-400 cursor-pointer hover:text-sky-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+                </div>
+            </div>
+            <svg class="w-4 h-4 text-gray-400 cursor-pointer hover:text-sky-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </div>
 
         <!-- 菜单栏 -->
         <div class="flex flex-col border-b border-gray-200">
-            <div class="flex items-center p-3 cursor-pointer text-gray-800 font-medium" onclick="showStep(0)">
-                <span class="mr-2 text-white font-bold bg-blue-500 w-5 h-5 flex items-center justify-center rounded text-xs">合</span> 合买大厅
-                <span class="ml-auto text-gray-800 font-bold text-sm">27</span>
+            <div id="menu-hall" class="flex items-center p-3 cursor-pointer text-sky-600 font-medium bg-sky-50 border-l-[3px] border-sky-500" onclick="hideHistoryView()">
+                <span class="mr-2 text-white font-bold bg-red-500 w-5 h-5 flex items-center justify-center rounded text-xs">合</span> 合买大厅
+                <span class="ml-auto text-sky-500 font-bold text-[11px] bg-white border border-sky-100 px-1.5 py-[1px] rounded shadow-sm">1</span>
             </div>
             <!-- 合买记录菜单 -->
-            <div class="flex items-center p-3 hover:bg-gray-50 cursor-pointer text-gray-600" onclick="showStep(4)">
-                <span class="mr-2 text-green-500 font-bold bg-green-100 w-5 h-5 flex items-center justify-center rounded text-xs">记</span> 合买记录
+            <div id="menu-records" class="flex items-center p-3 hover:bg-gray-50 cursor-pointer text-gray-600 border-l-[3px] border-transparent transition-colors" onclick="showHistoryView()">
+                <span class="mr-2 text-white font-bold bg-[#0ea5e9] w-5 h-5 flex items-center justify-center rounded text-xs">记</span> 合买记录
             </div>
         </div>
 
@@ -69,20 +95,20 @@
             <!-- 早盘/今日 切换 -->
             <div class="p-3 bg-white border-b border-gray-100 flex-shrink-0">
                 <div class="flex bg-gray-100 rounded-full p-1 w-full relative border border-gray-200">
-                    <button class="flex-1 text-sm py-1.5 rounded-full text-gray-600 font-medium hover:text-blue-500 transition-colors">今日</button>
-                    <button class="flex-1 text-sm py-1.5 rounded-full bg-[#1e88e5] text-white font-bold shadow-sm transition-colors">早盘</button>
+                    <button class="flex-1 text-sm py-1.5 rounded-full text-gray-600 font-medium hover:text-sky-500 transition-colors">今日</button>
+                    <button class="flex-1 text-sm py-1.5 rounded-full bg-[#0ea5e9] text-white font-bold shadow-sm transition-colors">早盘</button>
                 </div>
             </div>
             <!-- 列表 -->
             <div class="flex-1 overflow-y-auto p-2 space-y-1">
-                <button onclick="selectSport('football')" class="w-full flex items-center justify-between p-2.5 rounded bg-blue-50 border border-blue-100 text-[#1e88e5] transition-colors">
+                <button onclick="selectSport('football')" class="w-full flex items-center justify-between p-2.5 rounded bg-sky-50 border border-sky-100 text-[#0ea5e9] transition-colors">
                     <div class="flex items-center gap-2 font-bold text-sm">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm-1.5-6.5l-3-1.5 1.5-3 3 1.5-1.5 3zm4.5 0l-1.5-3 3-1.5 1.5 3-3 1.5z"></path></svg>
                         足球
                     </div>
                     <div class="text-xs font-medium">1151</div>
                 </button>
-                <button onclick="selectSport('basketball')" class="w-full flex items-center justify-between p-2.5 rounded hover:bg-blue-50 border border-transparent hover:border-blue-100 text-gray-700 hover:text-[#1e88e5] transition-colors">
+                <button onclick="selectSport('basketball')" class="w-full flex items-center justify-between p-2.5 rounded hover:bg-sky-50 border border-transparent hover:border-sky-100 text-gray-700 hover:text-[#0ea5e9] transition-colors">
                     <div class="flex items-center gap-2 font-medium text-sm">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.12.23-2.19.65-3.14L9 13v-2l-3-3v-.86c1.33-1.32 3.16-2.14 5.14-2.14 1.77 0 3.4.58 4.7 1.56l-3.35 3.35 1.41 1.41 3.35-3.35A7.957 7.957 0 0120 12c0 4.41-3.59 8-8 8zm4.36-12.72l-1.41 1.41 1.41 1.41 1.41-1.41-1.41-1.41zm-8.72 0l-1.41 1.41 1.41 1.41 1.41-1.41-1.41-1.41z"></path></svg>
                         篮球
@@ -102,10 +128,10 @@
                 </button>
                 
                 <div class="flex bg-gray-100 rounded-full p-0.5 w-48 relative border border-gray-200">
-                    <button class="flex-1 text-sm py-1 rounded-full bg-white text-blue-500 font-bold shadow-sm transition-colors relative">
-                        单关 <span id="slip-count" class="hidden absolute top-1/2 -translate-y-1/2 right-3 bg-blue-500 text-white rounded-full w-4 h-4 text-[10px] inline-flex items-center justify-center">1</span>
+                    <button class="flex-1 text-sm py-1 rounded-full bg-white text-sky-500 font-bold shadow-sm transition-colors relative">
+                        单关 <span id="slip-count" class="hidden absolute top-1/2 -translate-y-1/2 right-3 bg-sky-500 text-white rounded-full w-4 h-4 text-[10px] inline-flex items-center justify-center">1</span>
                     </button>
-                    <button class="flex-1 text-sm py-1 rounded-full text-gray-500 hover:text-blue-500 transition-colors">串关</button>
+                    <button class="flex-1 text-sm py-1 rounded-full text-gray-500 hover:text-sky-500 transition-colors">串关</button>
                 </div>
             </div>
 
@@ -119,19 +145,19 @@
             <!-- 底部合买表单区域 -->
             <div id="bet-form-container" class="bg-white border-t border-gray-200 p-3 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.05)] flex flex-col gap-3 overflow-y-auto flex-shrink min-h-0 max-h-[65vh]">
                 
-                <!-- 合买金额 -->
+                <!-- 合买金额 (修改 Nx 布局) -->
                 <div class="flex items-center">
                     <div class="text-[13px] text-gray-700 w-10">合买</div>
-                    <div class="flex-1 flex items-center bg-[#f4f7fb] border border-[#e2e8f0] rounded focus-within:border-blue-400 transition-colors px-3 py-0.5">
+                    <div class="flex-1 flex items-center bg-[#f4f7fb] border border-[#e2e8f0] rounded focus-within:border-sky-400 transition-colors px-3 py-0.5">
                         <input type="number" id="target-amount" class="flex-1 min-w-0 bg-transparent py-1.5 text-sm focus:outline-none" placeholder="限额 10 ~ 6701">
                         <div id="target-multiplier" class="text-[13px] text-gray-500 hidden ml-2"></div>
                     </div>
                 </div>
 
-                <!-- 认购金额 -->
+                <!-- 认购金额 (修改 Nx 布局) -->
                 <div class="flex items-center">
                     <div class="text-[13px] text-gray-700 w-10">认购</div>
-                    <div class="flex-1 flex items-center bg-[#f4f7fb] border border-[#e2e8f0] rounded focus-within:border-blue-400 transition-colors px-3 py-0.5">
+                    <div class="flex-1 flex items-center bg-[#f4f7fb] border border-[#e2e8f0] rounded focus-within:border-sky-400 transition-colors px-3 py-0.5">
                         <input type="number" id="subscribe-amount" class="flex-1 min-w-0 bg-transparent py-1.5 text-sm focus:outline-none" placeholder="请输入认购金额">
                         <div id="sub-multiplier" class="text-[13px] text-gray-500 hidden ml-2"></div>
                     </div>
@@ -141,8 +167,8 @@
                 <div class="border border-[#e2e8f0] rounded bg-[#f8fafc] overflow-hidden">
                     <!-- Header -->
                     <div class="flex justify-between items-center p-2 cursor-pointer bg-white" onclick="togglePreferences()">
-                        <div class="text-blue-500 font-medium text-sm">合买喜好</div>
-                        <svg id="pref-arrow" class="w-4 h-4 text-blue-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <div class="text-sky-500 font-medium text-sm">合买喜好</div>
+                        <svg id="pref-arrow" class="w-4 h-4 text-sky-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                     
                     <!-- Content (展开的详细设置) -->
@@ -157,7 +183,7 @@
                                     <option>认购后可查看</option>
                                     <option>开奖后公开</option>
                                 </select>
-                                <svg class="w-3 h-3 text-blue-500 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <svg class="w-3 h-3 text-sky-500 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </div>
                         </div>
 
@@ -196,7 +222,7 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-1">最终截止时间 <span class="w-3 h-3 rounded-full bg-gray-300 text-white flex items-center justify-center text-[8px] font-bold">i</span></div>
                                 <label class="flex items-center gap-1 cursor-pointer">
-                                    自定义 <input type="checkbox" class="rounded text-blue-500 w-3 h-3 border-gray-300">
+                                    自定义 <input type="checkbox" class="rounded text-sky-500 w-3 h-3 border-gray-300">
                                 </label>
                             </div>
                             <div class="flex items-center justify-between mt-1">
@@ -215,7 +241,7 @@
                         <!-- 发起人保底 -->
                         <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
                             <div class="flex items-center gap-1">发起人保底 <span class="w-3 h-3 rounded-full bg-gray-300 text-white flex items-center justify-center text-[8px] font-bold">i</span></div>
-                            <input type="checkbox" id="guarantee-checkbox" class="rounded text-blue-500 focus:ring-blue-500 w-4 h-4 border-gray-300 cursor-pointer">
+                            <input type="checkbox" id="guarantee-checkbox" class="rounded text-sky-500 focus:ring-sky-500 w-4 h-4 border-gray-300 cursor-pointer">
                         </div>
 
                         <!-- 占比与预估 -->
@@ -233,7 +259,7 @@
                 </div>
 
                 <!-- 操作按钮 -->
-                <button id="submit-btn" class="w-full bg-[#1e88e5] hover:bg-blue-600 text-white font-medium py-2.5 rounded shadow-sm transition-colors opacity-50 cursor-not-allowed">
+                <button id="submit-btn" class="w-full bg-[#0ea5e9] hover:bg-sky-600 text-white font-medium py-2.5 rounded shadow-sm transition-colors opacity-50 cursor-not-allowed">
                     发起合买投注
                 </button>
                 <button id="clear-btn" class="w-full bg-[#f4f7fb] hover:bg-gray-200 text-gray-600 font-medium py-2.5 rounded transition-colors text-sm">
@@ -249,7 +275,7 @@
             </div>
             <!-- 底部确认操作按钮区 -->
             <div class="bg-white border-t border-gray-200 p-3 pt-2 flex flex-col gap-2 flex-shrink-0 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.05)]">
-                <button id="real-submit-btn" class="w-full bg-[#1e88e5] hover:bg-blue-600 text-white font-medium py-2.5 rounded shadow-sm transition-colors">
+                <button id="real-submit-btn" class="w-full bg-[#0ea5e9] hover:bg-sky-600 text-white font-medium py-2.5 rounded shadow-sm transition-colors">
                     确认合买
                 </button>
                 <button id="cancel-confirm-btn" class="w-full bg-[#f4f7fb] hover:bg-gray-200 text-gray-600 font-medium py-2.5 rounded transition-colors text-sm">
@@ -263,7 +289,7 @@
             
             <!-- 顶部进行中/已完成 Tab -->
             <div class="flex px-3 pt-3 bg-white border-b border-gray-100 flex-shrink-0">
-                <button class="flex-1 bg-[#1e88e5] text-white text-sm py-2 rounded-t-md font-bold">进行中</button>
+                <button class="flex-1 bg-[#0ea5e9] text-white text-sm py-2 rounded-t-md font-bold">进行中</button>
                 <button class="flex-1 bg-white border border-gray-200 border-b-0 text-gray-500 text-sm py-2 rounded-t-md">已完成</button>
             </div>
 
@@ -274,13 +300,13 @@
             
             <!-- 底部确认操作按钮区 -->
             <div class="bg-white border-t border-gray-100 p-3 pt-2 flex flex-col gap-2 flex-shrink-0 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.05)] relative z-10">
-                <button id="success-confirm-btn" class="w-full bg-[#1e88e5] hover:bg-blue-600 text-white font-medium py-2.5 rounded shadow-sm transition-colors">
+                <button id="success-confirm-btn" class="w-full bg-[#0ea5e9] hover:bg-sky-600 text-white font-medium py-2.5 rounded shadow-sm transition-colors">
                     确定
                 </button>
                 <button id="keep-options-btn" class="w-full bg-[#f4f7fb] hover:bg-gray-200 text-gray-600 font-medium py-2.5 rounded transition-colors text-sm">
                     保留选项，继续投注
                 </button>
-                <button id="go-track-btn" class="w-full bg-[#1e88e5] hover:bg-blue-600 text-white font-medium py-2.5 rounded shadow-sm transition-colors text-sm">
+                <button id="go-track-btn" class="w-full bg-[#0ea5e9] hover:bg-sky-600 text-white font-medium py-2.5 rounded shadow-sm transition-colors text-sm">
                     去合买大厅追踪
                 </button>
             </div>
@@ -291,19 +317,19 @@
         <!-- ============================================== -->
         <div id="left-step-4-records" class="hidden flex-col flex-1 min-h-0 bg-[#f4f7fb] w-full z-20 overflow-hidden">
             <!-- 顶部返回 -->
-            <div class="flex items-center p-3.5 border-b border-gray-200 bg-white cursor-pointer hover:bg-gray-50 text-[#1e88e5] text-[14px] flex-shrink-0 font-medium" onclick="showStep(0)">
-                <svg class="w-4 h-4 mr-1 text-[#1e88e5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <div class="flex items-center p-3.5 border-b border-gray-200 bg-white cursor-pointer hover:bg-gray-50 text-[#0ea5e9] text-[14px] flex-shrink-0 font-medium" onclick="hideHistoryView()">
+                <svg class="w-4 h-4 mr-1 text-[#0ea5e9]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 返回菜单
             </div>
             
             <div class="flex justify-center p-3 bg-white border-b border-gray-100 flex-shrink-0">
                 <div class="flex bg-gray-100 rounded-full p-0.5 w-4/5 relative border border-gray-200">
-                    <button class="flex-1 text-sm py-1.5 rounded-full bg-[#448aff] text-white font-bold shadow-sm transition-colors">进行中</button>
-                    <button class="flex-1 text-sm py-1.5 rounded-full text-gray-500 hover:text-blue-500 transition-colors">已完成</button>
+                    <button class="flex-1 text-sm py-1.5 rounded-full bg-[#0ea5e9] text-white font-bold shadow-sm transition-colors">进行中</button>
+                    <button class="flex-1 text-sm py-1.5 rounded-full text-gray-500 hover:text-sky-500 transition-colors">已完成</button>
                 </div>
             </div>
 
-            <div class="px-3 py-2 flex items-center border-l-[3px] border-[#448aff] text-[#448aff] font-bold text-[13px] bg-white border-b border-gray-100 shadow-sm z-10 relative">
+            <div class="px-3 py-2 flex items-center border-l-[3px] border-[#0ea5e9] text-[#0ea5e9] font-bold text-[13px] bg-white border-b border-gray-100 shadow-sm z-10 relative">
                 合买
             </div>
 
@@ -319,7 +345,7 @@
         <!-- ============================================== -->
         <div id="left-participate-flow" class="hidden flex-col flex-1 min-h-0 bg-[#f4f7fb] w-full z-20 overflow-hidden">
             <!-- 顶部返回 -->
-            <div class="flex items-center p-3.5 border-b border-gray-200 bg-white cursor-pointer hover:bg-gray-50 text-gray-500 text-[13px] flex-shrink-0 font-medium" onclick="showStep(0)">
+            <div class="flex items-center p-3.5 border-b border-gray-200 bg-white cursor-pointer hover:bg-gray-50 text-gray-500 text-[13px] flex-shrink-0 font-medium" onclick="hideHistoryView()">
                 <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 返回菜单
             </div>
@@ -335,7 +361,7 @@
                 <div class="bg-white rounded shadow-sm border border-gray-100 p-3 text-[13px] text-gray-600 space-y-3 mt-1">
                     <div id="part-input-wrapper">
                         <div class="font-bold text-gray-800 mb-2">认购</div>
-                        <div class="flex items-center bg-[#f4f7fb] border border-[#e2e8f0] rounded p-1 focus-within:border-blue-400 transition-colors">
+                        <div class="flex items-center bg-[#f4f7fb] border border-[#e2e8f0] rounded p-1 focus-within:border-sky-400 transition-colors">
                             <input type="number" id="part-input-amt" placeholder="限额 2.00~5.00" class="flex-1 min-w-0 bg-transparent p-1.5 text-sm focus:outline-none text-gray-700">
                         </div>
                     </div>
@@ -355,23 +381,23 @@
                     <div class="border-t border-gray-100 pt-3 space-y-3 pb-1">
                         <div>
                             <div class="mb-0.5">合买序号</div>
-                            <div class="text-gray-800 font-mono text-[12px] flex items-center w-full overflow-hidden">
-                                <span id="part-order-no-1" class="flex-1 min-w-0 truncate mr-2">HM20260324000001</span> 
-                                <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 cursor-pointer hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <div class="text-gray-800 font-mono text-[12px] flex items-center w-full overflow-hidden justify-between">
+                                <span id="part-order-no-1" class="flex-1 min-w-0 truncate pr-2">HM20260324000001</span> 
+                                <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 cursor-pointer hover:text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                             </div>
                         </div>
                         <div>
                             <div class="mb-0.5">合买单号</div>
-                            <div class="text-gray-800 font-mono text-[12px] flex items-center w-full overflow-hidden">
-                                <span id="part-order-no-2" class="flex-1 min-w-0 truncate mr-2">5322955136520762</span> 
-                                <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 cursor-pointer hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <div class="text-gray-800 font-mono text-[12px] flex items-center w-full overflow-hidden justify-between">
+                                <span id="part-order-no-2" class="flex-1 min-w-0 truncate pr-2">5322955136520762</span> 
+                                <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 cursor-pointer hover:text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                             </div>
                         </div>
                         <div id="part-sub-no-row" class="hidden">
                             <div class="mb-0.5">认购编号</div>
-                            <div class="text-gray-800 font-mono text-[12px] flex items-center w-full overflow-hidden">
-                                <span id="part-sub-no-span" class="flex-1 min-w-0 truncate mr-2">RG5322955247862130</span> 
-                                <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 cursor-pointer hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <div class="text-gray-800 font-mono text-[12px] flex items-center w-full overflow-hidden justify-between">
+                                <span id="part-sub-no-span" class="flex-1 min-w-0 truncate pr-2">RG5322955247862130</span> 
+                                <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0 cursor-pointer hover:text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                             </div>
                         </div>
                         
@@ -385,10 +411,10 @@
 
             <!-- 底部操作按钮区 -->
             <div class="bg-[#f8fafc] border-t border-gray-200 p-4 pt-3 flex flex-col gap-2.5 flex-shrink-0 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.05)]">
-                <button id="part-action-btn" onclick="handlePartAction()" class="w-full bg-[#448aff] hover:bg-blue-500 text-white font-medium py-2.5 rounded-full shadow-md transition-colors tracking-wide text-[15px]">
+                <button id="part-action-btn" onclick="handlePartAction()" class="w-full bg-[#0ea5e9] hover:bg-sky-600 text-white font-medium py-2.5 rounded-full shadow-md transition-colors tracking-wide text-[15px]">
                     认购
                 </button>
-                <button id="part-cancel-btn" onclick="showStep(0)" class="w-full bg-[#f4f7fb] hover:bg-gray-200 text-gray-600 font-medium py-2.5 rounded-full transition-colors text-[15px] shadow-sm border border-gray-100">
+                <button id="part-cancel-btn" onclick="hideHistoryView()" class="w-full bg-[#f4f7fb] hover:bg-gray-200 text-gray-600 font-medium py-2.5 rounded-full transition-colors text-[15px] shadow-sm border border-gray-100">
                     取消
                 </button>
             </div>
@@ -399,50 +425,66 @@
 
     <!-- 右侧：赛事列表区域 -->
     <main class="flex-1 flex flex-col h-full bg-gray-50 overflow-hidden">
+        <!-- 主导航栏，无Logo -->
         <header class="bg-white border-b border-gray-200">
             <div class="h-14 flex items-center px-6 gap-6 text-sm font-medium text-gray-600">
-                <div class="text-blue-600 font-bold text-lg mr-4 italic">PANDA SPORTS</div>
-                <a href="#" class="hover:text-blue-600">体育投注</a>
-                <a href="#" class="hover:text-blue-600">电子竞技</a>
-                <a href="#" class="hover:text-blue-600">VR体育</a>
-                <a href="#" class="text-blue-600 border-b-2 border-blue-600 pb-[18px] pt-[18px]">合买大厅</a>
+                <a href="#" class="hover:text-sky-600 transition-colors">体育投注</a>
+                <a href="#" class="hover:text-sky-600 transition-colors">电子竞技</a>
+                <a href="#" class="hover:text-sky-600 transition-colors">VR体育</a>
+                <a href="#" class="hover:text-sky-600 transition-colors">注单历史</a>
+                <a href="#" class="hover:text-sky-600 transition-colors">赛果</a>
+                <a href="#" class="hover:text-sky-600 transition-colors">体育竞猜规则</a>
+                <a href="#" class="text-sky-600 border-b-2 border-sky-600 pb-[18px] pt-[18px]">合买大厅</a>
             </div>
-            <div class="bg-blue-50/50 border-t border-gray-100 py-1.5 px-6 text-xs text-gray-500 flex items-center">
-                <span class="border border-blue-300 text-blue-500 rounded px-1 text-[10px] mr-2">公告</span>
+            <div class="bg-sky-50/50 border-t border-gray-100 py-1.5 px-6 text-xs text-gray-500 flex items-center">
+                <span class="border border-sky-300 text-sky-500 rounded px-1 text-[10px] mr-2">公告</span>
                 <marquee class="flex-1" scrollamount="4">选择多个投注项进入合并单关模式，左侧输入框将自动增加 Nx 标识。展开“合买喜好”并勾选“发起人保底”可查看自动计算的保底金额。</marquee>
             </div>
         </header>
 
-        <!-- 合买大厅全局顶部导航栏 -->
-        <div id="main-top-nav" class="bg-white border-b border-gray-200 p-3 px-4 flex justify-between items-center shadow-sm z-20 flex-shrink-0">
+        <!-- 合买大厅全局顶部栏 -->
+        <div id="main-top-nav" class="bg-white border-b border-gray-200 p-3 px-4 flex justify-between items-center shadow-sm z-20 flex-shrink-0 transition-all">
             <div class="flex items-center gap-4">
-                <span class="font-bold text-gray-800 text-lg mr-2">合买大厅</span>
-                <!-- 模式切换 -->
-                <div class="flex bg-gray-100 rounded-full p-0.5 border border-gray-200 shadow-inner">
-                    <button id="tab-initiate" onclick="switchMainTab('initiate')" class="flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full bg-white text-blue-500 font-bold shadow-sm transition-colors">
+                
+                <!-- 历史模式的返回箭头 -->
+                <button id="nav-back-btn" onclick="hideHistoryView()" class="hidden items-center text-gray-500 hover:text-sky-500 transition-colors mr-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </button>
+                
+                <span id="nav-title-hall" class="font-bold text-gray-800 text-lg mr-2">合买大厅</span>
+                
+                <!-- 模式切换 (大厅) -->
+                <div id="nav-tabs-hall" class="flex bg-gray-100 rounded-full p-0.5 border border-gray-200 shadow-inner">
+                    <button id="tab-initiate" onclick="switchMainTab('initiate')" class="flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full bg-white text-sky-500 font-bold shadow-sm transition-colors">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
                         发起合买
                     </button>
-                    <button id="tab-participate" onclick="switchMainTab('participate')" class="flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full text-gray-500 hover:text-blue-500 transition-colors">
+                    <button id="tab-participate" onclick="switchMainTab('participate')" class="flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full text-gray-500 hover:text-sky-500 transition-colors">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path></svg>
                         参与合买
                     </button>
                 </div>
                 
+                <!-- 模式切换 (历史纪录) -->
+                <div id="nav-tabs-history" class="hidden bg-gray-100 rounded-full p-0.5 border border-gray-200 shadow-inner">
+                    <button id="hist-tab-sent" onclick="switchHistTab('sent')" class="flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full bg-white text-[#0ea5e9] font-bold shadow-sm transition-colors">我发起的</button>
+                    <button id="hist-tab-joined" onclick="switchHistTab('joined')" class="flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full text-gray-500 hover:text-[#0ea5e9] transition-colors">我参与的</button>
+                </div>
+                
                 <!-- 参与合买状态子菜单 (动态显示) -->
                 <div id="participate-sub-tabs" class="hidden items-center gap-2 ml-4">
-                    <button class="px-4 py-1 text-sm rounded-full bg-white border border-blue-500 text-blue-500 font-medium">进行中</button>
-                    <button class="px-4 py-1 text-sm rounded-full text-gray-500 hover:text-blue-500">已完成</button>
+                    <button class="px-4 py-1 text-sm rounded-full bg-white border border-sky-500 text-sky-500 font-medium">进行中</button>
+                    <button class="px-4 py-1 text-sm rounded-full text-gray-500 hover:text-sky-500">已完成</button>
                 </div>
             </div>
             
             <div class="flex items-center gap-4 text-xs text-gray-400">
-                <a href="#" class="hover:text-blue-500">合买规则</a>
+                <a href="#" class="hover:text-sky-500">合买规则</a>
                 <span>|</span>
-                <a href="#" onclick="showHistoryView(); return false;" class="hover:text-blue-500">合买注单历史</a>
-                <div class="flex items-center bg-white border border-gray-200 rounded-full overflow-hidden ml-2 shadow-sm focus-within:border-blue-400">
+                <a href="#" id="nav-btn-history" onclick="showHistoryView(); return false;" class="hover:text-sky-500 transition-colors">合买注单历史</a>
+                <div class="flex items-center bg-white border border-gray-200 rounded-full overflow-hidden ml-2 shadow-sm focus-within:border-sky-400">
                     <input type="text" placeholder="请输入合买序号搜索" class="bg-transparent px-4 py-1.5 text-xs outline-none w-48 text-gray-700">
-                    <button class="bg-[#1e88e5] hover:bg-blue-600 text-white px-5 py-1.5 font-medium transition-colors border-l border-[#1e88e5]">搜索</button>
+                    <button class="bg-[#0ea5e9] hover:bg-sky-600 text-white px-5 py-1.5 font-medium transition-colors border-l border-[#0ea5e9]">搜索</button>
                 </div>
             </div>
         </div>
@@ -462,7 +504,7 @@
                 <div class="bg-white rounded-t-lg border-b border-gray-200 p-3 flex justify-between items-center shadow-sm">
                     <div class="flex items-center gap-4">
                         <h2 class="font-bold text-gray-800">今日 (足球)</h2>
-                        <span class="text-blue-500 text-sm">未开赛 128</span>
+                        <span class="text-sky-500 text-sm">未开赛 128</span>
                     </div>
                     <div class="flex gap-2 text-xs">
                         <button class="border border-gray-200 bg-gray-50 px-3 py-1 rounded text-gray-600 hover:bg-white">选择联赛 全部</button>
@@ -470,7 +512,7 @@
                 </div>
 
                 <div class="bg-white rounded-b-lg shadow-sm mb-4">
-                    <div class="bg-blue-50/30 p-2 flex items-center text-sm border-b border-gray-200 cursor-pointer">
+                    <div class="bg-sky-50/30 p-2 flex items-center text-sm border-b border-gray-200 cursor-pointer">
                         <svg class="w-4 h-4 text-gray-500 mr-2 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         <span class="font-bold text-gray-700">欧洲联赛</span>
                         <span class="text-gray-400 ml-2 text-xs">7</span>
@@ -490,9 +532,9 @@
                             <select class="border border-gray-200 rounded px-4 py-1.5 bg-gray-50 text-gray-700 outline-none w-28 appearance-none cursor-pointer"><option>全部</option></select>
                             <select class="border border-gray-200 rounded px-4 py-1.5 bg-gray-50 text-gray-700 outline-none w-36 appearance-none cursor-pointer"><option>胜率高到低</option></select>
                             <select class="border border-gray-200 rounded px-4 py-1.5 bg-gray-50 text-gray-700 outline-none w-36 appearance-none cursor-pointer"><option>合买展示</option></select>
-                            <button class="bg-[#1e88e5] hover:bg-blue-600 text-white px-6 py-1.5 rounded-full shadow-sm transition-colors font-medium">筛选</button>
+                            <button class="bg-[#0ea5e9] hover:bg-sky-600 text-white px-6 py-1.5 rounded-full shadow-sm transition-colors font-medium">筛选</button>
                         </div>
-                        <button class="text-gray-400 hover:text-blue-500 transition-colors">
+                        <button class="text-gray-400 hover:text-sky-500 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         </button>
                     </div>
@@ -514,7 +556,7 @@
                     <!-- 分页控件 -->
                     <div class="p-3 border-t border-gray-100 flex justify-center items-center gap-3 text-[11px] text-gray-500 bg-white">
                         <button class="w-7 h-7 border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50 transition-colors">&lt;</button>
-                        <button class="w-7 h-7 bg-[#1e88e5] text-white rounded flex items-center justify-center font-medium shadow-sm">1</button>
+                        <button class="w-7 h-7 bg-[#0ea5e9] text-white rounded flex items-center justify-center font-medium shadow-sm">1</button>
                         <button class="w-7 h-7 border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50 transition-colors">&gt;</button>
                         
                         <div class="flex items-center gap-1 ml-2">
@@ -523,7 +565,7 @@
                         </div>
                         <div class="flex items-center gap-1 ml-2">
                             <span>跳转至</span>
-                            <input type="text" class="border border-gray-200 rounded w-10 py-1 text-center outline-none focus:border-blue-400" value="50">
+                            <input type="text" class="border border-gray-200 rounded w-10 py-1 text-center outline-none focus:border-sky-400" value="50">
                             <span>页</span>
                         </div>
                     </div>
@@ -535,7 +577,7 @@
                         
                         <!-- 赛事信息区块 -->
                         <div class="mb-2 bg-white border-b border-gray-200">
-                            <div class="p-3 bg-[#eef2f6] flex justify-between items-center cursor-pointer border-l-[3px] border-[#1e88e5]">
+                            <div class="p-3 bg-[#eef2f6] flex justify-between items-center cursor-pointer border-l-[3px] border-[#0ea5e9]">
                                 <span class="font-bold text-[13px] text-gray-800">赛事信息</span>
                                 <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
                             </div>
@@ -554,7 +596,7 @@
                         
                         <!-- 合买资讯区块 -->
                         <div class="mb-2 bg-white border-b border-gray-200 border-t border-gray-100">
-                            <div class="p-3 bg-[#eef2f6] flex justify-between items-center cursor-pointer border-l-[3px] border-[#1e88e5]">
+                            <div class="p-3 bg-[#eef2f6] flex justify-between items-center cursor-pointer border-l-[3px] border-[#0ea5e9]">
                                 <span class="font-bold text-[13px] text-gray-800">合买资讯</span>
                                 <svg class="w-4 h-4 text-gray-400 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
                             </div>
@@ -562,7 +604,7 @@
                                 <div class="flex justify-between items-center"><span class="text-gray-500">截止合买时间</span><span class="text-gray-800" id="detail-deadline">-</span></div>
                                 <div class="flex justify-between items-center"><span class="text-gray-500">认购最低限额</span><span class="text-gray-800">2.00RMB</span></div>
                                 <div class="flex justify-between items-center"><span class="text-gray-500">合买总金额</span><span class="text-gray-800" id="detail-total-amt">-</span></div>
-                                <div class="flex justify-between items-center"><span class="text-gray-500">中奖后佣金</span><span class="text-[#1e88e5] font-bold">5%</span></div>
+                                <div class="flex justify-between items-center"><span class="text-gray-500">中奖后佣金</span><span class="text-[#0ea5e9] font-bold">5%</span></div>
                                 <div class="flex justify-between items-center"><span class="text-gray-500">发起人认购比例</span><span class="text-gray-800">10.00%</span></div>
                                 <div class="flex justify-between items-center"><span class="text-gray-500">合买发起时赔率</span><span class="text-black font-bold" id="detail-odds-start">-</span></div>
                                 <div class="flex justify-between items-center"><span class="text-gray-500">合买即时赔率</span><span class="text-[#4caf50] font-bold" id="detail-odds-now">-</span></div>
@@ -570,18 +612,18 @@
                                 <div class="flex justify-between items-center"><span class="text-gray-500">展示选项</span><span class="text-gray-800">无条件公开</span></div>
                                 <div class="flex justify-between items-center"><span class="text-gray-500">合买状态</span>
                                     <div class="flex items-center whitespace-nowrap">
-                                        <span class="bg-[#1e88e5] text-white px-1.5 py-0.5 rounded-sm text-[10px] mr-1">合买进行中</span>
+                                        <span class="bg-[#0ea5e9] text-white px-1.5 py-0.5 rounded-sm text-[10px] mr-1">合买进行中</span>
                                         <span class="text-gray-800 font-bold" id="detail-progress-text">0%</span>
                                     </div>
                                 </div>
                                 <div class="mt-4 pt-1">
                                     <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1.5 relative">
-                                        <div class="bg-[#1e88e5] h-1.5 rounded-full" id="detail-progress-bar-inner" style="width: 0%"></div>
-                                        <div class="absolute right-0 top-[-16px] text-[#1e88e5]">
+                                        <div class="bg-[#0ea5e9] h-1.5 rounded-full" id="detail-progress-bar-inner" style="width: 0%"></div>
+                                        <div class="absolute right-0 top-[-16px] text-[#0ea5e9]">
                                             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"></path></svg>
                                         </div>
                                     </div>
-                                    <div class="flex justify-between text-[10px] text-[#1e88e5]">
+                                    <div class="flex justify-between text-[10px] text-[#0ea5e9]">
                                         <span id="detail-rem-val">0.00</span>
                                         <span class="text-gray-400" id="detail-total-val">0.00</span>
                                     </div>
@@ -591,16 +633,16 @@
 
                         <!-- 近3个月胜率明细区块 -->
                         <div class="bg-white border-t border-gray-100">
-                            <div class="p-3 bg-[#eef2f6] flex justify-between items-center cursor-pointer border-l-[3px] border-[#1e88e5]">
+                            <div class="p-3 bg-[#eef2f6] flex justify-between items-center cursor-pointer border-l-[3px] border-[#0ea5e9]">
                                 <span class="font-bold text-[13px] text-gray-800">近3个月胜率明细</span>
                                 <svg class="w-4 h-4 text-gray-400 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
                             </div>
                             <div class="p-4 text-xs">
                                 <!-- 统计网格 -->
-                                <div class="grid grid-cols-2 gap-x-6 gap-y-2 mb-4 border-b border-gray-100 pb-4 text-[11px]">
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-2 mb-2 pb-2 text-[11px]">
                                     <div class="flex justify-between"><span class="text-gray-500">发起历史合买数</span><span class="text-gray-800">13</span></div>
                                     <div class="flex justify-between"><span class="text-gray-500">合买累计总金额</span><span class="text-gray-800">250,000</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-500">胜率</span><span class="text-[#1e88e5] font-bold text-xs">80.21%</span></div>
+                                    <div class="flex justify-between"><span class="text-gray-500">胜率</span><span class="text-[#0ea5e9] font-bold text-xs">80.21%</span></div>
                                     <div class="flex justify-between"><span class="text-gray-500">合买中奖总金额</span><span class="text-gray-800">350,000</span></div>
                                 </div>
                             </div>
@@ -608,7 +650,7 @@
                     </div>
                     <!-- 底部悬浮按钮 -->
                     <div class="p-4 border-t border-gray-200 bg-white shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.02)]">
-                        <button onclick="startParticipateFlow(currentViewOrderId)" class="w-full bg-[#448aff] hover:bg-blue-500 text-white font-medium py-2.5 rounded-full shadow-md transition-colors text-sm tracking-wider">
+                        <button onclick="startParticipateFlow(currentViewOrderId)" class="w-full bg-[#0ea5e9] hover:bg-sky-600 text-white font-medium py-2.5 rounded-full shadow-md transition-colors text-sm tracking-wider">
                             参与认购
                         </button>
                     </div>
@@ -619,47 +661,25 @@
             <!-- 新增：合买注单历史 视图区 -->
             <!-- ============================================== -->
             <div id="right-history-content" class="hidden absolute inset-0 z-40 flex flex-col bg-[#f5f7fa] overflow-hidden">
-                <!-- History Top Bar -->
-                <div class="bg-white border-b border-gray-200 p-3 px-4 flex justify-between items-center shadow-sm z-20 flex-shrink-0">
-                    <div class="flex items-center gap-4">
-                        <button onclick="hideHistoryView()" class="flex items-center text-gray-800 hover:text-blue-500 text-[15px] font-bold mr-2 transition-colors">
-                            <svg class="w-5 h-5 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                            合买大厅
-                        </button>
-                        <div class="flex bg-gray-100 rounded-full p-0.5 border border-gray-200 shadow-inner">
-                            <button id="hist-tab-sent" onclick="switchHistTab('sent')" class="flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full bg-white text-blue-500 font-bold shadow-sm transition-colors">我发起的</button>
-                            <button id="hist-tab-joined" onclick="switchHistTab('joined')" class="flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full text-gray-500 hover:text-blue-500 transition-colors">我参与的</button>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 text-xs text-gray-400">
-                        <a href="#" class="hover:text-blue-500">合买规则</a>
-                        <span>|</span>
-                        <a href="#" class="hover:text-blue-500 text-blue-500 font-bold">合买注单历史</a>
-                        <div class="flex items-center bg-white border border-gray-200 rounded-full overflow-hidden ml-2 shadow-sm focus-within:border-blue-400">
-                            <input type="text" placeholder="请输入合买序号搜索" class="bg-transparent px-4 py-1.5 text-xs outline-none w-48 text-gray-700">
-                            <button class="bg-[#1e88e5] hover:bg-blue-600 text-white px-5 py-1.5 font-medium transition-colors border-l border-[#1e88e5]">搜索</button>
-                        </div>
-                    </div>
-                </div>
                 
                 <!-- Main Content -->
                 <div class="flex-1 flex p-4 gap-4 overflow-hidden">
                     <!-- Left Table Area -->
                     <div class="flex-1 bg-white rounded-lg shadow-sm flex flex-col overflow-hidden border border-gray-200 min-w-0">
                         <div class="p-3 border-b border-gray-100 flex items-center gap-4 text-xs text-gray-600 bg-[#f8fafc]">
-                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" checked class="rounded text-blue-500 w-3.5 h-3.5 border-gray-300"> 进行中</label>
-                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="rounded text-blue-500 w-3.5 h-3.5 border-gray-300"> 已完成</label>
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" checked class="rounded text-sky-500 w-3.5 h-3.5 border-gray-300"> 进行中</label>
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="rounded text-sky-500 w-3.5 h-3.5 border-gray-300"> 已完成</label>
                         </div>
                         
                         <!-- Table Header -->
                         <div class="flex gap-2 bg-[#f8fafc] p-3 border-b border-gray-200 text-[12px] text-gray-500 font-medium items-center">
-                            <div class="w-[40px] text-left pl-1 whitespace-nowrap">编号</div>
-                            <div class="w-[120px] text-left whitespace-nowrap">投注详情</div>
-                            <div class="w-[60px] text-left whitespace-nowrap">投注玩法</div>
-                            <div class="w-[140px] text-left whitespace-nowrap">选项</div>
-                            <div class="w-[70px] text-center whitespace-nowrap">合买投注额</div>
-                            <div class="w-[70px] text-center whitespace-nowrap">最高可赢</div>
-                            <div class="flex-1 text-left pl-2 whitespace-nowrap min-w-[140px]">状态</div>
+                            <div class="w-[40px] text-center whitespace-nowrap flex-shrink-0">编号</div>
+                            <div class="w-[120px] text-left whitespace-nowrap flex-shrink-0">投注详情</div>
+                            <div class="w-[65px] text-left whitespace-nowrap flex-shrink-0">投注玩法</div>
+                            <div class="flex-1 text-left whitespace-nowrap min-w-[120px]">选项</div>
+                            <div class="w-[100px] text-center whitespace-nowrap flex-shrink-0">合买投注额</div>
+                            <div class="w-[85px] text-center whitespace-nowrap flex-shrink-0">最高可赢</div>
+                            <div class="w-[150px] text-left pl-2 whitespace-nowrap flex-shrink-0">状态</div>
                         </div>
                         
                         <!-- Table Body -->
@@ -668,16 +688,16 @@
                         </div>
                         
                         <!-- Footer Pagination -->
-                        <div class="p-3 border-t border-gray-100 flex justify-between items-center text-[11px] text-gray-500 bg-white">
-                            <div class="flex items-center gap-2">
+                        <div class="p-3 border-t border-gray-100 flex items-center relative text-[11px] text-gray-500 bg-white h-[50px]">
+                            <div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
                                 <button class="w-6 h-6 border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50 text-gray-400">&lt;</button>
-                                <button class="w-6 h-6 bg-[#1e88e5] text-white rounded flex items-center justify-center font-medium shadow-sm">1</button>
+                                <button class="w-6 h-6 bg-[#0ea5e9] text-white rounded flex items-center justify-center font-medium shadow-sm">1</button>
                                 <button class="w-6 h-6 border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50 text-gray-400">&gt;</button>
                                 <select class="border border-gray-200 rounded px-1.5 py-1 outline-none ml-2"><option>10</option></select>
                                 <span>条/页</span>
                                 <span class="ml-2">跳转至 <input type="text" class="border border-gray-200 rounded w-8 py-0.5 text-center outline-none" value="1"> 页</span>
                             </div>
-                            <div class="flex items-center gap-4 text-[12px]">
+                            <div class="ml-auto flex items-center gap-4 text-[12px]">
                                 <span>总投注单数: <span id="hist-total-orders" class="font-bold text-gray-800">0</span></span>
                                 <span>总投注额: <span id="hist-total-amt" class="font-bold text-gray-800">0.00</span></span>
                             </div>
@@ -689,7 +709,7 @@
                         <div class="flex-1 overflow-y-auto">
                             <!-- 赛事信息 -->
                             <div class="mb-2 bg-white border-b border-gray-200">
-                                <div class="p-3 bg-[#eef2f6] flex justify-between items-center border-l-[3px] border-[#1e88e5]">
+                                <div class="p-3 bg-[#eef2f6] flex justify-between items-center border-l-[3px] border-[#0ea5e9]">
                                     <span class="font-bold text-[13px] text-gray-800">赛事信息</span>
                                     <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
                                 </div>
@@ -707,7 +727,7 @@
                             </div>
                             <!-- 合买资讯 -->
                             <div class="mb-2 bg-white border-b border-gray-200 border-t border-gray-100">
-                                <div class="p-3 bg-[#eef2f6] flex justify-between items-center border-l-[3px] border-[#1e88e5]">
+                                <div class="p-3 bg-[#eef2f6] flex justify-between items-center border-l-[3px] border-[#0ea5e9]">
                                     <span class="font-bold text-[13px] text-gray-800">合买资讯</span>
                                     <svg class="w-4 h-4 text-gray-400 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
                                 </div>
@@ -715,7 +735,7 @@
                                     <div class="flex justify-between items-center"><span class="text-gray-500">截止合买时间</span><span class="text-gray-800" id="hist-detail-deadline">-</span></div>
                                     <div class="flex justify-between items-center"><span class="text-gray-500">认购最低限额</span><span class="text-gray-800">2.00RMB</span></div>
                                     <div class="flex justify-between items-center"><span class="text-gray-500">合买总金额</span><span class="text-gray-800" id="hist-detail-total-amt">-</span></div>
-                                    <div class="flex justify-between items-center"><span class="text-gray-500">中奖后佣金</span><span class="text-[#1e88e5] font-bold">5%</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-gray-500">中奖后佣金</span><span class="text-[#0ea5e9] font-bold">5%</span></div>
                                     <div class="flex justify-between items-center"><span class="text-gray-500">发起人认购比例</span><span class="text-gray-800">10.00%</span></div>
                                     <div class="flex justify-between items-center"><span class="text-gray-500">合买发起时赔率</span><span class="text-black font-bold" id="hist-detail-odds-start">-</span></div>
                                     <div class="flex justify-between items-center"><span class="text-gray-500">合买即时赔率</span><span class="text-[#4caf50] font-bold" id="hist-detail-odds-now">-</span></div>
@@ -723,18 +743,18 @@
                                     <div class="flex justify-between items-center"><span class="text-gray-500">展示选项</span><span class="text-gray-800">无条件公开</span></div>
                                     <div class="flex justify-between items-center"><span class="text-gray-500">合买状态</span>
                                         <div class="flex items-center whitespace-nowrap">
-                                            <span class="bg-[#1e88e5] text-white px-1.5 py-0.5 rounded-sm text-[10px] mr-1">合买进行中</span>
+                                            <span class="bg-[#0ea5e9] text-white px-1.5 py-0.5 rounded-sm text-[10px] mr-1">合买进行中</span>
                                             <span class="text-gray-800 font-bold" id="hist-detail-progress-text">0%</span>
                                         </div>
                                     </div>
                                     <div class="mt-4 pt-1">
                                         <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1.5 relative">
-                                            <div class="bg-[#1e88e5] h-1.5 rounded-full" id="hist-detail-progress-bar" style="width: 0%"></div>
-                                            <div class="absolute right-0 top-[-16px] text-[#1e88e5]">
+                                            <div class="bg-[#0ea5e9] h-1.5 rounded-full" id="hist-detail-progress-bar" style="width: 0%"></div>
+                                            <div class="absolute right-0 top-[-16px] text-[#0ea5e9]">
                                                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"></path></svg>
                                             </div>
                                         </div>
-                                        <div class="flex justify-between text-[10px] text-[#1e88e5]">
+                                        <div class="flex justify-between text-[10px] text-[#0ea5e9]">
                                             <span id="hist-detail-rem-val">0.00</span>
                                             <span class="text-gray-400" id="hist-detail-total-val">0.00</span>
                                         </div>
@@ -744,7 +764,7 @@
                             
                             <!-- 近3个月胜率明细区块 -->
                             <div class="bg-white border-t border-gray-100">
-                                <div class="p-3 bg-[#eef2f6] flex justify-between items-center cursor-pointer border-l-[3px] border-[#1e88e5]">
+                                <div class="p-3 bg-[#eef2f6] flex justify-between items-center cursor-pointer border-l-[3px] border-[#0ea5e9]">
                                     <span class="font-bold text-[13px] text-gray-800">近3个月胜率明细</span>
                                     <svg class="w-4 h-4 text-gray-400 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
                                 </div>
@@ -753,7 +773,7 @@
                                     <div class="grid grid-cols-2 gap-x-4 gap-y-2 mb-2 pb-2 text-[11px]">
                                         <div class="flex justify-between"><span class="text-gray-500">发起历史合买数</span><span class="text-gray-800">13</span></div>
                                         <div class="flex justify-between"><span class="text-gray-500">合买累计总金额</span><span class="text-gray-800">250,000</span></div>
-                                        <div class="flex justify-between"><span class="text-gray-500">胜率</span><span class="text-[#1e88e5] font-bold text-xs">80.21%</span></div>
+                                        <div class="flex justify-between"><span class="text-gray-500">胜率</span><span class="text-[#0ea5e9] font-bold text-xs">80.21%</span></div>
                                         <div class="flex justify-between"><span class="text-gray-500">合买中奖总金额</span><span class="text-gray-800">350,000</span></div>
                                     </div>
                                 </div>
@@ -761,7 +781,7 @@
                         </div>
                         <!-- 右下侧参与认购按钮 -->
                         <div class="p-4 border-t border-gray-200 bg-white shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.02)]">
-                            <button onclick="startParticipateFlow(currentViewOrderId)" class="w-full bg-[#448aff] hover:bg-blue-500 text-white font-medium py-2.5 rounded-full shadow-md transition-colors text-sm tracking-wider">
+                            <button onclick="startParticipateFlow(currentViewOrderId)" class="w-full bg-[#0ea5e9] hover:bg-sky-600 text-white font-medium py-2.5 rounded-full shadow-md transition-colors text-sm tracking-wider">
                                 参与认购
                             </button>
                         </div>
@@ -772,7 +792,7 @@
     </main>
 
     <!-- ============================================== -->
-    <!-- 撤单确认弹窗 -->
+    <!-- 撤单确认弹窗 (重构版) -->
     <!-- ============================================== -->
     <div id="cancel-confirm-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
         <div class="bg-white rounded-xl w-[320px] max-w-[90%] flex flex-col overflow-hidden shadow-2xl transform transition-all scale-100 opacity-100 duration-200 ease-out">
@@ -781,13 +801,13 @@
             </div>
             <div class="flex border-t border-gray-100 p-4 gap-4 justify-center bg-white">
                 <button onclick="closeCancelModal()" class="flex-1 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-full transition-colors text-[14px] border border-gray-200 shadow-sm">取消</button>
-                <button onclick="confirmCancelOrder()" class="flex-1 bg-[#1e90ff] hover:bg-[#1e88e5] text-white font-medium py-2.5 rounded-full transition-colors text-[14px] shadow-sm">确定</button>
+                <button onclick="confirmCancelOrder()" class="flex-1 bg-[#0ea5e9] hover:bg-sky-600 text-white font-medium py-2.5 rounded-full transition-colors text-[14px] shadow-sm">确定</button>
             </div>
         </div>
     </div>
 
     <!-- ============================================== -->
-    <!-- 赛事信息(查看所有选项) 弹窗 -->
+    <!-- 赛事信息 弹窗 -->
     <!-- ============================================== -->
     <div id="match-options-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
         <div class="bg-white rounded-xl w-[360px] max-w-[90%] flex flex-col overflow-hidden shadow-2xl transform transition-all">
@@ -798,11 +818,6 @@
             
             <!-- 内容区 -->
             <div class="p-5 overflow-y-auto max-h-[65vh] bg-white">
-                <div class="flex items-center gap-2 mb-4">
-                    <div class="w-1 h-3.5 bg-[#1e88e5] rounded-full"></div>
-                    <span class="font-bold text-gray-800 text-[14px]">多项单注</span>
-                </div>
-                
                 <div class="space-y-3">
                     <!-- 选项1 -->
                     <div class="bg-[#f8fafc] rounded-lg p-4">
@@ -812,20 +827,12 @@
                         <div class="text-[#9ca3af] text-[12px] mb-1">多特蒙德 v 拜仁慕尼黑</div>
                         <div class="text-[#9ca3af] text-[12px]">2026-03-24 21:00:00(GMT+8)</div>
                     </div>
-                    <!-- 选项2 -->
-                    <div class="bg-[#f8fafc] rounded-lg p-4">
-                        <div class="font-bold text-gray-800 text-[13px] mb-2.5">[足球] 英格兰超级联赛</div>
-                        <div class="text-[13px] text-gray-600 mb-2.5">切尔西 <span class="text-[#4caf50] font-bold">@1.5</span></div>
-                        <div class="text-[#9ca3af] text-[12px] mb-1">[今日] 全场独赢 [欧洲盘]</div>
-                        <div class="text-[#9ca3af] text-[12px] mb-1">切尔西 v 阿森纳</div>
-                        <div class="text-[#9ca3af] text-[12px]">2026-03-24 21:00:00(GMT+8)</div>
-                    </div>
                 </div>
             </div>
             
             <!-- 底部按钮 -->
             <div class="p-4 bg-white">
-                <button onclick="closeMatchOptionsModal()" class="w-full bg-[#1e90ff] hover:bg-[#1e88e5] text-white font-medium py-3 rounded-full transition-colors text-[15px] tracking-wide shadow-sm">
+                <button onclick="closeMatchOptionsModal()" class="w-full bg-[#0ea5e9] hover:bg-sky-600 text-white font-medium py-3 rounded-full transition-colors text-[15px] tracking-wide shadow-sm">
                     确认
                 </button>
             </div>
@@ -902,7 +909,7 @@
                             ${match.teamH}
                         </div>
                         <div class="flex items-center text-sm text-gray-600 mb-1">
-                            <span class="w-4 h-4 rounded-full bg-blue-100 mr-2 flex items-center justify-center text-[10px] text-blue-500">客</span>
+                            <span class="w-4 h-4 rounded-full bg-sky-100 mr-2 flex items-center justify-center text-[10px] text-[#0ea5e9]">客</span>
                             ${match.teamC}
                         </div>
                         <div class="text-xs text-gray-400 mt-1">${match.time}</div>
@@ -919,8 +926,8 @@
 
         function renderOddsButton(match, oddsItem) {
             const isSelected = selectedBets[oddsItem.id];
-            const activeClass = isSelected ? 'active-bet-btn' : 'bg-[#f8fafc] hover:bg-blue-50 border-gray-200';
-            const textClass = isSelected ? 'text-white' : 'text-blue-500';
+            const activeClass = isSelected ? 'active-bet-btn' : 'bg-[#f8fafc] hover:bg-sky-50 border-gray-200';
+            const textClass = isSelected ? 'text-white' : 'text-sky-500';
             const valueClass = isSelected ? 'text-white' : 'text-gray-800';
             
             return `
@@ -940,7 +947,7 @@
             let html = '';
             participateOrders.forEach(order => {
                 html += `
-                <div class="grid grid-cols-7 gap-2 p-4 border-b border-gray-100 items-center text-center relative hover:bg-blue-50/20 transition-colors bg-white cursor-pointer" onclick="viewDetails('${order.id}')">
+                <div class="grid grid-cols-7 gap-2 p-4 border-b border-gray-100 items-center text-center relative hover:bg-sky-50/20 transition-colors bg-white cursor-pointer" onclick="viewDetails('${order.id}')">
                     ${order.isHot ? `
                     <div class="absolute top-0 left-0 w-10 h-10 overflow-hidden rounded-tl-lg">
                         <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white text-[9px] font-bold transform -rotate-45 -translate-x-[12px] translate-y-[4px] w-[50px] text-center shadow-sm tracking-wider">HOT</div>
@@ -952,14 +959,14 @@
                             <span class="text-yellow-400 font-bold mr-1 italic">V</span>${order.vip}
                         </div>
                         <div class="text-xs text-gray-800 font-medium mb-1">${order.user}</div>
-                        <div class="text-[10px] text-gray-400 flex items-center justify-center group hover:text-blue-500 w-full overflow-hidden">
+                        <div class="text-[10px] text-gray-400 flex items-center justify-center group hover:text-sky-500 w-full overflow-hidden">
                             <span class="truncate flex-1 text-right">${order.orderNo}</span>
                             <svg class="w-3 h-3 ml-1 opacity-50 group-hover:opacity-100 inline-block flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </div>
                     </div>
                     <!-- 2 胜率 -->
                     <div class="col-span-1 flex flex-col items-center">
-                        <div class="text-[#1e88e5] font-bold text-sm mb-1.5">${order.winRate}</div>
+                        <div class="text-[#0ea5e9] font-bold text-sm mb-1.5">${order.winRate}</div>
                         <div class="flex flex-wrap justify-center gap-[2px] w-[100px]">
                             ${order.history.map(h => `<span class="${h.color} text-white text-[10px] px-1 rounded-sm leading-tight py-[2px]">${h.label}</span>`).join('')}
                         </div>
@@ -976,7 +983,7 @@
                     </div>
                     <!-- 5 人数 -->
                     <div class="col-span-1 text-xs text-gray-800">${order.people}</div>
-                    <!-- 6 赔率 (移除籃球) -->
+                    <!-- 6 赔率 (参与合买页面，绿色) -->
                     <div class="col-span-1 flex flex-col items-center text-xs space-y-0.5">
                         <div class="flex items-center text-gray-600 justify-center w-full">
                             <svg class="w-3.5 h-3.5 mr-1 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 2v20m10-10H2M5.5 5.5l13 13m0-13l-13 13" stroke="currentColor" stroke-width="1.5"/></svg>
@@ -988,8 +995,8 @@
                     </div>
                     <!-- 7 参与/详情 -->
                     <div class="col-span-1 flex flex-col items-center justify-center gap-1.5">
-                        <button onclick="startParticipateFlow('${order.id}'); event.stopPropagation();" class="bg-[#1e88e5] hover:bg-blue-600 text-white text-xs px-6 py-1.5 rounded-full transition-colors font-medium shadow-sm">参与</button>
-                        <a href="#" onclick="viewDetails('${order.id}'); event.stopPropagation(); return false;" class="text-[#1e88e5] text-[11px] hover:underline">查看详情</a>
+                        <button onclick="startParticipateFlow('${order.id}'); event.stopPropagation();" class="bg-[#0ea5e9] hover:bg-sky-600 text-white text-xs px-6 py-1.5 rounded-full transition-colors font-medium shadow-sm">参与</button>
+                        <a href="#" onclick="viewDetails('${order.id}'); event.stopPropagation(); return false;" class="text-[#0ea5e9] text-[11px] hover:underline">查看详情</a>
                     </div>
                 </div>
                 `;
@@ -1008,11 +1015,12 @@
                     <div class="text-gray-800 text-[13px] mb-1 font-bold">${record.league}</div>
                     <div class="text-gray-600 text-[12px] mb-1">${record.teamH} VS ${record.teamC}</div>
                     <div class="text-gray-400 text-[11px] mb-2">${record.time}</div>
-                    <div class="text-[#1e88e5] text-[12px] mb-1">[足球] 赛前全场独赢 [欧洲盘]</div>
-                    <div class="text-[#1e88e5] text-[12px] mb-1">${record.betName}</div>
+                    <div class="text-[#0ea5e9] text-[12px] mb-1">[足球] 赛前全场独赢 [欧洲盘]</div>
+                    <div class="text-[#0ea5e9] text-[12px] mb-1">${record.betName}</div>
                     <div class="flex justify-between items-center mb-3">
+                        <!-- 我的合买记录中赔率也是绿色 -->
                         <div class="font-bold text-[#4caf50] text-[14px]">@${record.odds}</div>
-                        <div class="bg-[#1e88e5] text-white px-1.5 py-0.5 rounded text-[10px]">合买进行中</div>
+                        <div class="bg-[#0ea5e9] text-white px-1.5 py-0.5 rounded text-[10px]">合买进行中</div>
                     </div>
                     <div class="flex justify-between items-center text-[11px] text-gray-500 mb-1">
                         <span>合买金额</span><span>最高可赢</span>
@@ -1025,14 +1033,14 @@
                         <span>合买序号</span>
                         <span class="text-gray-800 font-mono flex items-center w-[130px] justify-end overflow-hidden">
                             <span class="truncate flex-1 text-right">${record.seqNo}</span> 
-                            <svg class="w-3.5 h-3.5 ml-1 cursor-pointer hover:text-blue-500 inline-block flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <svg class="w-3.5 h-3.5 ml-1 cursor-pointer hover:text-sky-500 inline-block flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </span>
                     </div>
                     <div class="flex justify-between items-center text-[11px] text-gray-500">
                         <span>合买单号</span>
                         <span class="text-gray-800 font-mono flex items-center w-[130px] justify-end overflow-hidden">
                             <span class="truncate flex-1 text-right">${record.orderNo}</span> 
-                            <svg class="w-3.5 h-3.5 ml-1 cursor-pointer hover:text-blue-500 inline-block flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <svg class="w-3.5 h-3.5 ml-1 cursor-pointer hover:text-sky-500 inline-block flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </span>
                     </div>
                 </div>
@@ -1053,9 +1061,8 @@
             document.getElementById('detail-league').innerText = '[足球] 欧洲联赛';
             document.getElementById('detail-bet-name').innerHTML = `${order.bet.name} <span class="text-[#4caf50] font-bold" id="detail-odds">@${order.odds}</span>`;
             
-            // 轉換假資料的時間格式 (將 03-20 01:45(GTM+8) 轉為 2026-03-20 01:45:00 樣式)
-            let matchTimeStr = order.bet.time.replace('(GTM+8)', '').trim(); 
-            let formattedTime = `2026-${matchTimeStr}:00`;
+            // 轉換假資料的時間格式 (將 03-20 01:45(GTM+8) 轉為 2026-03-24 23:15:00 樣式)
+            let formattedTime = `2026-03-24 23:15:00`; // 對齊截圖指定時間
             
             document.getElementById('detail-match-time').innerText = formattedTime;
             document.getElementById('detail-bet-type').innerText = `[赛前] ${order.bet.type} [欧洲盘]`;
@@ -1068,8 +1075,8 @@
             document.getElementById('detail-progress-bar-inner').style.width = order.progress + '%';
             document.getElementById('detail-rem-val').innerText = (order.totalAmt - order.remAmt).toFixed(2);
             document.getElementById('detail-total-val').innerText = order.totalAmt.toFixed(2);
-            document.getElementById('detail-odds-start').innerText = `@${order.odds}`;
-            document.getElementById('detail-odds-now').innerText = `@${order.odds}`;
+            document.getElementById('detail-odds-start').innerText = `@${order.odds}`; // 黑色
+            document.getElementById('detail-odds-now').innerText = `@${order.odds}`; // 绿色
         };
 
         // --- 核心交互逻辑 ---
@@ -1086,8 +1093,8 @@
 
             if (mode === 'initiate') {
                 // 发起合买状态
-                initiateBtn.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full bg-white text-blue-500 font-bold shadow-sm transition-colors";
-                participateBtn.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full text-gray-500 hover:text-blue-500 transition-colors";
+                initiateBtn.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full bg-white text-[#0ea5e9] font-bold shadow-sm transition-colors";
+                participateBtn.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full text-gray-500 hover:text-[#0ea5e9] transition-colors";
                 participateSubTabs.classList.add('hidden');
                 participateSubTabs.classList.remove('flex');
                 participateContent.classList.add('hidden');
@@ -1095,8 +1102,8 @@
                 showStep(0);
             } else {
                 // 参与合买状态
-                participateBtn.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full bg-white text-blue-500 font-bold shadow-sm transition-colors";
-                initiateBtn.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full text-gray-500 hover:text-blue-500 transition-colors";
+                participateBtn.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full bg-white text-[#0ea5e9] font-bold shadow-sm transition-colors";
+                initiateBtn.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full text-gray-500 hover:text-[#0ea5e9] transition-colors";
                 participateSubTabs.classList.remove('hidden');
                 participateSubTabs.classList.add('flex');
                 participateContent.classList.remove('hidden');
@@ -1149,8 +1156,8 @@
                             btn.querySelector('span:first-child').className = "text-white text-xs";
                             btn.querySelector('span:last-child').className = "font-bold text-white";
                         } else {
-                            btn.className = "h-[36px] flex-1 flex items-center justify-between px-3 border border-gray-200 rounded text-sm transition-all bg-[#f8fafc] hover:bg-blue-50";
-                            btn.querySelector('span:first-child').className = "text-blue-500 text-xs";
+                            btn.className = "h-[36px] flex-1 flex items-center justify-between px-3 border border-gray-200 rounded text-sm transition-all bg-[#f8fafc] hover:bg-sky-50";
+                            btn.querySelector('span:first-child').className = "text-[#0ea5e9] text-xs";
                             btn.querySelector('span:last-child').className = "font-bold text-gray-800";
                         }
                     }
@@ -1172,11 +1179,11 @@
                         <button onclick="toggleBet('${bet.matchId}', '${bet.oddsId}')" class="absolute top-1 right-1 text-gray-300 hover:text-red-500 transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         </button>
-                        <div class="text-[11px] text-blue-500 font-medium mb-1 truncate pr-5">[${bet.type}] ${bet.teamH} VS ${bet.teamC}</div>
+                        <div class="text-[11px] text-[#0ea5e9] font-medium mb-1 truncate pr-5">[${bet.type}] ${bet.teamH} VS ${bet.teamC}</div>
                         <div class="text-[11px] text-gray-500 mb-1">${bet.time}</div>
                         <div class="flex justify-between items-end">
                             <div class="text-sm font-bold text-gray-800">${bet.name}</div>
-                            <!-- 赔率颜色改为黑色 -->
+                            <!-- 发起合买赔率颜色改为黑色 -->
                             <div class="text-sm font-bold text-black">@${bet.value.toFixed(2)}</div>
                         </div>
                     </div>
@@ -1233,19 +1240,19 @@
                 let guaranteeAmt = (target * 0.7) - sub;
                 guaranteeAmt = guaranteeAmt > 0 ? guaranteeAmt : 0; 
                 guaranteeDisplay.innerText = guaranteeAmt.toFixed(2);
-                guaranteeDisplay.classList.add('text-blue-600', 'font-bold');
+                guaranteeDisplay.classList.add('text-sky-600', 'font-bold');
             } else {
                 guaranteeDisplay.innerText = '0.00';
-                guaranteeDisplay.classList.remove('text-blue-600', 'font-bold');
+                guaranteeDisplay.classList.remove('text-sky-600', 'font-bold');
             }
 
             // 校验提交按钮状态
             if (hasBets && target > 0 && sub > 0 && sub <= target) {
                 submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                submitBtn.classList.add('hover:bg-blue-600');
+                submitBtn.classList.add('hover:bg-sky-600');
             } else {
                 submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                submitBtn.classList.remove('hover:bg-blue-600');
+                submitBtn.classList.remove('hover:bg-sky-600');
             }
         }
 
@@ -1287,8 +1294,7 @@
             partFlow.classList.remove('hidden');
             partFlow.classList.add('flex');
             
-            let matchTimeStr = order.bet.time.replace('(GTM+8)', '').trim(); 
-            let formattedTime = `2026-${matchTimeStr}:00`;
+            let formattedTime = `2026-03-24 23:15:00`; // 對齊截圖時間
 
             // Render specific bet item
             const betContainer = document.getElementById('part-flow-bet-container');
@@ -1298,8 +1304,8 @@
                     <div class="text-[12px] text-gray-600 mb-1">${order.bet.teamH} VS ${order.bet.teamC}</div>
                     <div class="text-[12px] text-gray-500 mb-2">${formattedTime} (GMT+8)</div>
                     <div class="bg-[#f8fafc] rounded p-2 text-[12px] border border-gray-50">
-                        <div class="text-[#1e88e5] mb-1">[赛前] ${order.bet.type} [欧洲盘]</div>
-                        <div class="text-[#1e88e5] mb-1">${order.bet.name}</div>
+                        <div class="text-[#0ea5e9] mb-1">[赛前] ${order.bet.type} [欧洲盘]</div>
+                        <div class="text-[#0ea5e9] mb-1">${order.bet.name}</div>
                         <!-- 参与认购时赔率也是绿色 -->
                         <div class="font-bold text-[#4caf50] text-sm">@${order.odds}</div>
                     </div>
@@ -1434,7 +1440,7 @@
             if (orderToDeleteId) {
                 // 从列表中移除
                 participateOrders = participateOrders.filter(o => o.id !== orderToDeleteId);
-                // 同步清理本地记录(可保留或删除，依实际业务逻辑，此处假设移除)
+                // 同步清理本地记录
                 if(myRecords[orderToDeleteId]) {
                     delete myRecords[orderToDeleteId];
                 }
@@ -1487,6 +1493,23 @@
             if (partFlow) { partFlow.classList.add('hidden'); partFlow.classList.remove('flex'); }
             if (step4Records) { step4Records.classList.add('hidden'); step4Records.classList.remove('flex'); }
 
+            // 同步左侧菜单的选中状态
+            const menuHall = document.getElementById('menu-hall');
+            const menuRecords = document.getElementById('menu-records');
+            if (menuHall && menuRecords) {
+                if (step === 4 || step === -2) { // step -2 is history view flag
+                    menuHall.className = "flex items-center p-3 hover:bg-sky-50 cursor-pointer text-gray-600 border-l-[3px] border-transparent transition-colors";
+                    menuRecords.className = "flex items-center p-3 cursor-pointer text-white font-bold bg-[#0ea5e9] border-l-[3px] border-[#0ea5e9] shadow-sm";
+                    menuRecords.querySelector('span:first-child').className = "mr-2 text-[#0ea5e9] font-bold bg-white w-5 h-5 flex items-center justify-center rounded text-xs";
+                    menuHall.querySelector('span:first-child').className = "mr-2 text-white font-bold bg-red-500 w-5 h-5 flex items-center justify-center rounded text-xs";
+                } else {
+                    menuHall.className = "flex items-center p-3 cursor-pointer text-[#0ea5e9] font-bold bg-sky-50 border-l-[3px] border-[#0ea5e9]";
+                    menuRecords.className = "flex items-center p-3 hover:bg-sky-50 cursor-pointer text-gray-600 border-l-[3px] border-transparent transition-colors";
+                    menuHall.querySelector('span:first-child').className = "mr-2 text-white font-bold bg-red-500 w-5 h-5 flex items-center justify-center rounded text-xs";
+                    menuRecords.querySelector('span:first-child').className = "mr-2 text-white font-bold bg-[#0ea5e9] w-5 h-5 flex items-center justify-center rounded text-xs";
+                }
+            }
+
             if (step === 0 && step0Menu) {
                 step0Menu.classList.remove('hidden');
                 step0Menu.classList.add('flex');
@@ -1505,6 +1528,10 @@
                 step4Records.classList.remove('hidden');
                 step4Records.classList.add('flex');
                 renderMyRecords();
+            } else if (step === -1) {
+                // 特殊状态：參與合買左側
+            } else if (step === -2) {
+                // 特殊状态：僅為了隱藏左側菜單下方區域 (進入歷史大廳時使用)
             }
         }
 
@@ -1514,7 +1541,6 @@
             document.getElementById('right-empty-state').classList.add('hidden');
             document.getElementById('right-match-content').classList.add('hidden');
             document.getElementById('right-participate-content').classList.add('hidden');
-            document.getElementById('main-top-nav').classList.add('hidden'); // 隱藏重複的導航列
             
             const historyView = document.getElementById('right-history-content');
             if (historyView) {
@@ -1522,6 +1548,18 @@
                 historyView.classList.add('flex');
                 renderHistoryList();
             }
+            
+            // 隱藏原始大廳按鈕列，切換為歷史導航
+            document.getElementById('nav-back-btn').classList.remove('hidden');
+            document.getElementById('nav-back-btn').classList.add('flex');
+            document.getElementById('nav-tabs-hall').classList.add('hidden');
+            document.getElementById('nav-tabs-hall').classList.remove('flex');
+            document.getElementById('nav-tabs-history').classList.remove('hidden');
+            document.getElementById('nav-tabs-history').classList.add('flex');
+            document.getElementById('nav-btn-history').classList.add('text-[#0ea5e9]', 'font-bold', 'border-b-2', 'border-[#0ea5e9]', 'pb-[18px]', 'pt-[18px]');
+            document.getElementById('nav-btn-history').classList.remove('text-gray-400');
+            
+            showStep(-2); // 隐藏左侧球种菜单，只保留顶部个人资讯与固定菜单，且高亮合買紀錄
         };
 
         window.hideHistoryView = function() {
@@ -1530,19 +1568,29 @@
                 historyView.classList.add('hidden');
                 historyView.classList.remove('flex');
             }
-            document.getElementById('main-top-nav').classList.remove('hidden'); // 恢復導航列
+            
+            // 恢復大廳導航
+            document.getElementById('nav-back-btn').classList.add('hidden');
+            document.getElementById('nav-back-btn').classList.remove('flex');
+            document.getElementById('nav-tabs-history').classList.add('hidden');
+            document.getElementById('nav-tabs-history').classList.remove('flex');
+            document.getElementById('nav-tabs-hall').classList.remove('hidden');
+            document.getElementById('nav-tabs-hall').classList.add('flex');
+            document.getElementById('nav-btn-history').classList.remove('text-[#0ea5e9]', 'font-bold', 'border-b-2', 'border-[#0ea5e9]', 'pb-[18px]', 'pt-[18px]');
+            
             switchMainTab('participate'); // default back to participate
+            showStep(0); // 恢复左侧球种菜单
         };
 
         window.switchHistTab = function(tab) {
             const btnSent = document.getElementById('hist-tab-sent');
             const btnJoined = document.getElementById('hist-tab-joined');
             if (tab === 'sent') {
-                btnSent.className = "px-5 py-1.5 rounded-full border border-blue-500 text-blue-500 bg-blue-50 text-[13px] font-medium transition-colors";
-                btnJoined.className = "px-5 py-1.5 rounded-full border border-transparent text-gray-600 text-[13px] hover:text-blue-500 bg-white transition-colors";
+                btnSent.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full bg-white text-[#0ea5e9] font-bold shadow-sm transition-colors";
+                btnJoined.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full text-gray-500 hover:text-[#0ea5e9] transition-colors";
             } else {
-                btnJoined.className = "px-5 py-1.5 rounded-full border border-blue-500 text-blue-500 bg-blue-50 text-[13px] font-medium transition-colors";
-                btnSent.className = "px-5 py-1.5 rounded-full border border-transparent text-gray-600 text-[13px] hover:text-blue-500 bg-white transition-colors";
+                btnJoined.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full bg-white text-[#0ea5e9] font-bold shadow-sm transition-colors";
+                btnSent.className = "flex items-center gap-1.5 px-5 py-1.5 text-sm rounded-full text-gray-500 hover:text-[#0ea5e9] transition-colors";
             }
         };
 
@@ -1561,7 +1609,7 @@
         window.selectHistoryRow = function(id) {
             // Remove highlight from all
             document.querySelectorAll('.history-main-row').forEach(row => {
-                row.classList.remove('bg-blue-50', 'border-l-[3px]', 'border-blue-500');
+                row.classList.remove('bg-sky-50', 'border-l-[3px]', 'border-[#0ea5e9]');
                 row.classList.add('bg-white');
             });
 
@@ -1569,7 +1617,7 @@
             const row = document.getElementById(`main-row-${id}`);
             if (row) {
                 row.classList.remove('bg-white');
-                row.classList.add('bg-blue-50', 'border-l-[3px]', 'border-blue-500');
+                row.classList.add('bg-sky-50', 'border-l-[3px]', 'border-[#0ea5e9]');
             }
             
             currentViewOrderId = id; // 更新當前查看的 ID
@@ -1581,7 +1629,7 @@
                 document.getElementById('hist-detail-bet-name').innerHTML = `${order.bet.name} <span class="text-[#4caf50] font-bold">@${order.odds}</span>`;
                 
                 let matchTimeStr = order.bet.time.replace('(GTM+8)', '').trim(); 
-                let formattedTime = `2026-${matchTimeStr}:00`;
+                let formattedTime = `2026-03-24 23:15:00`;
                 
                 document.getElementById('hist-detail-match-time').innerText = formattedTime;
                 document.getElementById('hist-detail-bet-type').innerText = `[赛前] ${order.bet.type} [欧洲盘]`;
@@ -1589,8 +1637,8 @@
                 
                 document.getElementById('hist-detail-deadline').innerText = `${formattedTime} (GMT+8)`;
                 document.getElementById('hist-detail-total-amt').innerText = order.totalAmt.toFixed(2) + 'RMB';
-                document.getElementById('hist-detail-odds-start').innerText = `@${order.odds}`;
-                document.getElementById('hist-detail-odds-now').innerText = `@${order.odds}`;
+                document.getElementById('hist-detail-odds-start').innerText = `@${order.odds}`; // 黑色
+                document.getElementById('hist-detail-odds-now').innerText = `@${order.odds}`; // 绿色
                 
                 document.getElementById('hist-detail-progress-text').innerText = order.progress + '%';
                 document.getElementById('hist-detail-progress-bar').style.width = order.progress + '%';
@@ -1615,26 +1663,26 @@
                     return `
                     <div class="flex gap-2 border-b border-gray-200 py-3 text-[11px] text-gray-600 text-center items-center hover:bg-gray-100 transition-colors">
                         <div class="w-[40px] border-r border-gray-200">${no} - ${sIdx + 1}</div>
-                        <div class="w-[120px] text-left pl-4 whitespace-nowrap">
+                        <div class="w-[130px] text-left pl-4 whitespace-nowrap">
                             <div class="mb-0.5">${sub.time}</div>
                             <div class="text-gray-400">认购编号: <br>${sub.subNo}</div>
                         </div>
-                        <div class="w-[60px]">-</div>
-                        <div class="w-[140px]">-</div>
-                        <div class="w-[70px]">${sub.amt}</div>
-                        <div class="w-[70px]">${sub.win.toFixed(2)}</div>
-                        <div class="flex-1 text-left pl-4 whitespace-nowrap min-w-[140px]">${sub.type}</div>
+                        <div class="w-[65px]">-</div>
+                        <div class="flex-1">-</div>
+                        <div class="w-[100px]">${sub.amt}</div>
+                        <div class="w-[85px]">${sub.win.toFixed(2)}</div>
+                        <div class="w-[150px] text-right pr-4 whitespace-nowrap">${sub.type}</div>
                     </div>
                     `;
                 }).join('');
 
                 let matchTimeStr = order.bet.time.replace('(GTM+8)', '').trim(); 
-                let formattedTime = `2026-${matchTimeStr}:00`;
+                let formattedTime = `2026-03-24 23:15:00`;
 
                 // 根據進度顯示對應樣式的撤單按鈕
                 let cancelBtnHtml = '';
                 if (order.progress < 50) {
-                    cancelBtnHtml = `<button class="text-[#1e88e5] border border-[#1e88e5] px-3 py-1 rounded-full text-[11px] hover:bg-blue-50 transition-colors shadow-sm" onclick="openCancelModal('${order.id}'); event.stopPropagation();">撤单</button>`;
+                    cancelBtnHtml = `<button class="text-[#0ea5e9] border border-[#0ea5e9] px-3 py-1 rounded-full text-[11px] hover:bg-sky-50 transition-colors shadow-sm" onclick="openCancelModal('${order.id}'); event.stopPropagation();">撤单</button>`;
                 } else {
                     cancelBtnHtml = `<button class="text-gray-400 border border-gray-200 px-3 py-1 rounded-full text-[11px] cursor-not-allowed" onclick="event.stopPropagation();">撤单</button>`;
                 }
@@ -1645,19 +1693,19 @@
                     <div class="w-[40px] text-center border-r border-gray-100 text-[12px]">${no}</div>
                     
                     <!-- 投注详情 -->
-                    <div class="w-[120px] text-left text-[11px] pl-2 whitespace-nowrap overflow-hidden">
+                    <div class="w-[130px] text-left text-[11px] pl-2 whitespace-nowrap overflow-hidden">
                         <div class="mb-1 text-gray-800">${order.historySubs.length > 0 ? order.historySubs[0].time : formattedTime}</div>
                         <div class="text-gray-500 mb-0.5">合买序号: <br><span class="text-gray-800 font-mono text-[11px]">${order.seqNo}</span></div>
                         <div class="text-gray-500">合买单号: <br><span class="text-gray-800 font-mono text-[11px]">${order.realOrderNo}</span></div>
                     </div>
                     
                     <!-- 投注玩法 -->
-                    <div class="w-[60px] text-left text-[11px] text-gray-800 whitespace-nowrap pl-1">
+                    <div class="w-[65px] text-left text-[11px] text-gray-800 whitespace-nowrap pl-1">
                         合买<br>全场独赢
                     </div>
                     
                     <!-- 选项 -->
-                    <div class="w-[140px] text-left text-[11px] space-y-1 pr-2 whitespace-nowrap overflow-hidden">
+                    <div class="flex-1 text-left text-[11px] space-y-1 pr-2 whitespace-nowrap overflow-hidden min-w-[160px]">
                         <div class="text-gray-800 font-medium">[足球] 欧洲联赛</div>
                         <div class="text-gray-800">${order.bet.name} <span class="text-[#4caf50] font-bold">@${order.odds}</span></div>
                         <div class="text-gray-500">[赛前] 全场独赢 [欧洲盘]</div>
@@ -1666,38 +1714,38 @@
                     </div>
                     
                     <!-- 投注额 -->
-                    <div class="w-[70px] text-center text-[11px] whitespace-nowrap">
+                    <div class="w-[100px] text-center text-[11px] whitespace-nowrap">
                         <div class="text-gray-800 mb-1">${(order.totalAmt - order.remAmt).toFixed(2)} RMB</div>
                         <div class="text-gray-400">(${order.totalAmt.toFixed(2)} RMB)</div>
                     </div>
                     
                     <!-- 最高可赢 -->
-                    <div class="w-[70px] text-center text-[11px] text-gray-800 whitespace-nowrap">
+                    <div class="w-[85px] text-center text-[11px] text-gray-800 whitespace-nowrap">
                         ${(order.totalAmt * parseFloat(order.odds)).toFixed(2)} RMB
                     </div>
                     
                     <!-- 状态 -->
-                    <div class="flex-1 flex flex-col items-start pl-2 pr-2 text-xs space-y-1.5 whitespace-nowrap min-w-[140px]">
+                    <div class="w-[150px] flex flex-col items-start pl-2 pr-2 text-xs space-y-1.5 whitespace-nowrap">
                         <div class="text-gray-400 text-[10px] w-full text-right">${formattedTime}</div>
                         <div class="w-full relative pt-1">
                             <div class="flex justify-between text-[10px] mb-1">
-                                <span class="bg-[#1e88e5] text-white px-1.5 py-0.5 rounded-sm">合买进行中</span>
+                                <span class="bg-[#0ea5e9] text-white px-1.5 py-0.5 rounded-sm">合买进行中</span>
                                 <span class="text-gray-600">${order.progress}%</span>
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-1 relative">
-                                <div class="bg-[#1e88e5] h-1 rounded-full" style="width: ${order.progress}%"></div>
+                                <div class="bg-[#0ea5e9] h-1 rounded-full" style="width: ${order.progress}%"></div>
                             </div>
                             <div class="flex justify-between text-[10px] mt-1 text-gray-400">
-                                <span class="text-[#1e88e5]">${(order.totalAmt - order.remAmt).toFixed(2)}</span>
+                                <span class="text-[#0ea5e9]">${(order.totalAmt - order.remAmt).toFixed(2)}</span>
                                 <span>${order.totalAmt.toFixed(2)}</span>
                             </div>
                         </div>
                         <div class="flex justify-end items-center gap-2 w-full mt-2">
                             ${cancelBtnHtml}
-                            <button class="bg-[#1e88e5] text-white px-3 py-1 rounded-full text-[11px] hover:bg-blue-600 transition-colors shadow-sm" onclick="selectHistoryRow('${order.id}'); event.stopPropagation();">查看详情</button>
+                            <button class="bg-[#0ea5e9] text-white px-3 py-1 rounded-full text-[11px] hover:bg-sky-600 transition-colors shadow-sm" onclick="selectHistoryRow('${order.id}'); event.stopPropagation();">查看详情</button>
                         </div>
                         <div class="w-full text-right mt-1">
-                            <button id="toggle-btn-${order.id}" class="text-[#1e88e5] text-[11px] flex items-center justify-end w-full" onclick="toggleHistoryRow('${order.id}'); event.stopPropagation();">
+                            <button id="toggle-btn-${order.id}" class="text-[#0ea5e9] text-[11px] flex items-center justify-end w-full" onclick="toggleHistoryRow('${order.id}'); event.stopPropagation();">
                                 展开 <span class="ml-1 text-[8px]">▼</span>
                             </button>
                         </div>
@@ -1756,8 +1804,9 @@
                         <div class="text-[13px] text-gray-800">${bet.teamH} VS ${bet.teamC}</div>
                         <div class="text-xs text-gray-400 mt-0.5 mb-2">${matchTime}</div>
                         <div class="bg-[#f4f7fb] rounded p-2 text-[12px] relative border border-[#e2e8f0]">
-                            <div class="text-[#1e88e5] mb-1">[赛前] ${bet.type} [欧洲盘]</div>
-                            <div class="text-[#1e88e5] mb-1">${bet.name}</div>
+                            <div class="text-[#0ea5e9] mb-1">[赛前] ${bet.type} [欧洲盘]</div>
+                            <div class="text-[#0ea5e9] mb-1">${bet.name}</div>
+                            <!-- 赔率颜色改为黑色 -->
                             <div class="font-bold text-black text-[14px]">@${bet.value.toFixed(2)}</div>
                         </div>
                     </div>
@@ -1806,7 +1855,7 @@
                 const seqNo = bet.seqNo;
                 const orderNo = bet.orderNo;
                 const subNo = bet.initSubNo || 'RG' + Math.floor(Math.random() * 10000000000000000).toString();
-                const copyIcon = `<svg class="w-3.5 h-3.5 text-gray-400 inline-block flex-shrink-0 ml-1 cursor-pointer hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
+                const copyIcon = `<svg class="w-3.5 h-3.5 text-gray-400 inline-block flex-shrink-0 ml-1 cursor-pointer hover:text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
 
                 finalHtml += `
                 <div class="bg-white rounded-lg shadow-sm border border-gray-100 mb-4 overflow-hidden">
@@ -1816,11 +1865,11 @@
                         <div class="text-[13px] text-gray-800">${bet.teamH} VS ${bet.teamC}</div>
                         <div class="text-xs text-gray-400 mt-0.5 mb-2">${matchTime}</div>
                         <div class="bg-[#f4f7fb] rounded p-2 text-[12px] relative border border-[#e2e8f0]">
-                            <div class="text-[#1e88e5] mb-1">[赛前] ${bet.type} [欧洲盘]</div>
-                            <div class="text-[#1e88e5] mb-1">${bet.name}</div>
+                            <div class="text-[#0ea5e9] mb-1">[赛前] ${bet.type} [欧洲盘]</div>
+                            <div class="text-[#0ea5e9] mb-1">${bet.name}</div>
                             <!-- 赔率颜色保持黑色 -->
                             <div class="font-bold text-black text-[14px]">@${bet.value.toFixed(2)}</div>
-                            <div class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#1e88e5] text-white text-[11px] px-2 py-0.5 rounded">合买进行中</div>
+                            <div class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#0ea5e9] text-white text-[11px] px-2 py-0.5 rounded">合买进行中</div>
                         </div>
                     </div>
                     
@@ -1842,24 +1891,15 @@
                         <div class="text-[12px] space-y-3 text-gray-600 mb-4">
                             <div>
                                 <div class="mb-0.5">合买序号</div>
-                                <div class="text-gray-800 font-mono flex items-center w-full overflow-hidden">
-                                    <span class="flex-1 min-w-0 truncate pr-2">${seqNo}</span> 
-                                    ${copyIcon}
-                                </div>
+                                <div class="text-gray-800 font-mono flex items-center justify-between"><span class="flex-1 min-w-0 truncate pr-2">${seqNo}</span> ${copyIcon}</div>
                             </div>
                             <div>
                                 <div class="mb-0.5">合买单号</div>
-                                <div class="text-gray-800 font-mono flex items-center w-full overflow-hidden">
-                                    <span class="flex-1 min-w-0 truncate pr-2">${orderNo}</span> 
-                                    ${copyIcon}
-                                </div>
+                                <div class="text-gray-800 font-mono flex items-center justify-between"><span class="flex-1 min-w-0 truncate pr-2">${orderNo}</span> ${copyIcon}</div>
                             </div>
                             <div>
                                 <div class="mb-0.5">认购编号</div>
-                                <div class="text-gray-800 font-mono flex items-center w-full overflow-hidden">
-                                    <span class="flex-1 min-w-0 truncate pr-2">${subNo}</span> 
-                                    ${copyIcon}
-                                </div>
+                                <div class="text-gray-800 font-mono flex items-center justify-between"><span class="flex-1 min-w-0 truncate pr-2">${subNo}</span> ${copyIcon}</div>
                             </div>
                         </div>
 
