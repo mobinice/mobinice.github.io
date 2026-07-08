@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IceBet Flow 1</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #e7edf4;
+      color: #172033;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    button, input, select { font-family: inherit; }
+    button { cursor: pointer; }
+    .phone {
+      width: 428px;
+      height: 939px;
+      background: #f4f7fb;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 18px 60px rgba(15, 23, 42, .22);
+    }
+    @media (max-width: 428px) {
+      body { display: block; background: #f4f7fb; }
+      .phone { width: 100vw; height: 100vh; box-shadow: none; }
+    }
+    .status {
+      height: 34px;
+      padding: 9px 20px 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      background: #fff;
+    }
+    .page {
+      height: calc(100% - 34px - 70px);
+      overflow-y: auto;
+      padding: 10px 14px 14px;
+      display: none;
+    }
+    .phone.login-mode .page { height: calc(100% - 34px); }
+    .page.active { display: block; }
+    .hero {
+      height: 164px;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      background: #dff3ff;
+      border: 1px solid #e1edf8;
+      margin-bottom: 10px;
+    }
+    .hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(8, 79, 154, .8), rgba(8, 79, 154, .04) 72%);
+    }
+    .hero-copy {
+      position: absolute;
+      z-index: 1;
+      left: 16px;
+      top: 18px;
+      width: 230px;
+      color: #fff;
+      text-shadow: 0 1px 10px rgba(15, 23, 42, .28);
+    }
+    .hero-copy strong { display: block; font-size: 22px; line-height: 1.14; }
+    .hero-copy span { display: block; margin-top: 8px; font-size: 12px; line-height: 1.45; }
+    .wallet-row {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .balance-card, .state-card {
+      min-height: 108px;
+      border-radius: 8px;
+      padding: 13px;
+      position: relative;
+      overflow: hidden;
+    }
+    .balance-card {
+      color: #fff;
+      background:
+        radial-gradient(circle at 92% 8%, rgba(255,255,255,.24), transparent 34%),
+        linear-gradient(135deg, #1478e6, #4ab8ff);
+      box-shadow: 0 10px 22px rgba(20, 120, 230, .16);
+    }
+    .state-card {
+      background: #fff;
+      border: 1px solid #edf1f6;
+    }
+    .balance-card span, .state-card span { display: block; font-size: 11px; opacity: .9; }
+    .balance-card b { display: block; margin-top: 8px; font-size: 25px; }
+    .balance-card .user-name {
+      margin-bottom: 6px;
+      font-size: 12px;
+      opacity: .95;
+      font-weight: 900;
+    }
+    .state-card b { display: block; margin-top: 9px; color: #ea580c; font-size: 16px; }
+    .card-link {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      border: 0;
+      border-radius: 999px;
+      padding: 6px 10px;
+      color: #0b8ed6;
+      background: #e7f4ff;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .balance-card .card-link { background: rgba(255,255,255,.22); color: #fff; border: 1px solid rgba(255,255,255,.38); }
+    .section {
+      background: #fff;
+      border: 1px solid #e9edf4;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .section-head b { font-size: 15px; }
+    .section-head span {
+      color: #0c87cf;
+      background: #e7f4ff;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .venue-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .home-venue-layout {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+    }
+    .home-venue-main { min-width: 0; }
+    .home-category-menu button {
+      min-height: 42px;
+      background: #f1f5f9;
+    }
+    .venue-card {
+      border: 0;
+      border-radius: 8px;
+      min-height: 170px;
+      overflow: hidden;
+      text-align: left;
+      padding: 0;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, .08);
+      background: #fff;
+    }
+    .game-art {
+      height: 104px;
+      position: relative;
+      overflow: hidden;
+      background: var(--art);
+    }
+    .game-art .hot { z-index: 2; }
+    .game-art::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 24%, rgba(255,255,255,.42), transparent 18%),
+        radial-gradient(circle at 78% 26%, rgba(255,255,255,.28), transparent 20%);
+    }
+    .card-shape, .card-shape::before, .card-shape::after {
+      position: absolute;
+      border-radius: 12px;
+      background: rgba(255,255,255,.84);
+      border: 1px solid rgba(255,255,255,.96);
+      box-shadow: 0 9px 18px rgba(15,23,42,.16);
+    }
+    .card-shape {
+      width: 48px;
+      height: 64px;
+      right: 50px;
+      top: 22px;
+      transform: rotate(-12deg);
+    }
+    .card-shape::before {
+      content: "";
+      width: 46px;
+      height: 62px;
+      right: -30px;
+      top: 10px;
+      transform: rotate(20deg);
+    }
+    .card-shape::after {
+      content: "";
+      width: 44px;
+      height: 60px;
+      right: 20px;
+      top: 16px;
+      transform: rotate(-18deg);
+    }
+    .chip-dot {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      left: 16px;
+      top: 28px;
+      display: grid;
+      place-items: center;
+      color: #172033;
+      font-size: 20px;
+      background: rgba(255,255,255,.88);
+      box-shadow: 0 8px 18px rgba(15,23,42,.12);
+      font-weight: 900;
+    }
+    .venue-body { padding: 10px; }
+    .venue-body b { display: block; font-size: 14px; }
+    .venue-body span { display: block; margin-top: 5px; color: #7b8798; font-size: 11px; line-height: 1.35; }
+    .venue-body em {
+      display: inline-block;
+      margin-top: 8px;
+      color: #0c87cf;
+      background: #e7f4ff;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-style: normal;
+      font-weight: 900;
+    }
+    .promo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .promo-card {
+      min-height: 104px;
+      border: 0;
+      border-radius: 8px;
+      padding: 28px 11px 11px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      background: var(--promo);
+      text-align: left;
+    }
+    .promo-card::after {
+      content: "";
+      position: absolute;
+      width: 86px;
+      height: 86px;
+      right: -22px;
+      bottom: -26px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.18);
+    }
+    .hot {
+      position: absolute;
+      top: 9px;
+      left: 9px;
+      background: #ef4444;
+      color: #fff;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .promo-card b { display: block; font-size: 14px; line-height: 1.25; }
+    .promo-card span { display: block; margin-top: 7px; font-size: 11px; line-height: 1.35; opacity: .94; }
+    .game-page {
+      padding: 0;
+      background: var(--game-bg, #101a2f);
+      color: #fff;
+      overflow: hidden;
+      position: relative;
+    }
+    .game-page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(255,255,255,.22), transparent 22%),
+        radial-gradient(circle at 78% 10%, rgba(14,165,233,.28), transparent 28%),
+        linear-gradient(180deg, rgba(15,23,42,.12), rgba(15,23,42,.84));
+    }
+    .game-shell {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+    }
+    .game-top { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .back-btn {
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: rgba(255,255,255,.14);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 20px;
+    }
+    .game-top div { flex: 1; }
+    .game-top b { display: block; font-size: 18px; }
+    .game-top span { display: block; margin-top: 3px; font-size: 11px; opacity: .78; }
+    .kyc-pill {
+      border: 1px solid #fed7aa;
+      background: #fff7ed;
+      color: #ea580c;
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .table {
+      flex: 1;
+      min-height: 282px;
+      border-radius: 20px;
+      border: 10px solid rgba(255,255,255,.12);
+      background: radial-gradient(circle at center, rgba(16,185,129,.96), rgba(5,120,87,.96));
+      box-shadow: inset 0 0 40px rgba(0,0,0,.18), 0 22px 36px rgba(0,0,0,.28);
+      position: relative;
+      display: grid;
+      place-items: center;
+      margin-bottom: 14px;
+    }
+    .table::before {
+      content: "";
+      width: 142px;
+      height: 92px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.86);
+      box-shadow: 34px 8px 0 rgba(255,255,255,.74), -34px 8px 0 rgba(255,255,255,.74);
+      transform: rotate(-8deg);
+    }
+    .dealer {
+      position: absolute;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15,23,42,.5);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .bet-panel {
+      background: rgba(255,255,255,.96);
+      color: #172033;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 -12px 30px rgba(0,0,0,.22);
+    }
+    .bet-panel h2 { margin: 0 0 10px; font-size: 17px; }
+    .odds, .bet-amounts {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .odds { grid-template-columns: repeat(3, 1fr); }
+    .bet-amounts { grid-template-columns: repeat(4, 1fr); }
+    .odd {
+      height: 58px;
+      border-radius: 8px;
+      border: 1px solid #d9e8f7;
+      background: #f8fbff;
+      color: #1d74d8;
+      font-weight: 900;
+      font-size: 12px;
+    }
+    .odd.active { background: #0ea5e9; color: #fff; border-color: #0ea5e9; }
+    .amount {
+      height: 38px;
+      border: 1px solid #d9e8f7;
+      background: #fff;
+      color: #475569;
+      border-radius: 8px;
+      font-weight: 900;
+    }
+    .amount.active { color: #fff; background: #172033; border-color: #172033; }
+    .primary-btn, .soft-btn, .ghost-btn {
+      height: 44px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .primary-btn { border: 0; color: #fff; background: #0ea5e9; box-shadow: 0 8px 18px rgba(14,165,233,.24); }
+    .soft-btn { border: 1px solid #d8e2ee; color: #64748b; background: #fff; }
+    .ghost-btn { border: 1px solid #d9e8f7; color: #0c87cf; background: #e7f4ff; }
+    .full-btn { width: 100%; }
+    .profile-card {
+      border-radius: 8px;
+      padding: 14px;
+      background: linear-gradient(135deg, #1b74e8, #4bb7ff);
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .profile-card span { display: block; font-size: 12px; opacity: .9; }
+    .profile-card b { display: block; margin-top: 8px; font-size: 28px; }
+    .wallet-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .wallet-actions button {
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.38);
+      background: rgba(255,255,255,.18);
+      color: #fff;
+      font-weight: 900;
+      font-size: 12px;
+    }
+    .yuebao-card {
+      border: 0;
+      color: #fff;
+      background:
+        radial-gradient(circle at 88% 22%, rgba(255,255,255,.22), transparent 30%),
+        linear-gradient(135deg, #0f766e, #22c55e);
+    }
+    .yuebao-card .transfer-row { border-bottom: 0; }
+    .yuebao-card .transfer-row span { color: rgba(255,255,255,.82); }
+    .yuebao-card .transfer-row b { color: #fff; font-size: 22px; }
+    .yuebao-card .small-action {
+      color: #064e3b;
+      background: rgba(255,255,255,.9);
+      border-color: rgba(255,255,255,.92);
+      min-width: 52px;
+    }
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .profile-tile {
+      min-height: 82px;
+      background: #fff;
+      border: 1px solid #e9edf4;
+      border-radius: 8px;
+      padding: 12px;
+      position: relative;
+    }
+    .profile-tile span { display: block; color: #8b98aa; font-size: 11px; }
+    .profile-tile b { display: block; margin-top: 8px; font-size: 16px; color: #172033; }
+    .profile-tile .card-link {
+      right: 8px;
+      bottom: 8px;
+    }
+    .venue-balance-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .venue-balance-tile {
+      aspect-ratio: 1;
+      border: 1px solid #e3ebf5;
+      background: #f8fbff;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      color: #172033;
+      font-weight: 900;
+      padding: 8px;
+      text-align: center;
+    }
+    .venue-balance-tile span {
+      color: #0c87cf;
+      font-size: 13px;
+    }
+    .transfer-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #e8eef6;
+    }
+    .transfer-row:last-child { border-bottom: 0; }
+    .transfer-row b { display: block; font-size: 13px; }
+    .transfer-row span { display: block; color: #7b8798; font-size: 11px; margin-top: 4px; }
+    .small-action {
+      border: 1px solid #d9e8f7;
+      color: #0c87cf;
+      background: #e7f4ff;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .kyc-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .plain-back {
+      width: 34px;
+      height: 34px;
+      border: 1px solid #d9e2ec;
+      background: #fff;
+      color: #64748b;
+      border-radius: 50%;
+      font-size: 20px;
+    }
+    .kyc-head h1 { margin: 0; font-size: 20px; }
+    .field-grid { display: grid; gap: 10px; }
+    .field {
+      border: 1px solid #e3ebf5;
+      background: #f8fbff;
+      border-radius: 8px;
+      padding: 11px;
+    }
+    .field label { display: block; font-size: 12px; color: #64748b; margin-bottom: 8px; font-weight: 800; }
+    .field input,
+    .coin-trigger {
+      width: 100%;
+      height: 38px;
+      border: 1px solid #d9e2ec;
+      border-radius: 8px;
+      padding: 0 10px;
+      outline: none;
+      background: #fff;
+    }
+    .coin-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #172033;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .upload {
+      min-height: 94px;
+      border: 1px dashed #9ac9f1;
+      background: #f0f9ff;
+      color: #0c87cf;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 900;
+      padding: 10px;
+    }
+    .upload.full { min-height: 86px; }
+    .activity-layout {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 82px 1fr;
+      gap: 10px;
+      overflow: hidden;
+    }
+    .venue-menu { overflow-y: auto; padding-right: 2px; }
+    .venue-menu button {
+      width: 100%;
+      min-height: 44px;
+      border: 0;
+      border-radius: 8px;
+      background: #fff;
+      color: #64748b;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .venue-menu button.active { background: #0ea5e9; color: #fff; }
+    .activity-main { overflow-y: auto; min-width: 0; }
+    .activity-filter {
+      height: 42px;
+      border-radius: 8px;
+      border: 1px solid #e3ebf5;
+      background: #fff;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto 50px;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      margin-bottom: 10px;
+    }
+    .activity-filter input, .type-trigger {
+      border: 0;
+      outline: 0;
+      min-width: 0;
+      font-size: 12px;
+      background: transparent;
+    }
+    .type-trigger {
+      color: #475569;
+      text-align: center;
+      height: 30px;
+      min-width: 58px;
+      max-width: 92px;
+      padding: 0 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .activity-filter button {
+      height: 30px;
+      border: 0;
+      border-radius: 999px;
+      color: #fff;
+      background: #0ea5e9;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .activity-list { display: grid; gap: 10px; }
+    .activity-banner {
+      min-height: 126px;
+      border: 0;
+      border-radius: 8px;
+      color: #fff;
+      padding: 14px;
+      background: var(--banner);
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 9px 18px rgba(15,23,42,.1);
+    }
+    .activity-banner::after {
+      content: "";
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      right: -34px;
+      bottom: -40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.17);
+    }
+    .activity-banner b { display: block; width: 78%; font-size: 18px; line-height: 1.2; }
+    .activity-banner span { display: block; width: 78%; margin-top: 8px; font-size: 12px; line-height: 1.45; opacity: .94; }
+    .activity-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 9px;
+      width: 78%;
+    }
+    .activity-tag,
+    .venue-label {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(255,255,255,.2);
+      border: 1px solid rgba(255,255,255,.32);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .venue-label { background: rgba(15,23,42,.2); }
+    .fav-star {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      z-index: 2;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.48);
+      background: rgba(255,255,255,.18);
+      color: #fff;
+      font-size: 18px;
+      display: grid;
+      place-items: center;
+    }
+    .fav-star.on { background: #fff7ed; color: #f59e0b; border-color: #fed7aa; }
+    .activity-detail {
+      padding: 0;
+      color: #fff;
+      background: var(--detail-bg, linear-gradient(135deg,#0f172a,#2563eb));
+      position: relative;
+    }
+    .activity-detail::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 84% 14%, rgba(255,255,255,.28), transparent 24%),
+        linear-gradient(180deg, rgba(15,23,42,.12), rgba(15,23,42,.8));
+    }
+    .detail-shell {
+      position: relative;
+      z-index: 1;
+      min-height: 100%;
+      padding: 60px 14px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .activity-detail .back-btn {
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      z-index: 2;
+    }
+    .detail-hero {
+      min-height: 188px;
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 20px 44px rgba(0,0,0,.24);
+    }
+    .detail-hero h1 { margin: 0; font-size: 30px; line-height: 1.12; }
+    .detail-hero p { margin: 12px 0 0; font-size: 13px; line-height: 1.6; opacity: .92; }
+    .detail-info {
+      margin-top: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.94);
+      color: #172033;
+      padding: 14px;
+      box-shadow: 0 16px 34px rgba(15,23,42,.18);
+    }
+    .detail-info b { display: block; font-size: 16px; }
+    .detail-info p { margin: 8px 0 12px; color: #64748b; font-size: 13px; line-height: 1.6; }
+    .savings-hero {
+      border-radius: 10px;
+      padding: 16px;
+      color: #fff;
+      background: linear-gradient(135deg, #1e66d0, #46a9ff);
+      margin-bottom: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .savings-hero::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      right: -74px;
+      top: -55px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.14);
+    }
+    .savings-hero span { display: block; font-size: 12px; opacity: .9; }
+    .savings-hero b { display: block; margin-top: 8px; font-size: 30px; }
+    .savings-hero small { display: block; margin-top: 8px; font-size: 12px; opacity: .92; }
+    .subtabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #eaf2fb;
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 10px;
+    }
+    .subtabs button {
+      height: 38px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: #64748b;
+      font-weight: 900;
+    }
+    .subtabs button.active { background: #fff; color: #0b8ed6; box-shadow: 0 4px 10px rgba(15,23,42,.06); }
+    .native-card {
+      background: #fff;
+      border: 1px solid #e9edf4;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .task-card {
+      background: #fff;
+      border: 1px solid #e9edf4;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .task-row {
+      display: grid;
+      grid-template-columns: 58px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #edf1f6;
+    }
+    .task-row:last-child { border-bottom: 0; }
+    .rate { color: #ef4444; font-size: 18px; font-weight: 900; }
+    .task-row b { display: block; font-size: 13px; }
+    .task-row span { display: block; margin-top: 4px; color: #7b8798; font-size: 11px; }
+    .task-running {
+      border-radius: 8px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: none;
+    }
+    .task-running.show { display: block; }
+    .task-running b { display: block; color: #16a34a; font-size: 15px; }
+    .task-running span { display: block; margin-top: 6px; color: #475569; font-size: 12px; }
+    .rules-page { display: none; }
+    .rules-page.active { display: block; }
+    .rules-list { margin: 0; padding-left: 18px; color: #475569; font-size: 13px; line-height: 1.72; }
+    .withdraw-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #eaf2fb;
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 10px;
+    }
+    .withdraw-tabs button {
+      height: 38px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: #64748b;
+      font-weight: 900;
+    }
+    .withdraw-tabs button.active { background: #fff; color: #0b8ed6; box-shadow: 0 4px 10px rgba(15,23,42,.06); }
+    .withdraw-main { display: none; }
+    .withdraw-main.active { display: block; }
+    .withdraw-panel { display: none; }
+    .withdraw-panel.active { display: block; }
+    .submit-tip {
+      display: none;
+      border-radius: 8px;
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+    .submit-tip.show { display: block; }
+    .record-filters {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .record-filters button {
+      flex: 0 0 auto;
+      border: 1px solid #d9e8f7;
+      color: #64748b;
+      background: #fff;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .record-filters button.active { color: #0c87cf; background: #e7f4ff; }
+    .custom-range {
+      display: none;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .custom-range.show { display: grid; }
+    .custom-range input {
+      width: 100%;
+      height: 34px;
+      border: 1px solid #d9e2ec;
+      border-radius: 8px;
+      padding: 0 8px;
+      font-size: 11px;
+    }
+    .record-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #e8eef6;
+    }
+    .record-row:last-child { border-bottom: 0; }
+    .record-row b { display: block; font-size: 13px; }
+    .record-row span { display: block; margin-top: 4px; color: #7b8798; font-size: 11px; }
+    .status-badge {
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .status-review { color: #0c87cf; background: #e7f4ff; }
+    .status-pass { color: #15803d; background: #dcfce7; }
+    .status-wait { color: #a16207; background: #fef3c7; }
+    .status-reject { color: #b91c1c; background: #fee2e2; }
+    .picker-list {
+      max-height: 224px;
+      overflow-y: auto;
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .picker-option {
+      min-height: 46px;
+      border-radius: 8px;
+      border: 1px solid #e3ebf5;
+      background: #f8fbff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 12px;
+      font-weight: 900;
+      color: #475569;
+      text-align: center;
+    }
+    .picker-option em { color: #9aa8ba; font-style: normal; font-weight: 800; }
+    .picker-option.active {
+      color: #0c87cf;
+      background: #e7f4ff;
+      border-color: #9bd8ff;
+      box-shadow: inset 0 0 0 1px #9bd8ff;
+    }
+    .modal-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      background: rgba(15, 23, 42, .48);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-layer.show { display: flex; }
+    .modal {
+      width: 100%;
+      border-radius: 10px;
+      background: #fff;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 22px 46px rgba(15,23,42,.24);
+    }
+    .modal-icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #0ea5e9;
+      background: #e7f4ff;
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .modal h2 { margin: 0 0 8px; font-size: 19px; }
+    .modal p { margin: 0 0 16px; color: #64748b; font-size: 13px; line-height: 1.55; }
+    .condition-list {
+      text-align: left;
+      border: 1px solid #edf1f6;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      background: #f8fbff;
+    }
+    .condition-list div { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; color: #64748b; }
+    .condition-list b { color: #172033; }
+    .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tabbar {
+      height: 70px;
+      background: #fff;
+      border-top: 1px solid #e9edf4;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 7px 8px 9px;
+    }
+    .tab {
+      border: 0;
+      background: transparent;
+      color: #8a96a8;
+      display: grid;
+      place-items: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .tab i {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      font-style: normal;
+      font-size: 15px;
+    }
+    .tab.active { color: #0b8ed6; }
+    .tab.active i { background: #e7f4ff; }
+    .phone.login-mode .tabbar { display: none; }
+    .login-page {
+      display: none;
+      padding: 72px 22px 22px;
+      background:
+        radial-gradient(circle at 82% 8%, rgba(56,189,248,.22), transparent 30%),
+        linear-gradient(180deg, #10213d, #1f3d68 48%, #eef5fc 100%);
+    }
+    .login-card {
+      border-radius: 14px;
+      padding: 22px;
+      background: #fff;
+      box-shadow: 0 18px 40px rgba(15,23,42,.1);
+      text-align: center;
+    }
+    .login-card h1 { margin: 0 0 20px; font-size: 26px; }
+    .login-card .field label { text-align: center; }
+    .login-card input { text-align: center; }
+    .logout-btn {
+      margin-top: 10px;
+      border: 0;
+      background: #ef4444;
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(239,68,68,.2);
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <div class="status"><span>9:41</span><span>5G 100%</span></div>
+
+    <section class="page login-page" id="page-login">
+      <div class="login-card">
+        <h1>用户登录</h1>
+        <div class="field-grid">
+          <div class="field"><label>账号</label><input id="loginAccount" value="admin"></div>
+          <div class="field"><label>密码</label><input id="loginPassword" type="password" value="admin"></div>
+        </div>
+        <button class="primary-btn full-btn" id="loginBtn" style="margin-top:14px">登录</button>
+      </div>
+    </section>
+
+    <section class="page active" id="page-home">
+      <div class="hero">
+        <img src="ky_folder/ky/image%20(12).png" alt="娱乐城首页">
+        <div class="hero-copy">
+          <strong>热门棋牌场馆</strong>
+          <span>抢庄牛牛、斗地主、德州扑克，新会员可先体验试玩。</span>
+        </div>
+      </div>
+      <div class="wallet-row">
+        <div class="balance-card"><span class="user-name">用户名称：firebet0001</span><span>中心钱包</span><b id="homeBalance">1,860.71</b><button class="card-link" data-tab="profile">去转账</button></div>
+        <div class="state-card"><span>实名制状态</span><b>待认证</b><button class="card-link" data-page="kyc">认证领福利</button></div>
+      </div>
+      <div class="section">
+        <div class="section-head"><b>场馆大厅</b><span>点击试玩</span></div>
+        <div class="home-venue-layout">
+          <div class="venue-menu home-category-menu" id="homeCategoryMenu"></div>
+          <div class="home-venue-main"><div class="venue-grid" id="venueGrid"></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-head"><b>推荐活动</b><span>新人专属</span></div>
+        <div class="promo-grid">
+          <button class="promo-card" data-promo-activity="platform-kyc-lock" style="--promo:linear-gradient(135deg,#0f172a,#0ea5e9)"><div class="hot">HOT</div><b>实名认证赠锁定金</b><span>完成实名资料，赠锁定金额 3000。</span></button>
+          <button class="promo-card" data-promo-activity="platform-newbie" style="--promo:linear-gradient(135deg,#2563eb,#7c3aed)"><div class="hot">HOT</div><b>新人资料完善礼</b><span>完善资料后开启新人专属活动。</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page game-page" id="page-game">
+      <div class="game-shell">
+        <div class="game-top">
+          <button class="back-btn" data-tab="home">‹</button>
+          <div><b id="gameTitle">抢庄牛牛</b><span id="gameSub">试玩场 · 模拟下注</span></div>
+        <span class="kyc-pill">待认证</span>
+        </div>
+        <div class="table"><div class="dealer">系统发牌中</div></div>
+        <div class="bet-panel">
+          <h2>模拟下注</h2>
+          <div class="odds">
+            <button class="odd">庄赢 1.92</button>
+            <button class="odd active">闲赢 1.88</button>
+            <button class="odd">和局 8.50</button>
+          </div>
+          <div class="bet-amounts">
+            <button class="amount">10</button>
+            <button class="amount active">50</button>
+            <button class="amount">100</button>
+            <button class="amount">500</button>
+          </div>
+          <button class="primary-btn full-btn" id="placeBetBtn">确认下注</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-profile">
+      <div class="profile-card">
+        <span>平台余额</span>
+        <b id="profileBalance">1,860.71</b>
+        <span>锁定钱包 <b id="lockedBalance" style="display:inline;margin:0;font-size:14px">320.00</b></span>
+        <div class="wallet-actions">
+          <button id="recycleBtn">一键回收</button>
+          <button data-page="withdraw">立即提现</button>
+        </div>
+      </div>
+      <div class="section yuebao-card">
+        <div class="section-head"><b>余额宝余额</b></div>
+        <div class="transfer-row">
+          <div><b id="profileYuebaoBalance">1,903.71</b><span>今日预估收益 2.00，任务可随时查看</span></div>
+          <div style="display:grid;gap:8px">
+            <button class="small-action" data-yuebao-entry="tasks">任务</button>
+            <button class="small-action" data-yuebao-entry="rules">规则</button>
+          </div>
+        </div>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-tile"><span>实名制状态</span><b style="color:#ea580c">待认证</b><button class="card-link" data-page="kyc">认证领福利</button></div>
+        <div class="profile-tile"><span>活动资格</span><b style="color:#ea580c">待认证</b><button class="card-link" data-page="kyc">认证领福利</button></div>
+      </div>
+      <div class="section">
+        <div class="section-head"><b>场馆余额划转</b><span>中心钱包</span></div>
+        <div id="venueBalances"></div>
+      </div>
+      <div class="section">
+        <div class="section-head"><b>完善个人资料</b><span>解锁活动</span></div>
+        <p style="margin:0 0 12px;color:#64748b;font-size:13px;line-height:1.55">完成实名制认证后，可立即参加高倍流水返利活动，并开启提现资格。</p>
+        <button class="primary-btn full-btn" data-page="kyc">立即完善资料</button>
+        <button class="primary-btn full-btn logout-btn" data-page="login">登出</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-kyc">
+      <div class="kyc-head">
+        <button class="plain-back" data-tab="profile">‹</button>
+        <h1>完善个人资料</h1>
+      </div>
+      <div class="section">
+        <div class="section-head"><b>身份信息</b><span>必填</span></div>
+        <div class="field-grid">
+          <div class="field"><label>身份证字号</label><input placeholder="请输入身份证字号"></div>
+          <div class="upload-grid">
+            <button class="upload">上传身份证正面</button>
+            <button class="upload">上传身份证反面</button>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-head"><b>个人资料</b><span>必填</span></div>
+        <div class="field-grid">
+          <div class="field"><label>真实姓名</label><input placeholder="请输入与证件一致的姓名"></div>
+          <div class="field"><label>出生日期</label><input placeholder="YYYY / MM / DD"></div>
+          <div class="field"><label>联系电话</label><input placeholder="请输入可联系手机号"></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-head"><b>地址认证</b><span>必填</span></div>
+        <button class="upload full">上传地址证明<br><span style="font-weight:700;color:#64748b">可上传信用卡账单、水电账单或银行账单</span></button>
+      </div>
+      <button class="primary-btn full-btn">提交审核</button>
+    </section>
+
+    <section class="page" id="page-yuebao">
+      <div class="kyc-head">
+        <button class="plain-back" data-tab="profile">‹</button>
+        <h1>余额宝</h1>
+      </div>
+      <div class="subtabs">
+        <button class="active" data-yuebao-view="income">余额生利</button>
+        <button data-yuebao-view="tasks">余额宝任务</button>
+      </div>
+      <div id="yuebaoIncome">
+        <div class="savings-hero"><span>余额宝总额</span><b>1,903.71</b><small>今日预估收益 2.00 · 资金仍可转回场馆</small></div>
+        <div class="native-card">
+          <div class="section-head"><b>收益概览</b><span>自动计息</span></div>
+          <div class="transfer-row"><div><b>累计收益</b><span>过去 7 天自动结算</span></div><button class="small-action">12.68</button></div>
+          <div class="transfer-row"><div><b>可转出余额</b><span>不影响后续游戏投注</span></div><button class="small-action">1,903.71</button></div>
+        </div>
+      </div>
+      <div id="yuebaoTasks" style="display:none">
+        <div class="task-running" id="taskRunning"><b>活动持续中</b><span>剩余时间 23:59:42 · 当前流水 50 / 1,860.71</span></div>
+        <div class="native-card">
+          <div class="section-head"><b>余额宝任务</b><span>可开启</span></div>
+          <div class="task-card">
+            <div class="task-row">
+              <div class="rate">1x</div>
+              <div><b>一倍返水</b><span>开启后 24 小时内完成流水</span></div>
+              <button class="small-action" id="openSavingTask">开启</button>
+            </div>
+            <div class="task-row">
+              <div class="rate">1.50%</div>
+              <div><b>棋牌流水成长</b><span>完成指定流水后加息</span></div>
+              <button class="small-action">开启</button>
+            </div>
+            <div class="task-row">
+              <div class="rate">7.00%</div>
+              <div><b>高倍流水返利</b><span>实名制完成后解锁</span></div>
+              <button class="small-action">查看</button>
+            </div>
+          </div>
+          <button class="ghost-btn full-btn" id="showRulesBtn">查看余额宝活动规则</button>
+        </div>
+      </div>
+      <div class="rules-page" id="rulesPage">
+        <div class="native-card">
+          <div class="section-head"><b>活动规则</b><span>请确认</span></div>
+          <ol class="rules-list">
+            <li>余额宝任务开启后，系统按中心钱包可用余额计算收益。</li>
+            <li>一倍返水任务需在开启后 24 小时内完成对应流水。</li>
+            <li>余额可随时转回指定场馆，转回后不再计算当日对应收益。</li>
+            <li>如存在风控或资料未完善，提现前需要补充个人资料。</li>
+          </ol>
+          <button class="primary-btn full-btn" id="backTasksBtn" style="margin-top:12px">返回任务</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-withdraw">
+      <div class="kyc-head">
+        <button class="plain-back" data-tab="profile">‹</button>
+        <h1>提现</h1>
+      </div>
+      <div class="wallet-row">
+        <div class="balance-card"><span>平台余额</span><b id="withdrawBalance">1,860.71</b></div>
+        <div class="state-card"><span>锁定钱包</span><b id="withdrawLocked">320.00</b></div>
+      </div>
+      <div class="withdraw-tabs">
+        <button class="active" data-withdraw-main="apply">立即提现</button>
+        <button data-withdraw-main="records">提现记录</button>
+      </div>
+      <div class="withdraw-main active" id="withdrawApply">
+        <div class="withdraw-tabs">
+          <button class="active" data-withdraw-tab="crypto">虚拟币提现</button>
+          <button data-withdraw-tab="rmb">人民币提现</button>
+        </div>
+        <div class="submit-tip" id="withdrawTip">已提交审核</div>
+        <div class="withdraw-panel active" id="cryptoWithdraw">
+          <div class="section">
+            <div class="field-grid">
+              <div class="field"><label>选择币别</label><button class="coin-trigger" id="coinTrigger" type="button">USDT</button></div>
+              <div class="field"><label>当前汇率</label><input id="rateText" value="1 RMB = 0.15 USDT" readonly></div>
+              <div class="field"><label>输入 RMB 金额</label><input id="rmbAmount" type="number" placeholder="请输入 RMB 金额"></div>
+              <div class="field"><label>折合虚拟币</label><input id="cryptoAmount" type="number" placeholder="自动换算 USDT"></div>
+            </div>
+            <button class="primary-btn full-btn" id="submitCrypto" style="margin-top:12px">提现申请</button>
+          </div>
+        </div>
+        <div class="withdraw-panel" id="rmbWithdraw">
+          <div class="section">
+            <div class="field-grid">
+              <div class="field"><label>提现金额</label><input id="rmbWithdrawAmount" type="number" placeholder="请输入提现金额"></div>
+              <div class="field"><label>转出账号</label><input id="rmbAccount" placeholder="请输入银行卡或账户"></div>
+            </div>
+            <button class="primary-btn full-btn" id="submitRmb" style="margin-top:12px">提现申请</button>
+          </div>
+        </div>
+      </div>
+      <div class="withdraw-main" id="withdrawRecordPanel">
+        <div class="section">
+          <div class="record-filters" id="recordFilters">
+            <button class="active" data-record-filter="today">今日</button>
+            <button data-record-filter="yesterday">昨日</button>
+            <button data-record-filter="7">近7日</button>
+            <button data-record-filter="30">近30日</button>
+            <button data-record-filter="custom">自定义</button>
+          </div>
+          <div class="custom-range" id="customRange">
+            <input id="recordStart" type="datetime-local" step="60">
+            <input id="recordEnd" type="datetime-local" step="60">
+          </div>
+          <div id="withdrawRecords"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-activity">
+      <div class="activity-layout">
+        <div class="venue-menu" id="activityMenu"></div>
+        <div class="activity-main">
+          <div class="activity-filter">
+            <input id="activitySearch" placeholder="输入活动名称">
+            <button class="type-trigger" id="activityTypeTrigger">筛选活动类型</button>
+            <button id="activityQuery">查询</button>
+          </div>
+          <div class="activity-list" id="activityList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page activity-detail" id="page-activity-detail">
+      <div class="detail-shell">
+        <button class="back-btn" data-page="activity">‹</button>
+        <div class="detail-hero" id="detailHero">
+          <h1 id="detailTitle">高倍返水</h1>
+          <p id="detailText">棋牌馆最高 7% 返水，完成资料后自动参与。</p>
+        </div>
+        <div class="detail-info">
+          <b>活动说明</b>
+          <p id="detailExplain">完成指定流水后，奖励将自动派发到中心钱包。</p>
+          <button class="primary-btn full-btn" id="joinActivityBtn">参加活动</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="tabbar">
+      <button class="tab active" data-tab="home"><i>⌂</i><span>首页</span></button>
+      <button class="tab" data-tab="activity"><i>★</i><span>精彩活动</span></button>
+      <button class="tab" data-tab="profile"><i>👤</i><span>个人</span></button>
+    </footer>
+
+    <div class="modal-layer" id="trialModal">
+      <div class="modal">
+        <h2>开始体验试玩？</h2>
+        <p id="trialText">进入试玩场后可模拟下注，先体验场馆价值。</p>
+        <div class="modal-actions">
+          <button class="soft-btn" data-close-modal>取消</button>
+          <button class="primary-btn" id="confirmTrialBtn">确认体验</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="kycModal">
+      <div class="modal">
+        <h2>完善个人资料</h2>
+        <p>下注体验已完成。完善资料后可立刻参加高倍流水返利活动，并开启后续提现资格。</p>
+        <button class="primary-btn full-btn" id="goKycBtn">立刻参加高倍流水返利活动</button>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="savingModal">
+      <div class="modal">
+        <h2>是否确认开启活动？</h2>
+        <div class="condition-list">
+          <div><span>任务名称</span><b>一倍返水</b></div>
+          <div><span>时间限制</span><b>开启后 24 小时</b></div>
+          <div><span>当前流水</span><b>0 / 1,860.71</b></div>
+        </div>
+        <div class="modal-actions">
+          <button class="soft-btn" data-close-modal>取消</button>
+          <button class="primary-btn" id="confirmSavingBtn">确认开启</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="transferModal">
+      <div class="modal">
+        <h2 id="transferTitle">转入场馆</h2>
+        <div class="condition-list">
+          <div><span>中心余额</span><b id="transferCenterBalance">1,860.71</b></div>
+          <div><span>场馆余额</span><b id="transferVenueBalance">0.00</b></div>
+        </div>
+        <div class="field" style="margin-bottom:14px;text-align:left">
+          <label>转入金额</label>
+          <input id="transferAmount" type="number" placeholder="请输入转入金额">
+        </div>
+        <div class="modal-actions">
+          <button class="soft-btn" data-close-modal>取消</button>
+          <button class="primary-btn" id="confirmTransferBtn">转账</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="activityEligibilityModal">
+      <div class="modal">
+        <h2>完善资料可启用活动资格</h2>
+        <p>完成实名制与个人资料后，即可开启新人专属、高倍返水等活动资格。</p>
+        <button class="primary-btn full-btn" id="goActivityKycBtn">去完善资料</button>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="typeModal">
+      <div class="modal">
+        <h2>选择活动类型</h2>
+        <div class="picker-list" id="typeOptions">
+          <button class="picker-option active" data-type-option="全部"><span>全部类型</span><em>-</em><b>全部</b></button>
+          <button class="picker-option" data-type-option="返利"><span>流水返利</span><em>-</em><b>返利</b></button>
+          <button class="picker-option" data-type-option="VIP"><span>会员专属</span><em>-</em><b>VIP</b></button>
+          <button class="picker-option" data-type-option="信用"><span>信用场馆</span><em>-</em><b>信用</b></button>
+          <button class="picker-option" data-type-option="转盘"><span>抽奖活动</span><em>-</em><b>转盘</b></button>
+        </div>
+        <button class="primary-btn full-btn" data-close-modal>完成</button>
+      </div>
+    </div>
+
+    <div class="modal-layer" id="coinModal">
+      <div class="modal">
+        <h2>选择提现币别</h2>
+        <div class="picker-list" id="coinOptions">
+          <button class="picker-option active" data-coin-option="USDT"><span>稳定币</span><em>-</em><b>USDT</b></button>
+          <button class="picker-option" data-coin-option="ETH"><span>以太坊</span><em>-</em><b>ETH</b></button>
+          <button class="picker-option" data-coin-option="DOGE"><span>狗狗币</span><em>-</em><b>DOGE</b></button>
+        </div>
+        <button class="primary-btn full-btn" data-close-modal>完成</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const homeCategories = ["体育", "真人", "棋牌", "电竞", "彩票", "电子", "娱乐"];
+    const venueCatalog = {
+      "体育": [
+        { name: "冠军体育", desc: "足球篮球实时盘口", icon: "体", hot: true, art: "linear-gradient(135deg,#dcfce7,#16a34a 72%)", gameBg: "linear-gradient(135deg,#064e3b,#0f172a)" },
+        { name: "极速滚球", desc: "滚球赛事秒级结算", icon: "球", art: "linear-gradient(135deg,#e0f2fe,#0284c7 72%)", gameBg: "linear-gradient(135deg,#0c4a6e,#082f49)" }
+      ],
+      "真人": [
+        { name: "真人百家乐", desc: "真实荷官桌台直播", icon: "真", hot: true, art: "linear-gradient(135deg,#fee2e2,#dc2626 72%)", gameBg: "linear-gradient(135deg,#7f1d1d,#111827)" },
+        { name: "龙虎大厅", desc: "快速开牌轻松体验", icon: "龙", art: "linear-gradient(135deg,#fef3c7,#f59e0b 72%)", gameBg: "linear-gradient(135deg,#78350f,#111827)" }
+      ],
+      "棋牌": [
+        { name: "抢庄牛牛", menu: "牛牛", desc: "抢庄倍数刺激，适合新手试玩", icon: "牛", hot: true, art: "linear-gradient(135deg,#fff1c7,#fb7185 70%)", gameBg: "linear-gradient(135deg,#5b1f99,#0f766e)" },
+        { name: "斗地主", menu: "斗地主", desc: "经典三人牌局，节奏轻快", icon: "斗", art: "linear-gradient(135deg,#dbeafe,#60a5fa 72%)", gameBg: "linear-gradient(135deg,#1e3a8a,#0f172a)" },
+        { name: "德州扑克", menu: "德州扑克", desc: "策略竞技，高手局持续开桌", icon: "德", art: "linear-gradient(135deg,#dcfce7,#22c55e 72%)", gameBg: "linear-gradient(135deg,#14532d,#0f172a)" },
+        { name: "日本麻将", menu: "日本麻将", desc: "役满任务与竞技桌", icon: "麻", art: "linear-gradient(135deg,#ffe4e6,#ef4444 72%)", gameBg: "linear-gradient(135deg,#991b1b,#312e81)" }
+      ],
+      "电竞": [
+        { name: "电竞中心", desc: "热门赛事快速投注", icon: "电", hot: true, art: "linear-gradient(135deg,#ede9fe,#7c3aed 72%)", gameBg: "linear-gradient(135deg,#312e81,#020617)" },
+        { name: "冠军预测", desc: "战队胜负与地图玩法", icon: "竞", art: "linear-gradient(135deg,#cffafe,#06b6d4 72%)", gameBg: "linear-gradient(135deg,#164e63,#111827)" }
+      ],
+      "彩票": [
+        { name: "幸运飞艇", desc: "开奖节奏清楚易上手", icon: "彩", hot: true, art: "linear-gradient(135deg,#fce7f3,#db2777 72%)", gameBg: "linear-gradient(135deg,#831843,#111827)" },
+        { name: "时时彩", desc: "多期玩法自由选择", icon: "票", art: "linear-gradient(135deg,#ffedd5,#f97316 72%)", gameBg: "linear-gradient(135deg,#7c2d12,#111827)" }
+      ],
+      "电子": [
+        { name: "爆分老虎机", desc: "高倍奖池随机触发", icon: "机", hot: true, art: "linear-gradient(135deg,#ccfbf1,#14b8a6 72%)", gameBg: "linear-gradient(135deg,#134e4a,#0f172a)" },
+        { name: "宝石转轮", desc: "轻量旋转快速体验", icon: "宝", art: "linear-gradient(135deg,#e0e7ff,#6366f1 72%)", gameBg: "linear-gradient(135deg,#312e81,#020617)" }
+      ],
+      "娱乐": [
+        { name: "红包广场", desc: "碎片时间领任务红包", icon: "娱", hot: true, art: "linear-gradient(135deg,#fee2e2,#ef4444 72%)", gameBg: "linear-gradient(135deg,#7f1d1d,#312e81)" },
+        { name: "幸运转盘", desc: "新人福利每日抽奖", icon: "转", art: "linear-gradient(135deg,#fef9c3,#eab308 72%)", gameBg: "linear-gradient(135deg,#713f12,#111827)" }
+      ]
+    };
+    const activityMenus = ["专属", "平台", "综合", "体育", "真人", "棋牌", "电竞", "彩票", "电子", "娱乐"];
+    const activities = [
+      { id: "platform-kyc-lock", category: "平台", venueLabel: "平台", type: "实名", title: "实名认证赠锁定金", text: "完成实名资料，即可获得锁定金额 3000 的活动资格。", explain: "用户完成实名制认证与个人资料后，平台赠送锁定金额 3000，需完成对应流水后释放。", bg: "linear-gradient(135deg,#0f172a,#0ea5e9)", detail: "linear-gradient(135deg,#020617,#0f172a,#38bdf8)" },
+      { id: "platform-newbie", category: "平台", venueLabel: "平台", type: "新人", title: "新人资料完善礼", text: "完善个人资料后，开启新人专属活动与提现资格。", explain: "新用户完成资料补充后，可解锁新人活动、活动资格与后续提现入口。", bg: "linear-gradient(135deg,#2563eb,#7c3aed)", detail: "linear-gradient(135deg,#1e1b4b,#2563eb,#ddd6fe)" },
+      { id: "sport", category: "体育", venueLabel: "冠军体育", type: "返利", title: "赛事串关返水", text: "足球篮球串关达标，次日返利自动派发。", explain: "体育赛事有效投注达成后，可获得串关返水奖励并自动进入中心钱包。", bg: "linear-gradient(135deg,#16a34a,#0ea5e9)", detail: "linear-gradient(135deg,#064e3b,#0ea5e9,#bbf7d0)" },
+      { id: "sport-vip", category: "体育", venueLabel: "极速滚球", type: "VIP", title: "滚球 VIP 加码", text: "滚球场馆 VIP 会员享额外赔率加码。", explain: "参与滚球赛事并达到 VIP 条件后，可领取额外加码券。", bg: "linear-gradient(135deg,#0284c7,#1d4ed8)", detail: "linear-gradient(135deg,#082f49,#0284c7,#bfdbfe)" },
+      { id: "live", category: "真人", venueLabel: "真人百家乐", type: "返利", title: "真人桌台返利", text: "真人桌台流水达标，次日自动派发返利。", explain: "真人场馆有效流水达成后，系统将按比例计算返利。", bg: "linear-gradient(135deg,#be123c,#f97316)", detail: "linear-gradient(135deg,#4c0519,#be123c,#fed7aa)" },
+      { id: "live-wheel", category: "真人", venueLabel: "龙虎大厅", type: "转盘", title: "龙虎幸运轮", text: "完成龙虎桌台任务，抽取专属转盘奖励。", explain: "龙虎大厅完成指定局数后可抽转盘，奖励进入中心钱包。", bg: "linear-gradient(135deg,#b45309,#ef4444)", detail: "linear-gradient(135deg,#451a03,#b45309,#fecaca)" },
+      { id: "rebate", category: "棋牌", venueLabel: "抢庄牛牛", type: "返利", title: "高倍返水", text: "棋牌馆最高 7% 返水，完成资料后自动参与。", explain: "完成指定流水后，返利将在次日自动进入中心钱包，可继续转入任意场馆使用。", bg: "linear-gradient(135deg,#0ea5e9,#2563eb)", detail: "linear-gradient(135deg,#0f172a,#2563eb,#38bdf8)" },
+      { id: "vip", category: "棋牌", venueLabel: "德州扑克", type: "VIP", title: "德州 VIP 返水", text: "VIP 会员充值返利叠加德州牌局流水奖励。", explain: "充值金额达到门槛后，可叠加 VIP 返水与德州扑克场馆流水奖励。", bg: "linear-gradient(135deg,#16a34a,#22c55e)", detail: "linear-gradient(135deg,#064e3b,#16a34a,#bef264)" },
+      { id: "niu", category: "棋牌", venueLabel: "抢庄牛牛", type: "转盘", title: "牛牛连胜礼", text: "抢庄牛牛连胜 3 局，额外领取任务彩金。", explain: "连胜达成后开启专属转盘，最高可领取 888 任务彩金。", bg: "linear-gradient(135deg,#f97316,#ef4444)", detail: "linear-gradient(135deg,#7c2d12,#f97316,#fde68a)" },
+      { id: "landlord", category: "棋牌", venueLabel: "斗地主", type: "返利", title: "斗地主每日挑战", text: "完成 5 局即可获得返水券与任务积分。", explain: "每天完成挑战局数即可领取返水券，积分可累计兑换礼品。", bg: "linear-gradient(135deg,#2563eb,#7c3aed)", detail: "linear-gradient(135deg,#1e1b4b,#2563eb,#c4b5fd)" },
+      { id: "poker", category: "棋牌", venueLabel: "德州扑克", type: "信用", title: "德州高手榜", text: "排行榜前 20 名瓜分奖励池。", explain: "德州场馆以有效牌局积分排行，排名越高奖励池占比越高。", bg: "linear-gradient(135deg,#059669,#0f766e)", detail: "linear-gradient(135deg,#022c22,#059669,#99f6e4)" },
+      { id: "baccarat", category: "棋牌", venueLabel: "百家乐", type: "返利", title: "百家乐限时返利", text: "晚间桌台流水加码，次日自动派发。", explain: "每日晚间参与百家乐桌台，有效流水将获得额外返利加成。", bg: "linear-gradient(135deg,#be123c,#f43f5e)", detail: "linear-gradient(135deg,#4c0519,#be123c,#fecdd3)" },
+      { id: "bar", category: "棋牌", venueLabel: "二八杠", type: "信用", title: "二八杠信用加码", text: "完成信用场流水，解锁额外加码券。", explain: "二八杠信用场完成指定流水后，可领取加码券并用于下一次投注。", bg: "linear-gradient(135deg,#8b5cf6,#ec4899)", detail: "linear-gradient(135deg,#312e81,#8b5cf6,#f0abfc)" },
+      { id: "mahjong", category: "棋牌", venueLabel: "日本麻将", type: "转盘", title: "日麻役满礼", text: "完成指定番型任务，抽转盘最高领 188 奖励。", explain: "参与日本麻将场馆并完成指定番型后，可抽一次转盘，奖励自动进入中心钱包。", bg: "linear-gradient(135deg,#ef4444,#f59e0b)", detail: "linear-gradient(135deg,#7f1d1d,#ef4444,#fde68a)" },
+      { id: "esport", category: "电竞", venueLabel: "电竞中心", type: "VIP", title: "电竞冠军礼", text: "热门赛事投注达标，瓜分冠军礼金池。", explain: "参与电竞热门赛事并完成有效投注后，可获得冠军礼金池资格。", bg: "linear-gradient(135deg,#7c3aed,#2563eb)", detail: "linear-gradient(135deg,#2e1065,#7c3aed,#bfdbfe)" },
+      { id: "lottery", category: "彩票", venueLabel: "幸运飞艇", type: "转盘", title: "开奖加奖日", text: "指定期数参与后，额外获得加奖机会。", explain: "彩票平台指定玩法参与达标后，可获得额外加奖机会。", bg: "linear-gradient(135deg,#db2777,#f97316)", detail: "linear-gradient(135deg,#831843,#db2777,#fed7aa)" },
+      { id: "slot", category: "电子", venueLabel: "爆分老虎机", type: "返利", title: "电子爆分返利", text: "电子场馆有效流水越高，返利比例越高。", explain: "电子场馆完成有效流水后，返利将在次日派发。", bg: "linear-gradient(135deg,#14b8a6,#6366f1)", detail: "linear-gradient(135deg,#134e4a,#14b8a6,#c7d2fe)" },
+      { id: "fun", category: "娱乐", venueLabel: "红包广场", type: "转盘", title: "新人娱乐礼", text: "完成娱乐任务后抽取新人专属奖励。", explain: "娱乐专区完成新人任务后，可抽取随机奖励并进入中心钱包。", bg: "linear-gradient(135deg,#ef4444,#eab308)", detail: "linear-gradient(135deg,#7f1d1d,#ef4444,#fef08a)" }
+    ];
+    const favorites = new Set(["rebate"]);
+    const previousBetMenus = new Set(["抢庄牛牛", "日本麻将", "德州扑克"]);
+    const venueBalances = { "抢庄牛牛": 0, "斗地主": 0, "德州扑克": 0, "百家乐": 0, "二八杠": 0, "抢红包": 0 };
+    let centerBalance = 1860.71;
+    let lockedBalance = 320.00;
+    let selectedHomeCategory = "棋牌";
+    let selectedVenue = venueCatalog[selectedHomeCategory][0];
+    let selectedActivityMenu = "综合";
+    let activityKeyword = "";
+    let activityType = "全部";
+    let selectedCoin = "USDT";
+    const coinRates = { USDT: 0.15, ETH: 0.00004, DOGE: 2.1 };
+    let currentTransferVenue = "抢庄牛牛";
+    let withdrawalRecords = [];
+    let recordFilter = "today";
+
+    function setPage(page) {
+      document.querySelectorAll(".page").forEach(item => item.classList.remove("active"));
+      document.getElementById(`page-${page}`).classList.add("active");
+      document.querySelectorAll(".tab").forEach(button => button.classList.toggle("active", button.dataset.tab === page));
+      document.querySelector(".phone").classList.toggle("login-mode", page === "login");
+    }
+
+    function scrollPageToTop(page) {
+      const pageEl = document.getElementById(`page-${page}`);
+      if (pageEl) pageEl.scrollTop = 0;
+      const innerScroll = pageEl?.querySelector(".activity-main");
+      if (innerScroll) innerScroll.scrollTop = 0;
+    }
+
+    function resetBottomTab(page) {
+      closeModals();
+      if (page === "home") {
+        selectedHomeCategory = "棋牌";
+        selectedVenue = venueCatalog[selectedHomeCategory][0];
+        renderHomeVenues();
+      }
+      if (page === "activity") {
+        selectedActivityMenu = "综合";
+        activityKeyword = "";
+        activityType = "全部";
+        document.getElementById("activitySearch").value = "";
+        document.getElementById("activityTypeTrigger").textContent = "筛选活动类型";
+        document.querySelectorAll("[data-type-option]").forEach(item => {
+          item.classList.toggle("active", item.dataset.typeOption === "全部");
+        });
+        renderActivities();
+      }
+      if (page === "profile") {
+        syncBalances();
+      }
+      setPage(page);
+      scrollPageToTop(page);
+    }
+
+    function money(value) {
+      return Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function syncBalances() {
+      document.getElementById("homeBalance").textContent = money(centerBalance);
+      document.getElementById("profileBalance").textContent = money(centerBalance);
+      document.getElementById("lockedBalance").textContent = money(lockedBalance);
+      document.getElementById("withdrawBalance").textContent = money(centerBalance);
+      document.getElementById("withdrawLocked").textContent = money(lockedBalance);
+      document.getElementById("venueBalances").className = "venue-balance-grid";
+      document.getElementById("venueBalances").innerHTML = Object.entries(venueBalances).map(([name, amount]) => `
+        <button class="venue-balance-tile" data-transfer="${name}">
+          <b>${name}</b>
+          <span>${money(amount)}</span>
+        </button>
+      `).join("");
+    }
+
+    function renderHomeVenues() {
+      document.getElementById("homeCategoryMenu").innerHTML = homeCategories.map(category => `
+        <button class="${category === selectedHomeCategory ? "active" : ""}" data-home-category="${category}">${category}</button>
+      `).join("");
+      document.getElementById("venueGrid").innerHTML = venueCatalog[selectedHomeCategory].map((venue, index) => `
+        <button class="venue-card" data-venue="${index}">
+          <div class="game-art" style="--art:${venue.art}">
+            ${venue.hot ? `<div class="hot">HOT</div>` : ""}
+            <div class="chip-dot">${venue.icon}</div>
+            <div class="card-shape"></div>
+          </div>
+          <div class="venue-body"><b>${venue.name}</b><span>${venue.desc}</span><em>开始体验</em></div>
+        </button>
+      `).join("");
+    }
+
+    function switchYuebao(view) {
+      setPage("yuebao");
+      document.querySelectorAll("[data-yuebao-view]").forEach(item => item.classList.toggle("active", item.dataset.yuebaoView === "tasks"));
+      document.getElementById("yuebaoIncome").style.display = "none";
+      document.getElementById("yuebaoTasks").style.display = view === "tasks" ? "block" : "none";
+      document.getElementById("rulesPage").classList.toggle("active", view === "rules");
+    }
+
+    function showModal(id) { document.getElementById(id).classList.add("show"); }
+    function closeModals() { document.querySelectorAll(".modal-layer").forEach(modal => modal.classList.remove("show")); }
+
+    function renderActivityMenu() {
+      document.getElementById("activityMenu").innerHTML = activityMenus.map(menu => `
+        <button class="${menu === selectedActivityMenu ? "active" : ""}" data-activity-menu="${menu}">${menu}</button>
+      `).join("");
+    }
+
+    function activityMatches(activity, menu) {
+      if (menu === "专属") return favorites.has(activity.id) || previousBetMenus.has(activity.venueLabel);
+      if (menu === "综合") return true;
+      return activity.category === menu;
+    }
+
+    function renderActivities() {
+      renderActivityMenu();
+      let list = activities.filter(activity => {
+        const keywordOk = !activityKeyword || activity.title.includes(activityKeyword);
+        const typeOk = activityType === "全部" || activity.type === activityType;
+        return activityMatches(activity, selectedActivityMenu) && keywordOk && typeOk;
+      });
+      if (!list.length) list = activities.filter(activity => activityMatches(activity, selectedActivityMenu)).slice(0, 2);
+      document.getElementById("activityList").innerHTML = list.map(activity => `
+        <div class="activity-banner" style="--banner:${activity.bg}" data-activity="${activity.id}">
+          <button class="fav-star ${favorites.has(activity.id) ? "on" : ""}" data-star="${activity.id}">★</button>
+          <div class="activity-meta"><div class="activity-tag">${activity.type}</div><div class="venue-label">${activity.venueLabel}</div></div>
+          <b>${activity.title}</b><span>${activity.text}</span>
+        </div>
+      `).join("");
+    }
+
+    function openActivityDetail(id) {
+      const activity = activities.find(item => item.id === id);
+      document.getElementById("page-activity-detail").style.setProperty("--detail-bg", activity.detail);
+      document.getElementById("detailTitle").textContent = activity.title;
+      document.getElementById("detailText").textContent = activity.text + " 完成条件后奖励自动进入中心钱包。";
+      document.getElementById("detailExplain").textContent = activity.explain;
+      setPage("activity-detail");
+    }
+
+    document.addEventListener("click", event => {
+      if (event.target.classList.contains("modal-layer")) {
+        closeModals();
+        return;
+      }
+      const bottomTab = event.target.closest(".tabbar .tab[data-tab]");
+      if (bottomTab) {
+        resetBottomTab(bottomTab.dataset.tab);
+        return;
+      }
+      const tab = event.target.closest("[data-tab]");
+      if (tab) setPage(tab.dataset.tab);
+      const page = event.target.closest("[data-page]");
+      if (page) setPage(page.dataset.page);
+      const yuebaoEntry = event.target.closest("[data-yuebao-entry]");
+      if (yuebaoEntry) {
+        switchYuebao(yuebaoEntry.dataset.yuebaoEntry);
+      }
+      const homeCategory = event.target.closest("[data-home-category]");
+      if (homeCategory) {
+        selectedHomeCategory = homeCategory.dataset.homeCategory;
+        renderHomeVenues();
+      }
+      const transferButton = event.target.closest("[data-transfer]");
+      if (transferButton) {
+        currentTransferVenue = transferButton.dataset.transfer;
+        document.getElementById("transferTitle").textContent = `转入${currentTransferVenue}`;
+        document.getElementById("transferCenterBalance").textContent = money(centerBalance);
+        document.getElementById("transferVenueBalance").textContent = money(venueBalances[currentTransferVenue]);
+        document.getElementById("transferAmount").value = "";
+        showModal("transferModal");
+      }
+      const venueButton = event.target.closest("[data-venue]");
+      if (venueButton) {
+        selectedVenue = venueCatalog[selectedHomeCategory][Number(venueButton.dataset.venue)];
+        document.getElementById("trialText").textContent = `进入 ${selectedVenue.name} 试玩场后可模拟下注，先体验场馆价值。`;
+        showModal("trialModal");
+      }
+      const menu = event.target.closest("[data-activity-menu]");
+      if (menu) {
+        selectedActivityMenu = menu.dataset.activityMenu;
+        renderActivities();
+      }
+      const star = event.target.closest("[data-star]");
+      if (star) {
+        event.stopPropagation();
+        const id = star.dataset.star;
+        favorites.has(id) ? favorites.delete(id) : favorites.add(id);
+        renderActivities();
+      }
+      const activity = event.target.closest("[data-activity]");
+      if (activity && !event.target.closest("[data-star]")) openActivityDetail(activity.dataset.activity);
+      const promoActivity = event.target.closest("[data-promo-activity]");
+      if (promoActivity) openActivityDetail(promoActivity.dataset.promoActivity);
+      const typeOption = event.target.closest("[data-type-option]");
+      if (typeOption) {
+        activityType = typeOption.dataset.typeOption;
+        document.querySelectorAll("[data-type-option]").forEach(item => item.classList.toggle("active", item === typeOption));
+        document.getElementById("activityTypeTrigger").textContent = activityType;
+        closeModals();
+      }
+      if (event.target.closest("[data-close-modal]")) closeModals();
+    });
+
+    document.getElementById("confirmTrialBtn").addEventListener("click", () => {
+      closeModals();
+      document.getElementById("gameTitle").textContent = selectedVenue.name;
+      document.getElementById("gameSub").textContent = "试玩场 · 模拟下注";
+      document.getElementById("page-game").style.setProperty("--game-bg", selectedVenue.gameBg);
+      setPage("game");
+    });
+    document.getElementById("placeBetBtn").addEventListener("click", () => showModal("kycModal"));
+    document.getElementById("goKycBtn").addEventListener("click", () => {
+      closeModals();
+      setPage("kyc");
+    });
+    document.getElementById("goActivityKycBtn").addEventListener("click", () => {
+      closeModals();
+      setPage("kyc");
+    });
+    document.querySelectorAll("[data-yuebao-view]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-yuebao-view]").forEach(item => item.classList.toggle("active", item === button));
+        const view = button.dataset.yuebaoView;
+        document.getElementById("yuebaoIncome").style.display = view === "income" ? "block" : "none";
+        document.getElementById("yuebaoTasks").style.display = view === "tasks" ? "block" : "none";
+        document.getElementById("rulesPage").classList.remove("active");
+      });
+    });
+    document.getElementById("showRulesBtn").addEventListener("click", () => {
+      document.getElementById("yuebaoIncome").style.display = "none";
+      document.getElementById("yuebaoTasks").style.display = "none";
+      document.getElementById("rulesPage").classList.add("active");
+    });
+    document.getElementById("backTasksBtn").addEventListener("click", () => {
+      document.getElementById("rulesPage").classList.remove("active");
+      document.getElementById("yuebaoTasks").style.display = "block";
+    });
+    document.getElementById("openSavingTask").addEventListener("click", () => showModal("savingModal"));
+    document.getElementById("confirmSavingBtn").addEventListener("click", () => {
+      closeModals();
+      document.getElementById("taskRunning").classList.add("show");
+      document.getElementById("openSavingTask").textContent = "活动持续中";
+      document.getElementById("openSavingTask").disabled = true;
+    });
+    document.getElementById("confirmTransferBtn").addEventListener("click", () => {
+      const amount = Number(document.getElementById("transferAmount").value || 0);
+      if (amount > 0 && amount <= centerBalance) {
+        centerBalance -= amount;
+        venueBalances[currentTransferVenue] += amount;
+        syncBalances();
+        closeModals();
+      }
+    });
+    document.getElementById("recycleBtn").addEventListener("click", () => {
+      const total = Object.values(venueBalances).reduce((sum, value) => sum + value, 0);
+      centerBalance += total;
+      Object.keys(venueBalances).forEach(name => venueBalances[name] = 0);
+      syncBalances();
+    });
+    document.querySelectorAll("[data-withdraw-tab]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-withdraw-tab]").forEach(item => item.classList.toggle("active", item === button));
+        document.getElementById("cryptoWithdraw").classList.toggle("active", button.dataset.withdrawTab === "crypto");
+        document.getElementById("rmbWithdraw").classList.toggle("active", button.dataset.withdrawTab === "rmb");
+      });
+    });
+    document.querySelectorAll("[data-withdraw-main]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-withdraw-main]").forEach(item => item.classList.toggle("active", item === button));
+        document.getElementById("withdrawApply").classList.toggle("active", button.dataset.withdrawMain === "apply");
+        document.getElementById("withdrawRecordPanel").classList.toggle("active", button.dataset.withdrawMain === "records");
+      });
+    });
+    function currentCoinRate() {
+      return coinRates[selectedCoin];
+    }
+    function updateCoinUi() {
+      const rate = currentCoinRate();
+      document.getElementById("coinTrigger").textContent = selectedCoin;
+      document.getElementById("rateText").value = `1 RMB = ${rate} ${selectedCoin}`;
+      document.getElementById("cryptoAmount").placeholder = `自动换算 ${selectedCoin}`;
+      document.querySelectorAll("[data-coin-option]").forEach(option => {
+        option.classList.toggle("active", option.dataset.coinOption === selectedCoin);
+      });
+    }
+    function syncCryptoFromRmb() {
+      const rate = currentCoinRate();
+      const rmb = Math.min(Number(document.getElementById("rmbAmount").value || 0), centerBalance);
+      document.getElementById("rmbAmount").value = rmb ? String(rmb) : "";
+      document.getElementById("cryptoAmount").value = rmb ? (rmb * rate).toFixed(4) : "";
+    }
+    function syncRmbFromCrypto() {
+      const rate = currentCoinRate();
+      let crypto = Number(document.getElementById("cryptoAmount").value || 0);
+      const maxCrypto = centerBalance * rate;
+      if (crypto > maxCrypto) crypto = maxCrypto;
+      document.getElementById("cryptoAmount").value = crypto ? crypto.toFixed(4) : "";
+      document.getElementById("rmbAmount").value = crypto ? (crypto / rate).toFixed(2) : "";
+    }
+    document.getElementById("rmbAmount").addEventListener("input", syncCryptoFromRmb);
+    document.getElementById("cryptoAmount").addEventListener("input", syncRmbFromCrypto);
+    document.getElementById("coinTrigger").addEventListener("click", () => showModal("coinModal"));
+    document.querySelectorAll("[data-coin-option]").forEach(option => {
+      option.addEventListener("click", () => {
+        selectedCoin = option.dataset.coinOption;
+        updateCoinUi();
+        syncCryptoFromRmb();
+      });
+    });
+    function addWithdrawRecord(amount, currency, account) {
+      const now = new Date();
+      withdrawalRecords.unshift({
+        date: now.toISOString().slice(0, 16).replace("T", " "),
+        amount,
+        currency,
+        account,
+        status: "审核中"
+      });
+      document.getElementById("withdrawTip").classList.add("show");
+      renderWithdrawRecords();
+    }
+    document.getElementById("submitCrypto").addEventListener("click", () => {
+      const amount = Number(document.getElementById("rmbAmount").value || 0);
+      if (amount > 0) addWithdrawRecord(document.getElementById("cryptoAmount").value, selectedCoin, "虚拟币钱包");
+    });
+    document.getElementById("submitRmb").addEventListener("click", () => {
+      const amount = Number(document.getElementById("rmbWithdrawAmount").value || 0);
+      if (amount > 0) addWithdrawRecord(money(amount), "RMB", document.getElementById("rmbAccount").value || "银行卡");
+    });
+    function renderWithdrawRecords() {
+      const list = withdrawalRecords.length ? withdrawalRecords : [
+        { date: "2026-07-08 09:41", amount: "150.00", currency: "USDT", account: "虚拟币钱包", status: "审核中" },
+        { date: "2026-07-07 18:20", amount: "500.00", currency: "RMB", account: "6222 **** 9988", status: "审核通过" },
+        { date: "2026-07-06 12:05", amount: "80.00", currency: "USDT", account: "虚拟币钱包", status: "待审核" },
+        { date: "2026-07-05 21:33", amount: "300.00", currency: "RMB", account: "6217 **** 3312", status: "审核拒绝" }
+      ];
+      const statusClass = status => status === "审核通过" ? "status-pass" : status === "待审核" ? "status-wait" : status === "审核拒绝" ? "status-reject" : "status-review";
+      document.getElementById("withdrawRecords").innerHTML = list.map(record => `
+        <div class="record-row">
+          <div><b>账变转出 · ${record.currency}</b><span>${record.date} · ${record.account} · ${record.amount}</span></div>
+          <div class="status-badge ${statusClass(record.status)}">${record.status}</div>
+        </div>
+      `).join("");
+    }
+    document.querySelectorAll("[data-record-filter]").forEach(button => {
+      button.addEventListener("click", () => {
+        recordFilter = button.dataset.recordFilter;
+        document.querySelectorAll("[data-record-filter]").forEach(item => item.classList.toggle("active", item === button));
+        document.getElementById("customRange").classList.toggle("show", recordFilter === "custom");
+      });
+    });
+    document.getElementById("activityQuery").addEventListener("click", () => {
+      activityKeyword = document.getElementById("activitySearch").value.trim();
+      renderActivities();
+    });
+    document.getElementById("activityTypeTrigger").addEventListener("click", () => showModal("typeModal"));
+    document.getElementById("loginBtn").addEventListener("click", () => setPage("home"));
+    document.getElementById("joinActivityBtn").addEventListener("click", () => showModal("activityEligibilityModal"));
+    renderHomeVenues();
+    syncBalances();
+    renderWithdrawRecords();
+    renderActivities();
+  </script>
+</body>
+</html>
