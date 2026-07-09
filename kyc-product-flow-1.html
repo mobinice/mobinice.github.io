@@ -445,6 +445,24 @@
     .yuebao-card .transfer-row { border-bottom: 0; }
     .yuebao-card .transfer-row span { color: rgba(255,255,255,.82); }
     .yuebao-card .transfer-row b { color: #fff; font-size: 22px; }
+    .yuebao-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+    .yuebao-stat span {
+      display: block;
+      font-size: 11px;
+      color: rgba(255,255,255,.82);
+      line-height: 1.3;
+    }
+    .yuebao-stat b {
+      display: block;
+      margin-top: 7px;
+      color: #fff;
+      font-size: 22px;
+    }
     .yuebao-card .small-action {
       color: #064e3b;
       background: rgba(255,255,255,.9);
@@ -1003,6 +1021,35 @@
     }
     .modal h2 { margin: 0 0 8px; font-size: 19px; }
     .modal p { margin: 0 0 16px; color: #64748b; font-size: 13px; line-height: 1.55; }
+    .verify-bell {
+      width: 74px;
+      height: 74px;
+      margin: -54px auto 12px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: radial-gradient(circle at 34% 26%, #dbeafe, #38bdf8 48%, #2563eb);
+      box-shadow: 0 14px 24px rgba(37,99,235,.32);
+      font-size: 32px;
+    }
+    .verify-modal {
+      margin-top: 42px;
+      overflow: visible;
+    }
+    .interest-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 18px;
+      margin: 4px 0 16px;
+      text-align: left;
+    }
+    .interest-grid div {
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .interest-grid b { color: #172033; }
     .condition-list {
       text-align: left;
       border: 1px solid #edf1f6;
@@ -1198,9 +1245,10 @@
         </div>
       </div>
       <div class="section yuebao-card">
-        <div class="section-head"><b>余额宝余额</b></div>
-        <div class="transfer-row">
-          <div><b id="profileYuebaoBalance">1,903.71</b><span>今日预估收益 2.00，任务可随时查看</span></div>
+        <div class="section-head"><b>余额宝</b></div>
+        <div class="yuebao-stats">
+          <div class="yuebao-stat"><span>累计收益</span><b>0.00</b></div>
+          <div class="yuebao-stat"><span>可领取利息（元）</span><b>0.00</b></div>
           <div style="display:grid;gap:8px">
             <button class="small-action" data-yuebao-entry="tasks">任务</button>
             <button class="small-action" data-yuebao-entry="rules">规则</button>
@@ -1263,7 +1311,11 @@
         <button data-yuebao-view="tasks">余额宝任务</button>
       </div>
       <div id="yuebaoIncome">
-        <div class="savings-hero"><span>余额宝总额</span><b>1,903.71</b><small>今日预估收益 2.00 · 资金仍可转回场馆</small></div>
+        <div class="native-card">
+          <div class="transfer-row"><div><b>中心钱包（元）</b><span>可参与余额宝任务金额</span></div><button class="small-action">1,903.71</button></div>
+          <div class="transfer-row"><div><b>累计收益（元）</b><span>已累计结算收益</span></div><button class="small-action">0.00</button></div>
+          <div class="transfer-row"><div><b>可领取利息（元）</b><span>当前可领取收益</span></div><button class="small-action">0.00</button></div>
+        </div>
         <div class="native-card">
           <div class="section-head"><b>收益概览</b><span>自动计息</span></div>
           <div class="transfer-row"><div><b>累计收益</b><span>过去 7 天自动结算</span></div><button class="small-action">12.68</button></div>
@@ -1273,22 +1325,42 @@
       <div id="yuebaoTasks" style="display:none">
         <div class="task-running" id="taskRunning"><b>活动持续中</b><span>剩余时间 23:59:42 · 当前流水 50 / 1,860.71</span></div>
         <div class="native-card">
+          <div class="transfer-row"><div><b>中心钱包（元）</b><span>参与金额以中心钱包计算</span></div><button class="small-action">1,903.71</button></div>
+          <div class="transfer-row"><div><b>累计收益（元）</b><span>已累计结算收益</span></div><button class="small-action">0.00</button></div>
+          <div class="transfer-row"><div><b>可领取利息（元）</b><span>当前可领取收益</span></div><button class="small-action">0.00</button></div>
+        </div>
+        <div class="native-card">
           <div class="section-head"><b>余额宝任务</b><span>可开启</span></div>
           <div class="task-card">
             <div class="task-row">
-              <div class="rate">1x</div>
-              <div><b>一倍返水</b><span>开启后 24 小时内完成流水</span></div>
+              <div class="rate">0.03%</div>
+              <div><b>完成1倍流水</b><span>最高礼金¥15</span></div>
               <button class="small-action" id="openSavingTask">开启</button>
             </div>
             <div class="task-row">
+              <div class="rate">0.50%</div>
+              <div><b>完成3倍流水</b><span>最高礼金¥250</span></div>
+              <button class="small-action">开启</button>
+            </div>
+            <div class="task-row">
               <div class="rate">1.50%</div>
-              <div><b>棋牌流水成长</b><span>完成指定流水后加息</span></div>
+              <div><b>完成6倍流水</b><span>最高礼金¥750</span></div>
+              <button class="small-action">开启</button>
+            </div>
+            <div class="task-row">
+              <div class="rate">2.50%</div>
+              <div><b>完成10倍流水</b><span>最高礼金¥1250</span></div>
+              <button class="small-action">开启</button>
+            </div>
+            <div class="task-row">
+              <div class="rate">5.00%</div>
+              <div><b>完成15倍流水</b><span>最高礼金¥2500</span></div>
               <button class="small-action">开启</button>
             </div>
             <div class="task-row">
               <div class="rate">7.00%</div>
-              <div><b>高倍流水返利</b><span>实名制完成后解锁</span></div>
-              <button class="small-action">查看</button>
+              <div><b>完成20倍流水</b><span>最高礼金¥3500</span></div>
+              <button class="small-action">开启</button>
             </div>
           </div>
           <button class="ghost-btn full-btn" id="showRulesBtn">查看余额宝活动规则</button>
@@ -1420,17 +1492,29 @@
       </div>
     </div>
 
+    <div class="modal-layer" id="profileVerifyModal">
+      <div class="modal verify-modal">
+        <div class="verify-bell">!</div>
+        <h2>温馨提示</h2>
+        <p>请绑定真实的姓名、手机号与银行卡，提交信息后可使用人民币提现方式。</p>
+        <button class="primary-btn full-btn" id="profileVerifyBtn">认证领奖金</button>
+        <button class="ghost-btn full-btn" data-close-modal style="margin-top:10px">暂不认证</button>
+      </div>
+    </div>
+
     <div class="modal-layer" id="savingModal">
       <div class="modal">
-        <h2>是否确认开启活动？</h2>
-        <div class="condition-list">
-          <div><span>任务名称</span><b>一倍返水</b></div>
-          <div><span>时间限制</span><b>开启后 24 小时</b></div>
-          <div><span>当前流水</span><b>0 / 1,860.71</b></div>
+        <h2>您正在开启【余额宝】任务</h2>
+        <div class="interest-grid">
+          <div>参与金额：<b>1,903.71元</b></div>
+          <div>可得利息：<b>0.57元</b></div>
+          <div>流水要求：<b>1,903.71元</b></div>
+          <div>流水倍数：<b>1倍</b></div>
+          <div>延时时长：<b>24小时</b></div>
         </div>
         <div class="modal-actions">
-          <button class="soft-btn" data-close-modal>取消</button>
-          <button class="primary-btn" id="confirmSavingBtn">确认开启</button>
+          <button class="soft-btn" data-close-modal>关闭</button>
+          <button class="primary-btn" id="confirmSavingBtn">立即开启</button>
         </div>
       </div>
     </div>
@@ -1597,6 +1681,7 @@
       document.getElementById(`page-${page}`).classList.add("active");
       document.querySelectorAll(".tab").forEach(button => button.classList.toggle("active", button.dataset.tab === page));
       document.querySelector(".phone").classList.toggle("login-mode", page === "login");
+      if (page === "profile") setTimeout(() => showModal("profileVerifyModal"), 80);
     }
 
     function scrollPageToTop(page) {
@@ -1806,6 +1891,10 @@
     });
     document.getElementById("placeBetBtn").addEventListener("click", () => showModal("kycModal"));
     document.getElementById("goKycBtn").addEventListener("click", () => {
+      closeModals();
+      setPage("kyc");
+    });
+    document.getElementById("profileVerifyBtn").addEventListener("click", () => {
       closeModals();
       setPage("kyc");
     });
