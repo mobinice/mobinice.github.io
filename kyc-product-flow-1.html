@@ -627,6 +627,19 @@
       font-weight: 900;
     }
     .activity-list { display: grid; gap: 10px; }
+    .empty-state {
+      min-height: 126px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #94a3b8;
+      background: #f8fbff;
+      font-size: 13px;
+      font-weight: 900;
+      text-align: center;
+      padding: 16px;
+    }
     .activity-banner {
       min-height: 126px;
       border: 0;
@@ -947,6 +960,27 @@
       padding: 24px;
     }
     .modal-layer.show { display: flex; }
+    .toast {
+      position: absolute;
+      left: 50%;
+      top: 52px;
+      z-index: 30;
+      transform: translate(-50%, -12px);
+      border-radius: 999px;
+      padding: 9px 14px;
+      color: #fff;
+      background: rgba(15, 23, 42, .88);
+      font-size: 12px;
+      font-weight: 900;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      box-shadow: 0 12px 24px rgba(15,23,42,.22);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
     .modal {
       width: 100%;
       border-radius: 10px;
@@ -1039,6 +1073,7 @@
 <body>
   <main class="phone">
     <div class="status"><span>9:41</span><span>5G 100%</span></div>
+    <div class="toast" id="toastTip">已加入专属</div>
 
     <section class="page login-page" id="page-login">
       <div class="login-card">
@@ -1508,9 +1543,42 @@
       { id: "slot", category: "电子", venueLabel: "爆分老虎机", type: "返利", title: "电子爆分返利", text: "电子场馆有效流水越高，返利比例越高。", explain: "电子场馆完成有效流水后，返利将在次日派发。", bg: "linear-gradient(135deg,#14b8a6,#6366f1)", detail: "linear-gradient(135deg,#134e4a,#14b8a6,#c7d2fe)" },
       { id: "fun", category: "娱乐", venueLabel: "红包广场", type: "转盘", title: "新人娱乐礼", text: "完成娱乐任务后抽取新人专属奖励。", explain: "娱乐专区完成新人任务后，可抽取随机奖励并进入中心钱包。", bg: "linear-gradient(135deg,#ef4444,#eab308)", detail: "linear-gradient(135deg,#7f1d1d,#ef4444,#fef08a)" }
     ];
-    const favorites = new Set(["rebate"]);
-    const previousBetMenus = new Set(["抢庄牛牛", "日本麻将", "德州扑克"]);
-    const venueBalances = { "抢庄牛牛": 0, "斗地主": 0, "德州扑克": 0, "百家乐": 0, "二八杠": 0, "抢红包": 0 };
+    const favorites = new Set(["platform-kyc-lock", "platform-newbie"]);
+    const venueBalances = {
+      "开云体育": 1041.92,
+      "熊猫体育": 301.90,
+      "IM体育": 0,
+      "开云电竞": 0,
+      "YB电竞": 0,
+      "电竞牛": 0,
+      "开云真人": 0,
+      "YB真人": 0,
+      "PA钱包": 0,
+      "BG真人": 0,
+      "OG真人": 0,
+      "完美真人": 0,
+      "开云彩票": 0,
+      "YB彩票": 0,
+      "TCG彩票": 0,
+      "双赢彩票": 0,
+      "开云棋牌": 0,
+      "YB棋牌": 0,
+      "博雅棋牌": 0,
+      "高登棋牌": 0,
+      "双赢棋牌": 0,
+      "开云电子": 0,
+      "YB电子": 0,
+      "PG电子": 0,
+      "PT电子": 0,
+      "PP电子": 0,
+      "LGD电子": 0,
+      "开云捕鱼": 0,
+      "YB捕鱼": 0,
+      "YB刮刮乐": 0,
+      "YB哈希": 0,
+      "YGR捕鱼": 0,
+      "SP娱乐": 0
+    };
     let centerBalance = 1860.71;
     let lockedBalance = 320.00;
     let selectedHomeCategory = "棋牌";
@@ -1520,7 +1588,7 @@
     let activityType = "全部";
     let selectedCoin = "USDT";
     const coinRates = { USDT: 0.15, ETH: 0.00004, DOGE: 2.1 };
-    let currentTransferVenue = "抢庄牛牛";
+    let currentTransferVenue = "开云体育";
     let withdrawalRecords = [];
     let recordFilter = "today";
 
@@ -1608,6 +1676,14 @@
 
     function showModal(id) { document.getElementById(id).classList.add("show"); }
     function closeModals() { document.querySelectorAll(".modal-layer").forEach(modal => modal.classList.remove("show")); }
+    let toastTimer;
+    function showToast(message) {
+      const toast = document.getElementById("toastTip");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1400);
+    }
 
     function renderActivityMenu() {
       document.getElementById("activityMenu").innerHTML = activityMenus.map(menu => `
@@ -1616,7 +1692,7 @@
     }
 
     function activityMatches(activity, menu) {
-      if (menu === "专属") return favorites.has(activity.id) || previousBetMenus.has(activity.venueLabel);
+      if (menu === "专属") return favorites.has(activity.id);
       if (menu === "综合") return true;
       return activity.category === menu;
     }
@@ -1628,7 +1704,11 @@
         const typeOk = activityType === "全部" || activity.type === activityType;
         return activityMatches(activity, selectedActivityMenu) && keywordOk && typeOk;
       });
-      if (!list.length) list = activities.filter(activity => activityMatches(activity, selectedActivityMenu)).slice(0, 2);
+      if (!list.length && selectedActivityMenu !== "专属") list = activities.filter(activity => activityMatches(activity, selectedActivityMenu)).slice(0, 2);
+      if (!list.length) {
+        document.getElementById("activityList").innerHTML = `<div class="empty-state">暂无收藏活动</div>`;
+        return;
+      }
       document.getElementById("activityList").innerHTML = list.map(activity => `
         <div class="activity-banner" style="--banner:${activity.bg}" data-activity="${activity.id}">
           <button class="fav-star ${favorites.has(activity.id) ? "on" : ""}" data-star="${activity.id}">★</button>
@@ -1694,7 +1774,13 @@
       if (star) {
         event.stopPropagation();
         const id = star.dataset.star;
-        favorites.has(id) ? favorites.delete(id) : favorites.add(id);
+        if (favorites.has(id)) {
+          favorites.delete(id);
+          showToast("已取消收藏");
+        } else {
+          favorites.add(id);
+          showToast("已加入专属");
+        }
         renderActivities();
       }
       const activity = event.target.closest("[data-activity]");
