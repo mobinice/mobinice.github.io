@@ -32,11 +32,25 @@
     .status {
       height: 34px;
       padding: 9px 20px 0;
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: start;
       font-size: 12px;
       font-weight: 700;
       background: #fff;
+    }
+    .status span:last-child { text-align: right; }
+    .prototype-help {
+      height: 20px;
+      border: 0;
+      border-radius: 999px;
+      padding: 0 10px;
+      margin-top: -2px;
+      color: #0c87cf;
+      background: #e7f4ff;
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 20px;
     }
     .page {
       height: calc(100% - 34px - 70px);
@@ -100,12 +114,37 @@
         linear-gradient(135deg, #1478e6, #4ab8ff);
       box-shadow: 0 10px 22px rgba(20, 120, 230, .16);
     }
+    .balance-card.home-wallet { padding-right: 48px; }
     .state-card {
       background: #fff;
       border: 1px solid #edf1f6;
     }
     .balance-card span, .state-card span { display: block; font-size: 11px; opacity: .9; }
     .balance-card b { display: block; margin-top: 8px; font-size: 25px; }
+    .balance-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .balance-line b { margin-top: 0; }
+    .refresh-btn {
+      width: 28px;
+      height: 28px;
+      border: 1px solid rgba(255,255,255,.42);
+      border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      color: inherit;
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+      font-weight: 900;
+    }
+    .home-wallet .refresh-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+    }
     .balance-card .user-name {
       margin-bottom: 6px;
       font-size: 12px;
@@ -113,6 +152,8 @@
       font-weight: 900;
     }
     .state-card b { display: block; margin-top: 9px; color: #ea580c; font-size: 16px; }
+    .state-card b.verified,
+    .profile-tile b.verified { color: #16a34a !important; }
     .card-link {
       position: absolute;
       right: 10px;
@@ -420,9 +461,10 @@
     }
     .profile-card span { display: block; font-size: 12px; opacity: .9; }
     .profile-card b { display: block; margin-top: 8px; font-size: 28px; }
+    .profile-card .balance-line b { margin-top: 0; }
     .wallet-actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       margin-top: 12px;
     }
@@ -435,6 +477,51 @@
       font-weight: 900;
       font-size: 12px;
     }
+    .recharge-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .recharge-tabs button,
+    .coin-choice button {
+      height: 38px;
+      border: 1px solid #d8e2ee;
+      border-radius: 8px;
+      background: #fff;
+      color: #64748b;
+      font-weight: 900;
+    }
+    .recharge-tabs button.active,
+    .coin-choice button.active {
+      color: #fff;
+      background: #0ea5e9;
+      border-color: #0ea5e9;
+    }
+    .recharge-panel { display: none; }
+    .recharge-panel.active { display: block; }
+    .coin-choice {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .address-box {
+      border: 1px solid #e3ebf5;
+      border-radius: 8px;
+      padding: 14px;
+      background: #f8fbff;
+    }
+    .address-box span { display: block; color: #64748b; font-size: 12px; font-weight: 800; }
+    .address-box b {
+      display: block;
+      margin-top: 8px;
+      color: #172033;
+      font-size: 15px;
+      line-height: 1.35;
+      word-break: break-all;
+    }
+    .address-box small { display: block; margin-top: 8px; color: #8b98aa; line-height: 1.45; }
     .yuebao-card {
       border: 0;
       color: #fff;
@@ -1021,6 +1108,35 @@
     }
     .modal h2 { margin: 0 0 8px; font-size: 19px; }
     .modal p { margin: 0 0 16px; color: #64748b; font-size: 13px; line-height: 1.55; }
+    .prototype-modal {
+      max-height: 78%;
+      overflow-y: auto;
+      text-align: left;
+    }
+    .prototype-modal h2 { text-align: center; }
+    .prototype-note {
+      display: grid;
+      gap: 12px;
+      margin: 12px 0 16px;
+    }
+    .prototype-note div {
+      border: 1px solid #e8eef6;
+      border-radius: 10px;
+      padding: 12px;
+      background: #f8fbff;
+    }
+    .prototype-note b {
+      display: block;
+      margin-bottom: 6px;
+      color: #172033;
+      font-size: 14px;
+    }
+    .prototype-note p {
+      margin: 0;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.62;
+    }
     .verify-bell {
       width: 74px;
       height: 74px;
@@ -1119,7 +1235,7 @@
 </head>
 <body>
   <main class="phone">
-    <div class="status"><span>9:41</span><span>5G 100%</span></div>
+    <div class="status"><span>9:41</span><button class="prototype-help" id="prototypeHelpBtn">原型说明</button><span>5G 100%</span></div>
     <div class="toast" id="toastTip">已加入专属</div>
 
     <section class="page login-page" id="page-login">
@@ -1189,8 +1305,8 @@
         </div>
       </div>
       <div class="wallet-row">
-        <div class="balance-card"><span class="user-name">用户名称：firebet0001</span><span>中心钱包</span><b id="homeBalance">1,860.71</b><button class="card-link" data-tab="profile">去转账</button></div>
-        <div class="state-card"><span>实名制状态</span><b>待认证</b><button class="card-link" data-page="kyc">认证领福利</button></div>
+        <div class="balance-card home-wallet"><span class="user-name">用户名称：firebet0001</span><span>中心钱包</span><div class="balance-line"><b id="homeBalance">1,860.71</b><button class="refresh-btn" id="homeRefreshBtn" type="button">↻</button></div><button class="card-link" data-tab="profile">去转账</button></div>
+        <div class="state-card"><span>实名制状态</span><b id="homeRealStatus">待认证</b><button class="card-link" id="homeStatusAction" data-page="kyc">认证领福利</button></div>
       </div>
       <div class="section">
         <div class="section-head"><b>场馆大厅</b><span>点击试玩</span></div>
@@ -1237,10 +1353,11 @@
     <section class="page" id="page-profile">
       <div class="profile-card">
         <span>平台余额</span>
-        <b id="profileBalance">1,860.71</b>
+        <div class="balance-line"><b id="profileBalance">1,860.71</b><button class="refresh-btn" id="profileRefreshBtn" type="button">↻</button></div>
         <span>锁定钱包 <b id="lockedBalance" style="display:inline;margin:0;font-size:14px">320.00</b></span>
         <div class="wallet-actions">
           <button id="recycleBtn">一键回收</button>
+          <button data-page="recharge">立即充值</button>
           <button data-page="withdraw">立即提现</button>
         </div>
       </div>
@@ -1256,8 +1373,8 @@
         </div>
       </div>
       <div class="profile-grid">
-        <div class="profile-tile"><span>实名制状态</span><b style="color:#ea580c">待认证</b><button class="card-link" data-page="kyc">认证领福利</button></div>
-        <div class="profile-tile"><span>活动资格</span><b style="color:#ea580c">待认证</b><button class="card-link" data-page="kyc">认证领福利</button></div>
+        <div class="profile-tile"><span>实名制状态</span><b id="profileRealStatus" style="color:#ea580c">待认证</b><button class="card-link" id="profileRealAction" data-page="kyc">认证领福利</button></div>
+        <div class="profile-tile"><span>活动资格</span><b id="profileActivityStatus" style="color:#ea580c">待认证</b><button class="card-link" id="profileActivityAction" data-page="kyc">认证领福利</button></div>
       </div>
       <div class="section">
         <div class="section-head"><b>场馆余额划转</b><span>中心钱包</span></div>
@@ -1267,7 +1384,7 @@
         <div class="section-head"><b>完善个人资料</b><span>解锁活动</span></div>
         <p style="margin:0 0 12px;color:#64748b;font-size:13px;line-height:1.55">完成实名制认证后，可立即参加高倍流水返利活动，并开启提现资格。</p>
         <button class="primary-btn full-btn" data-page="kyc">立即完善资料</button>
-        <button class="primary-btn full-btn logout-btn" data-page="login">登出</button>
+        <button class="primary-btn full-btn logout-btn" data-page="login" id="logoutBtn">登出</button>
       </div>
     </section>
 
@@ -1298,7 +1415,7 @@
         <div class="section-head"><b>地址认证</b><span>必填</span></div>
         <button class="upload full">上传地址证明<br><span style="font-weight:700;color:#64748b">可上传信用卡账单、水电账单或银行账单</span></button>
       </div>
-      <button class="primary-btn full-btn">提交审核</button>
+      <button class="primary-btn full-btn" id="submitKycBtn">提交审核</button>
     </section>
 
     <section class="page" id="page-yuebao">
@@ -1376,6 +1493,46 @@
             <li>如存在风控或资料未完善，提现前需要补充个人资料。</li>
           </ol>
           <button class="primary-btn full-btn" id="backTasksBtn" style="margin-top:12px">返回任务</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-recharge">
+      <div class="kyc-head">
+        <button class="plain-back" data-tab="profile">‹</button>
+        <h1>充值</h1>
+      </div>
+      <div class="wallet-row">
+        <div class="balance-card"><span>平台余额</span><b id="rechargeBalance">1,860.71</b></div>
+        <div class="state-card"><span>锁定钱包</span><b id="rechargeLocked">320.00</b></div>
+      </div>
+      <div class="recharge-tabs">
+        <button class="active" data-recharge-tab="crypto">虚拟币充值</button>
+        <button data-recharge-tab="rmb">人民币充值</button>
+      </div>
+      <div class="recharge-panel active" id="cryptoRecharge">
+        <div class="section">
+          <div class="section-head"><b>选择充值币别</b><span>个人地址</span></div>
+          <div class="coin-choice">
+            <button class="active" data-recharge-coin="USDT">USDT</button>
+            <button data-recharge-coin="ETH">ETH</button>
+            <button data-recharge-coin="DOGE">DOGE</button>
+          </div>
+          <div class="address-box">
+            <span>个人转账地址</span>
+            <b id="rechargeCryptoAddress">TR8Yb9fireBET0001uSDtX92kqA</b>
+            <small>请使用当前所选币别转入，完成链上确认后将自动入账至平台余额。</small>
+          </div>
+        </div>
+      </div>
+      <div class="recharge-panel" id="rmbRecharge">
+        <div class="section">
+          <div class="section-head"><b>人民币充值</b><span>专属账号</span></div>
+          <div class="address-box">
+            <span>收款账号</span>
+            <b>6222 8888 9988 0001</b>
+            <small>开户名：firebet 充值专户<br>附言：firebet0001</small>
+          </div>
         </div>
       </div>
     </section>
@@ -1472,6 +1629,31 @@
       <button class="tab" data-tab="activity"><i>★</i><span>精彩活动</span></button>
       <button class="tab" data-tab="profile"><i>👤</i><span>个人</span></button>
     </footer>
+
+    <div class="modal-layer" id="prototypeModal">
+      <div class="modal prototype-modal">
+        <h2>原型说明</h2>
+        <div class="prototype-note">
+          <div>
+            <b>1. BC 提现页设计</b>
+            <p>个人页提供「立即提现」入口。虚拟币提现会根据用户选择的币别与当前汇率进行换算；当输入的虚拟币金额超过可用余额时，系统会自动换算并限制在余额上限内。提现记录中可查看每笔申请的日期、金额、币别与审核状态。</p>
+          </div>
+          <div>
+            <b>2. 实名认证与试玩体验</b>
+            <p>原题设定为未实名用户无法进入正式游戏，因此首页场馆设计为试玩环境，让用户在认证前也能体验场馆价值。用户完成模拟下注后，引导进行实名认证；认证通过后，场馆环境可自动切换为正式环境。原型中也可通过个人页登出后重新登录，模拟切换账号并回到实名未认证状态，用来对照未认证与已认证两种流程。</p>
+          </div>
+          <div>
+            <b>3. 精彩活动结构</b>
+            <p>原活动横向分类较杂乱，因此改为左侧选择活动/场馆类型，右侧展示对应活动。新增「平台」分类承载实名制等平台活动，用于引导用户完成认证；「专属」分类作为收藏入口，用户点击活动右上角星号后，可快速回到专属中找到该活动。</p>
+          </div>
+          <div>
+            <b>4. 活动 Banner 表现</b>
+            <p>活动采用横向 Banner 卡片，参考日式 SLOT 活动 Banner 的信息表达方式，用更短路径展示活动重点并吸引点击。进入详情页后再呈现活动说明与参与按钮，后续可继续增加更强氛围感的图素。</p>
+          </div>
+        </div>
+        <button class="primary-btn full-btn" data-close-modal>关闭</button>
+      </div>
+    </div>
 
     <div class="modal-layer" id="trialModal">
       <div class="modal">
@@ -1672,16 +1854,23 @@
     let activityType = "全部";
     let selectedCoin = "USDT";
     const coinRates = { USDT: 0.15, ETH: 0.00004, DOGE: 2.1 };
+    let rechargeCoin = "USDT";
+    const rechargeAddresses = {
+      USDT: "TR8Yb9fireBET0001uSDtX92kqA",
+      ETH: "0xFirebet0001ETh9A81CfaD421b6d",
+      DOGE: "D8Firebet0001DoGeXk72PLmQ"
+    };
     let currentTransferVenue = "开云体育";
     let withdrawalRecords = [];
     let recordFilter = "today";
+    let isVerified = false;
 
     function setPage(page) {
       document.querySelectorAll(".page").forEach(item => item.classList.remove("active"));
       document.getElementById(`page-${page}`).classList.add("active");
       document.querySelectorAll(".tab").forEach(button => button.classList.toggle("active", button.dataset.tab === page));
       document.querySelector(".phone").classList.toggle("login-mode", page === "login");
-      if (page === "profile") setTimeout(() => showModal("profileVerifyModal"), 80);
+      if (page === "profile" && !isVerified) setTimeout(() => showModal("profileVerifyModal"), 80);
     }
 
     function scrollPageToTop(page) {
@@ -1720,10 +1909,45 @@
       return Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
+    function setButtonTarget(button, targetType, targetValue) {
+      button.removeAttribute("data-page");
+      button.removeAttribute("data-tab");
+      button.setAttribute(targetType, targetValue);
+    }
+
+    function updateVerificationUi() {
+      const statusItems = [
+        { node: document.getElementById("homeRealStatus"), text: isVerified ? "通过" : "待认证" },
+        { node: document.getElementById("profileRealStatus"), text: isVerified ? "通过" : "待认证" },
+        { node: document.getElementById("profileActivityStatus"), text: isVerified ? "已认证" : "待认证" }
+      ];
+      statusItems.forEach(item => {
+        item.node.textContent = item.text;
+        item.node.classList.toggle("verified", isVerified);
+      });
+      const homeAction = document.getElementById("homeStatusAction");
+      const profileRealAction = document.getElementById("profileRealAction");
+      const profileActivityAction = document.getElementById("profileActivityAction");
+      homeAction.textContent = isVerified ? "立即充值" : "认证领福利";
+      profileRealAction.textContent = isVerified ? "立即充值" : "认证领福利";
+      profileActivityAction.textContent = isVerified ? "活动一览" : "认证领福利";
+      setButtonTarget(homeAction, "data-page", isVerified ? "recharge" : "kyc");
+      setButtonTarget(profileRealAction, "data-page", isVerified ? "recharge" : "kyc");
+      setButtonTarget(profileActivityAction, isVerified ? "data-tab" : "data-page", isVerified ? "activity" : "kyc");
+      if (isVerified) closeModals();
+    }
+
+    function resetVerificationState() {
+      isVerified = false;
+      updateVerificationUi();
+    }
+
     function syncBalances() {
       document.getElementById("homeBalance").textContent = money(centerBalance);
       document.getElementById("profileBalance").textContent = money(centerBalance);
       document.getElementById("lockedBalance").textContent = money(lockedBalance);
+      document.getElementById("rechargeBalance").textContent = money(centerBalance);
+      document.getElementById("rechargeLocked").textContent = money(lockedBalance);
       document.getElementById("withdrawBalance").textContent = money(centerBalance);
       document.getElementById("withdrawLocked").textContent = money(lockedBalance);
       document.getElementById("venueBalances").className = "venue-balance-grid";
@@ -1825,7 +2049,10 @@
       const tab = event.target.closest("[data-tab]");
       if (tab) setPage(tab.dataset.tab);
       const page = event.target.closest("[data-page]");
-      if (page) setPage(page.dataset.page);
+      if (page) {
+        if (page.dataset.page === "login") resetVerificationState();
+        setPage(page.dataset.page);
+      }
       const yuebaoEntry = event.target.closest("[data-yuebao-entry]");
       if (yuebaoEntry) {
         switchYuebao(yuebaoEntry.dataset.yuebaoEntry);
@@ -1901,6 +2128,39 @@
     document.getElementById("goActivityKycBtn").addEventListener("click", () => {
       closeModals();
       setPage("kyc");
+    });
+    document.getElementById("submitKycBtn").addEventListener("click", () => {
+      isVerified = true;
+      updateVerificationUi();
+      showToast("认证已通过");
+      setPage("profile");
+    });
+    document.getElementById("homeRefreshBtn").addEventListener("click", () => {
+      syncBalances();
+      showToast("余额已刷新");
+    });
+    document.getElementById("profileRefreshBtn").addEventListener("click", () => {
+      syncBalances();
+      showToast("余额已刷新");
+    });
+    function updateRechargeAddress() {
+      document.getElementById("rechargeCryptoAddress").textContent = rechargeAddresses[rechargeCoin];
+      document.querySelectorAll("[data-recharge-coin]").forEach(button => {
+        button.classList.toggle("active", button.dataset.rechargeCoin === rechargeCoin);
+      });
+    }
+    document.querySelectorAll("[data-recharge-tab]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-recharge-tab]").forEach(item => item.classList.toggle("active", item === button));
+        document.getElementById("cryptoRecharge").classList.toggle("active", button.dataset.rechargeTab === "crypto");
+        document.getElementById("rmbRecharge").classList.toggle("active", button.dataset.rechargeTab === "rmb");
+      });
+    });
+    document.querySelectorAll("[data-recharge-coin]").forEach(button => {
+      button.addEventListener("click", () => {
+        rechargeCoin = button.dataset.rechargeCoin;
+        updateRechargeAddress();
+      });
     });
     document.querySelectorAll("[data-yuebao-view]").forEach(button => {
       button.addEventListener("click", () => {
@@ -2039,12 +2299,19 @@
       renderActivities();
     });
     document.getElementById("activityTypeTrigger").addEventListener("click", () => showModal("typeModal"));
-    document.getElementById("loginBtn").addEventListener("click", () => setPage("home"));
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      resetVerificationState();
+      setPage("home");
+    });
     document.getElementById("joinActivityBtn").addEventListener("click", () => showModal("activityEligibilityModal"));
+    document.getElementById("prototypeHelpBtn").addEventListener("click", () => showModal("prototypeModal"));
     renderHomeVenues();
     syncBalances();
+    updateVerificationUi();
+    updateRechargeAddress();
     renderWithdrawRecords();
     renderActivities();
+    setTimeout(() => showModal("prototypeModal"), 160);
   </script>
 </body>
 </html>
