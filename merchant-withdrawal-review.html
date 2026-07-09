@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商户总后台 - 提现审核</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 1280px;
+      color: #172033;
+      background: #eef3f8;
+      font-family: "Inter", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(14, 165, 233, .2), transparent 30%),
+        linear-gradient(135deg, #10213d, #1e3a5f 48%, #e8f1fb);
+    }
+    .login-card {
+      width: 420px;
+      border-radius: 14px;
+      padding: 34px;
+      background: #fff;
+      box-shadow: 0 26px 60px rgba(15, 23, 42, .22);
+      text-align: center;
+    }
+    .login-card h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+    .login-card p {
+      margin: 10px 0 28px;
+      color: #64748b;
+      font-size: 14px;
+    }
+    .login-field {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+    .login-field label {
+      display: block;
+      margin-bottom: 8px;
+      color: #526174;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .login-field input {
+      width: 100%;
+      height: 44px;
+      border: 1px solid #d7e2ee;
+      border-radius: 8px;
+      padding: 0 12px;
+      outline: none;
+      background: #f8fbff;
+    }
+    .primary-btn {
+      height: 42px;
+      border: 0;
+      border-radius: 8px;
+      color: #fff;
+      background: #0ea5e9;
+      font-weight: 900;
+      box-shadow: 0 10px 20px rgba(14, 165, 233, .2);
+    }
+    .secondary-btn {
+      height: 42px;
+      border: 1px solid #d8e2ee;
+      border-radius: 8px;
+      color: #475569;
+      background: #fff;
+      font-weight: 900;
+    }
+    .danger-btn {
+      height: 42px;
+      border: 0;
+      border-radius: 8px;
+      color: #fff;
+      background: #ef4444;
+      font-weight: 900;
+    }
+    .full-btn { width: 100%; }
+    .app {
+      display: none;
+      min-height: 100vh;
+    }
+    .sidebar {
+      width: 232px;
+      background: #111827;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+    .brand {
+      height: 68px;
+      display: flex;
+      align-items: center;
+      padding: 0 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .menu {
+      padding: 16px 12px;
+    }
+    .menu button {
+      width: 100%;
+      height: 46px;
+      border: 0;
+      border-radius: 8px;
+      background: #0ea5e9;
+      color: #fff;
+      text-align: left;
+      padding: 0 14px;
+      font-weight: 900;
+    }
+    .main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar {
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: #fff;
+      border-bottom: 1px solid #e5edf5;
+    }
+    .topbar h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .admin-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .content {
+      padding: 24px 28px 32px;
+    }
+    .panel {
+      border: 1px solid #e4ebf4;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, .04);
+    }
+    .filter-panel {
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .panel-title b {
+      font-size: 15px;
+    }
+    .panel-title span {
+      color: #0c87cf;
+      background: #e7f4ff;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(150px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      height: 38px;
+      border: 1px solid #d8e2ee;
+      border-radius: 8px;
+      padding: 0 10px;
+      color: #172033;
+      background: #fff;
+      outline: none;
+    }
+    .filter-actions {
+      display: flex;
+      gap: 8px;
+      grid-column: 3;
+      grid-row: 2;
+    }
+    .filter-actions button {
+      min-width: 86px;
+      height: 38px;
+    }
+    .date-start {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .date-end {
+      grid-column: 2;
+      grid-row: 2;
+    }
+    .workflow-panel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+    .workflow-tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .workflow-tabs button {
+      min-width: 112px;
+      height: 38px;
+      border: 1px solid #d8e2ee;
+      border-radius: 8px;
+      color: #64748b;
+      background: #fff;
+      font-weight: 900;
+    }
+    .workflow-tabs button.active {
+      color: #fff;
+      border-color: #0ea5e9;
+      background: #0ea5e9;
+      box-shadow: 0 8px 18px rgba(14, 165, 233, .18);
+    }
+    .workflow-note {
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .hidden { display: none; }
+    .table-panel {
+      overflow: hidden;
+    }
+    .table-head {
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-bottom: 1px solid #edf2f7;
+    }
+    .table-head b {
+      font-size: 16px;
+    }
+    .summary {
+      display: flex;
+      gap: 12px;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .summary strong { color: #172033; }
+    .table-wrap {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      min-width: 1480px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      height: 46px;
+      padding: 0 12px;
+      color: #64748b;
+      background: #f8fbff;
+      text-align: left;
+      white-space: nowrap;
+      font-weight: 900;
+    }
+    td {
+      height: 64px;
+      padding: 0 12px;
+      border-top: 1px solid #edf2f7;
+      white-space: nowrap;
+    }
+    .money { font-weight: 900; }
+    .muted { color: #64748b; }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 72px;
+      height: 28px;
+      border-radius: 999px;
+      padding: 0 10px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .status-pending { color: #b45309; background: #fff7ed; }
+    .status-pass { color: #15803d; background: #dcfce7; }
+    .status-reject { color: #b91c1c; background: #fee2e2; }
+    .audit-btn {
+      height: 34px;
+      border: 0;
+      border-radius: 8px;
+      color: #fff;
+      background: #0ea5e9;
+      padding: 0 14px;
+      font-weight: 900;
+    }
+    .audit-btn:disabled {
+      cursor: default;
+      color: #94a3b8;
+      background: #e5edf5;
+    }
+    .currency-stats {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      min-height: 56px;
+      padding: 12px 18px;
+      border-top: 1px solid #edf2f7;
+      background: #f8fbff;
+    }
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+      border: 1px solid #dbe7f3;
+      border-radius: 999px;
+      padding: 0 12px;
+      color: #475569;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .stat-pill b { color: #172033; }
+    .modal-layer {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, .46);
+      z-index: 10;
+    }
+    .modal-layer.show { display: flex; }
+    .modal {
+      width: 520px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 28px 64px rgba(15, 23, 42, .28);
+      overflow: hidden;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      border-bottom: 1px solid #edf2f7;
+    }
+    .modal-header h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #64748b;
+      font-size: 18px;
+    }
+    .modal-body {
+      padding: 20px;
+    }
+    .audit-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .audit-summary div {
+      border: 1px solid #edf2f7;
+      border-radius: 8px;
+      padding: 10px;
+      background: #f8fbff;
+    }
+    .audit-summary span {
+      display: block;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .audit-summary b {
+      display: block;
+      margin-top: 6px;
+      font-size: 14px;
+    }
+    .radio-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .radio-card {
+      border: 1px solid #d8e2ee;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+    }
+    .reject-reason {
+      display: none;
+      margin-bottom: 16px;
+    }
+    .reject-reason.show { display: block; }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 16px 20px 20px;
+    }
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translate(-50%, -12px);
+      opacity: 0;
+      pointer-events: none;
+      border-radius: 999px;
+      padding: 10px 16px;
+      color: #fff;
+      background: rgba(15, 23, 42, .9);
+      font-size: 13px;
+      font-weight: 900;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 20;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  </style>
+</head>
+<body>
+  <div class="toast" id="toast">已更新</div>
+
+  <section class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <h1>商户总后台</h1>
+      <p>提现审核管理系统</p>
+      <div class="login-field">
+        <label>账号</label>
+        <input id="account" value="admin" autocomplete="username">
+      </div>
+      <div class="login-field">
+        <label>密码</label>
+        <input id="password" type="password" value="admin" autocomplete="current-password">
+      </div>
+      <button class="primary-btn full-btn" id="loginBtn">登录</button>
+    </div>
+  </section>
+
+  <section class="app" id="app">
+    <aside class="sidebar">
+      <div class="brand">商户总后台</div>
+      <nav class="menu">
+        <button>提现审核</button>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <h2>提现审核</h2>
+        <div class="admin-info">
+          <span>审核员：admin</span>
+          <button class="secondary-btn" id="logoutBtn">退出登录</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="panel workflow-panel">
+          <div class="workflow-tabs">
+            <button class="active" data-review-tab="pending">待审核 <span id="pendingTabCount">0</span></button>
+            <button data-review-tab="reviewed">已审核 <span id="reviewedTabCount">0</span></button>
+          </div>
+          <div class="workflow-note" id="workflowNote">当前显示待审核提现申请</div>
+        </section>
+
+        <section class="panel filter-panel">
+          <div class="panel-title">
+            <b>筛选项目</b>
+          </div>
+          <div class="filters">
+            <div class="field">
+              <label>商户</label>
+              <input id="filterMerchant" placeholder="请输入商户号">
+            </div>
+            <div class="field">
+              <label>用户ID</label>
+              <input id="filterUserId" placeholder="请输入用户ID">
+            </div>
+            <div class="field">
+              <label>用户名</label>
+              <input id="filterUserName" placeholder="请输入用户名">
+            </div>
+            <div class="field">
+              <label>申请币别</label>
+              <select id="filterCoin">
+                <option value="">全部币别</option>
+                <option value="RMB">RMB</option>
+                <option value="USDT">USDT</option>
+                <option value="ETH">ETH</option>
+                <option value="DOGE">DOGE</option>
+              </select>
+            </div>
+            <div class="field hidden" id="statusFilterField">
+              <label>审核状态</label>
+              <select id="filterStatus">
+                <option value="">全部状态</option>
+                <option value="审核通过">审核通过</option>
+                <option value="审核拒绝">审核拒绝</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="primary-btn" id="searchBtn">查询</button>
+              <button class="secondary-btn" id="resetBtn">重置</button>
+            </div>
+            <div class="field date-start">
+              <label>开始时间</label>
+              <input id="startTime" type="datetime-local" step="1">
+            </div>
+            <div class="field date-end">
+              <label>结束时间</label>
+              <input id="endTime" type="datetime-local" step="1">
+            </div>
+          </div>
+        </section>
+
+        <section class="panel table-panel">
+          <div class="table-head">
+            <b id="tableTitle">待审核提现申请</b>
+            <div class="summary">
+              <span><span id="countLabel">待审核</span>：<strong id="pendingCount">1</strong></span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr id="tableColumns"></tr>
+              </thead>
+              <tbody id="reviewTable"></tbody>
+            </table>
+          </div>
+          <div class="currency-stats" id="currencyStats"></div>
+        </section>
+      </div>
+    </main>
+  </section>
+
+  <div class="modal-layer" id="auditModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>提现审核</h3>
+        <button class="close-btn" id="closeModal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="audit-summary">
+          <div><span>用户</span><b id="modalUser">-</b></div>
+          <div><span>申请金额</span><b id="modalAmount">-</b></div>
+          <div><span>汇率</span><b id="modalRate">-</b></div>
+          <div><span>预扣人民币</span><b id="modalRmb">-</b></div>
+        </div>
+        <div class="radio-row">
+          <label class="radio-card"><input type="radio" name="auditResult" value="pass" checked> 审核通过</label>
+          <label class="radio-card"><input type="radio" name="auditResult" value="reject"> 审核拒绝</label>
+        </div>
+        <div class="field reject-reason" id="rejectReasonWrap">
+          <label>拒绝理由</label>
+          <select id="rejectReason">
+            <option value="">请选择拒绝理由</option>
+            <option value="蛇单用户">蛇单用户</option>
+            <option value="团体投注">团体投注</option>
+            <option value="风控拒提">风控拒提</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="secondary-btn" id="cancelAudit">取消</button>
+        <button class="primary-btn" id="confirmAudit">确认审核</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const coinRates = { RMB: 1, USDT: 7.2, ETH: 26000, DOGE: 1.05 };
+    const makeRecord = item => {
+      const rmbAmount = item.coin === "RMB" ? item.foreignAmount : item.foreignAmount * coinRates[item.coin];
+      return {
+        ...item,
+        rmbAmount,
+        balanceBefore: item.balanceAfter + rmbAmount
+      };
+    };
+    const records = [
+      makeRecord({
+        id: "WD20260709103122",
+        time: "2026-07-09 10:31:22",
+        merchant: "MCH-FIREBET-001",
+        merchantName: "Firebet旗舰厅",
+        username: "firebet0001",
+        userId: "100086",
+        coin: "USDT",
+        foreignAmount: 100,
+        balanceAfter: 9280,
+        status: "待审核",
+        remark: "-"
+      }),
+      makeRecord({
+        id: "WD20260709104108",
+        time: "2026-07-09 10:41:08",
+        merchant: "MCH-FIREBET-001",
+        merchantName: "Firebet旗舰厅",
+        username: "player0088",
+        userId: "100188",
+        coin: "RMB",
+        foreignAmount: 500,
+        balanceAfter: 3510,
+        status: "待审核",
+        remark: "-"
+      }),
+      makeRecord({
+        id: "WD20260709095611",
+        time: "2026-07-09 09:56:11",
+        merchant: "MCH-YB-002",
+        merchantName: "YB娱乐城",
+        username: "vip_chen",
+        userId: "100331",
+        coin: "ETH",
+        foreignAmount: 0.05,
+        balanceAfter: 8100,
+        status: "审核通过",
+        remark: "审核通过",
+        reviewedAt: "2026-07-09 10:02:19"
+      }),
+      makeRecord({
+        id: "WD20260708182245",
+        time: "2026-07-08 18:22:45",
+        merchant: "MCH-FIREBET-001",
+        merchantName: "Firebet旗舰厅",
+        username: "risk_user21",
+        userId: "100521",
+        coin: "DOGE",
+        foreignAmount: 1200,
+        balanceAfter: 640,
+        status: "审核拒绝",
+        remark: "风控拒提",
+        reviewedAt: "2026-07-08 18:31:07"
+      })
+    ];
+
+    const defaultRecordState = records.map(record => ({
+      id: record.id,
+      status: record.status,
+      remark: record.remark,
+      reviewedAt: record.reviewedAt
+    }));
+
+    function resetRecordState() {
+      defaultRecordState.forEach(defaultRecord => {
+        const record = records.find(item => item.id === defaultRecord.id);
+        if (!record) return;
+        record.status = defaultRecord.status;
+        record.remark = defaultRecord.remark;
+        record.reviewedAt = defaultRecord.reviewedAt;
+      });
+    }
+
+    let activeTab = "pending";
+    let visibleRecords = [];
+    let currentRecord = null;
+    let toastTimer;
+
+    const money = value => Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const compactNumber = value => Number(value).toLocaleString("zh-CN", { maximumFractionDigits: 6 });
+    const foreignText = record => record.coin === "RMB" ? `${money(record.foreignAmount)}RMB` : `${compactNumber(record.foreignAmount)}${record.coin}`;
+    const rateText = record => `1 ${record.coin} = ${record.coin === "RMB" ? "1.00" : money(coinRates[record.coin])} RMB`;
+    const statusClass = status => status === "审核通过" ? "status-pass" : status === "审核拒绝" ? "status-reject" : "status-pending";
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1400);
+    }
+
+    function renderTabs() {
+      const pendingCount = records.filter(record => record.status === "待审核").length;
+      const reviewedCount = records.filter(record => record.status !== "待审核").length;
+      document.getElementById("pendingTabCount").textContent = pendingCount;
+      document.getElementById("reviewedTabCount").textContent = reviewedCount;
+      document.querySelectorAll("[data-review-tab]").forEach(button => {
+        button.classList.toggle("active", button.dataset.reviewTab === activeTab);
+      });
+      document.getElementById("statusFilterField").classList.toggle("hidden", activeTab === "pending");
+      document.getElementById("workflowNote").textContent = activeTab === "pending" ? "当前显示待审核提现申请" : "当前显示已审核提现记录";
+      document.getElementById("tableTitle").textContent = activeTab === "pending" ? "待审核提现申请" : "已审核提现记录";
+      document.getElementById("countLabel").textContent = activeTab === "pending" ? "待审核" : "已审核";
+      if (activeTab === "pending") document.getElementById("filterStatus").value = "";
+    }
+
+    function renderColumns() {
+      const columns = [
+        "申请时间",
+        "商户号",
+        "商户名称",
+        "用户名",
+        "用户ID",
+        "申请金额（人民币）",
+        "申请金额（外汇）",
+        "汇率",
+        "申请前余额",
+        "申请后余额",
+        "审核状态",
+        "审核备注"
+      ];
+      if (activeTab === "pending") columns.push("操作");
+      document.getElementById("tableColumns").innerHTML = columns.map(column => `<th>${column}</th>`).join("");
+    }
+
+    function renderCurrencyStats() {
+      if (!visibleRecords.length) {
+        document.getElementById("currencyStats").innerHTML = `<span class="stat-pill">暂无统计</span>`;
+        return;
+      }
+      const groups = visibleRecords.reduce((result, record) => {
+        if (!result[record.coin]) result[record.coin] = { coin: record.coin, foreignAmount: 0, rmbAmount: 0, count: 0 };
+        result[record.coin].foreignAmount += record.foreignAmount;
+        result[record.coin].rmbAmount += record.rmbAmount;
+        result[record.coin].count += 1;
+        return result;
+      }, {});
+      const groupStats = Object.values(groups).map(group => `
+        <span class="stat-pill"><b>${group.coin === "RMB" ? money(group.foreignAmount) : compactNumber(group.foreignAmount)}${group.coin}</b> · 共${group.count}笔</span>
+      `).join("");
+      const rmbTotal = visibleRecords.reduce((sum, record) => sum + record.rmbAmount, 0);
+      document.getElementById("currencyStats").innerHTML = `${groupStats}<span class="stat-pill"><b>全部RMB金额</b> ${money(rmbTotal)} RMB</span>`;
+    }
+
+    function renderTable() {
+      renderTabs();
+      renderColumns();
+      if (!visibleRecords.length) {
+        const colSpan = activeTab === "pending" ? 13 : 12;
+        document.getElementById("reviewTable").innerHTML = `<tr><td colspan="${colSpan}" class="muted" style="text-align:center;height:90px">暂无符合条件的数据</td></tr>`;
+        renderCurrencyStats();
+        document.getElementById("pendingCount").textContent = "0";
+        return;
+      }
+      document.getElementById("reviewTable").innerHTML = visibleRecords.map(record => `
+        <tr>
+          <td>${record.time}</td>
+          <td>${record.merchant}</td>
+          <td>${record.merchantName}</td>
+          <td>${record.username}</td>
+          <td>${record.userId}</td>
+          <td class="money">${money(record.rmbAmount)} RMB</td>
+          <td class="money">${foreignText(record)}</td>
+          <td>${rateText(record)}</td>
+          <td class="money">${money(record.balanceBefore)} RMB</td>
+          <td class="money">${money(record.balanceAfter)} RMB</td>
+          <td><span class="status ${statusClass(record.status)}">${record.status}</span></td>
+          <td class="muted">${record.remark}</td>
+          ${activeTab === "pending" ? `<td><button class="audit-btn" data-audit="${record.id}">审核</button></td>` : ""}
+        </tr>
+      `).join("");
+      document.getElementById("pendingCount").textContent = String(visibleRecords.length);
+      renderCurrencyStats();
+    }
+
+    function openAuditModal(record) {
+      currentRecord = record;
+      document.getElementById("modalUser").textContent = `${record.username} / ${record.userId}`;
+      document.getElementById("modalAmount").textContent = foreignText(record);
+      document.getElementById("modalRate").textContent = rateText(record);
+      document.getElementById("modalRmb").textContent = `${money(record.rmbAmount)} RMB`;
+      document.querySelector("input[name='auditResult'][value='pass']").checked = true;
+      document.getElementById("rejectReason").value = "";
+      document.getElementById("rejectReasonWrap").classList.remove("show");
+      document.getElementById("auditModal").classList.add("show");
+    }
+
+    function closeAuditModal() {
+      document.getElementById("auditModal").classList.remove("show");
+    }
+
+    function applyFilters() {
+      const merchant = document.getElementById("filterMerchant").value.trim();
+      const userId = document.getElementById("filterUserId").value.trim();
+      const username = document.getElementById("filterUserName").value.trim();
+      const coin = document.getElementById("filterCoin").value;
+      const status = document.getElementById("filterStatus").value;
+      const startTime = document.getElementById("startTime").value;
+      const endTime = document.getElementById("endTime").value;
+      visibleRecords = records.filter(record => {
+        const recordTime = new Date(record.time.replace(" ", "T")).getTime();
+        const startOk = !startTime || recordTime >= new Date(startTime).getTime();
+        const endOk = !endTime || recordTime <= new Date(endTime).getTime();
+        const tabOk = activeTab === "pending" ? record.status === "待审核" : record.status !== "待审核";
+        return tabOk &&
+          (!merchant || record.merchant.includes(merchant) || record.merchantName.includes(merchant)) &&
+          (!userId || record.userId.includes(userId)) &&
+          (!username || record.username.includes(username)) &&
+          (!coin || record.coin === coin) &&
+          (activeTab === "pending" || !status || record.status === status) &&
+          startOk &&
+          endOk;
+      });
+      renderTable();
+    }
+
+    function clearFilters() {
+      ["filterMerchant", "filterUserId", "filterUserName", "startTime", "endTime"].forEach(id => document.getElementById(id).value = "");
+      document.getElementById("filterCoin").value = "";
+      document.getElementById("filterStatus").value = "";
+    }
+
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      resetRecordState();
+      clearFilters();
+      activeTab = "pending";
+      applyFilters();
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("app").style.display = "flex";
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      document.getElementById("app").style.display = "none";
+      document.getElementById("loginScreen").style.display = "grid";
+    });
+
+    document.addEventListener("click", event => {
+      const auditButton = event.target.closest("[data-audit]");
+      if (auditButton) openAuditModal(records.find(record => record.id === auditButton.dataset.audit));
+      if (event.target.id === "auditModal") closeAuditModal();
+    });
+
+    document.querySelectorAll("[data-review-tab]").forEach(button => {
+      button.addEventListener("click", () => {
+        activeTab = button.dataset.reviewTab;
+        applyFilters();
+      });
+    });
+
+    document.querySelectorAll("input[name='auditResult']").forEach(input => {
+      input.addEventListener("change", () => {
+        document.getElementById("rejectReasonWrap").classList.toggle("show", input.value === "reject" && input.checked);
+      });
+    });
+
+    document.getElementById("closeModal").addEventListener("click", closeAuditModal);
+    document.getElementById("cancelAudit").addEventListener("click", closeAuditModal);
+    document.getElementById("confirmAudit").addEventListener("click", () => {
+      const result = document.querySelector("input[name='auditResult']:checked").value;
+      const reason = document.getElementById("rejectReason").value;
+      if (result === "reject" && !reason) {
+        showToast("请选择拒绝理由");
+        return;
+      }
+      currentRecord.status = result === "pass" ? "审核通过" : "审核拒绝";
+      currentRecord.remark = result === "pass" ? "审核通过" : reason;
+      currentRecord.reviewedAt = new Date().toLocaleString("zh-CN", { hour12: false });
+      closeAuditModal();
+      applyFilters();
+      showToast(result === "pass" ? "已记录审核通过" : "已记录审核拒绝");
+    });
+
+    document.getElementById("searchBtn").addEventListener("click", applyFilters);
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      clearFilters();
+      applyFilters();
+      showToast("筛选已重置");
+    });
+
+    applyFilters();
+  </script>
+</body>
+</html>
