@@ -505,10 +505,15 @@
       border-radius: 24px;
       box-shadow: var(--shadow);
       position: relative;
-      touch-action: pan-y;
+      touch-action: none;
       will-change: transform, opacity;
       transition: transform .24s ease, opacity .24s ease;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
     .match-card.dragging {
       transition: none;
@@ -2256,38 +2261,73 @@
       let startX = 0;
       let startY = 0;
       let dx = 0;
+      let activePointerId = null;
+      let gesture = 'idle';
       let dragging = false;
+      let frame = 0;
+
+      function resetDragState() {
+        dragging = false;
+        activePointerId = null;
+        gesture = 'idle';
+        dx = 0;
+        if (frame) cancelAnimationFrame(frame);
+        frame = 0;
+        document.getElementById('match').style.overflowY = '';
+        card.classList.remove('dragging');
+      }
+
+      function applyDragTransform() {
+        frame = 0;
+        const rotate = Math.max(-12, Math.min(12, dx / 16));
+        card.style.transform = `translate3d(${dx}px, 0, 0) rotate(${rotate}deg)`;
+        card.classList.toggle('show-like', dx > 35);
+        card.classList.toggle('show-nope', dx < -35);
+      }
 
       card.addEventListener('pointerdown', event => {
+        if (event.target.closest('button, a, input, textarea, select')) return;
         if (isSwiping) return;
         dragging = true;
+        activePointerId = event.pointerId;
+        gesture = 'pending';
         startX = event.clientX;
         startY = event.clientY;
         dx = 0;
-        card.setPointerCapture(event.pointerId);
-        card.classList.add('dragging');
       });
 
       card.addEventListener('pointermove', event => {
         if (!dragging || isSwiping) return;
+        if (activePointerId !== event.pointerId) return;
         dx = event.clientX - startX;
         const dy = event.clientY - startY;
-        if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+        if (gesture === 'pending') {
+          if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+          if (Math.abs(dy) > Math.abs(dx) * 1.15) {
+            resetDragState();
+            return;
+          }
+          gesture = 'horizontal';
+          suppressMatchClick = true;
+          document.getElementById('match').style.overflowY = 'hidden';
+          try { card.setPointerCapture(event.pointerId); } catch {}
+          card.classList.add('dragging');
+        }
+        if (gesture !== 'horizontal') return;
+        event.preventDefault();
         suppressMatchClick = true;
-        const rotate = Math.max(-12, Math.min(12, dx / 16));
-        card.style.transform = `translateX(${dx}px) rotate(${rotate}deg)`;
-        card.classList.toggle('show-like', dx > 35);
-        card.classList.toggle('show-nope', dx < -35);
-      });
+        if (!frame) frame = requestAnimationFrame(applyDragTransform);
+      }, { passive: false });
 
       card.addEventListener('pointerup', event => {
         if (!dragging) return;
-        dragging = false;
-        card.classList.remove('dragging');
+        const shouldSwipe = gesture === 'horizontal' && Math.abs(dx) > 92;
+        const swipeDirection = dx > 0 ? 'right' : 'left';
         try { card.releasePointerCapture(event.pointerId); } catch {}
-        if (Math.abs(dx) > 92) {
+        resetDragState();
+        if (shouldSwipe) {
           card.style.transform = '';
-          swipeCaregiver(dx > 0 ? 'right' : 'left');
+          swipeCaregiver(swipeDirection);
           return;
         }
         card.style.transform = '';
@@ -2296,7 +2336,7 @@
       });
 
       card.addEventListener('pointercancel', () => {
-        dragging = false;
+        resetDragState();
         card.classList.remove('dragging', 'show-like', 'show-nope');
         card.style.transform = '';
         window.setTimeout(() => { suppressMatchClick = false; }, 80);
