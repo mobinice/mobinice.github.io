@@ -1,0 +1,2463 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Copaws 飼主端 Demo Prototype</title>
+  <style>
+    :root {
+      --green: #0b6b3a;
+      --green-2: #6f8c72;
+      --green-soft: #e8f5e9;
+      --clay: #d45a3f;
+      --cream: #fffaf1;
+      --paper: #fffdf8;
+      --line: #e5d9c8;
+      --muted: #89837a;
+      --ink: #25211e;
+      --shadow: 0 18px 40px rgba(30, 47, 33, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 20% 12%, rgba(11, 107, 58, .14), transparent 28%),
+        radial-gradient(circle at 80% 90%, rgba(212, 90, 63, .12), transparent 26%),
+        #e9eee7;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", sans-serif;
+    }
+
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; border: 0; background: transparent; }
+
+    .phone {
+      width: 428px;
+      height: 939px;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(145deg, rgba(235, 249, 238, .95), rgba(255, 249, 235, .98) 68%),
+        var(--cream);
+      box-shadow: 0 26px 90px rgba(25, 36, 28, .28);
+    }
+
+    .status-bar {
+      height: 42px;
+      padding: 14px 30px 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      font-weight: 800;
+      font-size: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .battery {
+      width: 27px;
+      height: 12px;
+      margin-top: 5px;
+      border-radius: 4px;
+      background: #211f1d;
+      position: relative;
+    }
+    .battery::after {
+      content: "";
+      position: absolute;
+      right: -4px;
+      top: 3px;
+      width: 2px;
+      height: 6px;
+      border-radius: 2px;
+      background: #211f1d;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      padding: 0 24px 116px;
+      opacity: 0;
+      transform: translateX(18px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      scrollbar-width: none;
+      background:
+        radial-gradient(circle at -10% 23%, rgba(140, 204, 158, .34) 0 72px, transparent 73px),
+        radial-gradient(circle at 106% 74%, rgba(234, 165, 95, .35) 0 72px, transparent 73px);
+      background-repeat: no-repeat;
+    }
+    .screen::-webkit-scrollbar { display: none; }
+    .screen.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+    .screen.no-nav { padding-bottom: 40px; }
+    .screen.long { padding-bottom: 122px; }
+
+    .screen-title {
+      margin: 10px 0 4px;
+      font-size: 29px;
+      line-height: 1.12;
+      letter-spacing: 0;
+      font-weight: 900;
+    }
+    .screen-back {
+      width: 38px;
+      height: 38px;
+      margin: 2px 0 8px -8px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--green);
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid var(--line);
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .subtitle {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .logo {
+      width: 156px;
+      display: block;
+      margin: 40px auto 18px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, .92);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel { padding: 24px; }
+
+    .input, .textarea, .select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink);
+      padding: 15px 16px;
+      outline: 0;
+    }
+    .input:focus, .textarea:focus, .select:focus {
+      border-color: rgba(11, 107, 58, .5);
+      box-shadow: 0 0 0 4px rgba(11, 107, 58, .08);
+    }
+    .textarea { min-height: 98px; resize: none; }
+    .select {
+      height: 42px;
+      padding: 0 38px 0 14px;
+      appearance: none;
+      background:
+        linear-gradient(45deg, transparent 50%, var(--green) 50%) calc(100% - 18px) 18px / 6px 6px no-repeat,
+        linear-gradient(135deg, var(--green) 50%, transparent 50%) calc(100% - 12px) 18px / 6px 6px no-repeat,
+        rgba(255, 255, 255, .9);
+      font-size: 13px;
+    }
+
+    .field { margin-top: 14px; }
+    .field label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin: 0 0 8px 2px;
+    }
+    .register-logo {
+      width: 100px;
+      height: 76px;
+      object-fit: contain;
+      display: block;
+      margin: 12px auto 10px;
+    }
+    .register-card {
+      margin-top: 26px;
+      padding: 24px;
+      border-radius: 28px;
+      box-shadow: none;
+    }
+    .register-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 12px;
+    }
+    .register-grid .field { margin-top: 0; }
+    .field.span-2 { grid-column: 1 / -1; }
+    .register-grid .input,
+    .register-grid .select {
+      height: 42px;
+      border-radius: 13px;
+      padding: 0 14px;
+      font-size: 13px;
+    }
+    .register-grid .select { padding-right: 34px; }
+    .register-grid .chips { gap: 8px; }
+    .register-grid .chip {
+      min-width: 68px;
+      height: 34px;
+      font-size: 12px;
+    }
+    .terms-list {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .terms-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .terms-row input {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      border: 1px solid var(--green);
+      background: #fff;
+      position: relative;
+      flex: 0 0 auto;
+    }
+    .terms-row input:checked::after {
+      content: "✓";
+      position: absolute;
+      inset: -3px 0 0;
+      color: var(--green);
+      text-align: center;
+      font-size: 17px;
+      font-weight: 900;
+    }
+    .register-submit { margin-top: 28px; height: 54px; border-radius: 16px; }
+
+    .btn {
+      min-height: 48px;
+      border-radius: 18px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 900;
+      color: #fff;
+      background: var(--green);
+      transition: transform .15s ease, opacity .15s ease;
+    }
+    .btn:active { transform: scale(.98); }
+    .btn.full { width: 100%; }
+    .btn.light {
+      color: var(--green);
+      background: #fff;
+      border: 1px solid rgba(11, 107, 58, .42);
+    }
+    .btn.clay { background: var(--clay); }
+    .btn.disabled {
+      background: #e2ddd2;
+      color: #918a80;
+      cursor: default;
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 14px 0 18px;
+    }
+    .role {
+      min-height: 92px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--paper);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: var(--muted);
+      text-align: left;
+    }
+    .role.active {
+      color: var(--green);
+      border-color: rgba(11, 107, 58, .55);
+      background: var(--green-soft);
+    }
+    .role strong { font-size: 16px; color: var(--ink); }
+
+    .login-screen {
+      padding-left: 36px;
+      padding-right: 36px;
+    }
+    .login-logo {
+      width: 154px;
+      display: block;
+      margin: 18px auto 12px;
+    }
+    .login-hero {
+      text-align: center;
+      margin-bottom: 42px;
+    }
+    .login-hero h1 {
+      margin: 0;
+      font-size: 23px;
+      line-height: 1.18;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+    .login-hero p {
+      width: 250px;
+      margin: 24px auto 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+      font-weight: 700;
+    }
+    .login-card {
+      padding: 26px 24px 18px;
+      border-radius: 22px;
+      box-shadow: 0 16px 38px rgba(43, 54, 38, .08);
+    }
+    .login-card label {
+      display: block;
+      margin-bottom: 10px;
+      color: #6f6a61;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .login-role-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .login-role {
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: #8a837a;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .login-role.active {
+      color: #fff;
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .login-input {
+      height: 52px;
+      border-radius: 16px;
+      padding: 0 18px;
+      font-size: 15px;
+    }
+    .login-submit {
+      height: 54px;
+      margin-top: 20px;
+      border-radius: 16px;
+    }
+    .login-test-note {
+      margin: 10px 0 0;
+      text-align: center;
+      color: #b2aaa0;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .otp-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 11px;
+      margin: 52px 0 46px;
+    }
+    .otp-box {
+      width: 48px;
+      height: 58px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      color: var(--green);
+      font-weight: 900;
+      font-size: 22px;
+      line-height: 1;
+    }
+    .otp-screen {
+      padding-left: 37px;
+      padding-right: 37px;
+      text-align: center;
+    }
+    .otp-logo {
+      width: 144px;
+      height: 178px;
+      object-fit: contain;
+      display: block;
+      margin: 20px auto -8px;
+    }
+    .otp-screen .screen-title {
+      margin: 0 auto 10px;
+      width: 336px;
+      font-size: 30px;
+      line-height: 1.25;
+      text-align: center;
+    }
+    .otp-screen .subtitle {
+      width: 320px;
+      margin: 0 auto;
+      font-size: 14px;
+      line-height: 1.3;
+      text-align: center;
+    }
+    .otp-submit {
+      width: 324px;
+      height: 54px;
+      border-radius: 16px;
+      margin: 0 auto;
+    }
+    .otp-resend {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .chips {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin: 18px 0;
+      scrollbar-width: none;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      min-width: max-content;
+      height: 34px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .9);
+      color: #7d756b;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .chip.active {
+      color: #fff;
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .match-head {
+      position: relative;
+      padding-right: 58px;
+    }
+    .favorite-entry {
+      position: absolute;
+      right: 0;
+      top: 16px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: transparent;
+      border: 0;
+      color: var(--green);
+      display: grid;
+      place-items: center;
+      box-shadow: none;
+    }
+    .favorite-entry svg { width: 26px; height: 26px; filter: drop-shadow(0 4px 8px rgba(54, 44, 28, .12)); }
+    .favorite-count {
+      position: absolute;
+      right: -9px;
+      top: -10px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: var(--clay);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .match-card {
+      min-height: 548px;
+      padding: 24px;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      touch-action: pan-y;
+      will-change: transform, opacity;
+      transition: transform .24s ease, opacity .24s ease;
+      user-select: none;
+    }
+    .match-card.dragging {
+      transition: none;
+      cursor: grabbing;
+    }
+    .match-card.swipe-left {
+      transform: translateX(-460px) rotate(-18deg);
+      opacity: 0;
+    }
+    .match-card.swipe-right {
+      transform: translateX(460px) rotate(18deg);
+      opacity: 0;
+    }
+    .swipe-stamp {
+      position: absolute;
+      top: 36px;
+      z-index: 5;
+      padding: 8px 14px;
+      border: 3px solid currentColor;
+      border-radius: 12px;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      opacity: 0;
+      transform: rotate(-12deg);
+      pointer-events: none;
+    }
+    .swipe-stamp.like { left: 36px; color: var(--green); }
+    .swipe-stamp.nope { right: 36px; color: var(--clay); transform: rotate(12deg); }
+    .match-card.show-like .swipe-stamp.like,
+    .match-card.show-nope .swipe-stamp.nope { opacity: .92; }
+    .match-card.resetting {
+      animation: cardIn .22s ease;
+    }
+    @keyframes cardIn {
+      from { transform: translateY(16px) scale(.98); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .photo-hero {
+      height: 246px;
+      border-radius: 22px;
+      background: #739079;
+      position: relative;
+      overflow: hidden;
+    }
+    .pet-shape::before {
+      content: "";
+      position: absolute;
+      left: 84px;
+      top: 104px;
+      width: 180px;
+      height: 76px;
+      border-radius: 24px;
+      background: #f7eed8;
+    }
+    .pet-shape::after {
+      content: "";
+      position: absolute;
+      left: 124px;
+      top: 44px;
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      background: #f7eed8;
+    }
+    .pet-dot {
+      position: absolute;
+      right: 60px;
+      bottom: 70px;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: #efb53e;
+    }
+    .hot {
+      position: absolute;
+      right: 22px;
+      top: 22px;
+      height: 30px;
+      padding: 0 18px;
+      border-radius: 999px;
+      color: #fff;
+      background: #d56850;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .verified-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-grid;
+      place-items: center;
+      color: #fff;
+      flex: 0 0 auto;
+    }
+    .verified-icon svg, .nav-icon svg, .circle-action svg { width: 20px; height: 20px; }
+
+    .stars { color: #e8a72c; letter-spacing: 1px; font-size: 13px; }
+    .meta { color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .match-name-row {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+    }
+    .match-name-row h2, .detail-card h2 { margin: 0; font-size: 30px; line-height: 1; }
+    .distance { color: var(--green); font-size: 13px; font-weight: 900; }
+    .nearest {
+      margin-top: 20px;
+      padding: 16px 22px;
+      border-radius: 18px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-weight: 900;
+    }
+    .nearest span { display: block; margin-top: 5px; color: #2d372f; font-size: 13px; font-weight: 600; }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 34px;
+      padding: 22px 52px 0;
+    }
+    .circle-action {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--green);
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 10px 22px rgba(54, 44, 28, .08);
+      font-weight: 900;
+      justify-self: center;
+    }
+    .circle-action.primary { background: var(--green); color: #fff; border-color: var(--green); }
+
+    .bottom-nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 92px;
+      background: rgba(255, 255, 255, .96);
+      border-top: 1px solid var(--line);
+      display: none;
+      grid-template-columns: repeat(4, 1fr);
+      z-index: 50;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #8b847a;
+      font-size: 12px;
+      font-weight: 900;
+      position: relative;
+    }
+    .nav-item.active { color: var(--green); }
+    .nav-item.active::after {
+      content: "";
+      position: absolute;
+      bottom: 12px;
+      width: 8px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--green);
+    }
+    .nav-icon {
+      width: 29px;
+      height: 29px;
+      display: grid;
+      place-items: center;
+    }
+    .nav-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid var(--line);
+    }
+
+    .map-canvas {
+      height: 430px;
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(30deg, transparent 48%, rgba(255,255,255,.55) 49%, rgba(255,255,255,.55) 51%, transparent 52%) 0 0 / 80px 80px,
+        linear-gradient(120deg, transparent 48%, rgba(255,255,255,.55) 49%, rgba(255,255,255,.55) 51%, transparent 52%) 0 0 / 90px 90px,
+        #dcebd8;
+    }
+    .pin {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border-radius: 50% 50% 50% 8px;
+      transform: rotate(-45deg);
+      background: var(--green);
+      box-shadow: 0 12px 24px rgba(0,0,0,.12);
+    }
+    .pin::after {
+      content: "";
+      position: absolute;
+      inset: 11px;
+      border-radius: 50%;
+      background: #fff;
+    }
+    .pin.a { left: 210px; top: 126px; }
+    .pin.b { left: 96px; top: 230px; background: var(--clay); }
+    .pin.c { left: 300px; top: 286px; background: #efb53e; }
+    .map-person {
+      position: absolute;
+      width: 52px;
+      height: 52px;
+      border-radius: 20px;
+      border: 3px solid #fff;
+      box-shadow: 0 14px 26px rgba(28, 42, 32, .18);
+      background:
+        radial-gradient(circle at 68% 70%, #efb53e 0 18%, transparent 19%),
+        linear-gradient(145deg, #739079, #5d7962);
+      display: grid;
+      place-items: center;
+    }
+    .map-person::before {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #f7eed8;
+      box-shadow: 0 18px 0 6px #f7eed8;
+      transform: translateY(-6px);
+    }
+    .map-person.active {
+      outline: 3px solid rgba(11, 107, 58, .28);
+      transform: translateY(-3px);
+    }
+    .map-person.p1 { left: 210px; top: 92px; }
+    .map-person.p2 { left: 82px; top: 182px; background: radial-gradient(circle at 70% 70%, #d45a3f 0 18%, transparent 19%), linear-gradient(145deg, #8d9b7b, #6f8067); }
+    .map-person.p3 { left: 288px; top: 244px; background: radial-gradient(circle at 70% 70%, #efb53e 0 18%, transparent 19%), linear-gradient(145deg, #6f8c72, #506a55); }
+    .map-person.p4 { left: 156px; top: 300px; width: 44px; height: 44px; opacity: .9; }
+    .near-card {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 24px;
+      padding: 16px;
+      background: rgba(255, 255, 255, .94);
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .near-card strong, .near-card p { pointer-events: none; }
+    .near-list-card {
+      padding: 18px 22px;
+      margin-top: 14px;
+      box-shadow: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: left;
+      width: 100%;
+    }
+    .near-list-card small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .map-ranking-card {
+      margin-top: 14px;
+      padding: 18px 22px 22px;
+      border-radius: 18px;
+      box-shadow: none;
+    }
+    .map-ranking-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .map-ranking-head h3 {
+      margin: 0 0 4px;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+    .map-ranking-head .meta { margin: 0; font-size: 12px; }
+    .map-list {
+      display: grid;
+      gap: 0;
+    }
+    .map-caregiver-row {
+      width: 100%;
+      min-height: 52px;
+      padding: 7px 0;
+      display: grid;
+      grid-template-columns: 42px 40px minmax(0, 1fr) 54px;
+      column-gap: 10px;
+      align-items: center;
+      text-align: left;
+      border-top: 1px solid rgba(229, 217, 200, .75);
+    }
+    .map-caregiver-row:first-child { border-top: 0; }
+    .map-rank {
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 900;
+      width: 42px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .mini-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 15px;
+      background:
+        radial-gradient(circle at 68% 70%, #efb53e 0 18%, transparent 19%),
+        linear-gradient(145deg, #739079, #5d7962);
+    }
+    .map-caregiver-row strong {
+      display: block;
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.25;
+    }
+    .map-caregiver-row small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.35;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .map-distance {
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+      text-align: right;
+    }
+    .map-more-row {
+      width: 100%;
+      min-height: 52px;
+      margin-top: 8px;
+      border-radius: 16px;
+      border-top: 1px solid rgba(229, 217, 200, .75);
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+    }
+    .map-expanded-list {
+      margin-top: 14px;
+      padding: 18px 18px 24px;
+      border-radius: 22px;
+      box-shadow: none;
+      display: none;
+    }
+    .map-expanded-list.show { display: block; }
+    .map-list-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .map-list-toolbar h3 { margin: 0; font-size: 18px; }
+    .map-list-toolbar .meta { margin: 2px 0 0; font-size: 11px; }
+    .map-pagination {
+      display: grid;
+      grid-template-columns: 42px 72px 42px;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 14px;
+    }
+    .page-btn {
+      width: 38px;
+      height: 34px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--green);
+      font-weight: 900;
+    }
+    .page-btn:disabled {
+      opacity: .4;
+      cursor: default;
+    }
+    .page-indicator {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 68% 68%, #efb53e 0 20%, transparent 21%),
+        linear-gradient(145deg, #739079, #5c775f);
+      flex: 0 0 auto;
+    }
+
+    .detail-hero {
+      margin: 0 -24px 0;
+      height: 286px;
+      background: #526b55;
+      border-radius: 0 0 28px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .back {
+      position: absolute;
+      left: 18px;
+      top: 34px;
+      width: 44px;
+      height: 44px;
+      color: #fff;
+      font-size: 32px;
+      font-weight: 800;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      line-height: 1;
+    }
+    .heart-float {
+      position: absolute;
+      right: 28px;
+      top: 34px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--green);
+      display: grid;
+      place-items: center;
+      z-index: 2;
+      transition: background .18s ease, color .18s ease, transform .18s ease;
+    }
+    .heart-float.active {
+      background: var(--green);
+      color: #fff;
+      transform: scale(1.04);
+    }
+    .detail-card {
+      margin: -18px -24px 0;
+      padding: 34px 28px 92px;
+      min-height: 590px;
+      border-radius: 28px 28px 0 0;
+      background: #fff;
+      position: relative;
+    }
+    .detail-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-right: 56px;
+    }
+    .detail-title-row .verified-icon {
+      width: 30px;
+      height: 30px;
+    }
+    .detail-title-row .verified-icon svg { width: 18px; height: 18px; }
+    .caregiver-photo::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 84px;
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      background: #f7eed8;
+      transform: translateX(-50%);
+    }
+    .caregiver-photo::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 174px;
+      width: 170px;
+      height: 54px;
+      border-radius: 999px 999px 34px 34px;
+      background: #f7eed8;
+      transform: translateX(-50%);
+    }
+    .caregiver-photo .pet-dot {
+      right: 108px;
+      bottom: 76px;
+      width: 56px;
+      height: 56px;
+      z-index: 1;
+    }
+    .tag-row { display: flex; gap: 10px; margin: 14px 0 24px; }
+    .tag {
+      height: 32px;
+      padding: 0 20px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: #7d756b;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .tag.active { background: #fff; color: #7d756b; border-color: var(--line); }
+    .tag {
+      pointer-events: none;
+    }
+
+    .month-card {
+      margin-top: 24px;
+      padding: 22px 20px 24px;
+      border-radius: 28px;
+      box-shadow: none;
+    }
+    .month-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .month-head strong {
+      font-size: 22px;
+      font-weight: 900;
+    }
+    .month-next {
+      color: var(--green);
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .weekday-grid,
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      justify-items: center;
+      gap: 9px 18px;
+    }
+    .weekday-grid {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 14px;
+    }
+    .date {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: #fff;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .date.available {
+      color: var(--green);
+      border-color: var(--green);
+      background: var(--green-soft);
+    }
+    .date.active {
+      color: #fff;
+      border-color: var(--green);
+      background: var(--green);
+    }
+    .slot-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 14px;
+    }
+    .slot {
+      min-height: 48px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: #fff;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: #7d756b;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    .slot small { display: block; margin-top: -1px; font-size: 9px; font-weight: 900; color: var(--clay); }
+    .slot.active { background: var(--green); border-color: var(--green); color: #fff; }
+    .slot.active small { display: none; }
+    .slot.disabled { background: #f0ebe0; color: #857d6e; }
+    .slot-note {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .caregiver-mini {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      margin-top: 14px;
+    }
+    .caregiver-mini h3 { margin: 0 0 4px; }
+    #time .caregiver-mini {
+      height: 74px;
+      margin-top: 20px;
+      border-radius: 22px;
+      box-shadow: none;
+    }
+    #time .screen-back {
+      position: absolute;
+      left: 20px;
+      top: 48px;
+      z-index: 12;
+      margin: 0;
+    }
+    #time .screen-title,
+    #time .subtitle {
+      margin-left: 34px;
+    }
+    .need-summary {
+      padding: 18px 24px;
+      border-radius: 20px;
+      background: #fefbf4;
+      box-shadow: none;
+    }
+    .favorites-summary {
+      padding: 14px 18px;
+      border-radius: 18px;
+      margin: 14px 0 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: none;
+    }
+    .favorite-card {
+      padding: 24px;
+      border-radius: 24px;
+      box-shadow: none;
+      margin-bottom: 18px;
+    }
+    .favorite-card-main {
+      display: grid;
+      grid-template-columns: 104px 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+    .favorite-photo {
+      width: 104px;
+      height: 104px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 72% 70%, #efb53e 0 16%, transparent 17%),
+        linear-gradient(145deg, #739079, #5d7962);
+      position: relative;
+      overflow: hidden;
+    }
+    .favorite-photo::before {
+      content: "";
+      position: absolute;
+      left: 24px;
+      top: 50px;
+      width: 58px;
+      height: 30px;
+      border-radius: 14px;
+      background: #f7eed8;
+    }
+    .favorite-photo::after {
+      content: "";
+      position: absolute;
+      left: 42px;
+      top: 30px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #f7eed8;
+    }
+    .favorite-badge {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 900;
+      margin-top: 12px;
+    }
+    .favorite-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .favorite-actions .btn {
+      min-height: 42px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    .summary-card {
+      padding: 18px;
+      margin-top: 14px;
+    }
+    .money-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-weight: 800;
+      padding: 5px 0;
+    }
+    .money-row.total {
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      color: var(--green);
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .book-card {
+      padding: 18px 24px;
+      min-height: 154px;
+      margin-top: 12px;
+      box-shadow: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .book-card.hidden {
+      display: none;
+    }
+    .book-card .status { font-size: 13px; font-weight: 900; color: var(--green); }
+    .book-card h3 { margin: 14px 0 6px; font-size: 21px; }
+    .book-actions {
+      display: flex;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .book-actions .btn {
+      min-height: 34px;
+      width: 116px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+    .booking-empty {
+      display: none;
+      padding: 34px 24px;
+      margin-top: 16px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .booking-empty.show { display: block; }
+
+    .profile-card {
+      height: 132px;
+      margin-top: 28px;
+      padding: 28px 24px;
+      position: relative;
+      display: grid;
+      grid-template-columns: 88px 1fr;
+      gap: 20px;
+      align-items: center;
+    }
+    .upload-btn {
+      width: 88px;
+      height: 44px;
+      border-radius: 16px;
+      border: 1px solid var(--green);
+      color: var(--green);
+      background: var(--green-soft);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.15;
+    }
+    .profile-card h2 { margin: 0 0 5px; font-size: 27px; }
+    .cert-icons {
+      position: absolute;
+      right: 44px;
+      top: 14px;
+      display: flex;
+      gap: 10px;
+    }
+    .cert-icons .verified-icon { width: 32px; height: 32px; }
+    .sitter-card {
+      margin-top: 30px;
+      padding: 28px 24px;
+      color: #fff;
+      background: var(--green);
+      border-radius: 24px;
+    }
+    .sitter-card h2 { margin: 0 0 10px; font-size: 28px; }
+    .menu-list { margin-top: 30px; display: grid; gap: 16px; }
+    .menu-item {
+      min-height: 56px;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      font-weight: 900;
+    }
+    .menu-item > span:first-child {
+      text-align: left;
+    }
+    .menu-item small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .terms {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin: 16px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .terms input { margin-top: 3px; accent-color: var(--green); }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      bottom: 110px;
+      transform: translateX(-50%) translateY(18px);
+      min-width: 176px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(37, 33, 30, .9);
+      color: #fff;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .modal-layer {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(20, 31, 23, .38);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+    }
+    .modal-layer.show { display: flex; }
+    .modal {
+      width: 100%;
+      border-radius: 26px;
+      background: var(--paper);
+      border: 1px solid rgba(255,255,255,.7);
+      box-shadow: 0 28px 80px rgba(0,0,0,.22);
+      padding: 24px;
+      animation: modalIn .18s ease;
+    }
+    @keyframes modalIn {
+      from { transform: translateY(8px) scale(.98); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal h3 { margin: 0 0 6px; font-size: 23px; }
+    .modal p { color: var(--muted); line-height: 1.55; margin: 0 0 18px; }
+    .cert-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-top: 1px solid var(--line);
+    }
+    .cert-row:first-of-type { border-top: 0; }
+    .cert-row strong { display: block; }
+    .cert-row span { color: var(--muted); font-size: 12px; }
+    .report-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .report-item {
+      padding: 14px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    .report-item strong { display: block; margin-bottom: 4px; color: var(--ink); }
+    .contact-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .contact-actions .btn {
+      min-height: 42px;
+      border-radius: 16px;
+    }
+
+    @media (max-width: 460px) {
+      body { display: block; background: var(--cream); }
+      .phone { width: 100vw; height: 100vh; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone" aria-label="Copaws mobile demo">
+    <div class="toast" id="toast">已加入收藏</div>
+
+    <section class="screen no-nav active login-screen" id="login">
+      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
+      <img class="login-logo" src="assets/copaws-logo-word.png" alt="Copaws">
+      <div class="login-hero">
+        <h1>找到離家最近的安心照護者</h1>
+        <p>不在家時，快速媒合有經驗的養寵人，到家陪伴、餵食與回報。</p>
+      </div>
+      <div class="card login-card">
+        <label>選擇身份</label>
+        <div class="login-role-row">
+          <button class="login-role active">我是飼主</button>
+          <button class="login-role">我是照護者</button>
+        </div>
+        <label>手機號碼</label>
+        <input class="input login-input" value="0912 345 678">
+        <button class="btn full login-submit" data-go="otp">註冊並登入</button>
+        <p class="login-test-note">測試版會自動帶入驗證碼 123456</p>
+      </div>
+    </section>
+
+    <section class="screen no-nav otp-screen" id="otp">
+      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
+      <img class="otp-logo" src="assets/copaws-logo-word.png" alt="Copaws">
+      <h1 class="screen-title">輸入驗證碼</h1>
+      <p class="subtitle">已發送至 0912 345 678，測試版自動填入。</p>
+      <div class="otp-row" aria-label="驗證碼 123456">
+        <div class="otp-box">1</div><div class="otp-box">2</div><div class="otp-box">3</div>
+        <div class="otp-box">4</div><div class="otp-box">5</div><div class="otp-box">6</div>
+      </div>
+      <button class="btn otp-submit" data-go="register">完成驗證</button>
+      <p class="otp-resend" id="resendBtn">重新發送 60s</p>
+    </section>
+
+    <section class="screen no-nav long" id="register">
+      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
+      <img class="register-logo" src="assets/copaws-logo-word.png" alt="Copaws">
+      <h1 class="screen-title">建立基本資料</h1>
+      <p class="subtitle">讓照護者更了解你的需求，也方便平台媒合適合的人。</p>
+      <div class="card register-card">
+        <div class="register-grid">
+          <div class="field"><label>暱稱 *</label><input class="input" value="小安"></div>
+          <div class="field"><label>生日 *</label><input class="input" type="date" value="1992-08-12"></div>
+          <div class="field span-2"><label>通訊 Email</label><input class="input" value="hello@copaws.tw"></div>
+          <div class="field span-2"><label>通訊電話</label><input class="input" value="0912 345 678"></div>
+          <div class="field"><label>性別</label><select class="select"><option>請選擇</option><option>女</option><option>男</option><option>不透露</option></select></div>
+          <div class="field"><label>興趣</label><select class="select"><option>攝影、散步</option><option>寵物訓練</option><option>居家整理</option><option>戶外運動</option></select></div>
+          <div class="field span-2">
+            <label>喜歡的寵物類別</label>
+            <div class="chips" data-toggle-group="pet-types"><button class="chip" type="button">狗狗</button><button class="chip active" type="button">貓咪</button><button class="chip" type="button">爬蟲</button><button class="chip" type="button">其他</button></div>
+          </div>
+          <div class="field span-2"><label>喜歡的寵物品種</label><input class="input" value="英短、米克斯、柴犬"></div>
+          <div class="terms-list">
+            <label class="terms-row"><input type="checkbox" checked><span>我已閱讀並同意 服務條款</span></label>
+            <label class="terms-row"><input type="checkbox" checked><span>我已閱讀並同意 隱私條款</span></label>
+          </div>
+        </div>
+      </div>
+      <button class="btn full register-submit" data-go="match">註冊</button>
+    </section>
+
+    <section class="screen" id="match">
+      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
+      <div class="match-head">
+        <h1 class="screen-title">附近照護者</h1>
+        <p class="subtitle">右滑收藏，查看最近可預約時間</p>
+        <button class="favorite-entry" data-go="favorites" aria-label="查看收藏照護者">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg>
+          <span class="favorite-count" id="favoriteCount">1</span>
+        </button>
+      </div>
+      <div class="chips">
+        <button class="chip active" data-match-filter="city">台北市</button><button class="chip" data-match-filter="district">大安區</button><button class="chip" data-match-filter="today">今日可約</button><button class="chip" data-match-filter="pet">貓狗皆可</button>
+      </div>
+      <article class="card match-card" id="matchCard" data-go="detail">
+        <span class="swipe-stamp like">LIKE</span>
+        <span class="swipe-stamp nope">NOPE</span>
+        <div class="photo-hero pet-shape" id="matchPhoto">
+          <span class="verified-icon" style="position:absolute;left:18px;top:20px" aria-label="已實名認證">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m15.5 14.5 1.8 1.8 3.2-3.8" stroke="#0b6b3a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="hot" id="matchHot">本區熱門</span>
+          <span class="pet-dot"></span>
+        </div>
+        <div class="match-name-row">
+          <h2 id="matchName">Mina Chen</h2>
+          <span class="distance" id="matchDistance">距離 0.8 km</span>
+        </div>
+        <p class="meta"><span class="stars" id="matchStars">★★★★★</span>　<span id="matchRating">4.9 · 126 則評價 · 瀏覽 2,431</span></p>
+        <p class="meta" id="matchIntro">8 年養貓經驗，熟悉餵藥、陪玩與每日照片回報。今晚 19:00 後可預約。</p>
+        <div class="nearest">最近可預約 <span id="matchNearest">今天 19:00-21:00 · 明天 10:00-12:00</span></div>
+      </article>
+      <div class="action-row">
+        <button class="circle-action" onclick="swipeCaregiver('left')">×</button>
+        <button class="circle-action primary" onclick="swipeCaregiver('right')">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="circle-action" data-go="time">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="3" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="1.4" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <section class="screen" id="map">
+      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
+      <h1 class="screen-title">地圖探索</h1>
+      <p class="subtitle">看見離家最近、評價最穩的照護者</p>
+      <div class="map-canvas">
+        <button class="map-person p1 active" data-map-index="0" aria-label="Mina Chen"></button>
+        <button class="map-person p2" data-map-index="1" aria-label="小芸"></button>
+        <button class="map-person p3" data-map-index="2" aria-label="柏宇"></button>
+        <button class="map-person p4" data-map-index="0" aria-label="附近照護者"></button>
+        <button class="near-card" id="mapPreviewCard" data-go="detail" aria-label="查看照護者卡片">
+          <span class="avatar" id="mapPreviewAvatar"></span>
+          <div>
+            <strong id="mapPreviewName">Mina Chen · 0.8 km</strong>
+            <p class="meta" id="mapPreviewMeta" style="margin:4px 0 0"><span class="stars">★★★★★</span> 4.9 · 今日 19:00 可約</p>
+          </div>
+        </button>
+      </div>
+      <div class="card map-ranking-card">
+        <div class="map-ranking-head">
+          <div>
+            <h3 id="mapRankingTitle">附近 24 位照護者</h3>
+            <p class="meta">先顯示距離最近的 1-20 位，第 21 個位置可展開更多。</p>
+          </div>
+        </div>
+        <div class="map-list" id="mapTopList"></div>
+      </div>
+    </section>
+
+    <section class="screen" id="mapList">
+      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
+      <button class="screen-back" data-back aria-label="返回地圖">‹</button>
+      <h1 class="screen-title">附近照護者</h1>
+      <p class="subtitle">全部照護者依距離由近到遠排序，點擊卡片可查看資料與預約。</p>
+      <div class="card map-expanded-list show" id="mapExpandedList">
+        <div class="map-list-toolbar">
+          <div>
+            <h3>全部照護者</h3>
+            <p class="meta" id="mapPageSummary">第 1 頁</p>
+          </div>
+        </div>
+        <div class="map-list" id="mapPagedList"></div>
+        <div class="map-pagination">
+          <button class="page-btn" id="mapPrevPage" aria-label="上一頁">‹</button>
+          <span class="page-indicator" id="mapPageIndicator">1 / 2</span>
+          <button class="page-btn" id="mapNextPage" aria-label="下一頁">›</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="detail">
+      <div class="detail-hero caregiver-photo">
+        <button class="back" id="detailBack" data-back>‹</button>
+        <button class="heart-float" id="detailFavoriteButton" aria-label="收藏照護者" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+        <span class="pet-dot"></span>
+      </div>
+      <div class="detail-card">
+        <div class="detail-title-row">
+          <h2 id="detailName">Mina Chen</h2>
+          <span class="verified-icon" aria-label="已實名認證">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m15.5 14.5 1.8 1.8 3.2-3.8" stroke="#0b6b3a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </div>
+        <p class="meta"><span class="stars">★★★★★</span>　<span id="detailMeta">4.9 · 126 則評價 · 0.8 km</span></p>
+        <p class="meta" id="detailIntro">專長照顧貓咪與小型犬，可協助餵藥、清貓砂、散步、即時照片回報。</p>
+        <h3>照護經驗</h3>
+        <div class="tag-row"><span class="tag">8 年養貓</span><span class="tag">可餵藥</span><span class="tag">每日回報</span></div>
+        <h3>近期評價</h3>
+        <div class="summary-card card">
+          <p style="margin:0">「回報很即時，貓咪看起來很放鬆，下次出差會再預約。」<br><span class="meta">- Alice · 2 天前</span></p>
+        </div>
+        <button class="btn full" style="margin-top:68px" data-go="time">查看可預約時段</button>
+      </div>
+    </section>
+
+    <section class="screen" id="time">
+      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
+      <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
+      <h1 class="screen-title">選擇時段</h1>
+      <p class="subtitle">先確認照護者與日期，再填寫需求</p>
+      <div class="caregiver-mini card">
+        <span class="avatar"></span>
+        <div style="flex:1">
+          <h3 id="timeName">Mina Chen</h3>
+          <p class="meta" id="timeMeta" style="margin:0">4.9 · 126 則評價 · 距離 0.8 km</p>
+          <p class="meta" id="timeIntro" style="margin:2px 0 0;font-size:11px">到府照護 · 貓咪餵食、清砂、陪玩回報</p>
+        </div>
+        <span class="verified-icon" aria-label="已實名認證">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m15.5 14.5 1.8 1.8 3.2-3.8" stroke="#0b6b3a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </div>
+      <div class="card month-card">
+        <div class="month-head"><strong>2026 七月</strong><span class="month-next">›</span></div>
+        <div class="weekday-grid"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+        <div class="month-grid" aria-label="2026 七月可預約日期">
+          <button class="date" data-date="1">1</button><button class="date" data-date="2">2</button><button class="date" data-date="3">3</button><button class="date" data-date="4">4</button><button class="date" data-date="5">5</button><button class="date" data-date="6">6</button><button class="date" data-date="7">7</button>
+          <button class="date" data-date="8">8</button><button class="date" data-date="9">9</button><button class="date available" data-date="10">10</button><button class="date available" data-date="11">11</button><button class="date available" data-date="12">12</button><button class="date" data-date="13">13</button><button class="date" data-date="14">14</button>
+          <button class="date" data-date="15">15</button><button class="date active" data-date="16">16</button><button class="date" data-date="17">17</button><button class="date available" data-date="18">18</button><button class="date" data-date="19">19</button><button class="date" data-date="20">20</button><button class="date" data-date="21">21</button>
+          <button class="date available" data-date="22">22</button><button class="date" data-date="23">23</button><button class="date" data-date="24">24</button><button class="date" data-date="25">25</button><button class="date" data-date="26">26</button><button class="date" data-date="27">27</button><button class="date" data-date="28">28</button>
+          <button class="date" data-date="29">29</button><button class="date" data-date="30">30</button><button class="date" data-date="31">31</button><button class="date" data-date="32">32</button><button class="date" data-date="33">33</button><button class="date" data-date="34">34</button><button class="date" data-date="35">35</button>
+        </div>
+      </div>
+      <h3 id="slotTitle">7/16 可預約時段</h3>
+      <div class="slot-row" id="slotRow">
+        <button class="slot disabled" data-slot="10:00-12:00">10:00-12:00<small>已預約</small></button>
+        <button class="slot active" data-slot="14:00-16:00">14:00-16:00<small>已選擇</small></button>
+        <button class="slot" data-slot="19:00-21:00">19:00-21:00</button>
+      </div>
+      <p class="slot-note">灰色為已被預約，綠色為目前選取</p>
+      <div class="card need-summary">
+        <strong style="color:var(--green);font-size:13px">需求摘要</strong>
+        <p class="meta" style="margin:8px 0 0">貓咪餵食、清砂、陪玩 30 分鐘，完成後照片回報。</p>
+      </div>
+      <button class="btn full" style="margin-top:20px" data-go="demand">下一步：填寫需求</button>
+    </section>
+
+    <section class="screen" id="favorites">
+      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
+      <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
+      <h1 class="screen-title" style="margin-left:34px">收藏照護者</h1>
+      <p class="subtitle" style="margin-left:34px">剛剛收藏的照護員會集中在這裡。</p>
+      <div class="card favorites-summary">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--green)"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg>
+        <div><strong id="favoriteSummary">已收藏 1 位照護者</strong><p class="meta" style="margin:2px 0 0">點卡片可查看照護者資料與預約入口</p></div>
+      </div>
+      <div id="favoriteList"></div>
+    </section>
+
+    <section class="screen long" id="demand">
+      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
+      <h1 class="screen-title">填寫需求</h1>
+      <p class="subtitle">照護者確認後，平台會保留需求與付款紀錄。</p>
+      <div class="summary-card card">
+        <strong>Mina Chen · 7/16 14:00-16:00</strong>
+        <p class="meta" style="margin:6px 0 0">到府餵食、清砂、照片回報</p>
+      </div>
+      <div class="field"><label>服務地址</label><input class="input" value="台北市大安區和平東路一段 88 號"></div>
+      <div class="field"><label>寵物名稱</label><input class="input" value="麻糬"></div>
+      <div class="field"><label>需要協助事項</label><textarea class="textarea">餵乾糧與罐罐，清理貓砂，補水，陪玩 15 分鐘。</textarea></div>
+      <div class="field"><label>注意事項</label><textarea class="textarea">麻糬比較怕生，進門後先讓牠聞味道，不要直接抱牠。</textarea></div>
+      <div class="field"><label>回報需求</label><textarea class="textarea">完成餵食、清砂後各拍一張照片，離開前回報門窗狀態。</textarea></div>
+      <div class="field"><label>照護費</label><input class="input" id="careFee" value="200" inputmode="numeric"></div>
+      <div class="summary-card card">
+        <strong style="color:var(--green)">金額統計</strong>
+        <div class="money-row"><span>照護費</span><strong id="feeBase">NT$ 200</strong></div>
+        <div class="money-row"><span>平台服務費 10%</span><strong id="feeService">NT$ 20</strong></div>
+        <div class="money-row total"><span>總計</span><strong id="feeTotal">NT$ 220</strong></div>
+      </div>
+      <button class="btn full" style="margin-top:18px" data-go="bookings" onclick="toast('需求已送出')">送出需求</button>
+    </section>
+
+    <section class="screen" id="bookings">
+      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
+      <h1 class="screen-title">我的預約</h1>
+      <p class="subtitle">進行中服務會在這裡集中管理</p>
+      <div class="chips">
+        <button class="chip active" data-booking-filter="all">全部</button><button class="chip" data-booking-filter="pending">待服務</button><button class="chip" data-booking-filter="active">進行中</button><button class="chip" data-booking-filter="review">待評價</button>
+      </div>
+      <p class="subtitle" style="margin-top:-12px">待服務包含即將服務，可依狀態快速切換</p>
+      <article class="card book-card" data-booking-status="active">
+        <span class="status">進行中</span>
+        <h3>Mina Chen 到府照護</h3>
+        <p class="meta">服務中，每 30 分鐘回報照片與狀態。</p>
+        <div class="book-actions"><button class="btn" onclick="openBookingModal('report')">查看回報</button><button class="btn light" onclick="openBookingModal('contact')">聯絡照護者</button></div>
+      </article>
+      <article class="card book-card" data-booking-status="upcoming">
+        <span class="status" style="color:var(--clay)">即將服務</span>
+        <h3>小芸 · 到府餵食</h3>
+        <p class="meta">今天 18:30 開始，照護者已確認接案。</p>
+        <div class="book-actions"><button class="btn clay">查看詳情</button><button class="btn light" style="color:var(--clay);border-color:var(--clay)">提醒我</button></div>
+      </article>
+      <article class="card book-card" data-booking-status="pending">
+        <span class="status" style="color:var(--green-2)">待服務</span>
+        <h3>柏宇 · 散步陪伴</h3>
+        <p class="meta">明天 09:00 預約，等待服務開始。</p>
+        <div class="book-actions"><button class="btn" style="background:var(--green-2)">查看需求</button><button class="btn light" style="color:var(--green-2);border-color:var(--green-2)">修改</button></div>
+      </article>
+      <article class="card book-card" data-booking-status="review">
+        <span class="status" style="color:var(--clay)">待評價</span>
+        <h3>Nina · 到府陪伴</h3>
+        <p class="meta">撥款完成，留下評價後回寫熱門排序。</p>
+        <div class="book-actions"><button class="btn clay">留下評價</button></div>
+      </article>
+      <div class="card booking-empty" id="bookingEmpty">目前沒有符合篩選的預約。</div>
+    </section>
+
+    <section class="screen" id="profile">
+      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
+      <h1 class="screen-title">個人</h1>
+      <p class="subtitle">飼主與照護者都從這裡管理資料</p>
+      <div class="profile-card card">
+        <button class="upload-btn">上傳<br>大頭照</button>
+        <div><h2>小安</h2><p class="meta" style="margin:0">飼主帳號 · 手機已驗證</p></div>
+        <div class="cert-icons">
+          <button class="verified-icon" onclick="openCertModal('identity')" aria-label="查看實名認證">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m15.5 14.5 1.8 1.8 3.2-3.8" stroke="#0b6b3a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="verified-icon" onclick="openCertModal('phone')" aria-label="查看手機認證">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="8" y="3.5" width="8" height="17" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="sitter-card">
+        <h2>成為照護者</h2>
+        <p style="margin:0 0 18px;line-height:1.5">上傳身分證完成實名認證，建立服務區域、價格與可預約日曆。</p>
+        <button class="btn light">開始認證</button>
+      </div>
+      <div class="menu-list">
+        <button class="menu-item" onclick="openCertModal('all')"><span>認證狀態<small>查看實名與手機狀態</small></span><span>›</span></button>
+        <button class="menu-item"><span>我的毛孩<small>管理寵物資料與照護注意事項</small></span><span>›</span></button>
+        <button class="menu-item"><span>付款與收款<small>交易紀錄、撥款、發票資料</small></span><span>›</span></button>
+        <button class="menu-item"><span>品牌白標<small>未來可套用 A 品牌或自有品牌</small></span><span>›</span></button>
+      </div>
+    </section>
+
+    <nav class="bottom-nav" aria-label="底部導航">
+      <button class="nav-item" data-tab="match" data-go="match"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg></span><span>配對</span></button>
+      <button class="nav-item" data-tab="map" data-go="map"><img class="nav-logo" src="assets/copaws-logo-icon.png" alt=""><span>地圖</span></button>
+      <button class="nav-item" data-tab="bookings" data-go="bookings"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="3" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="1.4" fill="currentColor"/></svg></span><span>預約</span></button>
+      <button class="nav-item" data-tab="profile" data-go="profile"><span class="nav-icon"><svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><circle cx="8.5" cy="9.5" r="3"/><circle cx="13" cy="6.8" r="3"/><circle cx="19" cy="6.8" r="3"/><circle cx="23.5" cy="9.5" r="3"/><ellipse cx="16" cy="21.2" rx="7.2" ry="6.1"/></svg></span><span>個人</span></button>
+    </nav>
+
+    <div class="modal-layer" id="modalLayer" onclick="closeModal(event)">
+      <div class="modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+        <h3 id="modalTitle">認證提示</h3>
+        <p id="modalCopy">這是點擊認證 icon 後出現的提示彈窗。</p>
+        <div id="modalBody">
+        </div>
+        <button class="btn full" style="margin-top:18px" onclick="hideModal()">知道了</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const appScreens = Array.from(document.querySelectorAll('.screen'));
+    const nav = document.querySelector('.bottom-nav');
+    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+    const screensWithNav = new Set(['match', 'map', 'mapList', 'detail', 'time', 'demand', 'bookings', 'profile', 'favorites']);
+    const tabByScreen = { match: 'match', detail: 'match', time: 'bookings', demand: 'bookings', map: 'map', mapList: 'map', bookings: 'bookings', profile: 'profile', favorites: 'match' };
+    let currentScreen = 'login';
+    const backStack = [];
+    let resend = 60;
+    let resendTimer;
+    let caregiverIndex = 0;
+    let selectedCaregiverIndex = 0;
+    let selectedDate = '16';
+    let selectedSlot = '14:00-16:00';
+    const favoriteIndexes = new Set([0]);
+    let mapPage = 1;
+    const mapPageSize = 8;
+    let isSwiping = false;
+    let suppressMatchClick = false;
+    let lastMatchFilter = 'city';
+    const caregivers = [
+      {
+        name: 'Mina Chen',
+        distance: '距離 0.8 km',
+        rating: '4.9 · 126 則評價 · 瀏覽 2,431',
+        intro: '8 年養貓經驗，熟悉餵藥、陪玩與每日照片回報。今晚 19:00 後可預約。',
+        nearest: '今天 19:00-21:00 · 明天 10:00-12:00',
+        detail: '專長照顧貓咪與小型犬，可協助餵藥、清貓砂、散步、即時照片回報。',
+        timeIntro: '到府照護 · 貓咪餵食、清砂、陪玩回報',
+        hot: '本區熱門',
+        color: '#739079',
+        dot: '#efb53e',
+        filters: ['city', 'district', 'today', 'pet'],
+        focus: 'district'
+      },
+      {
+        name: '小芸',
+        distance: '距離 1.2 km',
+        rating: '4.8 · 88 則評價 · 瀏覽 1,902',
+        intro: '熟悉貓咪分離焦慮與餵藥，可協助清砂、補水、每日短影片回報。',
+        nearest: '今天 18:30-20:30 · 後天 09:00-11:00',
+        detail: '擅長照顧慢熟貓與分離焦慮毛孩，可提供短影片與用藥提醒。',
+        timeIntro: '到府照護 · 餵藥、清砂、短影片回報',
+        hot: '回覆很快',
+        color: '#8d9b7b',
+        dot: '#d45a3f',
+        filters: ['city', 'today'],
+        focus: 'today'
+      },
+      {
+        name: '柏宇',
+        distance: '距離 1.6 km',
+        rating: '4.7 · 64 則評價 · 瀏覽 1,284',
+        intro: '大型犬散步與陪伴經驗多，能回報路線、喝水與便便狀態。',
+        nearest: '明天 09:00-11:00 · 明天 17:00-19:00',
+        detail: '大型犬散步與陪伴經驗多，可協助回報路線、喝水與便便狀態。',
+        timeIntro: '散步陪伴 · 大型犬路線回報',
+        hot: '散步熱門',
+        color: '#6f8c72',
+        dot: '#efb53e',
+        filters: ['city', 'pet'],
+        focus: 'pet'
+      }
+    ];
+    const extraCaregiverNames = ['Nina Lin', '阿哲', '小雨', 'Emma Wu', '張維', 'Lulu', 'Sam Chen', '安琪', 'Kenji', '佩佩', 'Rita Huang', '阿峰', 'June', 'Leo Wang', '芯怡', 'Hana', '明軒', 'Coco', 'Ivy Lin', '小晴', 'Oliver'];
+    extraCaregiverNames.forEach((name, i) => {
+      const base = caregivers[i % 3];
+      const distanceValue = (1.9 + i * 0.23).toFixed(1);
+      const ratingValue = (4.9 - Math.min(i * 0.01, 0.35)).toFixed(1);
+      caregivers.push({
+        ...base,
+        name,
+        distance: `距離 ${distanceValue} km`,
+        rating: `${ratingValue} · ${72 + i * 7} 則評價 · 瀏覽 ${980 + i * 111}`,
+        intro: `${name} 可協助到府陪伴、餵食與照片回報，依距離排序目前為附近第 ${i + 4} 位。`,
+        nearest: i % 2 === 0 ? '今天 20:00-22:00 · 明天 10:00-12:00' : '明天 09:00-11:00 · 後天 18:00-20:00',
+        detail: `${name} 有穩定照護經驗，能依照飼主需求回報照片、用餐與居家狀態。`,
+        timeIntro: '到府照護 · 餵食、清潔、陪伴回報',
+        hot: i % 3 === 0 ? '近期熱門' : base.hot,
+        focus: 'city'
+      });
+    });
+    const slotsByDate = {
+      '10': [
+        { time: '09:00-11:00', status: 'available' },
+        { time: '13:00-15:00', status: 'booked' },
+        { time: '18:00-20:00', status: 'available' }
+      ],
+      '11': [
+        { time: '10:00-12:00', status: 'available' },
+        { time: '14:00-16:00', status: 'available' },
+        { time: '19:00-21:00', status: 'booked' }
+      ],
+      '12': [
+        { time: '09:30-11:30', status: 'booked' },
+        { time: '15:00-17:00', status: 'available' },
+        { time: '20:00-22:00', status: 'available' }
+      ],
+      '16': [
+        { time: '10:00-12:00', status: 'booked' },
+        { time: '14:00-16:00', status: 'available' },
+        { time: '19:00-21:00', status: 'available' }
+      ],
+      '18': [
+        { time: '08:00-10:00', status: 'available' },
+        { time: '13:30-15:30', status: 'available' },
+        { time: '18:30-20:30', status: 'booked' }
+      ],
+      '22': [
+        { time: '10:00-12:00', status: 'available' },
+        { time: '16:00-18:00', status: 'available' },
+        { time: '19:00-21:00', status: 'available' }
+      ]
+    };
+
+    function go(id) {
+      appScreens.forEach(screen => {
+        screen.classList.toggle('active', screen.id === id);
+        if (screen.id === id) screen.scrollTop = 0;
+      });
+      nav.style.display = screensWithNav.has(id) ? 'grid' : 'none';
+      const activeTab = tabByScreen[id] || id;
+      navItems.forEach(item => item.classList.toggle('active', item.dataset.tab === activeTab));
+      if (id === 'otp') startResend();
+      if (id === 'favorites') renderFavorites();
+      if (id === 'map') renderMapLists();
+      if (id === 'mapList') renderMapLists();
+      if (id === 'detail') renderDetail();
+      if (id === 'time') {
+        renderTimeCaregiver();
+        renderSlots();
+      }
+      currentScreen = id;
+    }
+
+    function navigate(id) {
+      if (currentScreen && currentScreen !== id) backStack.push(currentScreen);
+      go(id);
+    }
+
+    function goBack() {
+      const fallback = currentScreen === 'detail' ? 'match' : 'match';
+      go(backStack.pop() || fallback);
+    }
+
+    function toast(message) {
+      const node = document.getElementById('toast');
+      node.textContent = message;
+      node.classList.add('show');
+      clearTimeout(node._t);
+      node._t = setTimeout(() => node.classList.remove('show'), 1600);
+    }
+
+    function renderCaregiver() {
+      const list = getFilteredCaregivers();
+      const data = list[caregiverIndex % list.length] || caregivers[0];
+      selectedCaregiverIndex = caregivers.indexOf(data);
+      document.getElementById('matchName').textContent = data.name;
+      document.getElementById('matchDistance').textContent = data.distance;
+      document.getElementById('matchRating').textContent = data.rating;
+      document.getElementById('matchIntro').textContent = data.intro;
+      document.getElementById('matchNearest').textContent = data.nearest;
+      document.getElementById('matchHot').textContent = data.hot;
+      document.getElementById('matchPhoto').style.background = data.color;
+      document.querySelector('#matchPhoto .pet-dot').style.background = data.dot;
+    }
+
+    function compactMeta(data) {
+      return data.rating.replace(' · 瀏覽 2,431', '').replace(' · 瀏覽 1,902', '').replace(' · 瀏覽 1,284', '');
+    }
+
+    function renderDetail() {
+      const data = caregivers[selectedCaregiverIndex] || caregivers[0];
+      document.getElementById('detailName').textContent = data.name;
+      document.getElementById('detailMeta').textContent = `${compactMeta(data)} · ${data.distance.replace('距離 ', '')}`;
+      document.getElementById('detailIntro').textContent = data.detail;
+      document.querySelector('.detail-hero').style.background = data.color;
+      document.querySelector('.detail-hero .pet-dot').style.background = data.dot;
+      syncDetailFavoriteButton();
+    }
+
+    function renderTimeCaregiver() {
+      const data = caregivers[selectedCaregiverIndex] || caregivers[0];
+      document.getElementById('timeName').textContent = data.name;
+      document.getElementById('timeMeta').textContent = `${compactMeta(data)} · ${data.distance}`;
+      document.getElementById('timeIntro').textContent = data.timeIntro;
+    }
+
+    function addCurrentToFavorites() {
+      favoriteIndexes.add(selectedCaregiverIndex);
+      updateFavoriteCount();
+      renderFavorites();
+      syncDetailFavoriteButton();
+    }
+
+    function toggleCurrentFavorite() {
+      if (favoriteIndexes.has(selectedCaregiverIndex)) {
+        favoriteIndexes.delete(selectedCaregiverIndex);
+        toast('已取消收藏');
+      } else {
+        favoriteIndexes.add(selectedCaregiverIndex);
+        toast('已加入收藏');
+      }
+      updateFavoriteCount();
+      renderFavorites();
+      syncDetailFavoriteButton();
+    }
+
+    function updateFavoriteCount() {
+      const count = document.getElementById('favoriteCount');
+      if (count) count.textContent = favoriteIndexes.size;
+    }
+
+    function syncDetailFavoriteButton() {
+      const button = document.getElementById('detailFavoriteButton');
+      if (!button) return;
+      const saved = favoriteIndexes.has(selectedCaregiverIndex);
+      button.classList.toggle('active', saved);
+      button.setAttribute('aria-pressed', saved ? 'true' : 'false');
+      button.setAttribute('aria-label', saved ? '取消收藏照護者' : '收藏照護者');
+    }
+
+    function renderFavorites() {
+      const list = document.getElementById('favoriteList');
+      const summary = document.getElementById('favoriteSummary');
+      if (!list || !summary) return;
+      summary.textContent = `已收藏 ${favoriteIndexes.size} 位照護者`;
+      if (!favoriteIndexes.size) {
+        list.innerHTML = '<div class="card favorite-card"><p class="meta" style="margin:0">目前尚未收藏照護者，回到配對頁右滑或點愛心即可加入。</p></div>';
+        return;
+      }
+      list.innerHTML = Array.from(favoriteIndexes).map(index => {
+        const data = caregivers[index];
+        return `
+          <article class="card favorite-card">
+            <div class="favorite-card-main">
+              <div class="favorite-photo" style="background: radial-gradient(circle at 72% 70%, ${data.dot} 0 16%, transparent 17%), linear-gradient(145deg, ${data.color}, #5d7962)"></div>
+              <div>
+                <h2 style="margin:0 0 8px;font-size:25px">${data.name}</h2>
+                <p class="meta" style="margin:0"><span class="stars">★★★★★</span> ${compactMeta(data)}</p>
+                <p class="distance" style="margin:6px 0 0">${data.distance} · 大安區</p>
+              </div>
+            </div>
+            <span class="favorite-badge">最近可預約</span>
+            <p class="meta" style="margin:10px 0 0">${data.nearest}</p>
+            <div class="favorite-actions">
+              <button class="btn light" data-go="detail" data-index="${index}">查看照護者卡片</button>
+              <button class="btn" data-go="time" data-index="${index}">查看時段預約</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderMapPreview(index) {
+      selectedCaregiverIndex = index;
+      const data = caregivers[index] || caregivers[0];
+      document.getElementById('mapPreviewName').textContent = `${data.name} · ${data.distance.replace('距離 ', '')}`;
+      document.getElementById('mapPreviewMeta').innerHTML = `<span class="stars">★★★★★</span> ${compactMeta(data)} · ${data.nearest.split(' · ')[0]}`;
+      document.getElementById('mapPreviewAvatar').style.background = `radial-gradient(circle at 68% 68%, ${data.dot} 0 20%, transparent 21%), linear-gradient(145deg, ${data.color}, #5c775f)`;
+      document.querySelectorAll('[data-map-index]').forEach(point => {
+        point.classList.toggle('active', Number(point.dataset.mapIndex) === index);
+      });
+    }
+
+    function distanceNumber(data) {
+      const match = data.distance.match(/([\d.]+)/);
+      return match ? Number(match[1]) : 999;
+    }
+
+    function sortedNearbyCaregivers() {
+      return caregivers
+        .map((data, index) => ({ data, index }))
+        .sort((a, b) => distanceNumber(a.data) - distanceNumber(b.data));
+    }
+
+    function mapRowTemplate(item, rank) {
+      const { data, index } = item;
+      const ratingScore = data.rating.split(' · ')[0];
+      const nearestTime = data.nearest.split(' · ')[0];
+      return `
+        <button class="map-caregiver-row" data-map-list-index="${index}">
+          <span class="map-rank">#${rank}</span>
+          <span class="mini-avatar" style="background: radial-gradient(circle at 68% 70%, ${data.dot} 0 18%, transparent 19%), linear-gradient(145deg, ${data.color}, #5d7962)"></span>
+          <span>
+            <strong>${data.name}</strong>
+            <small><span class="stars">★★★★★</span> ${ratingScore} · ${nearestTime}</small>
+          </span>
+          <span class="map-distance">${data.distance.replace('距離 ', '')}</span>
+        </button>
+      `;
+    }
+
+    function renderMapLists() {
+      const sorted = sortedNearbyCaregivers();
+      const topList = document.getElementById('mapTopList');
+      const pagedList = document.getElementById('mapPagedList');
+      const title = document.getElementById('mapRankingTitle');
+      const summary = document.getElementById('mapPageSummary');
+      const indicator = document.getElementById('mapPageIndicator');
+      const prev = document.getElementById('mapPrevPage');
+      const next = document.getElementById('mapNextPage');
+      if (!topList || !pagedList) return;
+      if (title) title.textContent = `附近 ${sorted.length} 位照護者`;
+      const firstTwenty = sorted.slice(0, Math.min(20, sorted.length));
+      topList.innerHTML = firstTwenty.map((item, index) => mapRowTemplate(item, index + 1)).join('')
+        + (sorted.length > 20 ? '<button class="map-more-row" id="showMoreMapCaregivers">查看更多</button>' : '');
+      const totalPages = Math.max(1, Math.ceil(sorted.length / mapPageSize));
+      mapPage = Math.max(1, Math.min(mapPage, totalPages));
+      const start = (mapPage - 1) * mapPageSize;
+      const pageItems = sorted.slice(start, start + mapPageSize);
+      pagedList.innerHTML = pageItems.map((item, index) => mapRowTemplate(item, start + index + 1)).join('');
+      summary.textContent = `第 ${mapPage} 頁 · 顯示 ${start + 1}-${Math.min(start + mapPageSize, sorted.length)} / ${sorted.length}`;
+      indicator.textContent = `${mapPage} / ${totalPages}`;
+      prev.disabled = mapPage <= 1;
+      next.disabled = mapPage >= totalPages;
+    }
+
+    function swipeCaregiver(direction) {
+      if (isSwiping) return;
+      const card = document.getElementById('matchCard');
+      const list = getFilteredCaregivers();
+      isSwiping = true;
+      suppressMatchClick = true;
+      card.classList.remove('show-like', 'show-nope', 'resetting');
+      card.classList.add(direction === 'right' ? 'show-like' : 'show-nope');
+      requestAnimationFrame(() => card.classList.add(direction === 'right' ? 'swipe-right' : 'swipe-left'));
+      if (direction === 'right') addCurrentToFavorites();
+      toast(direction === 'right' ? '已加入收藏，顯示下一位' : '已略過，顯示下一位');
+      window.setTimeout(() => {
+        caregiverIndex = (caregiverIndex + 1) % list.length;
+        renderCaregiver();
+        card.classList.remove('swipe-right', 'swipe-left', 'show-like', 'show-nope');
+        card.style.transform = '';
+        card.style.opacity = '';
+        card.classList.add('resetting');
+        window.setTimeout(() => card.classList.remove('resetting'), 240);
+        isSwiping = false;
+        window.setTimeout(() => { suppressMatchClick = false; }, 80);
+      }, 280);
+    }
+
+    function wireMatchDrag() {
+      const card = document.getElementById('matchCard');
+      if (!card) return;
+      let startX = 0;
+      let startY = 0;
+      let dx = 0;
+      let dragging = false;
+
+      card.addEventListener('pointerdown', event => {
+        if (isSwiping) return;
+        dragging = true;
+        startX = event.clientX;
+        startY = event.clientY;
+        dx = 0;
+        card.setPointerCapture(event.pointerId);
+        card.classList.add('dragging');
+      });
+
+      card.addEventListener('pointermove', event => {
+        if (!dragging || isSwiping) return;
+        dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+        suppressMatchClick = true;
+        const rotate = Math.max(-12, Math.min(12, dx / 16));
+        card.style.transform = `translateX(${dx}px) rotate(${rotate}deg)`;
+        card.classList.toggle('show-like', dx > 35);
+        card.classList.toggle('show-nope', dx < -35);
+      });
+
+      card.addEventListener('pointerup', event => {
+        if (!dragging) return;
+        dragging = false;
+        card.classList.remove('dragging');
+        try { card.releasePointerCapture(event.pointerId); } catch {}
+        if (Math.abs(dx) > 92) {
+          card.style.transform = '';
+          swipeCaregiver(dx > 0 ? 'right' : 'left');
+          return;
+        }
+        card.style.transform = '';
+        card.classList.remove('show-like', 'show-nope');
+        window.setTimeout(() => { suppressMatchClick = false; }, 80);
+      });
+
+      card.addEventListener('pointercancel', () => {
+        dragging = false;
+        card.classList.remove('dragging', 'show-like', 'show-nope');
+        card.style.transform = '';
+        window.setTimeout(() => { suppressMatchClick = false; }, 80);
+      });
+
+      card.addEventListener('click', event => {
+        if (!suppressMatchClick) return;
+        event.preventDefault();
+        event.stopPropagation();
+      }, true);
+    }
+
+    function startResend() {
+      clearInterval(resendTimer);
+      resend = 60;
+      const btn = document.getElementById('resendBtn');
+      btn.classList.add('disabled');
+      btn.textContent = `重新發送 ${resend}s`;
+      resendTimer = setInterval(() => {
+        resend -= 1;
+        btn.textContent = resend > 0 ? `重新發送 ${resend}s` : '重新發送驗證碼';
+        if (resend <= 0) {
+          btn.classList.remove('disabled');
+          clearInterval(resendTimer);
+        }
+      }, 1000);
+    }
+
+    function openCertModal(type) {
+      const title = document.getElementById('modalTitle');
+      const copy = document.getElementById('modalCopy');
+      const body = document.getElementById('modalBody');
+      if (type === 'identity') {
+        title.textContent = '實名認證提示';
+        copy.textContent = '這是點擊實名認證 icon 後出現的 tips，讓用戶快速理解此帳號已完成平台驗證。';
+      } else if (type === 'phone') {
+        title.textContent = '手機認證提示';
+        copy.textContent = '這是點擊手機認證 icon 後出現的 tips，代表此帳號已通過手機驗證。';
+      } else {
+        title.textContent = '認證狀態';
+        copy.textContent = '此區塊整理目前帳號的實名與手機驗證狀態。';
+      }
+      body.innerHTML = `
+        <div class="cert-row">
+          <div><strong>已實名認證</strong><span>身分證與本人資料已通過平台確認</span></div>
+          <span class="verified-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m15.5 14.5 1.8 1.8 3.2-3.8" stroke="#0b6b3a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <div class="cert-row">
+          <div><strong>已手機認證</strong><span>可接收預約通知、驗證碼與服務提醒</span></div>
+          <span class="verified-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="8" y="3.5" width="8" height="17" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/></svg></span>
+        </div>
+      `;
+      document.getElementById('modalLayer').classList.add('show');
+    }
+
+    function openBookingModal(type) {
+      const title = document.getElementById('modalTitle');
+      const copy = document.getElementById('modalCopy');
+      const body = document.getElementById('modalBody');
+      if (type === 'report') {
+        title.textContent = '服務回報';
+        copy.textContent = 'Mina Chen 正在照護麻糬，以下為目前服務中的即時回報。';
+        body.innerHTML = `
+          <div class="report-list">
+            <div class="report-item"><strong>14:18 已抵達</strong><span>照護者已進門，確認門窗與貓咪狀態正常。</span></div>
+            <div class="report-item"><strong>14:32 完成餵食</strong><span>已補乾糧與水，麻糬有正常進食。</span></div>
+            <div class="report-item"><strong>14:46 清理貓砂</strong><span>已清理貓砂並拍照回傳，無異常狀況。</span></div>
+          </div>
+        `;
+      } else {
+        title.textContent = '聯絡照護者';
+        copy.textContent = '可以選擇用平台訊息或電話聯絡 Mina Chen。Demo 版先以彈窗展示操作。';
+        body.innerHTML = `
+          <div class="report-list">
+            <div class="report-item"><strong>Mina Chen</strong><span>通常 5 分鐘內回覆 · 手機已認證</span></div>
+          </div>
+          <div class="contact-actions">
+            <button class="btn" onclick="toast('已開啟平台訊息')">平台訊息</button>
+            <button class="btn light" onclick="toast('已撥打照護者電話')">撥打電話</button>
+          </div>
+        `;
+      }
+      document.getElementById('modalLayer').classList.add('show');
+    }
+
+    function hideModal() {
+      document.getElementById('modalLayer').classList.remove('show');
+    }
+
+    function closeModal(event) {
+      if (event.target.id === 'modalLayer') hideModal();
+    }
+
+    function filterBookings(filter) {
+      const cards = Array.from(document.querySelectorAll('.book-card'));
+      let visible = 0;
+      cards.forEach(card => {
+        const status = card.dataset.bookingStatus;
+        const show = filter === 'all'
+          || (filter === 'pending' && (status === 'pending' || status === 'upcoming'))
+          || filter === status;
+        card.classList.toggle('hidden', !show);
+        if (show) visible += 1;
+      });
+      document.getElementById('bookingEmpty').classList.toggle('show', visible === 0);
+      document.querySelectorAll('[data-booking-filter]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.bookingFilter === filter);
+      });
+    }
+
+    function renderSlots() {
+      const row = document.getElementById('slotRow');
+      const title = document.getElementById('slotTitle');
+      const slots = slotsByDate[selectedDate] || slotsByDate['16'];
+      const available = slots.find(slot => slot.status === 'available');
+      if (!slots.some(slot => slot.time === selectedSlot && slot.status === 'available')) {
+        selectedSlot = available ? available.time : '';
+      }
+      title.textContent = `7/${selectedDate} 可預約時段`;
+      row.innerHTML = slots.map(slot => {
+        const disabled = slot.status === 'booked';
+        const active = slot.time === selectedSlot && !disabled;
+        return `<button class="slot ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}" data-slot="${slot.time}" ${disabled ? 'aria-disabled="true"' : ''}>${slot.time}${disabled ? '<small>已預約</small>' : active ? '<small>已選擇</small>' : ''}</button>`;
+      }).join('');
+      document.querySelectorAll('.date').forEach(date => {
+        date.classList.toggle('active', date.dataset.date === selectedDate);
+      });
+    }
+
+    function getSelectedMatchFilters() {
+      return Array.from(document.querySelectorAll('[data-match-filter].active')).map(item => item.dataset.matchFilter);
+    }
+
+    function getFilteredCaregivers() {
+      const selected = getSelectedMatchFilters();
+      const exact = caregivers.filter(caregiver => selected.every(filter => caregiver.filters.includes(filter)));
+      return exact.length ? exact : caregivers.filter(caregiver => caregiver.filters.includes('city'));
+    }
+
+    function toggleMatchFilter(button) {
+      const filters = Array.from(document.querySelectorAll('[data-match-filter]'));
+      const activeCount = filters.filter(item => item.classList.contains('active')).length;
+      if (button.classList.contains('active') && activeCount === 1) {
+        toast('至少保留一個篩選條件');
+        return;
+      }
+      const willActivate = !button.classList.contains('active');
+      button.classList.toggle('active');
+      if (willActivate) lastMatchFilter = button.dataset.matchFilter;
+      const selected = filters.filter(item => item.classList.contains('active')).map(item => item.textContent.trim());
+      const filtered = getFilteredCaregivers();
+      const focusedIndex = filtered.findIndex(caregiver => caregiver.focus === lastMatchFilter);
+      caregiverIndex = focusedIndex >= 0 ? focusedIndex : 0;
+      renderCaregiver();
+      const card = document.getElementById('matchCard');
+      card.classList.remove('resetting');
+      void card.offsetWidth;
+      card.classList.add('resetting');
+      window.setTimeout(() => card.classList.remove('resetting'), 240);
+      toast(selected.length ? `已套用：${selected.join('、')}` : '已清除篩選');
+    }
+
+    document.addEventListener('click', event => {
+      const backButton = event.target.closest('[data-back]');
+      if (backButton) {
+        event.preventDefault();
+        goBack();
+        return;
+      }
+      const petToggle = event.target.closest('[data-toggle-group="pet-types"] .chip');
+      if (petToggle) {
+        event.preventDefault();
+        petToggle.classList.toggle('active');
+        toast(`已${petToggle.classList.contains('active') ? '選取' : '取消'}：${petToggle.textContent.trim()}`);
+        return;
+      }
+      const mapListItem = event.target.closest('[data-map-list-index]');
+      if (mapListItem) {
+        event.preventDefault();
+        selectedCaregiverIndex = Number(mapListItem.dataset.mapListIndex);
+        renderMapPreview(selectedCaregiverIndex);
+        navigate('detail');
+        return;
+      }
+      if (event.target.closest('#showMoreMapCaregivers')) {
+        event.preventDefault();
+        mapPage = 1;
+        renderMapLists();
+        navigate('mapList');
+        return;
+      }
+      if (event.target.closest('#mapPrevPage')) {
+        event.preventDefault();
+        mapPage -= 1;
+        renderMapLists();
+        return;
+      }
+      if (event.target.closest('#mapNextPage')) {
+        event.preventDefault();
+        mapPage += 1;
+        renderMapLists();
+        return;
+      }
+      const mapPoint = event.target.closest('[data-map-index]');
+      if (mapPoint) {
+        event.preventDefault();
+        renderMapPreview(Number(mapPoint.dataset.mapIndex));
+        return;
+      }
+      const dateButton = event.target.closest('[data-date]');
+      if (dateButton) {
+        event.preventDefault();
+        selectedDate = dateButton.dataset.date;
+        selectedSlot = '';
+        renderSlots();
+        return;
+      }
+      const slotButton = event.target.closest('[data-slot]');
+      if (slotButton) {
+        event.preventDefault();
+        if (slotButton.classList.contains('disabled')) {
+          toast('此時段已被預約');
+          return;
+        }
+        selectedSlot = slotButton.dataset.slot;
+        renderSlots();
+        return;
+      }
+      const matchFilter = event.target.closest('[data-match-filter]');
+      if (matchFilter) {
+        event.preventDefault();
+        toggleMatchFilter(matchFilter);
+        return;
+      }
+      const detailFavorite = event.target.closest('#detailFavoriteButton');
+      if (detailFavorite) {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleCurrentFavorite();
+        return;
+      }
+      const filterButton = event.target.closest('[data-booking-filter]');
+      if (filterButton) {
+        event.preventDefault();
+        filterBookings(filterButton.dataset.bookingFilter);
+        return;
+      }
+      const target = event.target.closest('[data-go]');
+      if (!target) return;
+      if (target.id === 'matchCard' && suppressMatchClick) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      if (target.dataset.index) selectedCaregiverIndex = Number(target.dataset.index);
+      if (target.dataset.go === 'detail' && target.id === 'matchCard') {
+        const list = getFilteredCaregivers();
+        selectedCaregiverIndex = caregivers.indexOf(list[caregiverIndex % list.length] || caregivers[0]);
+      }
+      if (target.dataset.go === 'detail' && target.closest('#map')) {
+        // map preview already set selectedCaregiverIndex
+      }
+      navigate(target.dataset.go);
+    });
+
+    document.getElementById('careFee').addEventListener('input', event => {
+      const base = Math.max(0, parseInt(event.target.value.replace(/\D/g, ''), 10) || 0);
+      const service = Math.round(base * 0.1);
+      document.getElementById('feeBase').textContent = `NT$ ${base}`;
+      document.getElementById('feeService').textContent = `NT$ ${service}`;
+      document.getElementById('feeTotal').textContent = `NT$ ${base + service}`;
+    });
+
+    renderCaregiver();
+    renderMapPreview(0);
+    renderMapLists();
+    updateFavoriteCount();
+    renderFavorites();
+    renderSlots();
+    wireMatchDrag();
+    go('login');
+  </script>
+</body>
+</html>
