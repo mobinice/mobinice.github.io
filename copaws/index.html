@@ -1136,10 +1136,102 @@
     }
     .caregiver-mini h3 { margin: 0 0 4px; }
     #time .caregiver-mini {
-      height: 74px;
+      min-height: 118px;
+      height: auto;
       margin-top: 20px;
+      padding: 14px 16px;
       border-radius: 22px;
       box-shadow: none;
+      align-items: flex-start;
+      position: relative;
+      overflow: hidden;
+    }
+    #time .caregiver-mini .avatar {
+      width: 52px;
+      height: 52px;
+      flex-basis: 52px;
+      border-radius: 17px;
+      margin-top: 2px;
+    }
+    #time .caregiver-mini .verified-icon {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+    }
+    #time .caregiver-mini .verified-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+    .time-caregiver-body {
+      flex: 1;
+      min-width: 0;
+      padding-right: 40px;
+    }
+    .time-caregiver-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      min-width: 0;
+    }
+    .time-caregiver-top h3 {
+      max-width: 128px;
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.18;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .time-rating-pill {
+      min-height: 26px;
+      max-width: 132px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 0 1 auto;
+    }
+    .time-rating-pill .star {
+      color: #e8a72c;
+      font-size: 12px;
+    }
+    .time-info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .time-info {
+      min-width: 0;
+      padding: 5px 6px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fffdf8;
+      color: #6f685f;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1.1;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #timeIntro {
+      margin: 7px 0 0;
+      font-size: 11px;
+      line-height: 1.35;
     }
     #time .screen-back {
       position: absolute;
@@ -1635,10 +1727,17 @@
       <p class="subtitle">先確認照護者與日期，再填寫需求</p>
       <div class="caregiver-mini card">
         <span class="avatar"></span>
-        <div style="flex:1">
-          <h3 id="timeName">Mina Chen</h3>
-          <p class="meta" id="timeMeta" style="margin:0">4.9 · 126 則評價 · 距離 0.8 km</p>
-          <p class="meta" id="timeIntro" style="margin:2px 0 0;font-size:11px">到府照護 · 貓咪餵食、清砂、陪玩回報</p>
+        <div class="time-caregiver-body">
+          <div class="time-caregiver-top">
+            <h3 id="timeName">Mina Chen</h3>
+            <span class="time-rating-pill"><span class="star">★</span><span id="timeRating">4.9</span><span id="timeReviews">126 則評價</span></span>
+          </div>
+          <div class="time-info-grid" aria-label="照護者摘要資訊">
+            <span class="time-info" id="timeViews">瀏覽 2,431</span>
+            <span class="time-info" id="timeDistance">0.8 km</span>
+            <span class="time-info" id="timeServiceType">到府照護</span>
+          </div>
+          <p class="meta" id="timeIntro">貓咪餵食、清砂、陪玩回報</p>
         </div>
         <span class="verified-icon" aria-label="已實名認證">
           <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m15.5 14.5 1.8 1.8 3.2-3.8" stroke="#0b6b3a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1953,8 +2052,26 @@
       document.querySelector('#matchPhoto .pet-dot').style.background = data.dot;
     }
 
+    function caregiverMetaParts(data) {
+      const segments = data.rating.split(' · ').map(item => item.trim());
+      const score = segments[0] || '4.9';
+      const reviews = segments.find(item => item.includes('評價')) || '0 則評價';
+      const views = segments.find(item => item.includes('瀏覽')) || '瀏覽 0';
+      const distance = data.distance.replace('距離 ', '');
+      const introSegments = data.timeIntro.split(' · ').map(item => item.trim());
+      return {
+        score,
+        reviews,
+        views,
+        distance,
+        serviceType: introSegments[0] || '到府照護',
+        serviceDetail: introSegments.slice(1).join('、') || data.detail
+      };
+    }
+
     function compactMeta(data) {
-      return data.rating.replace(' · 瀏覽 2,431', '').replace(' · 瀏覽 1,902', '').replace(' · 瀏覽 1,284', '');
+      const parts = caregiverMetaParts(data);
+      return `${parts.score} · ${parts.reviews}`;
     }
 
     function renderDetail() {
@@ -1969,9 +2086,14 @@
 
     function renderTimeCaregiver() {
       const data = caregivers[selectedCaregiverIndex] || caregivers[0];
+      const parts = caregiverMetaParts(data);
       document.getElementById('timeName').textContent = data.name;
-      document.getElementById('timeMeta').textContent = `${compactMeta(data)} · ${data.distance}`;
-      document.getElementById('timeIntro').textContent = data.timeIntro;
+      document.getElementById('timeRating').textContent = parts.score;
+      document.getElementById('timeReviews').textContent = parts.reviews;
+      document.getElementById('timeViews').textContent = parts.views;
+      document.getElementById('timeDistance').textContent = parts.distance;
+      document.getElementById('timeServiceType').textContent = parts.serviceType;
+      document.getElementById('timeIntro').textContent = parts.serviceDetail;
     }
 
     function addCurrentToFavorites() {
