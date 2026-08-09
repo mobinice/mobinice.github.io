@@ -1199,9 +1199,9 @@
     }
     .caregiver-mini h3 { margin: 0 0 4px; }
     #time .caregiver-mini {
-      min-height: 118px;
+      min-height: 96px;
       height: auto;
-      margin-top: 20px;
+      margin-top: 14px;
       padding: 14px 16px;
       border-radius: 22px;
       box-shadow: none;
@@ -1308,6 +1308,29 @@
     #time .subtitle {
       margin-left: 34px;
     }
+    #time .month-card {
+      margin-top: 16px;
+      padding: 20px 20px;
+    }
+    #time .month-head {
+      margin-bottom: 14px;
+    }
+    #time .weekday-grid {
+      margin-bottom: 12px;
+    }
+    #time .weekday-grid,
+    #time .month-grid {
+      gap: 8px clamp(7px, 2.8vw, 14px);
+    }
+    #slotTitle {
+      margin: 18px 0 0;
+    }
+    #time .slot-row {
+      margin-top: 10px;
+    }
+    #time .need-summary {
+      padding: 14px 24px;
+    }
     .need-summary {
       padding: 18px 24px;
       border-radius: 20px;
@@ -1368,8 +1391,10 @@
     .favorite-badge {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
+      width: 104px;
       height: 28px;
-      padding: 0 14px;
+      padding: 0;
       border-radius: 999px;
       background: var(--green-soft);
       color: var(--green);
