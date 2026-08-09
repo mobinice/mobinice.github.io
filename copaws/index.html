@@ -9,6 +9,9 @@
       --green: #0b6b3a;
       --green-2: #6f8c72;
       --green-soft: #e8f5e9;
+      --avatar-green: #68876d;
+      --avatar-cream: #f6efdf;
+      --avatar-yellow: #e6ad40;
       --clay: #d45a3f;
       --cream: #fffaf1;
       --paper: #fffdf8;
@@ -596,7 +599,7 @@
     .photo-hero {
       height: 246px;
       border-radius: 22px;
-      background: #739079;
+      background: var(--avatar-green);
       position: relative;
       overflow: hidden;
     }
@@ -608,7 +611,7 @@
       width: 180px;
       height: 76px;
       border-radius: 24px;
-      background: #f7eed8;
+      background: var(--avatar-cream);
     }
     .pet-shape::after {
       content: "";
@@ -618,7 +621,7 @@
       width: 78px;
       height: 78px;
       border-radius: 50%;
-      background: #f7eed8;
+      background: var(--avatar-cream);
     }
     .pet-dot {
       position: absolute;
@@ -627,7 +630,7 @@
       width: 58px;
       height: 58px;
       border-radius: 50%;
-      background: #efb53e;
+      background: var(--avatar-yellow);
     }
     .hot {
       position: absolute;
@@ -794,27 +797,39 @@
       border: 3px solid #fff;
       box-shadow: 0 14px 26px rgba(28, 42, 32, .18);
       background:
-        radial-gradient(circle at 68% 70%, #efb53e 0 18%, transparent 19%),
-        linear-gradient(145deg, #739079, #5d7962);
+        radial-gradient(circle at 72% 70%, var(--avatar-yellow) 0 10%, transparent 11%),
+        var(--avatar-green);
       display: grid;
       place-items: center;
+      overflow: hidden;
     }
     .map-person::before {
       content: "";
-      width: 20px;
-      height: 20px;
+      position: absolute;
+      left: 38%;
+      top: 18%;
+      width: 24%;
+      height: 24%;
       border-radius: 50%;
-      background: #f7eed8;
-      box-shadow: 0 18px 0 6px #f7eed8;
-      transform: translateY(-6px);
+      background: var(--avatar-cream);
+    }
+    .map-person::after {
+      content: "";
+      position: absolute;
+      left: 26%;
+      top: 42%;
+      width: 48%;
+      height: 30%;
+      border-radius: 999px 999px 12px 12px;
+      background: var(--avatar-cream);
     }
     .map-person.active {
       outline: 3px solid rgba(11, 107, 58, .28);
       transform: translateY(-3px);
     }
     .map-person.p1 { left: 210px; top: 92px; }
-    .map-person.p2 { left: 82px; top: 182px; background: radial-gradient(circle at 70% 70%, #d45a3f 0 18%, transparent 19%), linear-gradient(145deg, #8d9b7b, #6f8067); }
-    .map-person.p3 { left: 288px; top: 244px; background: radial-gradient(circle at 70% 70%, #efb53e 0 18%, transparent 19%), linear-gradient(145deg, #6f8c72, #506a55); }
+    .map-person.p2 { left: 82px; top: 182px; }
+    .map-person.p3 { left: 288px; top: 244px; }
     .map-person.p4 { left: 156px; top: 300px; width: 44px; height: 44px; opacity: .9; }
     .near-card {
       position: absolute;
@@ -895,8 +910,30 @@
       height: 40px;
       border-radius: 15px;
       background:
-        radial-gradient(circle at 68% 70%, #efb53e 0 18%, transparent 19%),
-        linear-gradient(145deg, #739079, #5d7962);
+        radial-gradient(circle at 72% 70%, var(--avatar-yellow) 0 10%, transparent 11%),
+        var(--avatar-green);
+      position: relative;
+      overflow: hidden;
+    }
+    .mini-avatar::before {
+      content: "";
+      position: absolute;
+      left: 38%;
+      top: 18%;
+      width: 24%;
+      height: 24%;
+      border-radius: 50%;
+      background: var(--avatar-cream);
+    }
+    .mini-avatar::after {
+      content: "";
+      position: absolute;
+      left: 26%;
+      top: 42%;
+      width: 48%;
+      height: 30%;
+      border-radius: 999px 999px 10px 10px;
+      background: var(--avatar-cream);
     }
     .map-caregiver-row strong {
       display: block;
@@ -983,15 +1020,39 @@
       height: 54px;
       border-radius: 18px;
       background:
-        radial-gradient(circle at 68% 68%, #efb53e 0 20%, transparent 21%),
-        linear-gradient(145deg, #739079, #5c775f);
+        radial-gradient(circle at 72% 70%, var(--avatar-yellow) 0 10%, transparent 11%),
+        var(--avatar-green);
       flex: 0 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    .avatar::before {
+      content: "";
+      position: absolute;
+      left: 38%;
+      top: 18%;
+      width: 24%;
+      height: 24%;
+      border-radius: 50%;
+      background: var(--avatar-cream);
+    }
+    .avatar::after {
+      content: "";
+      position: absolute;
+      left: 26%;
+      top: 42%;
+      width: 48%;
+      height: 30%;
+      border-radius: 999px 999px 12px 12px;
+      background: var(--avatar-cream);
     }
 
     .detail-hero {
       margin: 0 -24px 0;
       height: 286px;
-      background: #526b55;
+      background:
+        radial-gradient(circle at 72% 66%, var(--avatar-yellow) 0 9%, transparent 10%),
+        var(--avatar-green);
       border-radius: 0 0 28px 28px;
       position: relative;
       overflow: hidden;
@@ -1051,30 +1112,32 @@
     .caregiver-photo::before {
       content: "";
       position: absolute;
-      left: 50%;
-      top: 84px;
-      width: 82px;
-      height: 82px;
+      left: 38%;
+      top: 18%;
+      width: 24%;
+      aspect-ratio: 1;
+      height: auto;
       border-radius: 50%;
-      background: #f7eed8;
-      transform: translateX(-50%);
+      background: var(--avatar-cream);
     }
     .caregiver-photo::after {
       content: "";
       position: absolute;
-      left: 50%;
-      top: 174px;
-      width: 170px;
-      height: 54px;
+      left: 26%;
+      top: 42%;
+      width: 48%;
+      height: 30%;
       border-radius: 999px 999px 34px 34px;
-      background: #f7eed8;
-      transform: translateX(-50%);
+      background: var(--avatar-cream);
     }
     .caregiver-photo .pet-dot {
-      right: 108px;
-      bottom: 76px;
-      width: 56px;
-      height: 56px;
+      left: 63%;
+      top: 54%;
+      right: auto;
+      bottom: auto;
+      width: 18%;
+      aspect-ratio: 1;
+      height: auto;
       z-index: 1;
     }
     .tag-row { display: flex; gap: 10px; margin: 14px 0 24px; }
@@ -1351,42 +1414,81 @@
       border-radius: 24px;
       box-shadow: none;
       margin-bottom: 18px;
+      position: relative;
+      overflow: hidden;
     }
     .favorite-card-main {
       display: grid;
       grid-template-columns: 104px 1fr;
       gap: 18px;
-      align-items: center;
+      align-items: start;
     }
     .favorite-photo {
       width: 104px;
-      height: 104px;
+      height: 120px;
       border-radius: 18px;
       background:
-        radial-gradient(circle at 72% 70%, #efb53e 0 16%, transparent 17%),
-        linear-gradient(145deg, #739079, #5d7962);
+        radial-gradient(circle at 72% 62%, var(--avatar-yellow) 0 9%, transparent 10%),
+        var(--avatar-green);
       position: relative;
       overflow: hidden;
     }
     .favorite-photo::before {
       content: "";
       position: absolute;
-      left: 24px;
-      top: 50px;
-      width: 58px;
-      height: 30px;
-      border-radius: 14px;
-      background: #f7eed8;
+      left: 26%;
+      top: 42%;
+      width: 48%;
+      height: 30%;
+      border-radius: 999px 999px 18px 18px;
+      background: var(--avatar-cream);
     }
     .favorite-photo::after {
       content: "";
       position: absolute;
-      left: 42px;
-      top: 30px;
-      width: 32px;
-      height: 32px;
+      left: 38%;
+      top: 18%;
+      width: 24%;
+      height: 20%;
       border-radius: 50%;
-      background: #f7eed8;
+      background: var(--avatar-cream);
+    }
+    .favorite-new-tag {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 66px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 0 24px 0 14px;
+      background: var(--green);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+    .favorite-copy h2 {
+      margin: 0 0 7px;
+      font-size: 24px;
+      line-height: 1.18;
+    }
+    .favorite-intro {
+      margin: 6px 0 0;
+      color: #7d756b;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .favorite-slot-row {
+      height: 42px;
+      margin-top: 16px;
+      padding: 0 14px 0 0;
+      border-radius: 18px;
+      background: var(--green-soft);
+      display: grid;
+      grid-template-columns: 104px 1fr;
+      align-items: center;
+      column-gap: 2px;
     }
     .favorite-badge {
       display: inline-flex;
@@ -1396,17 +1498,22 @@
       height: 28px;
       padding: 0;
       border-radius: 999px;
-      background: var(--green-soft);
       color: var(--green);
       font-size: 12px;
       font-weight: 900;
-      margin-top: 12px;
+    }
+    .favorite-slot-time {
+      margin: 0;
+      color: #2f2b26;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.2;
     }
     .favorite-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-top: 18px;
+      margin-top: 12px;
     }
     .favorite-actions .btn {
       min-height: 42px;
@@ -1865,7 +1972,7 @@
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
       <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
       <h1 class="screen-title" style="margin-left:34px">收藏照護者</h1>
-      <p class="subtitle" style="margin-left:34px">剛剛收藏的照護員會集中在這裡。</p>
+      <p class="subtitle" style="margin-left:34px">已收藏的保母會集中在這裡，可查看卡片與預約時段。</p>
       <div class="card favorites-summary">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--green)"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg>
         <div><strong id="favoriteSummary">已收藏 1 位照護者</strong><p class="meta" style="margin:2px 0 0">點卡片可查看照護者資料與預約入口</p></div>
@@ -2143,8 +2250,6 @@
       document.getElementById('matchIntro').textContent = data.intro;
       document.getElementById('matchNearest').textContent = data.nearest;
       document.getElementById('matchHot').textContent = data.hot;
-      document.getElementById('matchPhoto').style.background = data.color;
-      document.querySelector('#matchPhoto .pet-dot').style.background = data.dot;
     }
 
     function caregiverMetaParts(data) {
@@ -2174,8 +2279,6 @@
       document.getElementById('detailName').textContent = data.name;
       document.getElementById('detailMeta').textContent = `${compactMeta(data)} · ${data.distance.replace('距離 ', '')}`;
       document.getElementById('detailIntro').textContent = data.detail;
-      document.querySelector('.detail-hero').style.background = data.color;
-      document.querySelector('.detail-hero .pet-dot').style.background = data.dot;
       syncDetailFavoriteButton();
     }
 
@@ -2238,18 +2341,22 @@
         const data = caregivers[index];
         return `
           <article class="card favorite-card">
+            <span class="favorite-new-tag">NEW</span>
             <div class="favorite-card-main">
-              <div class="favorite-photo" style="background: radial-gradient(circle at 72% 70%, ${data.dot} 0 16%, transparent 17%), linear-gradient(145deg, ${data.color}, #5d7962)"></div>
-              <div>
-                <h2 style="margin:0 0 8px;font-size:25px">${data.name}</h2>
+              <div class="favorite-photo"></div>
+              <div class="favorite-copy">
+                <h2>${data.name}</h2>
                 <p class="meta" style="margin:0"><span class="stars">★★★★★</span> ${compactMeta(data)}</p>
                 <p class="distance" style="margin:6px 0 0">${data.distance} · 大安區</p>
+                <p class="favorite-intro">${data.detail}</p>
               </div>
             </div>
-            <span class="favorite-badge">最近可預約</span>
-            <p class="meta" style="margin:10px 0 0">${data.nearest}</p>
+            <div class="favorite-slot-row">
+              <span class="favorite-badge">最近可預約</span>
+              <p class="favorite-slot-time">${data.nearest.split(' · ')[0]}</p>
+            </div>
             <div class="favorite-actions">
-              <button class="btn light" data-go="detail" data-index="${index}">查看照護者卡片</button>
+              <button class="btn light" data-go="detail" data-index="${index}">查看保母</button>
               <button class="btn" data-go="time" data-index="${index}">查看時段預約</button>
             </div>
           </article>
@@ -2262,7 +2369,6 @@
       const data = caregivers[index] || caregivers[0];
       document.getElementById('mapPreviewName').textContent = `${data.name} · ${data.distance.replace('距離 ', '')}`;
       document.getElementById('mapPreviewMeta').innerHTML = `<span class="stars">★★★★★</span> ${compactMeta(data)} · ${data.nearest.split(' · ')[0]}`;
-      document.getElementById('mapPreviewAvatar').style.background = `radial-gradient(circle at 68% 68%, ${data.dot} 0 20%, transparent 21%), linear-gradient(145deg, ${data.color}, #5c775f)`;
       document.querySelectorAll('[data-map-index]').forEach(point => {
         point.classList.toggle('active', Number(point.dataset.mapIndex) === index);
       });
@@ -2286,7 +2392,7 @@
       return `
         <button class="map-caregiver-row" data-map-list-index="${index}">
           <span class="map-rank">#${rank}</span>
-          <span class="mini-avatar" style="background: radial-gradient(circle at 68% 70%, ${data.dot} 0 18%, transparent 19%), linear-gradient(145deg, ${data.color}, #5d7962)"></span>
+          <span class="mini-avatar"></span>
           <span>
             <strong>${data.name}</strong>
             <small><span class="stars">★★★★★</span> ${ratingScore} · ${nearestTime}</small>
