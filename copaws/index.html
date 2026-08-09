@@ -194,13 +194,6 @@
       font-weight: 700;
       margin: 0 0 8px 2px;
     }
-    .register-logo {
-      width: 100px;
-      height: 76px;
-      object-fit: contain;
-      display: block;
-      margin: 12px auto 10px;
-    }
     .register-card {
       margin-top: 26px;
       padding: 24px;
@@ -262,6 +255,38 @@
       font-weight: 900;
     }
     .register-submit { margin-top: 28px; height: 54px; border-radius: 16px; }
+    #register {
+      overflow-y: hidden;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-bottom: 24px;
+    }
+    #register .screen-title {
+      margin: 14px 0 2px;
+      font-size: 28px;
+    }
+    #register .subtitle {
+      margin-bottom: 14px;
+      font-size: 12.5px;
+      line-height: 1.35;
+    }
+    #register .register-card {
+      margin-top: 0;
+      padding: 20px 24px;
+    }
+    #register .register-grid {
+      gap: 10px 12px;
+    }
+    #register .field label {
+      margin-bottom: 6px;
+    }
+    #register .terms-list {
+      gap: 8px;
+      margin-top: 4px;
+    }
+    #register .register-submit {
+      margin-top: 16px;
+    }
 
     .btn {
       min-height: 48px;
@@ -320,9 +345,11 @@
       padding-right: 36px;
     }
     .login-logo {
-      width: 154px;
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
       display: block;
-      margin: 18px auto 12px;
+      margin: 14px auto 14px;
     }
     .login-hero {
       text-align: center;
@@ -419,11 +446,11 @@
       text-align: center;
     }
     .otp-logo {
-      width: 144px;
-      height: 178px;
+      width: 124px;
+      height: 124px;
       object-fit: contain;
       display: block;
-      margin: 20px auto -8px;
+      margin: 18px auto 10px;
     }
     .otp-screen .screen-title {
       margin: 0 auto 10px;
@@ -1586,7 +1613,7 @@
 
     <section class="screen no-nav active login-screen" id="login">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <img class="login-logo" src="assets/copaws-logo-word.png" alt="Copaws">
+      <img class="login-logo" src="assets/copaws-a-plan-icon.png" alt="Copaws">
       <div class="login-hero">
         <h1>找到離家最近的安心照護者</h1>
         <p>不在家時，快速媒合有經驗的養寵人，到家陪伴、餵食與回報。</p>
@@ -1606,7 +1633,7 @@
 
     <section class="screen no-nav otp-screen" id="otp">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <img class="otp-logo" src="assets/copaws-logo-word.png" alt="Copaws">
+      <img class="otp-logo" src="assets/copaws-a-plan-icon.png" alt="Copaws">
       <h1 class="screen-title">輸入驗證碼</h1>
       <p class="subtitle">已發送至 0912 345 678，測試版自動填入。</p>
       <div class="otp-row" aria-label="驗證碼 123456">
@@ -1617,9 +1644,8 @@
       <p class="otp-resend" id="resendBtn">重新發送 60s</p>
     </section>
 
-    <section class="screen no-nav long" id="register">
+    <section class="screen no-nav" id="register">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <img class="register-logo" src="assets/copaws-logo-word.png" alt="Copaws">
       <h1 class="screen-title">建立基本資料</h1>
       <p class="subtitle">讓照護者更了解你的需求，也方便平台媒合適合的人。</p>
       <div class="card register-card">
