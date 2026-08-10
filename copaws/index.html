@@ -1806,6 +1806,302 @@
       font-weight: 600;
     }
 
+    .profile-screen {
+      padding-top: 20px;
+    }
+    .profile-screen > .screen-title {
+      margin: 0 0 2px;
+    }
+    .profile-screen > .subtitle {
+      margin-bottom: 0;
+    }
+    .profile-screen .profile-card {
+      margin-top: 26px;
+    }
+    .profile-screen .sitter-card {
+      height: 170px;
+      padding: 30px 24px 18px;
+    }
+    .profile-screen .sitter-card h2 {
+      margin: 0 0 8px;
+      line-height: 30px;
+    }
+    .profile-screen .sitter-card p {
+      width: 300px;
+      margin: 0 0 12px !important;
+      font-size: 12px;
+      line-height: 16px !important;
+    }
+    .profile-screen .sitter-card .btn {
+      min-height: 40px;
+      height: 40px;
+      border-radius: 16px;
+    }
+
+    .pet-screen {
+      padding-top: 15px;
+    }
+    .pet-page-header {
+      min-height: 55px;
+      position: relative;
+    }
+    .pet-page-header .screen-back {
+      position: absolute;
+      left: 0;
+      top: 2px;
+      margin: 0;
+    }
+    .pet-page-header .screen-title {
+      margin: 0 0 0 48px;
+      font-size: 29px;
+      line-height: 32px;
+    }
+    .pet-page-header .subtitle {
+      margin: 0 0 0 48px;
+      line-height: 18px;
+    }
+    .pet-add-compact {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 40px;
+      border-radius: 999px;
+      background: var(--green);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .pet-list {
+      margin-top: 21px;
+      display: grid;
+      gap: 19px;
+    }
+    .pet-list-card {
+      height: 152px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: 20px;
+      position: relative;
+      box-shadow: none;
+    }
+    .pet-photo {
+      width: 88px;
+      height: 104px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: var(--avatar-green);
+    }
+    .pet-photo.clay { background: #c98754; }
+    .pet-photo img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+    .pet-paw-svg {
+      width: 40px;
+      height: 40px;
+      color: var(--avatar-cream);
+    }
+    .pet-list-copy {
+      min-width: 0;
+      padding-right: 30px;
+    }
+    .pet-list-copy h2 {
+      margin: -2px 0 2px;
+      font-size: 22px;
+      line-height: 28px;
+    }
+    .pet-list-copy p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 24px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pet-list-copy .pet-list-meta {
+      color: var(--green);
+      font-weight: 900;
+    }
+    .pet-list-copy .pet-list-note {
+      margin-top: 4px;
+      line-height: 18px;
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+    .pet-open-button {
+      position: absolute;
+      right: 23px;
+      top: 22px;
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--green-soft);
+      color: var(--green);
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .pet-add-primary {
+      width: 100%;
+      height: 48px;
+      margin-top: 22px;
+      border-radius: 999px;
+      background: var(--green);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .pet-form-screen {
+      padding-top: 15px;
+      padding-bottom: 40px;
+    }
+    .pet-upload-card {
+      height: 136px;
+      margin-top: 27px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: 20px;
+      box-shadow: none;
+    }
+    .pet-upload-preview {
+      width: 88px;
+      height: 88px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--green-soft);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: var(--green);
+    }
+    .pet-upload-preview svg {
+      width: 34px;
+      height: 34px;
+    }
+    .pet-upload-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .pet-upload-preview.has-image svg { display: none; }
+    .pet-upload-preview.has-image img { display: block; }
+    .pet-upload-copy h2 {
+      margin: 3px 0 1px;
+      font-size: 18px;
+      line-height: 24px;
+    }
+    .pet-upload-copy p {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 16px;
+    }
+    .pet-photo-trigger {
+      width: 118px;
+      height: 36px;
+      border-radius: 999px;
+      background: var(--green);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .pet-form-fields {
+      margin-top: 24px;
+      display: grid;
+      gap: 22px;
+    }
+    .pet-form-field label,
+    .pet-form-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 18px;
+    }
+    .pet-form-input,
+    .pet-form-textarea {
+      width: 100%;
+      min-width: 0;
+      height: 52px;
+      padding: 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .94);
+      color: var(--ink);
+      outline: 0;
+      font-size: 14px;
+    }
+    .pet-form-input:focus,
+    .pet-form-textarea:focus {
+      border-color: rgba(11, 107, 58, .5);
+      box-shadow: 0 0 0 4px rgba(11, 107, 58, .08);
+    }
+    .pet-option-row {
+      display: grid;
+      gap: 8px;
+    }
+    .pet-option-row.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .pet-option-row.four {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 8px;
+    }
+    .pet-option-row.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .pet-option {
+      height: 36px;
+      padding: 0 4px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .84);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .pet-option.active {
+      color: #fff;
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .pet-form-split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+    .pet-form-textarea {
+      height: 124px;
+      padding: 16px 18px;
+      resize: none;
+      line-height: 1.5;
+    }
+    .pet-form-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .pet-form-actions .btn {
+      min-height: 48px;
+      border-radius: 999px;
+      font-size: 14px;
+    }
+
     .terms {
       display: flex;
       align-items: flex-start;
@@ -2220,13 +2516,12 @@
       <div class="card booking-empty" id="bookingEmpty">目前沒有符合篩選的預約。</div>
     </section>
 
-    <section class="screen" id="profile">
-      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
+    <section class="screen profile-screen" id="profile">
       <h1 class="screen-title">個人</h1>
       <p class="subtitle">飼主與寵物保母都從這裡管理資料</p>
       <div class="profile-card card">
         <button class="upload-btn">上傳<br>大頭照</button>
-        <div><h2>小安</h2><p class="meta" style="margin:0">飼主帳號 · 手機已驗證</p></div>
+        <div><h2>小安</h2></div>
         <div class="cert-icons">
           <button class="verified-icon" onclick="openCertModal('identity')" aria-label="查看實名認證">
             <svg class="identity-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="m21.1 12.6 1.95 1.95 3.5-4.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2243,9 +2538,104 @@
       </div>
       <div class="menu-list">
         <button class="menu-item" onclick="openCertModal('all')"><span>認證狀態<small>查看實名與手機狀態</small></span><span>›</span></button>
-        <button class="menu-item"><span>我的毛孩<small>管理寵物資料與照護注意事項</small></span><span>›</span></button>
+        <button class="menu-item" data-go="pets"><span>我的毛孩<small>管理寵物資料與照護注意事項</small></span><span>›</span></button>
         <button class="menu-item"><span>付款與收款<small>交易紀錄、撥款、發票資料</small></span><span>›</span></button>
-        <button class="menu-item"><span>品牌白標<small>未來可套用 A 品牌或自有品牌</small></span><span>›</span></button>
+      </div>
+    </section>
+
+    <section class="screen pet-screen" id="pets">
+      <header class="pet-page-header">
+        <button class="screen-back" data-back aria-label="返回">‹</button>
+        <h1 class="screen-title">我的毛孩</h1>
+        <p class="subtitle">管理寵物資料與照護注意事項</p>
+        <button class="pet-add-compact" data-new-pet>＋ 新增寵物</button>
+      </header>
+      <div class="pet-list" id="petList"></div>
+      <button class="pet-add-primary" data-new-pet>＋ 新增寵物</button>
+    </section>
+
+    <section class="screen no-nav pet-form-screen" id="petForm">
+      <header class="pet-page-header">
+        <button class="screen-back" data-back aria-label="返回">‹</button>
+        <h1 class="screen-title" id="petFormTitle">新增寵物</h1>
+        <p class="subtitle">所有欄位皆為選填</p>
+      </header>
+
+      <div class="card pet-upload-card">
+        <div class="pet-upload-preview" id="petPhotoPreview">
+          <svg viewBox="0 0 34 34" fill="none" aria-hidden="true"><rect x="4.5" y="9.5" width="25" height="18" rx="4" stroke="currentColor" stroke-width="2"/><path d="M11 9.5 13.5 6.5h7L23 9.5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="17" cy="18.5" r="5" stroke="currentColor" stroke-width="2"/><circle cx="27" cy="13" r="1" fill="currentColor"/></svg>
+          <img id="petPhotoImage" alt="寵物照片預覽">
+        </div>
+        <div class="pet-upload-copy">
+          <h2>上傳寵物照片</h2>
+          <p>選填</p>
+          <button class="pet-photo-trigger" type="button" id="petPhotoTrigger">選擇照片</button>
+          <input type="file" id="petPhotoInput" accept="image/*" hidden>
+        </div>
+      </div>
+
+      <div class="pet-form-fields">
+        <div class="pet-form-field">
+          <label for="petName">名字</label>
+          <input class="pet-form-input" id="petName" placeholder="請輸入寵物名字">
+        </div>
+
+        <div class="pet-form-field">
+          <div class="pet-form-label-row"><span>種類</span></div>
+          <div class="pet-option-row five" data-pet-options="type">
+            <button class="pet-option active" type="button" data-pet-value="貓">貓</button>
+            <button class="pet-option" type="button" data-pet-value="狗">狗</button>
+            <button class="pet-option" type="button" data-pet-value="鳥">鳥</button>
+            <button class="pet-option" type="button" data-pet-value="蟲">蟲</button>
+            <button class="pet-option" type="button" data-pet-value="魚">魚</button>
+          </div>
+          <div class="pet-option-row four" data-pet-options="type">
+            <button class="pet-option" type="button" data-pet-value="鼠">鼠</button>
+            <button class="pet-option" type="button" data-pet-value="兔子">兔子</button>
+            <button class="pet-option" type="button" data-pet-value="龜">龜</button>
+            <button class="pet-option" type="button" data-pet-value="其他">其他</button>
+          </div>
+        </div>
+
+        <div class="pet-form-field">
+          <div class="pet-form-label-row"><span>性別</span></div>
+          <div class="pet-option-row three" data-pet-options="gender">
+            <button class="pet-option" type="button" data-pet-value="公">公</button>
+            <button class="pet-option" type="button" data-pet-value="母">母</button>
+            <button class="pet-option" type="button" data-pet-value="不確定">不確定</button>
+          </div>
+        </div>
+
+        <div class="pet-form-split">
+          <div class="pet-form-field">
+            <label for="petBirthday">生日</label>
+            <input class="pet-form-input" id="petBirthday" inputmode="numeric" placeholder="YYYY / MM / DD">
+          </div>
+          <div class="pet-form-field">
+            <label for="petWeight">體重</label>
+            <input class="pet-form-input" id="petWeight" inputmode="decimal" placeholder="例如 4.2 kg">
+          </div>
+        </div>
+
+        <div class="pet-form-field">
+          <label for="petBreed">品種</label>
+          <input class="pet-form-input" id="petBreed" placeholder="請輸入品種">
+        </div>
+
+        <div class="pet-form-field">
+          <label for="petTraits">特徵</label>
+          <input class="pet-form-input" id="petTraits" placeholder="例如：怕生、親人、需戴胸背">
+        </div>
+
+        <div class="pet-form-field">
+          <div class="pet-form-label-row"><span>照護注意事項</span><span id="petNotesCount">0 / 100</span></div>
+          <textarea class="pet-form-textarea" id="petNotes" maxlength="100" placeholder="請輸入餵食、用藥、外出或個性等注意事項"></textarea>
+        </div>
+      </div>
+
+      <div class="pet-form-actions">
+        <button class="btn light" type="button" data-save-pet="close">儲存檔案</button>
+        <button class="btn" type="button" data-save-pet="next">新增下一個</button>
       </div>
     </section>
 
@@ -2272,8 +2662,8 @@
     const appScreens = Array.from(document.querySelectorAll('.screen'));
     const nav = document.querySelector('.bottom-nav');
     const navItems = Array.from(document.querySelectorAll('.nav-item'));
-    const screensWithNav = new Set(['match', 'map', 'mapList', 'detail', 'time', 'demand', 'bookings', 'profile', 'favorites']);
-    const tabByScreen = { match: 'match', detail: 'match', time: 'bookings', demand: 'bookings', map: 'map', mapList: 'map', bookings: 'bookings', profile: 'profile', favorites: 'match' };
+    const screensWithNav = new Set(['match', 'map', 'mapList', 'detail', 'time', 'demand', 'bookings', 'profile', 'pets', 'favorites']);
+    const tabByScreen = { match: 'match', detail: 'match', time: 'bookings', demand: 'bookings', map: 'map', mapList: 'map', bookings: 'bookings', profile: 'profile', pets: 'profile', favorites: 'match' };
     let currentScreen = 'login';
     const backStack = [];
     let resend = 60;
@@ -2288,6 +2678,20 @@
     let isSwiping = false;
     let suppressMatchClick = false;
     let lastMatchFilter = 'city';
+    let editingPetIndex = null;
+    let petPhotoData = '';
+    const pets = [
+      {
+        name: '麻糬', type: '貓', gender: '母', age: '3 歲', birthday: '',
+        breed: '英國短毛貓', weight: '4.2 kg', traits: '怕生',
+        notes: '怕生，進門後先讓牠聞味道。', color: 'green', photo: ''
+      },
+      {
+        name: '豆豆', type: '狗', gender: '公', age: '5 歲', birthday: '',
+        breed: '米克斯', weight: '12.8 kg', traits: '對大型犬敏感',
+        notes: '外出需繫胸背，對大型犬較敏感。', color: 'clay', photo: ''
+      }
+    ];
 
     const caregivers = [
       {
@@ -2384,6 +2788,118 @@
       ]
     };
 
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
+      })[char]);
+    }
+
+    function petPawSvg() {
+      return '<svg class="pet-paw-svg" viewBox="0 0 40 40" fill="currentColor" aria-hidden="true"><ellipse cx="7" cy="15" rx="4" ry="5"/><ellipse cx="16" cy="10" rx="4.5" ry="5.5"/><ellipse cx="25" cy="10" rx="4.5" ry="5.5"/><ellipse cx="33" cy="15" rx="4" ry="5"/><ellipse cx="20" cy="27" rx="11" ry="8"/></svg>';
+    }
+
+    function renderPets() {
+      const list = document.getElementById('petList');
+      if (!list) return;
+      list.innerHTML = pets.map((pet, index) => {
+        const photo = pet.photo
+          ? `<img src="${pet.photo}" alt="${escapeHtml(pet.name || '寵物')}照片">`
+          : petPawSvg();
+        const name = pet.name || '未命名毛孩';
+        const meta = [pet.type, pet.gender, pet.age || pet.birthday].filter(Boolean).join(' · ') || '資料尚未填寫';
+        const breed = [pet.breed, pet.weight].filter(Boolean).join(' · ') || '品種與體重未填';
+        const note = pet.notes || pet.traits || '尚未填寫照護注意事項。';
+        return `
+          <article class="card pet-list-card">
+            <div class="pet-photo ${pet.color === 'clay' ? 'clay' : ''}">${photo}</div>
+            <div class="pet-list-copy">
+              <h2>${escapeHtml(name)}</h2>
+              <p class="pet-list-meta">${escapeHtml(meta)}</p>
+              <p>${escapeHtml(breed)}</p>
+              <p class="pet-list-note">${escapeHtml(note)}</p>
+            </div>
+            <button class="pet-open-button" type="button" data-edit-pet="${index}" aria-label="編輯${escapeHtml(name)}">›</button>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function setPetOption(group, value) {
+      document.querySelectorAll(`[data-pet-options="${group}"] .pet-option`).forEach(button => {
+        button.classList.toggle('active', button.dataset.petValue === value);
+      });
+    }
+
+    function selectedPetOption(group) {
+      return document.querySelector(`[data-pet-options="${group}"] .pet-option.active`)?.dataset.petValue || '';
+    }
+
+    function syncPetPhotoPreview() {
+      const preview = document.getElementById('petPhotoPreview');
+      const image = document.getElementById('petPhotoImage');
+      if (!preview || !image) return;
+      preview.classList.toggle('has-image', Boolean(petPhotoData));
+      image.src = petPhotoData || '';
+    }
+
+    function resetPetForm(index = null) {
+      editingPetIndex = Number.isInteger(index) ? index : null;
+      const pet = editingPetIndex === null ? null : pets[editingPetIndex];
+      document.getElementById('petFormTitle').textContent = pet ? '編輯寵物' : '新增寵物';
+      document.getElementById('petName').value = pet?.name || '';
+      document.getElementById('petBirthday').value = pet?.birthday || '';
+      document.getElementById('petWeight').value = pet?.weight || '';
+      document.getElementById('petBreed').value = pet?.breed || '';
+      document.getElementById('petTraits').value = pet?.traits || '';
+      document.getElementById('petNotes').value = pet?.notes || '';
+      petPhotoData = pet?.photo || '';
+      setPetOption('type', pet?.type || '貓');
+      setPetOption('gender', pet?.gender || '');
+      syncPetPhotoPreview();
+      updatePetNotesCount();
+    }
+
+    function openPetForm(index = null) {
+      resetPetForm(index);
+      navigate('petForm');
+    }
+
+    function collectPetForm() {
+      return {
+        name: document.getElementById('petName').value.trim(),
+        type: selectedPetOption('type'),
+        gender: selectedPetOption('gender'),
+        birthday: document.getElementById('petBirthday').value.trim(),
+        age: '',
+        breed: document.getElementById('petBreed').value.trim(),
+        traits: document.getElementById('petTraits').value.trim(),
+        weight: document.getElementById('petWeight').value.trim(),
+        notes: document.getElementById('petNotes').value.trim(),
+        color: selectedPetOption('type') === '狗' ? 'clay' : 'green',
+        photo: petPhotoData
+      };
+    }
+
+    function savePet(continueAdding) {
+      const pet = collectPetForm();
+      if (editingPetIndex === null) pets.push(pet);
+      else pets[editingPetIndex] = { ...pets[editingPetIndex], ...pet };
+      renderPets();
+      toast('寵物資料已儲存');
+      if (continueAdding) {
+        resetPetForm();
+        document.getElementById('petForm').scrollTop = 0;
+      } else {
+        goBack();
+      }
+    }
+
+    function updatePetNotesCount() {
+      const notes = document.getElementById('petNotes');
+      const count = document.getElementById('petNotesCount');
+      if (notes && count) count.textContent = `${notes.value.length} / 100`;
+    }
+
     function go(id) {
       appScreens.forEach(screen => {
         screen.classList.toggle('active', screen.id === id);
@@ -2394,6 +2910,7 @@
       navItems.forEach(item => item.classList.toggle('active', item.dataset.tab === activeTab));
       if (id === 'otp') startResend();
       if (id === 'favorites') renderFavorites();
+      if (id === 'pets') renderPets();
       if (id === 'map') renderMapLists();
       if (id === 'mapList') renderMapLists();
       if (id === 'detail') renderDetail();
@@ -2925,6 +3442,31 @@
         goBack();
         return;
       }
+      const newPetButton = event.target.closest('[data-new-pet]');
+      if (newPetButton) {
+        event.preventDefault();
+        openPetForm();
+        return;
+      }
+      const editPetButton = event.target.closest('[data-edit-pet]');
+      if (editPetButton) {
+        event.preventDefault();
+        openPetForm(Number(editPetButton.dataset.editPet));
+        return;
+      }
+      const petOption = event.target.closest('.pet-option[data-pet-value]');
+      if (petOption) {
+        event.preventDefault();
+        const group = petOption.closest('[data-pet-options]')?.dataset.petOptions;
+        if (group) setPetOption(group, petOption.dataset.petValue);
+        return;
+      }
+      const savePetButton = event.target.closest('[data-save-pet]');
+      if (savePetButton) {
+        event.preventDefault();
+        savePet(savePetButton.dataset.savePet === 'next');
+        return;
+      }
       const petToggle = event.target.closest('[data-toggle-group="pet-types"] .chip');
       if (petToggle) {
         event.preventDefault();
@@ -3023,6 +3565,23 @@
       navigate(target.dataset.go);
     });
 
+    document.getElementById('petPhotoTrigger').addEventListener('click', () => {
+      document.getElementById('petPhotoInput').click();
+    });
+
+    document.getElementById('petPhotoInput').addEventListener('change', event => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        petPhotoData = String(reader.result || '');
+        syncPetPhotoPreview();
+      });
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('petNotes').addEventListener('input', updatePetNotesCount);
+
     document.getElementById('careFee').addEventListener('input', event => {
       const base = Math.max(0, parseInt(event.target.value.replace(/\D/g, ''), 10) || 0);
       const service = Math.round(base * 0.1);
@@ -3036,6 +3595,7 @@
     renderMapLists();
     updateFavoriteCount();
     renderFavorites();
+    renderPets();
     renderSlots();
     wireMatchDrag();
     go('login');
