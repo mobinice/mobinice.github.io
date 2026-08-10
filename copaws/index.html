@@ -34,7 +34,7 @@
       min-height: 100dvh;
       display: grid;
       place-items: center;
-      overflow: hidden;
+      overflow: auto;
       background:
         radial-gradient(circle at 20% 12%, rgba(11, 107, 58, .14), transparent 28%),
         radial-gradient(circle at 80% 90%, rgba(212, 90, 63, .12), transparent 26%),
@@ -205,13 +205,14 @@
     }
     .register-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 14px 12px;
     }
     .register-grid .field { margin-top: 0; }
     .field.span-2 { grid-column: 1 / -1; }
     .register-grid .input,
     .register-grid .select {
+      min-width: 0;
       height: 42px;
       border-radius: 13px;
       padding: 0 14px;
@@ -259,10 +260,11 @@
     }
     .register-submit { margin-top: 28px; height: 54px; border-radius: 16px; }
     #register {
-      overflow-y: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       padding-left: 20px;
       padding-right: 20px;
-      padding-bottom: 24px;
+      padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px));
     }
     #register .screen-title {
       margin: 14px 0 2px;
@@ -1820,7 +1822,7 @@
         <span class="swipe-stamp nope">NOPE</span>
         <div class="photo-hero pet-shape" id="matchPhoto">
           <span class="verified-icon" style="position:absolute;left:18px;top:20px" aria-label="已實名認證">
-            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m15.5 14.5 1.8 1.8 3.2-3.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m14.4 14.1 2.3 2.4 4.4-5.1" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
           <span class="hot" id="matchHot">本區熱門</span>
           <span class="pet-dot"></span>
@@ -1905,7 +1907,7 @@
         <div class="detail-title-row">
           <h2 id="detailName">Mina Chen</h2>
           <span class="verified-icon" aria-label="已實名認證">
-            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m15.5 14.5 1.8 1.8 3.2-3.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m14.4 14.1 2.3 2.4 4.4-5.1" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
         </div>
         <p class="meta"><span class="stars">★★★★★</span>　<span id="detailMeta">4.9 · 126 則評價 · 0.8 km</span></p>
@@ -1940,7 +1942,7 @@
           <p class="meta" id="timeIntro">貓咪餵食、清砂、陪玩回報</p>
         </div>
         <span class="verified-icon" aria-label="已實名認證">
-          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m15.5 14.5 1.8 1.8 3.2-3.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m14.4 14.1 2.3 2.4 4.4-5.1" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
       </div>
       <div class="card month-card">
@@ -2047,7 +2049,7 @@
         <div><h2>小安</h2><p class="meta" style="margin:0">飼主帳號 · 手機已驗證</p></div>
         <div class="cert-icons">
           <button class="verified-icon" onclick="openCertModal('identity')" aria-label="查看實名認證">
-            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m15.5 14.5 1.8 1.8 3.2-3.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m14.4 14.1 2.3 2.4 4.4-5.1" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <button class="verified-icon" onclick="openCertModal('phone')" aria-label="查看手機認證">
             <svg viewBox="0 0 24 24" fill="none"><rect x="8" y="3.5" width="8" height="17" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/></svg>
@@ -2578,7 +2580,7 @@
       body.innerHTML = `
         <div class="cert-row">
           <div><strong>已實名認證</strong><span>身分證與本人資料已通過平台確認</span></div>
-          <span class="verified-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m15.5 14.5 1.8 1.8 3.2-3.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="verified-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M5 20c1.2-4 12.8-4 14 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m14.4 14.1 2.3 2.4 4.4-5.1" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </div>
         <div class="cert-row">
           <div><strong>已手機認證</strong><span>可接收預約通知、驗證碼與服務提醒</span></div>
