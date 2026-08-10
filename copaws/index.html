@@ -1302,21 +1302,22 @@
     .caregiver-mini h3 { margin: 0 0 4px; }
     #time .caregiver-mini {
       min-height: 96px;
-      height: auto;
+      height: 96px;
       margin-top: 14px;
-      padding: 14px 16px;
+      padding: 12px 16px 6px;
       border-radius: 22px;
       box-shadow: none;
       align-items: flex-start;
+      gap: 12px;
       position: relative;
       overflow: hidden;
     }
     #time .caregiver-mini .avatar {
-      width: 52px;
-      height: 52px;
-      flex-basis: 52px;
-      border-radius: 17px;
-      margin-top: 2px;
+      width: 68px;
+      height: 78px;
+      flex-basis: 68px;
+      border-radius: 16px;
+      margin-top: 0;
     }
     #time .caregiver-mini .verified-icon {
       position: absolute;
@@ -1333,13 +1334,18 @@
       flex: 1;
       min-width: 0;
       padding-right: 36px;
+      height: 78px;
+      display: grid;
+      grid-template-rows: 24px 22px 16px;
+      row-gap: 8px;
     }
     .time-caregiver-top {
       display: grid;
-      grid-template-columns: minmax(72px, max-content) minmax(96px, 1fr);
+      grid-template-columns: minmax(0, 94px) minmax(0, 126px);
       align-items: center;
-      gap: 8px;
+      gap: 4px;
       min-width: 0;
+      height: 24px;
     }
     .time-caregiver-top h3 {
       max-width: 104px;
@@ -1351,8 +1357,9 @@
       text-overflow: ellipsis;
     }
     .time-rating-pill {
-      min-height: 26px;
-      max-width: 120px;
+      min-height: 24px;
+      height: 24px;
+      max-width: 126px;
       padding: 4px 7px;
       border-radius: 999px;
       background: var(--green-soft);
@@ -1375,13 +1382,15 @@
     }
     .time-info-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, .82fr) minmax(0, 1fr);
-      gap: 5px;
-      margin-top: 8px;
+      grid-template-columns: minmax(0, 78px) minmax(0, 60px) minmax(0, 74px);
+      gap: 4px;
+      height: 22px;
+      margin-top: 0;
     }
     .time-info {
       min-width: 0;
-      padding: 5px 4px;
+      height: 22px;
+      padding: 4px;
       border: 1px solid var(--line);
       border-radius: 10px;
       background: #fffdf8;
@@ -1395,9 +1404,13 @@
       text-overflow: ellipsis;
     }
     #timeIntro {
-      margin: 7px 0 0;
+      height: 16px;
+      margin: 0;
       font-size: 11px;
-      line-height: 1.35;
+      line-height: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     #time .screen-back {
       position: absolute;
