@@ -826,7 +826,7 @@
       border: 3px solid #fff;
       box-shadow: 0 14px 26px rgba(28, 42, 32, .18);
       background:
-        radial-gradient(circle at 72% 70%, var(--avatar-yellow) 0 10%, transparent 11%),
+        radial-gradient(circle at 72% 63%, var(--avatar-yellow) 0 9%, transparent 10%),
         var(--avatar-green);
       display: grid;
       place-items: center;
@@ -939,7 +939,7 @@
       height: 40px;
       border-radius: 15px;
       background:
-        radial-gradient(circle at 72% 70%, var(--avatar-yellow) 0 10%, transparent 11%),
+        radial-gradient(circle at 72% 63%, var(--avatar-yellow) 0 9%, transparent 10%),
         var(--avatar-green);
       position: relative;
       overflow: hidden;
@@ -1049,7 +1049,7 @@
       height: 54px;
       border-radius: 18px;
       background:
-        radial-gradient(circle at 72% 70%, var(--avatar-yellow) 0 10%, transparent 11%),
+        radial-gradient(circle at 72% 63%, var(--avatar-yellow) 0 9%, transparent 10%),
         var(--avatar-green);
       flex: 0 0 auto;
       position: relative;
@@ -1079,9 +1079,7 @@
     .detail-hero {
       margin: 0 -24px 0;
       height: 286px;
-      background:
-        radial-gradient(circle at 72% 66%, var(--avatar-yellow) 0 9%, transparent 10%),
-        var(--avatar-green);
+      background: var(--avatar-green);
       border-radius: 0 0 28px 28px;
       position: relative;
       overflow: hidden;
@@ -1812,14 +1810,14 @@
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
       <img class="login-logo" src="assets/copaws-a-plan-icon.png?v=clean-20260810" alt="Copaws">
       <div class="login-hero">
-        <h1>找到離家最近的安心照護者</h1>
+        <h1>找到離家最近的安心寵物保母</h1>
         <p>不在家時，快速媒合有經驗的養寵人，到家陪伴、餵食與回報。</p>
       </div>
       <div class="card login-card">
         <label>選擇身份</label>
         <div class="login-role-row">
           <button class="login-role active">我是飼主</button>
-          <button class="login-role">我是照護者</button>
+          <button class="login-role">我是寵物保母</button>
         </div>
         <label>手機號碼</label>
         <input class="input login-input" value="0912 345 678">
@@ -1844,7 +1842,7 @@
     <section class="screen no-nav" id="register">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
       <h1 class="screen-title">建立基本資料</h1>
-      <p class="subtitle">讓照護者更了解你的需求，也方便平台媒合適合的人。</p>
+      <p class="subtitle">讓寵物保母更了解你的需求，也方便平台媒合適合的人。</p>
       <div class="card register-card">
         <div class="register-grid">
           <div class="field"><label>暱稱 *</label><input class="input" value="小安"></div>
@@ -1870,9 +1868,9 @@
     <section class="screen" id="match">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
       <div class="match-head">
-        <h1 class="screen-title">附近照護者</h1>
+        <h1 class="screen-title">附近寵物保母</h1>
         <p class="subtitle">右滑收藏，查看最近可預約時間</p>
-        <button class="favorite-entry" data-go="favorites" aria-label="查看收藏照護者">
+        <button class="favorite-entry" data-go="favorites" aria-label="查看收藏寵物保母">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg>
           <span class="favorite-count" id="favoriteCount">1</span>
         </button>
@@ -1912,13 +1910,13 @@
     <section class="screen" id="map">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
       <h1 class="screen-title">地圖探索</h1>
-      <p class="subtitle">看見離家最近、評價最穩的照護者</p>
+      <p class="subtitle">看見離家最近、評價最穩的寵物保母</p>
       <div class="map-canvas">
         <button class="map-person p1 active" data-map-index="0" aria-label="Mina Chen"></button>
         <button class="map-person p2" data-map-index="1" aria-label="小芸"></button>
         <button class="map-person p3" data-map-index="2" aria-label="柏宇"></button>
-        <button class="map-person p4" data-map-index="0" aria-label="附近照護者"></button>
-        <button class="near-card" id="mapPreviewCard" data-go="detail" aria-label="查看照護者卡片">
+        <button class="map-person p4" data-map-index="0" aria-label="附近寵物保母"></button>
+        <button class="near-card" id="mapPreviewCard" data-go="detail" aria-label="查看寵物保母卡片">
           <span class="avatar" id="mapPreviewAvatar"></span>
           <div>
             <strong id="mapPreviewName">Mina Chen · 0.8 km</strong>
@@ -1929,7 +1927,7 @@
       <div class="card map-ranking-card">
         <div class="map-ranking-head">
           <div>
-            <h3 id="mapRankingTitle">附近 24 位照護者</h3>
+            <h3 id="mapRankingTitle">附近 24 位寵物保母</h3>
             <p class="meta">先顯示距離最近的 1-20 位，第 21 個位置可展開更多。</p>
           </div>
         </div>
@@ -1939,13 +1937,15 @@
 
     <section class="screen" id="mapList">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <button class="screen-back" data-back aria-label="返回地圖">‹</button>
-      <h1 class="screen-title">附近照護者</h1>
-      <p class="subtitle">全部照護者依距離由近到遠排序，點擊卡片可查看資料與預約。</p>
+      <div class="page-heading">
+        <button class="screen-back" data-back aria-label="返回地圖">‹</button>
+        <h1 class="screen-title">附近寵物保母</h1>
+      </div>
+      <p class="subtitle">全部寵物保母依距離由近到遠排序，點擊卡片可查看資料與預約。</p>
       <div class="card map-expanded-list show" id="mapExpandedList">
         <div class="map-list-toolbar">
           <div>
-            <h3>全部照護者</h3>
+            <h3>全部寵物保母</h3>
             <p class="meta" id="mapPageSummary">第 1 頁</p>
           </div>
         </div>
@@ -1961,7 +1961,7 @@
     <section class="screen" id="detail">
       <div class="detail-hero caregiver-photo">
         <button class="back" id="detailBack" data-back>‹</button>
-        <button class="heart-float" id="detailFavoriteButton" aria-label="收藏照護者" aria-pressed="false">
+        <button class="heart-float" id="detailFavoriteButton" aria-label="收藏寵物保母" aria-pressed="false">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z" stroke="currentColor" stroke-width="2"/></svg>
         </button>
         <span class="pet-dot"></span>
@@ -1991,7 +1991,7 @@
         <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
         <h1 class="screen-title">選擇時段</h1>
       </div>
-      <p class="subtitle">先確認照護者與日期，再填寫需求</p>
+      <p class="subtitle">先確認寵物保母與日期，再填寫需求</p>
       <div class="caregiver-mini card">
         <span class="avatar"></span>
         <div class="time-caregiver-body">
@@ -1999,7 +1999,7 @@
             <h3 id="timeName">Mina Chen</h3>
             <span class="time-rating-pill"><span class="star">★</span><span id="timeRating">4.9</span><span id="timeReviews">126 則評價</span></span>
           </div>
-          <div class="time-info-grid" aria-label="照護者摘要資訊">
+          <div class="time-info-grid" aria-label="寵物保母摘要資訊">
             <span class="time-info" id="timeViews">瀏覽 2,431</span>
             <span class="time-info" id="timeDistance">0.8 km</span>
             <span class="time-info" id="timeServiceType">到府照護</span>
@@ -2039,12 +2039,12 @@
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
       <div class="page-heading">
         <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
-        <h1 class="screen-title">收藏照護者</h1>
+        <h1 class="screen-title">收藏寵物保母</h1>
       </div>
-      <p class="subtitle">已收藏的保母會集中在這裡，可查看卡片與預約時段。</p>
+      <p class="subtitle">已收藏的寵物保母會集中在這裡，可查看卡片與預約時段。</p>
       <div class="card favorites-summary">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--green)"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg>
-        <div><strong id="favoriteSummary">已收藏 1 位照護者</strong><p class="meta" style="margin:2px 0 0">點卡片可查看照護者資料與預約入口</p></div>
+        <div><strong id="favoriteSummary">已收藏 1 位寵物保母</strong><p class="meta" style="margin:2px 0 0">點卡片可查看寵物保母資料與預約入口</p></div>
       </div>
       <div id="favoriteList"></div>
     </section>
@@ -2055,7 +2055,7 @@
         <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
         <h1 class="screen-title">填寫需求</h1>
       </div>
-      <p class="subtitle">照護者確認後，平台會保留需求與付款紀錄。</p>
+      <p class="subtitle">寵物保母確認後，平台會保留需求與付款紀錄。</p>
       <div class="summary-card card">
         <strong>Mina Chen · 7/16 14:00-16:00</strong>
         <p class="meta" style="margin:6px 0 0">到府餵食、清砂、照片回報</p>
@@ -2087,12 +2087,12 @@
         <span class="status">進行中</span>
         <h3>Mina Chen 到府照護</h3>
         <p class="meta">服務中，每 30 分鐘回報照片與狀態。</p>
-        <div class="book-actions"><button class="btn" onclick="openBookingModal('report')">查看回報</button><button class="btn light" onclick="openBookingModal('contact')">聯絡照護者</button></div>
+        <div class="book-actions"><button class="btn" onclick="openBookingModal('report')">查看回報</button><button class="btn light" onclick="openBookingModal('contact')">聯絡寵物保母</button></div>
       </article>
       <article class="card book-card" data-booking-status="upcoming">
         <span class="status" style="color:var(--clay)">即將服務</span>
         <h3>小芸 · 到府餵食</h3>
-        <p class="meta">今天 18:30 開始，照護者已確認接案。</p>
+        <p class="meta">今天 18:30 開始，寵物保母已確認接案。</p>
         <div class="book-actions"><button class="btn clay">查看詳情</button><button class="btn light" style="color:var(--clay);border-color:var(--clay)">提醒我</button></div>
       </article>
       <article class="card book-card" data-booking-status="pending">
@@ -2113,7 +2113,7 @@
     <section class="screen" id="profile">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
       <h1 class="screen-title">個人</h1>
-      <p class="subtitle">飼主與照護者都從這裡管理資料</p>
+      <p class="subtitle">飼主與寵物保母都從這裡管理資料</p>
       <div class="profile-card card">
         <button class="upload-btn">上傳<br>大頭照</button>
         <div><h2>小安</h2><p class="meta" style="margin:0">飼主帳號 · 手機已驗證</p></div>
@@ -2127,7 +2127,7 @@
         </div>
       </div>
       <div class="sitter-card">
-        <h2>成為照護者</h2>
+        <h2>成為寵物保母</h2>
         <p style="margin:0 0 18px;line-height:1.5">上傳身分證完成實名認證，建立服務區域、價格與可預約日曆。</p>
         <button class="btn light">開始認證</button>
       </div>
@@ -2189,8 +2189,8 @@
         detail: '專長照顧貓咪與小型犬，可協助餵藥、清貓砂、散步、即時照片回報。',
         timeIntro: '到府照護 · 貓咪餵食、清砂、陪玩回報',
         hot: '本區熱門',
-        color: '#739079',
-        dot: '#efb53e',
+        color: '#68876d',
+        dot: '#e5ad40',
         filters: ['city', 'district', 'today', 'pet'],
         focus: 'district'
       },
@@ -2203,8 +2203,8 @@
         detail: '擅長照顧慢熟貓與分離焦慮毛孩，可提供短影片與用藥提醒。',
         timeIntro: '到府照護 · 餵藥、清砂、短影片回報',
         hot: '回覆很快',
-        color: '#8d9b7b',
-        dot: '#d45a3f',
+        color: '#68876d',
+        dot: '#e5ad40',
         filters: ['city', 'today'],
         focus: 'today'
       },
@@ -2217,8 +2217,8 @@
         detail: '大型犬散步與陪伴經驗多，可協助回報路線、喝水與便便狀態。',
         timeIntro: '散步陪伴 · 大型犬路線回報',
         hot: '散步熱門',
-        color: '#6f8c72',
-        dot: '#efb53e',
+        color: '#68876d',
+        dot: '#e5ad40',
         filters: ['city', 'pet'],
         focus: 'pet'
       }
@@ -2397,16 +2397,16 @@
       const saved = favoriteIndexes.has(selectedCaregiverIndex);
       button.classList.toggle('active', saved);
       button.setAttribute('aria-pressed', saved ? 'true' : 'false');
-      button.setAttribute('aria-label', saved ? '取消收藏照護者' : '收藏照護者');
+      button.setAttribute('aria-label', saved ? '取消收藏寵物保母' : '收藏寵物保母');
     }
 
     function renderFavorites() {
       const list = document.getElementById('favoriteList');
       const summary = document.getElementById('favoriteSummary');
       if (!list || !summary) return;
-      summary.textContent = `已收藏 ${favoriteIndexes.size} 位照護者`;
+      summary.textContent = `已收藏 ${favoriteIndexes.size} 位寵物保母`;
       if (!favoriteIndexes.size) {
-        list.innerHTML = '<div class="card favorite-card"><p class="meta" style="margin:0">目前尚未收藏照護者，回到配對頁右滑或點愛心即可加入。</p></div>';
+        list.innerHTML = '<div class="card favorite-card"><p class="meta" style="margin:0">目前尚未收藏寵物保母，回到配對頁右滑或點愛心即可加入。</p></div>';
         return;
       }
       list.innerHTML = Array.from(favoriteIndexes).map(index => {
@@ -2433,7 +2433,7 @@
               <p class="favorite-slot-time">${data.nearest.split(' · ')[0]}</p>
             </div>
             <div class="favorite-actions">
-              <button class="btn light" data-go="detail" data-index="${index}">查看保母</button>
+              <button class="btn light" data-go="detail" data-index="${index}">查看寵物保母</button>
               <button class="btn" data-go="time" data-index="${index}">查看時段預約</button>
             </div>
           </article>
@@ -2489,7 +2489,7 @@
       const prev = document.getElementById('mapPrevPage');
       const next = document.getElementById('mapNextPage');
       if (!topList || !pagedList) return;
-      if (title) title.textContent = `附近 ${sorted.length} 位照護者`;
+      if (title) title.textContent = `附近 ${sorted.length} 位寵物保母`;
       const firstTwenty = sorted.slice(0, Math.min(20, sorted.length));
       topList.innerHTML = firstTwenty.map((item, index) => mapRowTemplate(item, index + 1)).join('')
         + (sorted.length > 20 ? '<button class="map-more-row" id="showMoreMapCaregivers">查看更多</button>' : '');
@@ -2674,13 +2674,13 @@
         copy.textContent = 'Mina Chen 正在照護麻糬，以下為目前服務中的即時回報。';
         body.innerHTML = `
           <div class="report-list">
-            <div class="report-item"><strong>14:18 已抵達</strong><span>照護者已進門，確認門窗與貓咪狀態正常。</span></div>
+            <div class="report-item"><strong>14:18 已抵達</strong><span>寵物保母已進門，確認門窗與貓咪狀態正常。</span></div>
             <div class="report-item"><strong>14:32 完成餵食</strong><span>已補乾糧與水，麻糬有正常進食。</span></div>
             <div class="report-item"><strong>14:46 清理貓砂</strong><span>已清理貓砂並拍照回傳，無異常狀況。</span></div>
           </div>
         `;
       } else {
-        title.textContent = '聯絡照護者';
+        title.textContent = '聯絡寵物保母';
         copy.textContent = '可以選擇用平台訊息或電話聯絡 Mina Chen。Demo 版先以彈窗展示操作。';
         body.innerHTML = `
           <div class="report-list">
@@ -2688,7 +2688,7 @@
           </div>
           <div class="contact-actions">
             <button class="btn" onclick="toast('已開啟平台訊息')">平台訊息</button>
-            <button class="btn light" onclick="toast('已撥打照護者電話')">撥打電話</button>
+            <button class="btn light" onclick="toast('已撥打寵物保母電話')">撥打電話</button>
           </div>
         `;
       }
