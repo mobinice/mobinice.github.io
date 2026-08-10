@@ -142,6 +142,22 @@
       font-weight: 900;
       line-height: 1;
     }
+    .page-heading {
+      margin: 10px 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .page-heading .screen-back {
+      margin: 0;
+      flex: 0 0 auto;
+    }
+    .page-heading .screen-title {
+      margin: 0;
+    }
+    .page-heading + .subtitle {
+      margin-left: 48px;
+    }
     .subtitle {
       margin: 0 0 20px;
       color: var(--muted);
@@ -1380,6 +1396,19 @@
       z-index: 12;
       margin: 0;
     }
+    #time .page-heading .screen-back {
+      position: static;
+      left: auto;
+      top: auto;
+      z-index: auto;
+      margin: 0;
+    }
+    #time .page-heading .screen-title {
+      margin-left: 0;
+    }
+    #time .page-heading + .subtitle {
+      margin-left: 48px;
+    }
     #time .screen-title,
     #time .subtitle {
       margin-left: 34px;
@@ -1935,8 +1964,10 @@
 
     <section class="screen" id="time">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
-      <h1 class="screen-title">選擇時段</h1>
+      <div class="page-heading">
+        <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
+        <h1 class="screen-title">選擇時段</h1>
+      </div>
       <p class="subtitle">先確認照護者與日期，再填寫需求</p>
       <div class="caregiver-mini card">
         <span class="avatar"></span>
@@ -1983,9 +2014,11 @@
 
     <section class="screen" id="favorites">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
-      <h1 class="screen-title" style="margin-left:34px">收藏照護者</h1>
-      <p class="subtitle" style="margin-left:34px">已收藏的保母會集中在這裡，可查看卡片與預約時段。</p>
+      <div class="page-heading">
+        <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
+        <h1 class="screen-title">收藏照護者</h1>
+      </div>
+      <p class="subtitle">已收藏的保母會集中在這裡，可查看卡片與預約時段。</p>
       <div class="card favorites-summary">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--green)"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg>
         <div><strong id="favoriteSummary">已收藏 1 位照護者</strong><p class="meta" style="margin:2px 0 0">點卡片可查看照護者資料與預約入口</p></div>
@@ -1995,7 +2028,10 @@
 
     <section class="screen long" id="demand">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <h1 class="screen-title">填寫需求</h1>
+      <div class="page-heading">
+        <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
+        <h1 class="screen-title">填寫需求</h1>
+      </div>
       <p class="subtitle">照護者確認後，平台會保留需求與付款紀錄。</p>
       <div class="summary-card card">
         <strong>Mina Chen · 7/16 14:00-16:00</strong>
