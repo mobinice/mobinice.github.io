@@ -10,8 +10,8 @@
       --green-2: #6f8c72;
       --green-soft: #e8f5e9;
       --avatar-green: #68876d;
-      --avatar-cream: #f6efdf;
-      --avatar-yellow: #e6ad40;
+      --avatar-cream: #f6f0df;
+      --avatar-yellow: #e5ad40;
       --clay: #d45a3f;
       --cream: #fffaf1;
       --paper: #fffdf8;
@@ -1469,13 +1469,23 @@
       width: 104px;
       height: 120px;
       border-radius: 18px;
-      background:
-        radial-gradient(circle at 72% 62%, var(--avatar-yellow) 0 9%, transparent 10%),
-        var(--avatar-green);
+      background: var(--avatar-green);
       position: relative;
       overflow: hidden;
     }
     .favorite-photo::before {
+      content: "";
+      position: absolute;
+      left: 38%;
+      top: 18%;
+      width: 24%;
+      aspect-ratio: 1;
+      height: auto;
+      border-radius: 50%;
+      background: var(--avatar-cream);
+      z-index: 2;
+    }
+    .favorite-photo::after {
       content: "";
       position: absolute;
       left: 26%;
@@ -1484,16 +1494,29 @@
       height: 30%;
       border-radius: 999px 999px 18px 18px;
       background: var(--avatar-cream);
+      z-index: 2;
     }
-    .favorite-photo::after {
-      content: "";
+    .favorite-photo .pet-dot {
+      left: 63%;
+      top: 54%;
+      right: auto;
+      bottom: auto;
+      width: 18%;
+      aspect-ratio: 1;
+      height: auto;
+      z-index: 1;
+    }
+    .favorite-photo .verified-icon {
       position: absolute;
-      left: 38%;
-      top: 18%;
-      width: 24%;
-      height: 20%;
-      border-radius: 50%;
-      background: var(--avatar-cream);
+      left: 12px;
+      top: 12px;
+      width: 28px;
+      height: 28px;
+      z-index: 3;
+    }
+    .favorite-photo .verified-icon svg {
+      width: 17px;
+      height: 17px;
     }
     .favorite-new-tag {
       position: absolute;
@@ -2392,7 +2415,12 @@
           <article class="card favorite-card">
             <span class="favorite-new-tag">NEW</span>
             <div class="favorite-card-main">
-              <div class="favorite-photo"></div>
+              <div class="favorite-photo">
+                <span class="verified-icon" aria-label="已實名認證">
+                  <svg viewBox="0 0 32 32" fill="none"><circle cx="10.5" cy="9.4" r="4.2" fill="currentColor"/><path d="M3.8 25.8c1-6.4 12.4-6.4 13.4 0v1.2H3.8v-1.2Z" fill="currentColor"/><path d="m19.2 20.5 3.2 3.2 6.3-7.4" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="pet-dot"></span>
+              </div>
               <div class="favorite-copy">
                 <h2>${data.name}</h2>
                 <p class="meta" style="margin:0"><span class="stars">★★★★★</span> ${compactMeta(data)}</p>
