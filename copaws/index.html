@@ -143,10 +143,18 @@
       line-height: 1;
     }
     .page-heading {
-      margin: 10px 0 4px;
+      min-height: 56px;
+      margin: 0 -24px 4px;
+      padding: 10px 24px 8px;
       display: flex;
       align-items: center;
       gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 45;
+      background: linear-gradient(145deg, rgba(235, 249, 238, .97), rgba(255, 249, 235, .97));
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
     }
     .page-heading .screen-back {
       margin: 0;
@@ -532,6 +540,19 @@
       color: #fff;
       background: var(--green);
       border-color: var(--green);
+    }
+    #bookings > .chips {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      overflow: visible;
+      padding-bottom: 0;
+    }
+    #bookings > .chips .chip {
+      width: 100%;
+      min-width: 0;
+      padding: 0 8px;
+      white-space: nowrap;
     }
     .match-head {
       position: relative;
@@ -1772,6 +1793,141 @@
     }
     .booking-empty.show { display: block; }
 
+    .demand-detail-screen > .subtitle {
+      margin-bottom: 0;
+    }
+    .sitter-summary-card.demand-detail-sitter {
+      height: 128px;
+      margin-top: 16px;
+      padding: 18px 24px;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .demand-detail-sitter .sitter-summary-copy {
+      gap: 7px;
+    }
+    .demand-detail-confirmed {
+      width: max-content;
+      height: 26px;
+      padding: 0 14px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #e8f7ea;
+      color: #0c5832;
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .demand-detail-section {
+      margin-top: 20px;
+    }
+    .demand-detail-section h3 {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 22px;
+    }
+    .demand-detail-card {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .94);
+      box-shadow: none;
+    }
+    .demand-detail-time {
+      min-height: 66px;
+      padding: 11px 20px;
+      border: 0;
+      background: #e8f7ea;
+    }
+    .demand-detail-time strong {
+      display: block;
+      color: #054024;
+      font-size: 15px;
+      line-height: 28px;
+    }
+    .demand-detail-time span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 18px;
+    }
+    .demand-detail-address {
+      min-height: 56px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      line-height: 20px;
+    }
+    .demand-detail-pet {
+      min-height: 88px;
+      padding: 9px 20px;
+      display: grid;
+      align-content: center;
+      gap: 4px;
+      font-size: 12px;
+      line-height: 18px;
+    }
+    .demand-detail-pet strong {
+      font-size: 13px;
+    }
+    .demand-detail-assistance {
+      display: grid;
+      grid-template-columns: repeat(4, 76px);
+      gap: 10px;
+    }
+    .demand-detail-chip {
+      height: 36px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #e8f7ea;
+      color: #0c5832;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .demand-detail-chip.inactive {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--muted);
+    }
+    .demand-detail-copy {
+      min-height: 82px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .demand-detail-fee {
+      min-height: 142px;
+      padding: 11px 20px;
+    }
+    .demand-detail-fee .money-row {
+      min-height: 32px;
+      padding: 4px 0;
+      font-size: 12px;
+    }
+    .demand-detail-fee .money-row strong {
+      color: var(--ink);
+      font-size: 13px;
+    }
+    .demand-detail-fee .money-row.total {
+      min-height: 50px;
+      margin-top: 0;
+      padding-top: 10px;
+      color: var(--ink);
+      font-size: 14px;
+    }
+    .demand-detail-fee .money-row.total strong {
+      color: var(--clay);
+      font-size: 18px;
+    }
+
     .booking-flow-screen,
     .finance-screen,
     .receipt-screen {
@@ -2250,16 +2406,23 @@
     }
 
     .pet-screen {
-      padding-top: 15px;
+      padding-top: 0;
     }
     .pet-page-header {
-      min-height: 55px;
-      position: relative;
+      min-height: 72px;
+      margin: 0 -24px;
+      padding: 10px 24px 8px;
+      position: sticky;
+      top: 0;
+      z-index: 45;
+      background: linear-gradient(145deg, rgba(235, 249, 238, .97), rgba(255, 249, 235, .97));
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
     }
     .pet-page-header .screen-back {
       position: absolute;
-      left: 0;
-      top: 2px;
+      left: 24px;
+      top: 10px;
       margin: 0;
     }
     .pet-page-header .screen-title {
@@ -2273,8 +2436,8 @@
     }
     .pet-add-compact {
       position: absolute;
-      top: 0;
-      right: 0;
+      top: 10px;
+      right: 24px;
       width: 100px;
       height: 40px;
       border-radius: 999px;
@@ -2376,7 +2539,7 @@
     }
 
     .pet-form-screen {
-      padding-top: 15px;
+      padding-top: 0;
       padding-bottom: 40px;
     }
     .pet-upload-card {
@@ -2978,17 +3141,42 @@
       <div class="chat-composer"><input class="input" id="chatInput" placeholder="輸入留言"><button class="chat-send" id="chatSend" aria-label="送出留言">↑</button></div>
     </section>
 
-    <section class="screen long booking-flow-screen" id="bookingDetail">
+    <section class="screen long booking-flow-screen demand-detail-screen" id="bookingDetail">
       <div class="page-heading">
         <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
         <h1 class="screen-title">需求詳情</h1>
       </div>
-      <p class="subtitle">查看本次預約與先前填寫的需求內容</p>
-      <div class="sitter-summary-card card" data-sitter-summary></div>
-      <article class="flow-section-card card"><h3>服務資訊</h3><div class="detail-row"><span>服務時間</span><strong>2026/12/01 14:00～2026/12/01 15:00</strong></div><div class="detail-row"><span>服務地址</span><strong>台北市大安區和平東路一段 88 號</strong></div></article>
-      <article class="flow-section-card card"><h3>寵物資訊</h3><div class="detail-row"><span>寵物</span><strong>麻糬 · 貓</strong></div><div class="detail-row"><span>性別</span><strong>母</strong></div><div class="detail-row"><span>品種</span><strong>英國短毛貓</strong></div><div class="detail-row"><span>特徵</span><strong>怕生、慢熟</strong></div></article>
-      <article class="flow-section-card card"><h3>需求內容</h3><div class="detail-row"><span>協助事項</span><strong>餵乾糧與罐罐、清理貓砂、補水、陪玩 15 分鐘</strong></div><div class="detail-row"><span>注意事項</span><strong>進門後先讓麻糬聞味道，不要直接抱牠</strong></div><div class="detail-row"><span>回報需求</span><strong>餵食與清砂後各拍一張照片，離開前回報門窗狀態</strong></div></article>
-      <article class="flow-section-card card"><h3>費用明細</h3><div class="money-row"><span>寵物保母服務費</span><strong>NT$ 1,200</strong></div><div class="money-row"><span>平台服務費</span><strong>NT$ 180</strong></div><div class="money-row total"><span>總計</span><strong>NT$ 1,380</strong></div></article>
+      <p class="subtitle">訂單 CP20261201008</p>
+      <div class="sitter-summary-card demand-detail-sitter card" data-sitter-summary data-demand-detail-sitter></div>
+
+      <section class="demand-detail-section">
+        <h3>本次服務時間</h3>
+        <div class="demand-detail-card demand-detail-time"><strong>2026/12/01 14:00～2026/12/01 15:00</strong><span>到府照護 · 共 1 小時</span></div>
+      </section>
+      <section class="demand-detail-section">
+        <h3>服務地址</h3>
+        <div class="demand-detail-card demand-detail-address">台北市大安區信義路三段 88 號</div>
+      </section>
+      <section class="demand-detail-section">
+        <h3>寵物資訊</h3>
+        <div class="demand-detail-card demand-detail-pet"><strong>Mochi · 貓咪 · 3 歲</strong><span>性別：男生　　品種：英國短毛貓</span><span>特徵：灰藍短毛、琥珀色眼睛</span></div>
+      </section>
+      <section class="demand-detail-section">
+        <h3>需要協助的事項</h3>
+        <div class="demand-detail-assistance"><span class="demand-detail-chip">餵食</span><span class="demand-detail-chip">清砂</span><span class="demand-detail-chip">陪玩</span><span class="demand-detail-chip inactive">餵藥</span></div>
+      </section>
+      <section class="demand-detail-section">
+        <h3>注意事項</h3>
+        <div class="demand-detail-card demand-detail-copy">怕陌生人，進門後先不要抱牠。罐頭在廚房左側櫃子。</div>
+      </section>
+      <section class="demand-detail-section">
+        <h3>回報需求</h3>
+        <div class="demand-detail-card demand-detail-copy">完成餵食、清砂後各拍一張照片，離開前回報門窗狀態。</div>
+      </section>
+      <section class="demand-detail-section">
+        <h3>費用明細</h3>
+        <div class="demand-detail-card demand-detail-fee"><div class="money-row"><span>寵物保母服務費</span><strong>NT$ 1,200</strong></div><div class="money-row"><span>平台服務費 15%</span><strong>NT$ 180</strong></div><div class="money-row total"><span>付款總額</span><strong>NT$ 1,380</strong></div></div>
+      </section>
     </section>
 
     <section class="screen long booking-flow-screen" id="bookingEdit">
@@ -3552,6 +3740,16 @@
       const data = caregivers[selectedCaregiverIndex] || caregivers[0];
       const parts = caregiverMetaParts(data);
       document.querySelectorAll('[data-sitter-summary]').forEach(card => {
+        if (card.hasAttribute('data-demand-detail-sitter')) {
+          card.innerHTML = `
+            <span class="avatar" aria-hidden="true"></span>
+            <div class="sitter-summary-copy">
+              <h3>${escapeHtml(data.name)}</h3>
+              <div class="sitter-rating-line"><span class="stars">★★★★★</span><span>${escapeHtml(parts.score)} · ${escapeHtml(parts.reviews)}</span></div>
+              <span class="demand-detail-confirmed">保母已確認</span>
+            </div>`;
+          return;
+        }
         card.innerHTML = `
           <span class="avatar" aria-hidden="true"></span>
           <div class="sitter-summary-copy">
