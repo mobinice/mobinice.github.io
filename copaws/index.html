@@ -1309,7 +1309,7 @@
     #time .caregiver-mini {
       min-height: 96px;
       height: 96px;
-      margin-top: 14px;
+      margin-top: 16px;
       padding: 12px 16px 6px;
       border-radius: 22px;
       box-shadow: none;
@@ -1437,6 +1437,7 @@
     }
     #time .page-heading + .subtitle {
       margin-left: 48px;
+      margin-bottom: 0;
     }
     #time .screen-title,
     #time .subtitle {
@@ -1746,10 +1747,395 @@
     }
     .booking-empty.show { display: block; }
 
-    .profile-card {
+    .booking-flow-screen,
+    .finance-screen,
+    .receipt-screen {
+      padding-top: 0;
+    }
+    #demand > .subtitle,
+    .booking-flow-screen > .subtitle {
+      margin-bottom: 0;
+    }
+    .sitter-summary-card {
+      height: 128px;
+      margin-top: 16px;
+      padding: 18px 16px;
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr) 34px;
+      gap: 14px;
+      align-items: start;
+      position: relative;
+      box-shadow: none;
+    }
+    .sitter-summary-card .avatar {
+      width: 72px;
+      height: 84px;
+      border-radius: 16px;
+    }
+    .sitter-summary-copy {
+      min-width: 0;
+      height: 84px;
+      display: grid;
+      align-content: start;
+      gap: 8px;
+    }
+    .sitter-summary-copy h3 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 24px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sitter-rating-line {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .sitter-rating-line .stars {
+      font-size: 10px;
+      letter-spacing: 0;
+    }
+    .sitter-summary-meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .sitter-summary-meta span {
+      min-width: 0;
+      height: 24px;
+      padding: 5px 6px;
+      border-radius: 999px;
+      background: #f5f1e8;
+      color: #6f685f;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 14px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sitter-summary-card > .verified-icon {
+      width: 34px;
+      height: 34px;
+      margin-top: 0;
+    }
+    .service-form {
+      margin-top: 18px;
+    }
+    .service-time-label {
+      margin: 18px 0 8px 2px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .service-time-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .service-time-box {
+      height: 70px;
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.92);
+    }
+    .service-time-box span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .service-time-box strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 15px;
+      white-space: nowrap;
+    }
+    .pet-picker-empty {
+      display: none;
+      min-height: 92px;
+      padding: 16px;
+      border: 1px dashed rgba(11,107,58,.34);
+      border-radius: 18px;
+      background: var(--green-soft);
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .pet-picker-empty.show { display: flex; }
+    .pet-picker-empty strong { font-size: 13px; }
+    .pet-picker-empty p { margin: 3px 0 0; font-size: 11px; color: var(--muted); }
+    .pet-create-button {
+      flex: 0 0 auto;
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: var(--green);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .flow-section-card {
+      margin-top: 16px;
+      padding: 18px;
+      box-shadow: none;
+    }
+    .flow-section-card h3 {
+      margin: 0 0 12px;
+      font-size: 17px;
+    }
+    .detail-row {
+      display: grid;
+      grid-template-columns: 86px minmax(0, 1fr);
+      gap: 10px;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .detail-row:first-of-type { border-top: 0; padding-top: 0; }
+    .detail-row span { color: var(--muted); font-weight: 800; }
+    .detail-row strong { font-weight: 800; }
+    .report-timeline {
+      margin-top: 18px;
+      display: grid;
+      gap: 16px;
+    }
+    .report-entry {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 12px;
+    }
+    .report-time {
+      padding-top: 12px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 900;
+      text-align: right;
+    }
+    .report-card {
+      padding: 16px;
+      box-shadow: none;
+    }
+    .report-card h3 { margin: 0 0 5px; font-size: 16px; }
+    .report-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .report-photo {
       height: 132px;
+      margin-bottom: 12px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: #dfeadf;
+      color: var(--green);
+    }
+    .report-photo svg { width: 34px; height: 34px; }
+    .chat-board {
+      min-height: 520px;
+      margin-top: 18px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: none;
+    }
+    .chat-message { max-width: 82%; }
+    .chat-message.owner { align-self: flex-end; }
+    .chat-message.sitter { align-self: flex-start; }
+    .chat-bubble {
+      padding: 12px 14px;
+      border-radius: 18px 18px 18px 5px;
+      background: #f4efe5;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .chat-message.owner .chat-bubble {
+      border-radius: 18px 18px 5px 18px;
+      background: var(--green);
+      color: #fff;
+    }
+    .chat-meta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 10px;
+      text-align: left;
+    }
+    .chat-message.owner .chat-meta { text-align: right; }
+    .chat-status { margin-left: 5px; color: var(--green); font-weight: 900; }
+    .quick-replies {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-top: auto;
+      padding-top: 12px;
+    }
+    .quick-reply {
+      flex: 0 0 auto;
+      height: 34px;
+      padding: 0 14px;
+      border: 1px solid var(--green);
+      border-radius: 999px;
+      color: var(--green);
+      background: #fff;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .chat-composer {
+      display: grid;
+      grid-template-columns: 1fr 44px;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .chat-composer .input { height: 44px; padding: 0 14px; }
+    .chat-send {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .finance-summary {
+      margin-top: 16px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      box-shadow: none;
+    }
+    .finance-summary div { min-width: 0; }
+    .finance-summary span { display: block; color: var(--muted); font-size: 11px; }
+    .finance-summary strong { display: block; margin-top: 5px; color: var(--green); font-size: 20px; }
+    .finance-filters { margin-top: 16px; }
+    .finance-filter-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .finance-filter-row .chip {
+      min-width: 0;
+      width: 100%;
+      height: 32px;
+      padding: 0 6px;
+      font-size: 11px;
+    }
+    .transaction-list {
+      margin-top: 18px;
+      display: grid;
+      gap: 10px;
+    }
+    .transaction-item {
+      min-height: 104px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 12px;
+      text-align: left;
+      box-shadow: none;
+    }
+    .transaction-item h3 { margin: 0; font-size: 15px; }
+    .transaction-item p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .transaction-status { color: var(--green); font-size: 11px; font-weight: 900; }
+    .transaction-amount { align-self: center; font-size: 15px; font-weight: 900; }
+    .transaction-amount.plus { color: var(--green); }
+    .transaction-amount.minus { color: var(--clay); }
+    .transaction-complete {
+      grid-column: 1 / -1;
+      justify-self: end;
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: var(--green);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .pagination {
+      display: grid;
+      grid-template-columns: 38px 1fr 38px;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0 10px;
+    }
+    .pagination span { color: var(--muted); font-size: 12px; font-weight: 900; text-align: center; }
+    .progress-card { margin-top: 18px; padding: 20px; box-shadow: none; }
+    .progress-order { margin-bottom: 18px; }
+    .progress-order h2 { margin: 0; font-size: 20px; }
+    .progress-order p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .progress-step {
+      position: relative;
+      min-height: 70px;
+      padding-left: 34px;
+    }
+    .progress-step::before {
+      content: "";
+      position: absolute;
+      left: 9px;
+      top: 18px;
+      bottom: -6px;
+      width: 2px;
+      background: #d9d3c9;
+    }
+    .progress-step:last-child::before { display: none; }
+    .progress-dot {
+      position: absolute;
+      left: 2px;
+      top: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #c9c3ba;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 1px #c9c3ba;
+    }
+    .progress-step.done .progress-dot { background: var(--green); box-shadow: 0 0 0 1px var(--green); }
+    .progress-step.current .progress-dot { background: #e8a72c; box-shadow: 0 0 0 1px #e8a72c; }
+    .progress-step.final .progress-dot { background: #064d2b; box-shadow: 0 0 0 1px #064d2b; }
+    .progress-step strong { display: block; font-size: 14px; }
+    .progress-step span { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .receipt-meta {
+      margin-top: 18px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      box-shadow: none;
+    }
+    .receipt-meta span { display: block; color: var(--muted); font-size: 9px; }
+    .receipt-meta strong { display: block; margin-top: 4px; font-size: 11px; white-space: nowrap; }
+    .receipt-block { margin-top: 14px; padding: 18px; box-shadow: none; }
+    .receipt-block h3 { margin: 0 0 12px; font-size: 17px; }
+    .receipt-line { display: flex; justify-content: space-between; padding: 7px 0; color: var(--muted); font-size: 12px; }
+    .receipt-line.total { margin-top: 8px; padding-top: 13px; border-top: 1px solid var(--line); color: var(--green); font-size: 16px; font-weight: 900; }
+
+    .review-sitter {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 14px;
+      align-items: center;
+      margin: 16px 0;
+    }
+    .review-sitter .avatar { width: 72px; height: 84px; border-radius: 16px; }
+    .review-sitter h4 { margin: 0 0 4px; font-size: 20px; }
+    .review-stars { display: flex; justify-content: center; gap: 8px; margin: 14px 0 8px; }
+    .review-star { color: #c9c3ba; font-size: 32px; line-height: 1; }
+    .review-star.active { color: #e8a72c; }
+    .review-rating-label { text-align: center; color: var(--muted); font-size: 12px; font-weight: 800; }
+
+    .profile-card {
+      height: 136px;
       margin-top: 28px;
-      padding: 28px 24px;
+      padding: 24px;
       position: relative;
       display: grid;
       grid-template-columns: 88px 1fr;
@@ -1758,8 +2144,8 @@
     }
     .upload-btn {
       width: 88px;
-      height: 44px;
-      border-radius: 16px;
+      height: 88px;
+      border-radius: 18px;
       border: 1px solid var(--green);
       color: var(--green);
       background: var(--green-soft);
@@ -2461,22 +2847,33 @@
         <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
         <h1 class="screen-title">填寫需求</h1>
       </div>
-      <p class="subtitle">寵物保母確認後，平台會保留需求與付款紀錄。</p>
-      <div class="summary-card card">
-        <strong>Mina Chen · 7/16 14:00-16:00</strong>
-        <p class="meta" style="margin:6px 0 0">到府餵食、清砂、照片回報</p>
+      <p class="subtitle">確認服務內容，送出後進入預約確認</p>
+      <div class="sitter-summary-card card" data-sitter-summary></div>
+      <div class="service-form">
+        <p class="service-time-label">服務時間區間</p>
+        <div class="service-time-grid">
+          <div class="service-time-box"><span>開始時間</span><strong>12/01 14:00</strong></div>
+          <div class="service-time-box"><span>結束時間</span><strong>12/01 15:00</strong></div>
+        </div>
       </div>
       <div class="field"><label>服務地址</label><input class="input" value="台北市大安區和平東路一段 88 號"></div>
-      <div class="field"><label>寵物名稱</label><input class="input" value="麻糬"></div>
+      <div class="field pet-picker-field">
+        <label>寵物資訊</label>
+        <select class="select" id="demandPetSelect" aria-label="選擇寵物資訊"></select>
+        <div class="pet-picker-empty" id="demandPetEmpty">
+          <div><strong>尚未建立寵物資料</strong><p>建立後即可帶入本次服務需求</p></div>
+          <button class="pet-create-button" type="button" data-create-pet-from-demand>建立寵物資料</button>
+        </div>
+      </div>
       <div class="field"><label>需要協助事項</label><textarea class="textarea">餵乾糧與罐罐，清理貓砂，補水，陪玩 15 分鐘。</textarea></div>
       <div class="field"><label>注意事項</label><textarea class="textarea">麻糬比較怕生，進門後先讓牠聞味道，不要直接抱牠。</textarea></div>
       <div class="field"><label>回報需求</label><textarea class="textarea">完成餵食、清砂後各拍一張照片，離開前回報門窗狀態。</textarea></div>
-      <div class="field"><label>照護費</label><input class="input" id="careFee" value="200" inputmode="numeric"></div>
+      <div class="field"><label>寵物保母服務費</label><input class="input" id="careFee" value="200" inputmode="numeric"></div>
       <div class="summary-card card">
         <strong style="color:var(--green)">金額統計</strong>
-        <div class="money-row"><span>照護費</span><strong id="feeBase">NT$ 200</strong></div>
-        <div class="money-row"><span>平台服務費 10%</span><strong id="feeService">NT$ 20</strong></div>
-        <div class="money-row total"><span>總計</span><strong id="feeTotal">NT$ 220</strong></div>
+        <div class="money-row"><span>寵物保母服務費</span><strong id="feeBase">NT$ 200</strong></div>
+        <div class="money-row"><span>平台服務費 15%</span><strong id="feeService">NT$ 30</strong></div>
+        <div class="money-row total"><span>總計</span><strong id="feeTotal">NT$ 230</strong></div>
       </div>
       <button class="btn full" style="margin-top:18px" data-go="bookings" onclick="toast('需求已送出')">送出需求</button>
     </section>
@@ -2486,34 +2883,100 @@
       <h1 class="screen-title">我的預約</h1>
       <p class="subtitle">進行中服務會在這裡集中管理</p>
       <div class="chips">
-        <button class="chip active" data-booking-filter="all">全部</button><button class="chip" data-booking-filter="pending">待服務</button><button class="chip" data-booking-filter="active">進行中</button><button class="chip" data-booking-filter="review">待評價</button>
+        <button class="chip active" data-booking-filter="all">全部</button><button class="chip" data-booking-filter="confirming">需求確認中</button><button class="chip" data-booking-filter="pending">待服務</button><button class="chip" data-booking-filter="active">進行中</button><button class="chip" data-booking-filter="payout">待撥款</button>
       </div>
-      <p class="subtitle" style="margin-top:-12px">待服務包含即將服務，可依狀態快速切換</p>
+      <p class="subtitle" style="margin-top:-12px">依預約狀態快速切換與管理需求</p>
       <article class="card book-card" data-booking-status="active">
         <span class="status">進行中</span>
         <h3>Mina Chen 到府照護</h3>
         <p class="meta">服務中，每 30 分鐘回報照片與狀態。</p>
-        <div class="book-actions"><button class="btn" onclick="openBookingModal('report')">查看回報</button><button class="btn light" onclick="openBookingModal('contact')">聯絡寵物保母</button></div>
+        <div class="book-actions"><button class="btn" data-go="bookingReport">查看回報</button><button class="btn light" data-go="bookingChat">聯絡寵物保母</button></div>
       </article>
       <article class="card book-card" data-booking-status="upcoming">
         <span class="status" style="color:var(--clay)">即將服務</span>
         <h3>小芸 · 到府餵食</h3>
         <p class="meta">今天 18:30 開始，寵物保母已確認接案。</p>
-        <div class="book-actions"><button class="btn clay">查看詳情</button><button class="btn light" style="color:var(--clay);border-color:var(--clay)">提醒我</button></div>
+        <div class="book-actions"><button class="btn clay" data-go="bookingDetail">查看詳情</button><button class="btn light" style="color:var(--clay);border-color:var(--clay)" onclick="toast('已設定服務提醒')">提醒我</button></div>
+      </article>
+      <article class="card book-card" data-booking-status="confirming">
+        <span class="status" style="color:#b77a13">需求確認中</span>
+        <h3>Emma Wu · 到府照護</h3>
+        <p class="meta">需求已送出，等待寵物保母確認接案。</p>
+        <div class="book-actions"><button class="btn" data-go="bookingDetail">查看需求</button><button class="btn light" data-go="bookingEdit">修改</button></div>
       </article>
       <article class="card book-card" data-booking-status="pending">
         <span class="status" style="color:var(--green-2)">待服務</span>
         <h3>柏宇 · 散步陪伴</h3>
         <p class="meta">明天 09:00 預約，等待服務開始。</p>
-        <div class="book-actions"><button class="btn" style="background:var(--green-2)">查看需求</button><button class="btn light" style="color:var(--green-2);border-color:var(--green-2)">修改</button></div>
+        <div class="book-actions"><button class="btn" style="background:var(--green-2)" data-go="bookingDetail">查看需求</button><button class="btn light" style="color:var(--green-2);border-color:var(--green-2)" data-go="bookingEdit">修改</button></div>
       </article>
-      <article class="card book-card" data-booking-status="review">
-        <span class="status" style="color:var(--clay)">待評價</span>
+      <article class="card book-card" data-booking-status="payout">
+        <span class="status" style="color:var(--clay)">待撥款</span>
         <h3>Nina · 到府陪伴</h3>
-        <p class="meta">撥款完成，留下評價後回寫熱門排序。</p>
-        <div class="book-actions"><button class="btn clay">留下評價</button></div>
+        <p class="meta">服務已完成，留下評價後立即完成交易並撥款。</p>
+        <div class="book-actions"><button class="btn clay" data-open-review>留下評價</button></div>
       </article>
       <div class="card booking-empty" id="bookingEmpty">目前沒有符合篩選的預約。</div>
+    </section>
+
+    <section class="screen booking-flow-screen" id="bookingReport">
+      <div class="page-heading">
+        <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
+        <h1 class="screen-title">服務回報</h1>
+      </div>
+      <p class="subtitle">查看本次服務進度與寵物保母回報</p>
+      <div class="sitter-summary-card card" data-sitter-summary></div>
+      <div class="report-timeline">
+        <div class="report-entry"><span class="report-time">14:01</span><article class="report-card card"><h3>寵物保母開始服務</h3><p>已抵達服務地址，確認門窗與麻糬狀態正常。</p></article></div>
+        <div class="report-entry"><span class="report-time">14:12</span><article class="report-card card"><div class="report-photo"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10" r="2" fill="currentColor"/><path d="m5 17 4-4 3 3 2-2 5 3" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><h3>完成餵食</h3><p>已補乾糧、罐罐與飲水，麻糬有正常進食。</p></article></div>
+        <div class="report-entry"><span class="report-time">14:38</span><article class="report-card card"><div class="report-photo"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10" r="2" fill="currentColor"/><path d="m5 17 4-4 3 3 2-2 5 3" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><h3>完成貓砂清潔</h3><p>貓砂盆已整理並補砂，目前無異常狀況。</p></article></div>
+      </div>
+    </section>
+
+    <section class="screen booking-flow-screen" id="bookingChat">
+      <div class="page-heading">
+        <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
+        <h1 class="screen-title">聯絡寵物保母</h1>
+      </div>
+      <p class="subtitle">Mina Chen · 本次服務留言板</p>
+      <div class="sitter-summary-card card" data-sitter-summary></div>
+      <div class="chat-board card" id="chatBoard">
+        <div class="chat-message sitter"><div class="chat-bubble">我已經到達囉，先確認麻糬的狀態。</div><div class="chat-meta">14:03</div></div>
+        <div class="chat-message owner"><div class="chat-bubble">好的沒問題，麻煩您了。</div><div class="chat-meta">14:05<span class="chat-status">保母已讀</span></div></div>
+        <div class="chat-message sitter"><div class="chat-bubble">餵食完成後會再拍照回報給您。</div><div class="chat-meta">14:10</div></div>
+        <div class="chat-message owner"><div class="chat-bubble">稍等我回覆您。</div><div class="chat-meta">14:11<span class="chat-status">已送達</span></div></div>
+        <div class="quick-replies"><button class="quick-reply" data-quick-reply="好的沒問題">好的沒問題</button><button class="quick-reply" data-quick-reply="稍等我回覆您">稍等我回覆您</button></div>
+      </div>
+      <div class="chat-composer"><input class="input" id="chatInput" placeholder="輸入留言"><button class="chat-send" id="chatSend" aria-label="送出留言">↑</button></div>
+    </section>
+
+    <section class="screen long booking-flow-screen" id="bookingDetail">
+      <div class="page-heading">
+        <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
+        <h1 class="screen-title">需求詳情</h1>
+      </div>
+      <p class="subtitle">查看本次預約與先前填寫的需求內容</p>
+      <div class="sitter-summary-card card" data-sitter-summary></div>
+      <article class="flow-section-card card"><h3>服務資訊</h3><div class="detail-row"><span>服務時間</span><strong>2026/12/01 14:00～2026/12/01 15:00</strong></div><div class="detail-row"><span>服務地址</span><strong>台北市大安區和平東路一段 88 號</strong></div></article>
+      <article class="flow-section-card card"><h3>寵物資訊</h3><div class="detail-row"><span>寵物</span><strong>麻糬 · 貓</strong></div><div class="detail-row"><span>性別</span><strong>母</strong></div><div class="detail-row"><span>品種</span><strong>英國短毛貓</strong></div><div class="detail-row"><span>特徵</span><strong>怕生、慢熟</strong></div></article>
+      <article class="flow-section-card card"><h3>需求內容</h3><div class="detail-row"><span>協助事項</span><strong>餵乾糧與罐罐、清理貓砂、補水、陪玩 15 分鐘</strong></div><div class="detail-row"><span>注意事項</span><strong>進門後先讓麻糬聞味道，不要直接抱牠</strong></div><div class="detail-row"><span>回報需求</span><strong>餵食與清砂後各拍一張照片，離開前回報門窗狀態</strong></div></article>
+      <article class="flow-section-card card"><h3>費用明細</h3><div class="money-row"><span>寵物保母服務費</span><strong>NT$ 1,200</strong></div><div class="money-row"><span>平台服務費</span><strong>NT$ 180</strong></div><div class="money-row total"><span>總計</span><strong>NT$ 1,380</strong></div></article>
+    </section>
+
+    <section class="screen long booking-flow-screen" id="bookingEdit">
+      <div class="page-heading">
+        <button class="screen-back" data-back aria-label="返回上一頁">‹</button>
+        <h1 class="screen-title">修改需求</h1>
+      </div>
+      <p class="subtitle">變更後將重新進入需求確認中</p>
+      <div class="sitter-summary-card card" data-sitter-summary></div>
+      <div class="service-form"><p class="service-time-label">服務時間區間</p><div class="service-time-grid"><div class="service-time-box"><span>開始時間</span><strong>12/01 14:00</strong></div><div class="service-time-box"><span>結束時間</span><strong>12/01 15:00</strong></div></div></div>
+      <div class="field"><label>服務地址</label><input class="input" value="台北市大安區和平東路一段 88 號"></div>
+      <div class="field"><label>寵物資訊</label><select class="select" id="editDemandPetSelect" aria-label="修改需求的寵物資訊"></select></div>
+      <div class="field"><label>需要協助事項</label><textarea class="textarea">餵乾糧與罐罐，清理貓砂，補水，陪玩 15 分鐘。</textarea></div>
+      <div class="field"><label>注意事項</label><textarea class="textarea">麻糬比較怕生，進門後先讓牠聞味道，不要直接抱牠。</textarea></div>
+      <div class="field"><label>回報需求</label><textarea class="textarea">完成餵食、清砂後各拍一張照片，離開前回報門窗狀態。</textarea></div>
+      <button class="btn full" style="margin-top:18px" data-change-demand>變更需求</button>
     </section>
 
     <section class="screen profile-screen" id="profile">
@@ -2539,7 +3002,7 @@
       <div class="menu-list">
         <button class="menu-item" onclick="openCertModal('all')"><span>認證狀態<small>查看實名與手機狀態</small></span><span>›</span></button>
         <button class="menu-item" data-go="pets"><span>我的毛孩<small>管理寵物資料與照護注意事項</small></span><span>›</span></button>
-        <button class="menu-item"><span>付款與收款<small>交易紀錄、撥款、發票資料</small></span><span>›</span></button>
+        <button class="menu-item" data-go="finance"><span>付款與收款<small>交易紀錄、撥款、發票資料</small></span><span>›</span></button>
       </div>
     </section>
 
@@ -2639,6 +3102,56 @@
       </div>
     </section>
 
+    <section class="screen finance-screen" id="finance">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回上一頁">‹</button><h1 class="screen-title">付款與收款</h1></div>
+      <p class="subtitle">查看交易紀錄、訂單款項與平台撥款</p>
+      <div class="finance-filters">
+        <div class="finance-filter-row" id="transactionStatusFilters">
+          <button class="chip active" data-transaction-filter="all">全部</button><button class="chip" data-transaction-filter="paid">已付款</button><button class="chip" data-transaction-filter="payout">待撥款</button>
+          <button class="chip" data-transaction-filter="pending">待完成</button><button class="chip" data-transaction-filter="complete">已完成</button><button class="chip" data-transaction-filter="refund">退款／取消</button>
+        </div>
+        <div class="finance-filter-row"><button class="chip active">近 30 天</button><button class="chip">近 3 個月</button><button class="chip">自訂範圍</button></div>
+      </div>
+      <div class="finance-summary card"><div><span>近 30 天支出</span><strong>− NT$ 4,280</strong></div><div><span>近 30 天收入</span><strong>＋ NT$ 2,560</strong></div></div>
+      <div class="transaction-list" id="transactionList">
+        <article class="transaction-item card" data-transaction-status="payout pending" data-go="transactionProgress"><div><h3>訂單付款 · Mina Chen</h3><p>待平台撥款 · 剩餘 3 天自動完成</p></div><strong class="transaction-amount minus">− NT$ 1,380</strong><button class="transaction-complete" data-open-review>立即完成</button></article>
+        <article class="transaction-item card" data-transaction-status="paid" data-go="transactionProgress"><div><h3>訂單付款 · 小芸</h3><p>已付款 · 2026/07/10 18:32</p></div><strong class="transaction-amount minus">− NT$ 980</strong></article>
+        <article class="transaction-item card" data-transaction-status="refund" data-go="transactionProgress"><div><h3>訂單退款 · 柏宇</h3><p>退款完成 · 2026/07/09 11:20</p></div><strong class="transaction-amount plus">＋ NT$ 720</strong></article>
+        <article class="transaction-item card" data-transaction-status="complete" data-go="transactionComplete"><div><h3>訂單付款 · Nina Lin</h3><p>已完成 · 2026/07/08 20:15</p></div><strong class="transaction-amount minus">− NT$ 1,380</strong></article>
+        <article class="transaction-item card" data-transaction-status="complete" data-go="transactionProgress"><div><h3>寵物保母服務收入</h3><p>已撥款 · 2026/07/08 16:40</p></div><strong class="transaction-amount plus">＋ NT$ 850</strong></article>
+        <article class="transaction-item card" data-transaction-status="paid" data-go="transactionProgress"><div><h3>訂單付款 · Emma Wu</h3><p>已付款 · 2026/07/07 09:18</p></div><strong class="transaction-amount minus">− NT$ 640</strong></article>
+        <article class="transaction-item card" data-transaction-status="refund" data-go="transactionProgress"><div><h3>取消訂單退款</h3><p>退款完成 · 2026/07/06 14:08</p></div><strong class="transaction-amount plus">＋ NT$ 520</strong></article>
+        <article class="transaction-item card" data-transaction-status="payout" data-go="transactionProgress"><div><h3>寵物保母服務收入</h3><p>待平台撥款 · 2026/07/05 19:30</p></div><strong class="transaction-amount plus">＋ NT$ 1,020</strong></article>
+        <article class="transaction-item card" data-transaction-status="complete" data-go="transactionComplete"><div><h3>訂單付款 · 阿哲</h3><p>已完成 · 2026/07/04 12:22</p></div><strong class="transaction-amount minus">− NT$ 760</strong></article>
+        <article class="transaction-item card" data-transaction-status="pending" data-go="transactionProgress"><div><h3>訂單付款 · 小雨</h3><p>待完成 · 2026/07/03 18:45</p></div><strong class="transaction-amount minus">− NT$ 620</strong></article>
+      </div>
+      <div class="pagination"><button class="page-btn" disabled>‹</button><span>第 1 / 2 頁 · 共 12 筆</span><button class="page-btn" onclick="toast('已切換至第 2 頁')">›</button></div>
+    </section>
+
+    <section class="screen finance-screen" id="transactionProgress">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回上一頁">‹</button><h1 class="screen-title">交易進度明細</h1></div>
+      <p class="subtitle">訂單 COP-20260711-001</p>
+      <div class="progress-card card"><div class="progress-order"><h2>Mina Chen · 到府照護</h2><p>訂單付款 NT$ 1,380 · 目前待平台撥款</p></div><div class="progress-step done"><span class="progress-dot"></span><strong>送出需求</strong><span>2026/07/11 09:12</span></div><div class="progress-step done"><span class="progress-dot"></span><strong>寵物保母配對完成</strong><span>2026/07/11 09:28</span></div><div class="progress-step done"><span class="progress-dot"></span><strong>寵物保母開始服務</strong><span>2026/07/16 14:01</span></div><div class="progress-step done"><span class="progress-dot"></span><strong>寵物保母結束服務</strong><span>2026/07/16 15:00</span></div><div class="progress-step current"><span class="progress-dot"></span><strong>平台待撥款</strong><span>等待飼主完成確認，最晚 7 天自動完成</span></div><div class="progress-step"><span class="progress-dot"></span><strong>平台已撥款給寵物保母</strong><span>尚未完成</span></div></div>
+      <button class="btn full" style="margin-top:18px" data-open-review>立即完成並評價</button>
+    </section>
+
+    <section class="screen finance-screen" id="transactionComplete">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回上一頁">‹</button><h1 class="screen-title">已完成交易明細</h1></div>
+      <p class="subtitle">訂單 COP-20260708-009</p>
+      <div class="progress-card card"><div class="progress-order"><h2>Nina Lin · 到府照護</h2><p>訂單付款 NT$ 1,380 · 已完成</p></div><div class="progress-step done"><span class="progress-dot"></span><strong>送出需求</strong><span>2026/07/08 09:12</span></div><div class="progress-step done"><span class="progress-dot"></span><strong>寵物保母配對完成</strong><span>2026/07/08 09:28</span></div><div class="progress-step done"><span class="progress-dot"></span><strong>寵物保母開始服務</strong><span>2026/07/08 14:01</span></div><div class="progress-step done"><span class="progress-dot"></span><strong>寵物保母結束服務</strong><span>2026/07/08 15:00</span></div><div class="progress-step done"><span class="progress-dot"></span><strong>平台待撥款</strong><span>2026/07/08 15:01</span></div><div class="progress-step final"><span class="progress-dot"></span><strong>平台已撥款給寵物保母</strong><span>2026/07/08 20:15</span></div></div>
+      <button class="btn full" style="margin-top:18px" data-go="receipt">查看收據</button>
+    </section>
+
+    <section class="screen receipt-screen" id="receipt">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回上一頁">‹</button><h1 class="screen-title">電子發票</h1></div>
+      <p class="subtitle">訂單 COP-20260708-009</p>
+      <div class="receipt-meta card"><div><span>發票日期</span><strong>2026/07/11</strong></div><div><span>發票號碼</span><strong>AB-12345678</strong></div><div><span>四位數隨機碼</span><strong>4827</strong></div></div>
+      <article class="receipt-block card"><h3>寵物保母服務收據</h3><div class="receipt-line"><span>到府照護服務</span><strong>NT$ 1,200</strong></div><div class="receipt-line"><span>收款人</span><strong>Nina Lin</strong></div><div class="receipt-line total"><span>服務費小計</span><strong>NT$ 1,200</strong></div></article>
+      <article class="receipt-block card"><h3>平台服務費發票</h3><div class="receipt-line"><span>平台服務費 15%</span><strong>NT$ 180</strong></div><div class="receipt-line"><span>開立單位</span><strong>Copaws</strong></div><div class="receipt-line total"><span>平台費小計</span><strong>NT$ 180</strong></div></article>
+      <article class="receipt-block card"><div class="receipt-line total" style="margin-top:0"><span>訂單總額</span><strong>NT$ 1,380</strong></div></article>
+      <button class="btn full" style="margin-top:18px" onclick="toast('電子發票 PDF 已準備下載')">下載 PDF</button>
+    </section>
+
     <nav class="bottom-nav" aria-label="底部導航">
       <button class="nav-item" data-tab="match" data-go="match"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg></span><span>配對</span></button>
       <button class="nav-item" data-tab="map" data-go="map"><span class="nav-map-icon" aria-hidden="true"><svg class="nav-logo nav-logo-outline" viewBox="0 0 28 28" fill="none"><rect x="2.25" y="2.25" width="23.5" height="23.5" rx="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M14 5.75C10.96 5.75 8.5 8.14 8.5 11.1C8.5 14.9 14 21.25 14 21.25C14 21.25 19.5 14.9 19.5 11.1C19.5 8.14 17.04 5.75 14 5.75Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/><circle cx="12.05" cy="10.1" r=".8" fill="currentColor"/><circle cx="14" cy="9.35" r=".8" fill="currentColor"/><circle cx="15.95" cy="10.1" r=".8" fill="currentColor"/><path d="M11.75 12.75C11.75 11.75 12.78 11.05 14 11.05C15.22 11.05 16.25 11.75 16.25 12.75C16.25 13.75 15.3 14.25 14 14.25C12.7 14.25 11.75 13.75 11.75 12.75Z" stroke="currentColor" stroke-width="1.15"/><path d="M5.5 22.1C7.15 20.7 8.75 20.6 10.35 21.45C11.95 22.3 13.55 22.25 15.15 21.35C16.7 20.48 18.45 20.45 20.35 21.55" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-dasharray="1.4 2.2"/></svg><img class="nav-logo nav-logo-filled" src="assets/copaws-a-plan-icon.png?v=nav-20260810" alt=""></span><span>地圖</span></button>
@@ -2647,7 +3160,7 @@
     </nav>
 
     <div class="modal-layer" id="modalLayer" onclick="closeModal(event)">
-      <div class="modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+      <div class="modal" role="dialog" aria-modal="true">
         <h3 id="modalTitle">認證提示</h3>
         <p id="modalCopy">這是點擊認證 icon 後出現的提示彈窗。</p>
         <div id="modalBody">
@@ -2662,8 +3175,8 @@
     const appScreens = Array.from(document.querySelectorAll('.screen'));
     const nav = document.querySelector('.bottom-nav');
     const navItems = Array.from(document.querySelectorAll('.nav-item'));
-    const screensWithNav = new Set(['match', 'map', 'mapList', 'detail', 'time', 'demand', 'bookings', 'profile', 'pets', 'favorites']);
-    const tabByScreen = { match: 'match', detail: 'match', time: 'bookings', demand: 'bookings', map: 'map', mapList: 'map', bookings: 'bookings', profile: 'profile', pets: 'profile', favorites: 'match' };
+    const screensWithNav = new Set(['match', 'map', 'mapList', 'detail', 'time', 'demand', 'bookings', 'bookingReport', 'bookingChat', 'bookingDetail', 'bookingEdit', 'profile', 'pets', 'favorites', 'finance']);
+    const tabByScreen = { match: 'match', detail: 'match', time: 'bookings', demand: 'bookings', map: 'map', mapList: 'map', bookings: 'bookings', bookingReport: 'bookings', bookingChat: 'bookings', bookingDetail: 'bookings', bookingEdit: 'bookings', profile: 'profile', pets: 'profile', finance: 'profile', favorites: 'match' };
     let currentScreen = 'login';
     const backStack = [];
     let resend = 60;
@@ -2680,6 +3193,8 @@
     let lastMatchFilter = 'city';
     let editingPetIndex = null;
     let petPhotoData = '';
+    let petFormReturnScreen = 'pets';
+    let reviewRating = 5;
     const pets = [
       {
         name: '麻糬', type: '貓', gender: '母', age: '3 歲', birthday: '',
@@ -2822,6 +3337,20 @@
           </article>
         `;
       }).join('');
+      renderPetPickers();
+    }
+
+    function renderPetPickers() {
+      const options = pets.map((pet, index) => `<option value="${index}">${escapeHtml(pet.name || '未命名毛孩')} · ${escapeHtml(pet.type || '未填種類')}</option>`).join('');
+      ['demandPetSelect', 'editDemandPetSelect'].forEach(id => {
+        const select = document.getElementById(id);
+        if (!select) return;
+        const previous = select.value;
+        select.innerHTML = options;
+        if (pets.length) select.value = previous && pets[Number(previous)] ? previous : '0';
+        select.hidden = pets.length === 0;
+      });
+      document.getElementById('demandPetEmpty')?.classList.toggle('show', pets.length === 0);
     }
 
     function setPetOption(group, value) {
@@ -2859,7 +3388,8 @@
       updatePetNotesCount();
     }
 
-    function openPetForm(index = null) {
+    function openPetForm(index = null, returnScreen = currentScreen) {
+      petFormReturnScreen = returnScreen || 'pets';
       resetPetForm(index);
       navigate('petForm');
     }
@@ -2890,7 +3420,8 @@
         resetPetForm();
         document.getElementById('petForm').scrollTop = 0;
       } else {
-        goBack();
+        backStack.length = 0;
+        go(petFormReturnScreen);
       }
     }
 
@@ -2918,6 +3449,10 @@
         renderTimeCaregiver();
         renderSlots();
       }
+      if (['demand', 'bookingReport', 'bookingChat', 'bookingDetail', 'bookingEdit'].includes(id)) {
+        renderSitterSummaries();
+      }
+      if (id === 'demand' || id === 'bookingEdit') renderPetPickers();
       currentScreen = id;
     }
 
@@ -2966,6 +3501,25 @@
         serviceType: introSegments[0] || '到府照護',
         serviceDetail: introSegments.slice(1).join('、') || data.detail
       };
+    }
+
+    function identityMarkSvg() {
+      return '<svg class="identity-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="m21.1 12.6 1.95 1.95 3.5-4.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    }
+
+    function renderSitterSummaries() {
+      const data = caregivers[selectedCaregiverIndex] || caregivers[0];
+      const parts = caregiverMetaParts(data);
+      document.querySelectorAll('[data-sitter-summary]').forEach(card => {
+        card.innerHTML = `
+          <span class="avatar" aria-hidden="true"></span>
+          <div class="sitter-summary-copy">
+            <h3>${escapeHtml(data.name)}</h3>
+            <div class="sitter-rating-line"><span class="stars">★★★★★</span><span>${escapeHtml(parts.score)} · ${escapeHtml(parts.reviews)}</span></div>
+            <div class="sitter-summary-meta"><span>${escapeHtml(parts.views)}</span><span>${escapeHtml(parts.distance)}</span><span>${escapeHtml(parts.serviceType)}</span></div>
+          </div>
+          <span class="verified-icon" aria-label="已實名認證">${identityMarkSvg()}</span>`;
+      });
     }
 
     function compactMeta(data) {
@@ -3325,6 +3879,9 @@
           <span class="verified-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="8" y="3.5" width="8" height="17" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/></svg></span>
         </div>
       `;
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      action.textContent = '知道了';
+      action.onclick = hideModal;
       document.getElementById('modalLayer').classList.add('show');
     }
 
@@ -3358,6 +3915,39 @@
       document.getElementById('modalLayer').classList.add('show');
     }
 
+    function renderReviewStars() {
+      document.querySelectorAll('[data-review-star]').forEach(star => {
+        star.classList.toggle('active', Number(star.dataset.reviewStar) <= reviewRating);
+      });
+      const label = document.getElementById('reviewRatingLabel');
+      if (label) label.textContent = `已選擇 ${reviewRating} 顆星`;
+    }
+
+    function openReviewModal() {
+      reviewRating = 5;
+      document.getElementById('modalTitle').textContent = '立即完成並評價';
+      document.getElementById('modalCopy').textContent = '完成後平台將撥款給寵物保母；星級必填，評價文字選填。';
+      document.getElementById('modalBody').innerHTML = `
+        <div class="review-sitter"><span class="avatar"></span><div><h4>Mina Chen</h4><span class="meta">本次到府照護已完成</span></div></div>
+        <div class="review-stars" aria-label="星級評分">
+          ${[1,2,3,4,5].map(value => `<button class="review-star active" type="button" data-review-star="${value}" aria-label="${value} 顆星">★</button>`).join('')}
+        </div>
+        <div class="review-rating-label" id="reviewRatingLabel">已選擇 5 顆星</div>
+        <div class="field"><label>評價文字（選填）</label><textarea class="textarea" maxlength="200" placeholder="分享這次服務體驗"></textarea></div>
+        <p class="meta" style="margin:12px 0 0">若 7 天內未確認，系統將自動給予 5 顆星並完成交易。</p>`;
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      action.textContent = '確認完成';
+      action.onclick = completeReview;
+      renderReviewStars();
+      document.getElementById('modalLayer').classList.add('show');
+    }
+
+    function completeReview() {
+      if (!reviewRating) return;
+      hideModal();
+      toast(`已送出 ${reviewRating} 顆星，交易完成並進入撥款`);
+    }
+
     function hideModal() {
       document.getElementById('modalLayer').classList.remove('show');
     }
@@ -3381,6 +3971,28 @@
       document.querySelectorAll('[data-booking-filter]').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.bookingFilter === filter);
       });
+    }
+
+    function filterTransactions(filter) {
+      document.querySelectorAll('.transaction-item').forEach(item => {
+        item.hidden = filter !== 'all' && !item.dataset.transactionStatus.split(' ').includes(filter);
+      });
+      document.querySelectorAll('[data-transaction-filter]').forEach(button => {
+        button.classList.toggle('active', button.dataset.transactionFilter === filter);
+      });
+    }
+
+    function sendChatMessage(message) {
+      const text = String(message || '').trim();
+      if (!text) return;
+      const board = document.getElementById('chatBoard');
+      const quickReplies = board.querySelector('.quick-replies');
+      const node = document.createElement('div');
+      node.className = 'chat-message owner';
+      node.innerHTML = `<div class="chat-bubble">${escapeHtml(text)}</div><div class="chat-meta">現在<span class="chat-status">已送達</span></div>`;
+      board.insertBefore(node, quickReplies);
+      document.getElementById('chatInput').value = '';
+      board.scrollTop = board.scrollHeight;
     }
 
     function renderSlots() {
@@ -3445,13 +4057,19 @@
       const newPetButton = event.target.closest('[data-new-pet]');
       if (newPetButton) {
         event.preventDefault();
-        openPetForm();
+        openPetForm(null, currentScreen);
+        return;
+      }
+      const demandPetButton = event.target.closest('[data-create-pet-from-demand]');
+      if (demandPetButton) {
+        event.preventDefault();
+        openPetForm(null, 'demand');
         return;
       }
       const editPetButton = event.target.closest('[data-edit-pet]');
       if (editPetButton) {
         event.preventDefault();
-        openPetForm(Number(editPetButton.dataset.editPet));
+        openPetForm(Number(editPetButton.dataset.editPet), currentScreen);
         return;
       }
       const petOption = event.target.closest('.pet-option[data-pet-value]');
@@ -3545,6 +4163,44 @@
         filterBookings(filterButton.dataset.bookingFilter);
         return;
       }
+      const transactionFilter = event.target.closest('[data-transaction-filter]');
+      if (transactionFilter) {
+        event.preventDefault();
+        filterTransactions(transactionFilter.dataset.transactionFilter);
+        return;
+      }
+      const reviewButton = event.target.closest('[data-open-review]');
+      if (reviewButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        openReviewModal();
+        return;
+      }
+      const reviewStar = event.target.closest('[data-review-star]');
+      if (reviewStar) {
+        event.preventDefault();
+        reviewRating = Number(reviewStar.dataset.reviewStar);
+        renderReviewStars();
+        return;
+      }
+      const quickReply = event.target.closest('[data-quick-reply]');
+      if (quickReply) {
+        event.preventDefault();
+        sendChatMessage(quickReply.dataset.quickReply);
+        return;
+      }
+      if (event.target.closest('#chatSend')) {
+        event.preventDefault();
+        sendChatMessage(document.getElementById('chatInput').value);
+        return;
+      }
+      if (event.target.closest('[data-change-demand]')) {
+        event.preventDefault();
+        backStack.length = 0;
+        go('bookings');
+        toast('需求已更新，重新進入需求確認中');
+        return;
+      }
       const target = event.target.closest('[data-go]');
       if (!target) return;
       if (target.id === 'matchCard' && suppressMatchClick) {
@@ -3584,7 +4240,7 @@
 
     document.getElementById('careFee').addEventListener('input', event => {
       const base = Math.max(0, parseInt(event.target.value.replace(/\D/g, ''), 10) || 0);
-      const service = Math.round(base * 0.1);
+      const service = Math.round(base * 0.15);
       document.getElementById('feeBase').textContent = `NT$ ${base}`;
       document.getElementById('feeService').textContent = `NT$ ${service}`;
       document.getElementById('feeTotal').textContent = `NT$ ${base + service}`;
