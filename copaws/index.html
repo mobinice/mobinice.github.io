@@ -568,23 +568,37 @@
       font-weight: 900;
     }
 
+    .match-card-stack {
+      height: 548px;
+      margin: 0 4px;
+      position: relative;
+      perspective: 900px;
+    }
     .match-card {
       min-height: 548px;
       padding: 24px 23px;
-      margin-left: 4px;
-      margin-right: 4px;
+      margin: 0;
       border-radius: 24px;
       box-shadow: var(--shadow);
-      position: relative;
+      position: absolute;
+      inset: 0;
       touch-action: pan-y;
       will-change: transform, opacity;
-      transition: transform .24s ease, opacity .24s ease;
+      transition: transform .28s cubic-bezier(.2,.75,.25,1), opacity .22s ease;
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
       transform: translate3d(0, 0, 0);
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
+    }
+    .match-card-front { z-index: 2; }
+    .match-card-back {
+      z-index: 1;
+      pointer-events: none;
+      transform: translate3d(0, 18px, -28px) scale(.94);
+      opacity: .74;
+      box-shadow: 0 12px 28px rgba(30, 47, 33, .08);
     }
     .match-card.dragging {
       transition: none;
@@ -600,22 +614,33 @@
     }
     .swipe-stamp {
       position: absolute;
-      top: 36px;
-      z-index: 5;
-      padding: 8px 14px;
+      top: 50%;
+      z-index: 6;
+      width: 58px;
+      height: 58px;
+      padding: 0;
       border: 3px solid currentColor;
-      border-radius: 12px;
-      font-size: 22px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.94);
+      display: grid;
+      place-items: center;
+      font-size: 30px;
       font-weight: 900;
-      letter-spacing: 1px;
+      line-height: 1;
+      letter-spacing: 0;
       opacity: 0;
-      transform: rotate(-12deg);
+      transform: translateY(-50%) scale(.72);
       pointer-events: none;
+      box-shadow: 0 10px 24px rgba(37,33,30,.15);
+      transition: opacity .12s ease, transform .12s ease;
     }
-    .swipe-stamp.like { left: 36px; color: var(--green); }
-    .swipe-stamp.nope { right: 36px; color: var(--clay); transform: rotate(12deg); }
-    .match-card.show-like .swipe-stamp.like,
-    .match-card.show-nope .swipe-stamp.nope { opacity: .92; }
+    .swipe-stamp.like { right: 14px; color: var(--green); }
+    .swipe-stamp.nope { left: 14px; color: #d84b43; }
+    .match-card-stack.show-like .swipe-stamp.like,
+    .match-card-stack.show-nope .swipe-stamp.nope {
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
     .match-card.resetting {
       animation: cardIn .22s ease;
     }
@@ -2669,24 +2694,27 @@
       <div class="chips">
         <button class="chip active" data-match-filter="city">台北市</button><button class="chip" data-match-filter="district">大安區</button><button class="chip" data-match-filter="today">今日可約</button><button class="chip" data-match-filter="pet">貓狗皆可</button>
       </div>
-      <article class="card match-card" id="matchCard" data-go="detail">
-        <span class="swipe-stamp like">LIKE</span>
-        <span class="swipe-stamp nope">NOPE</span>
-        <div class="photo-hero pet-shape" id="matchPhoto">
-          <span class="verified-icon" style="position:absolute;left:18px;top:20px" aria-label="已實名認證">
-            <svg class="identity-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="m21.1 12.6 1.95 1.95 3.5-4.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          <span class="hot" id="matchHot">本區熱門</span>
-          <span class="pet-dot"></span>
-        </div>
-        <div class="match-name-row">
-          <h2 id="matchName">Mina Chen</h2>
-          <span class="distance" id="matchDistance">距離 0.8 km</span>
-        </div>
-        <p class="meta"><span class="stars" id="matchStars">★★★★★</span>　<span id="matchRating">4.9 · 126 則評價 · 瀏覽 2,431</span></p>
-        <p class="meta" id="matchIntro">8 年養貓經驗，熟悉餵藥、陪玩與每日照片回報。今晚 19:00 後可預約。</p>
-        <div class="nearest">最近可預約 <span id="matchNearest">今天 19:00-21:00 · 明天 10:00-12:00</span></div>
-      </article>
+      <div class="match-card-stack">
+        <article class="card match-card match-card-back" id="matchCardBack" aria-hidden="true"></article>
+        <article class="card match-card match-card-front" id="matchCard" data-go="detail">
+          <div class="photo-hero pet-shape" id="matchPhoto">
+            <span class="verified-icon" style="position:absolute;left:18px;top:20px" aria-label="已實名認證">
+              <svg class="identity-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="m21.1 12.6 1.95 1.95 3.5-4.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="hot" id="matchHot">本區熱門</span>
+            <span class="pet-dot"></span>
+          </div>
+          <div class="match-name-row">
+            <h2 id="matchName">Mina Chen</h2>
+            <span class="distance" id="matchDistance">距離 0.8 km</span>
+          </div>
+          <p class="meta"><span class="stars" id="matchStars">★★★★★</span>　<span id="matchRating">4.9 · 126 則評價 · 瀏覽 2,431</span></p>
+          <p class="meta" id="matchIntro">8 年養貓經驗，熟悉餵藥、陪玩與每日照片回報。今晚 19:00 後可預約。</p>
+          <div class="nearest">最近可預約 <span id="matchNearest">今天 19:00-21:00 · 明天 10:00-12:00</span></div>
+        </article>
+        <span class="swipe-stamp like" aria-hidden="true">○</span>
+        <span class="swipe-stamp nope" aria-hidden="true">×</span>
+      </div>
       <div class="action-row">
         <button class="circle-action" onclick="swipeCaregiver('left')">×</button>
         <button class="circle-action primary" onclick="swipeCaregiver('right')">
@@ -3474,16 +3502,29 @@
       node._t = setTimeout(() => node.classList.remove('show'), 1600);
     }
 
+    function matchCardContent(data, withIds = false) {
+      const id = name => withIds ? ` id="${name}"` : '';
+      return `
+        <div class="photo-hero pet-shape"${id('matchPhoto')} style="background:${escapeHtml(data.color)}">
+          <span class="verified-icon" style="position:absolute;left:18px;top:20px" aria-label="已實名認證">${identityMarkSvg()}</span>
+          <span class="hot"${id('matchHot')}>${escapeHtml(data.hot)}</span>
+          <span class="pet-dot" style="background:${escapeHtml(data.dot)}"></span>
+        </div>
+        <div class="match-name-row"><h2${id('matchName')}>${escapeHtml(data.name)}</h2><span class="distance"${id('matchDistance')}>${escapeHtml(data.distance)}</span></div>
+        <p class="meta"><span class="stars"${id('matchStars')}>★★★★★</span>　<span${id('matchRating')}>${escapeHtml(data.rating)}</span></p>
+        <p class="meta"${id('matchIntro')}>${escapeHtml(data.intro)}</p>
+        <div class="nearest">最近可預約 <span${id('matchNearest')}>${escapeHtml(data.nearest)}</span></div>`;
+    }
+
     function renderCaregiver() {
       const list = getFilteredCaregivers();
-      const data = list[caregiverIndex % list.length] || caregivers[0];
-      selectedCaregiverIndex = caregivers.indexOf(data);
-      document.getElementById('matchName').textContent = data.name;
-      document.getElementById('matchDistance').textContent = data.distance;
-      document.getElementById('matchRating').textContent = data.rating;
-      document.getElementById('matchIntro').textContent = data.intro;
-      document.getElementById('matchNearest').textContent = data.nearest;
-      document.getElementById('matchHot').textContent = data.hot;
+      const safeList = list.length ? list : caregivers;
+      caregiverIndex = ((caregiverIndex % safeList.length) + safeList.length) % safeList.length;
+      const data = safeList[caregiverIndex];
+      const nextData = safeList[(caregiverIndex + 1) % safeList.length];
+      selectedCaregiverIndex = Math.max(0, caregivers.indexOf(data));
+      document.getElementById('matchCard').innerHTML = matchCardContent(data, true);
+      document.getElementById('matchCardBack').innerHTML = matchCardContent(nextData);
     }
 
     function caregiverMetaParts(data) {
@@ -3721,28 +3762,76 @@
       next.disabled = mapPage >= totalPages;
     }
 
-    function swipeCaregiver(direction) {
+    function setBackCardProgress(progress, animate = false) {
+      const back = document.getElementById('matchCardBack');
+      const value = Math.max(0, Math.min(1, progress));
+      back.style.transition = animate ? 'transform .28s cubic-bezier(.2,.75,.25,1), opacity .22s ease' : 'none';
+      back.style.transform = `translate3d(0, ${18 * (1 - value)}px, ${-28 * (1 - value)}px) scale(${.94 + .06 * value})`;
+      back.style.opacity = String(.74 + .26 * value);
+    }
+
+    function setSwipeCue(dx) {
+      const stack = document.querySelector('.match-card-stack');
+      const like = stack.querySelector('.swipe-stamp.like');
+      const nope = stack.querySelector('.swipe-stamp.nope');
+      const progress = Math.max(0, Math.min(1, Math.abs(dx) / 110));
+      stack.classList.toggle('show-like', dx > 8);
+      stack.classList.toggle('show-nope', dx < -8);
+      like.style.opacity = dx > 8 ? String(progress) : '0';
+      nope.style.opacity = dx < -8 ? String(progress) : '0';
+      const transform = `translateY(-50%) scale(${.72 + .28 * progress})`;
+      like.style.transform = transform;
+      nope.style.transform = transform;
+    }
+
+    function resetMatchVisuals() {
+      const card = document.getElementById('matchCard');
+      const back = document.getElementById('matchCardBack');
+      card.classList.remove('dragging', 'swipe-left', 'swipe-right', 'resetting');
+      card.style.transition = 'none';
+      card.style.transform = 'translate3d(0,0,0) rotate(0deg)';
+      card.style.opacity = '1';
+      setBackCardProgress(0);
+      setSwipeCue(0);
+      void card.offsetWidth;
+      card.style.transition = '';
+      back.style.transition = '';
+    }
+
+    function swipeCaregiver(direction, originDx = 0) {
       if (isSwiping) return;
       const card = document.getElementById('matchCard');
+      const back = document.getElementById('matchCardBack');
       const list = getFilteredCaregivers();
+      const safeLength = Math.max(1, list.length);
+      const sign = direction === 'right' ? 1 : -1;
+      const initialDx = originDx || 0;
       isSwiping = true;
       suppressMatchClick = true;
-      card.classList.remove('show-like', 'show-nope', 'resetting');
-      card.classList.add(direction === 'right' ? 'show-like' : 'show-nope');
-      requestAnimationFrame(() => card.classList.add(direction === 'right' ? 'swipe-right' : 'swipe-left'));
+      card.classList.remove('dragging', 'resetting');
+      card.style.transition = 'none';
+      card.style.transform = `translate3d(${initialDx}px,0,0) rotate(${Math.max(-12, Math.min(12, initialDx / 16))}deg)`;
+      card.style.opacity = '1';
+      setBackCardProgress(Math.min(1, Math.abs(initialDx) / 180));
+      setSwipeCue(initialDx || sign * 12);
+      void card.offsetWidth;
+      card.style.transition = '';
+      back.style.transition = 'transform .28s cubic-bezier(.2,.75,.25,1), opacity .22s ease';
+      requestAnimationFrame(() => {
+        card.style.transform = `translate3d(${sign * 480}px,0,0) rotate(${sign * 18}deg)`;
+        card.style.opacity = '0';
+        setBackCardProgress(1, true);
+        setSwipeCue(sign * 110);
+      });
       if (direction === 'right') addCurrentToFavorites();
       toast(direction === 'right' ? '已加入收藏，顯示下一位' : '已略過，顯示下一位');
       window.setTimeout(() => {
-        caregiverIndex = (caregiverIndex + 1) % list.length;
+        caregiverIndex = (caregiverIndex + 1) % safeLength;
         renderCaregiver();
-        card.classList.remove('swipe-right', 'swipe-left', 'show-like', 'show-nope');
-        card.style.transform = '';
-        card.style.opacity = '';
-        card.classList.add('resetting');
-        window.setTimeout(() => card.classList.remove('resetting'), 240);
+        resetMatchVisuals();
         isSwiping = false;
         window.setTimeout(() => { suppressMatchClick = false; }, 80);
-      }, 280);
+      }, 290);
     }
 
     function wireMatchDrag() {
@@ -3756,7 +3845,7 @@
       let dragging = false;
       let frame = 0;
 
-      function resetDragState() {
+      function resetDragState(preserveVisual = false) {
         dragging = false;
         activePointerId = null;
         gesture = 'idle';
@@ -3765,14 +3854,19 @@
         frame = 0;
         document.getElementById('match').style.overflowY = '';
         card.classList.remove('dragging');
+        if (!preserveVisual) {
+          setBackCardProgress(0, true);
+          setSwipeCue(0);
+        }
       }
 
       function applyDragTransform() {
         frame = 0;
         const rotate = Math.max(-12, Math.min(12, dx / 16));
         card.style.transform = `translate3d(${dx}px, 0, 0) rotate(${rotate}deg)`;
-        card.classList.toggle('show-like', dx > 35);
-        card.classList.toggle('show-nope', dx < -35);
+        card.style.opacity = String(1 - Math.min(Math.abs(dx) / 900, .16));
+        setBackCardProgress(Math.min(1, Math.abs(dx) / 180));
+        setSwipeCue(dx);
       }
 
       card.addEventListener('pointerdown', event => {
@@ -3813,22 +3907,27 @@
         if (!dragging) return;
         const shouldSwipe = gesture === 'horizontal' && Math.abs(dx) > 92;
         const swipeDirection = dx > 0 ? 'right' : 'left';
+        const releaseDx = dx;
+        if (frame) {
+          cancelAnimationFrame(frame);
+          frame = 0;
+          applyDragTransform();
+        }
         try { card.releasePointerCapture(event.pointerId); } catch {}
-        resetDragState();
+        resetDragState(shouldSwipe);
         if (shouldSwipe) {
-          card.style.transform = '';
-          swipeCaregiver(swipeDirection);
+          swipeCaregiver(swipeDirection, releaseDx);
           return;
         }
         card.style.transform = '';
-        card.classList.remove('show-like', 'show-nope');
+        card.style.opacity = '';
         window.setTimeout(() => { suppressMatchClick = false; }, 80);
       });
 
       card.addEventListener('pointercancel', () => {
         resetDragState();
-        card.classList.remove('dragging', 'show-like', 'show-nope');
         card.style.transform = '';
+        card.style.opacity = '';
         window.setTimeout(() => { suppressMatchClick = false; }, 80);
       });
 
