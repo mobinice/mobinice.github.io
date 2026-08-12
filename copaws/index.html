@@ -59,7 +59,7 @@
       overflow: hidden;
       transform-origin: top left;
       background:
-        linear-gradient(145deg, rgba(235, 249, 238, .95), rgba(255, 249, 235, .98) 68%),
+        linear-gradient(to bottom, #e8f5eb, #f6f0df),
         var(--cream);
       box-shadow: 0 26px 90px rgba(25, 36, 28, .28);
     }
@@ -152,7 +152,7 @@
       position: sticky;
       top: 0;
       z-index: 45;
-      background: linear-gradient(145deg, rgba(235, 249, 238, .97), rgba(255, 249, 235, .97));
+      background: rgba(232, 245, 235, .97);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
     }
@@ -2219,19 +2219,52 @@
       min-height: 104px;
       padding: 16px;
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 42px minmax(0, 1fr) auto;
       gap: 8px 12px;
+      align-items: start;
       text-align: left;
       box-shadow: none;
+    }
+    .transaction-item::before {
+      content: "−";
+      grid-column: 1;
+      grid-row: 1 / span 2;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #ffe5de;
+      color: var(--clay);
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .transaction-item.income::before {
+      content: "＋";
+      background: #e8f7ea;
+      color: var(--green);
+    }
+    .transaction-item > div {
+      grid-column: 2;
+      min-width: 0;
     }
     .transaction-item h3 { margin: 0; font-size: 15px; }
     .transaction-item p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
     .transaction-status { color: var(--green); font-size: 11px; font-weight: 900; }
-    .transaction-amount { align-self: center; font-size: 15px; font-weight: 900; }
+    .transaction-amount {
+      grid-column: 3;
+      grid-row: 1;
+      align-self: start;
+      font-size: 15px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
     .transaction-amount.plus { color: var(--green); }
     .transaction-amount.minus { color: var(--clay); }
     .transaction-complete {
-      grid-column: 1 / -1;
+      grid-column: 3;
+      grid-row: 2;
       justify-self: end;
       height: 32px;
       padding: 0 14px;
@@ -2415,7 +2448,7 @@
       position: sticky;
       top: 0;
       z-index: 45;
-      background: linear-gradient(145deg, rgba(235, 249, 238, .97), rgba(255, 249, 235, .97));
+      background: rgba(232, 245, 235, .97);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
     }
@@ -3332,12 +3365,12 @@
       <div class="transaction-list" id="transactionList">
         <article class="transaction-item card" data-transaction-status="payout pending" data-go="transactionProgress"><div><h3>訂單付款 · Mina Chen</h3><p>待平台撥款 · 剩餘 3 天自動完成</p></div><strong class="transaction-amount minus">− NT$ 1,380</strong><button class="transaction-complete" data-open-review>立即完成</button></article>
         <article class="transaction-item card" data-transaction-status="paid" data-go="transactionProgress"><div><h3>訂單付款 · 小芸</h3><p>已付款 · 2026/07/10 18:32</p></div><strong class="transaction-amount minus">− NT$ 980</strong></article>
-        <article class="transaction-item card" data-transaction-status="refund" data-go="transactionProgress"><div><h3>訂單退款 · 柏宇</h3><p>退款完成 · 2026/07/09 11:20</p></div><strong class="transaction-amount plus">＋ NT$ 720</strong></article>
+        <article class="transaction-item card income" data-transaction-status="refund" data-go="transactionProgress"><div><h3>訂單退款 · 柏宇</h3><p>退款完成 · 2026/07/09 11:20</p></div><strong class="transaction-amount plus">＋ NT$ 720</strong></article>
         <article class="transaction-item card" data-transaction-status="complete" data-go="transactionComplete"><div><h3>訂單付款 · Nina Lin</h3><p>已完成 · 2026/07/08 20:15</p></div><strong class="transaction-amount minus">− NT$ 1,380</strong></article>
-        <article class="transaction-item card" data-transaction-status="complete" data-go="transactionProgress"><div><h3>寵物保母服務收入</h3><p>已撥款 · 2026/07/08 16:40</p></div><strong class="transaction-amount plus">＋ NT$ 850</strong></article>
+        <article class="transaction-item card income" data-transaction-status="complete" data-go="transactionProgress"><div><h3>寵物保母服務收入</h3><p>已撥款 · 2026/07/08 16:40</p></div><strong class="transaction-amount plus">＋ NT$ 850</strong></article>
         <article class="transaction-item card" data-transaction-status="paid" data-go="transactionProgress"><div><h3>訂單付款 · Emma Wu</h3><p>已付款 · 2026/07/07 09:18</p></div><strong class="transaction-amount minus">− NT$ 640</strong></article>
-        <article class="transaction-item card" data-transaction-status="refund" data-go="transactionProgress"><div><h3>取消訂單退款</h3><p>退款完成 · 2026/07/06 14:08</p></div><strong class="transaction-amount plus">＋ NT$ 520</strong></article>
-        <article class="transaction-item card" data-transaction-status="payout" data-go="transactionProgress"><div><h3>寵物保母服務收入</h3><p>待平台撥款 · 2026/07/05 19:30</p></div><strong class="transaction-amount plus">＋ NT$ 1,020</strong></article>
+        <article class="transaction-item card income" data-transaction-status="refund" data-go="transactionProgress"><div><h3>取消訂單退款</h3><p>退款完成 · 2026/07/06 14:08</p></div><strong class="transaction-amount plus">＋ NT$ 520</strong></article>
+        <article class="transaction-item card income" data-transaction-status="payout" data-go="transactionProgress"><div><h3>寵物保母服務收入</h3><p>待平台撥款 · 2026/07/05 19:30</p></div><strong class="transaction-amount plus">＋ NT$ 1,020</strong></article>
         <article class="transaction-item card" data-transaction-status="complete" data-go="transactionComplete"><div><h3>訂單付款 · 阿哲</h3><p>已完成 · 2026/07/04 12:22</p></div><strong class="transaction-amount minus">− NT$ 760</strong></article>
         <article class="transaction-item card" data-transaction-status="pending" data-go="transactionProgress"><div><h3>訂單付款 · 小雨</h3><p>待完成 · 2026/07/03 18:45</p></div><strong class="transaction-amount minus">− NT$ 620</strong></article>
       </div>
