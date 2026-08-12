@@ -594,6 +594,7 @@
       margin: 0 4px;
       position: relative;
       perspective: 900px;
+      touch-action: pan-y;
     }
     .match-card {
       min-height: 548px;
@@ -612,6 +613,10 @@
       transform: translate3d(0, 0, 0);
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
+    }
+    .match-card * {
+      touch-action: pan-y;
+      -webkit-user-drag: none;
     }
     .match-card-front {
       z-index: 2;
@@ -4089,6 +4094,7 @@
       let startX = 0;
       let startY = 0;
       let dx = 0;
+      let dy = 0;
       let activePointerId = null;
       let gesture = 'idle';
       let dragging = false;
@@ -4099,6 +4105,7 @@
         activePointerId = null;
         gesture = 'idle';
         dx = 0;
+        dy = 0;
         if (frame) cancelAnimationFrame(frame);
         frame = 0;
         document.getElementById('match').style.overflowY = '';
@@ -4118,17 +4125,24 @@
         setSwipeCue(dx);
       }
 
-      function finishDrag(event, cancelled = false) {
+      function finishDrag(event, forceCancel = false) {
         if (!dragging) return;
         if (event?.pointerId != null && activePointerId != null && event.pointerId !== activePointerId) return;
+        if (event?.clientX != null && event?.clientY != null) {
+          const finalDx = event.clientX - startX;
+          const finalDy = event.clientY - startY;
+          if (Math.abs(finalDx) >= Math.abs(dx)) dx = finalDx;
+          if (Math.abs(finalDy) >= Math.abs(dy)) dy = finalDy;
+        }
         const pointerId = activePointerId;
-        const shouldSwipe = !cancelled && gesture === 'horizontal' && Math.abs(dx) > 92;
+        const horizontalIntent = gesture === 'horizontal' || (Math.abs(dx) > 92 && Math.abs(dx) >= Math.abs(dy));
+        const shouldSwipe = !forceCancel && horizontalIntent && Math.abs(dx) > 92;
         const swipeDirection = dx > 0 ? 'right' : 'left';
         const releaseDx = dx;
         if (frame) {
           cancelAnimationFrame(frame);
           frame = 0;
-          if (!cancelled) applyDragTransform();
+          if (!forceCancel) applyDragTransform();
         }
         resetDragState(shouldSwipe);
         try {
@@ -4153,16 +4167,15 @@
         startX = event.clientX;
         startY = event.clientY;
         dx = 0;
-        if (event.pointerType === 'mouse') {
-          try { card.setPointerCapture(event.pointerId); } catch {}
-        }
+        dy = 0;
+        try { card.setPointerCapture(event.pointerId); } catch {}
       });
 
       card.addEventListener('pointermove', event => {
         if (!dragging || isSwiping) return;
         if (activePointerId !== event.pointerId) return;
         dx = event.clientX - startX;
-        const dy = event.clientY - startY;
+        dy = event.clientY - startY;
         if (gesture === 'pending') {
           if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
           if (Math.abs(dy) > Math.abs(dx) * 1.15) {
@@ -4182,13 +4195,13 @@
       }, { passive: false });
 
       card.addEventListener('pointerup', event => finishDrag(event));
-      card.addEventListener('pointercancel', event => finishDrag(event, true));
-      card.addEventListener('lostpointercapture', event => finishDrag(event, true));
+      card.addEventListener('pointercancel', event => finishDrag(event));
+      card.addEventListener('lostpointercapture', event => finishDrag(event));
       window.addEventListener('pointerup', event => finishDrag(event), true);
-      window.addEventListener('pointercancel', event => finishDrag(event, true), true);
-      window.addEventListener('blur', () => finishDrag(null, true));
+      window.addEventListener('pointercancel', event => finishDrag(event), true);
+      window.addEventListener('blur', () => finishDrag(null));
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) finishDrag(null, true);
+        if (document.hidden) finishDrag(null);
       });
       card.addEventListener('dragstart', event => event.preventDefault());
 
