@@ -606,7 +606,7 @@
       inset: 0;
       touch-action: pan-y;
       will-change: transform, opacity;
-      transition: transform .28s cubic-bezier(.2,.75,.25,1), opacity .22s ease;
+      transition: transform 175ms cubic-bezier(.2,.75,.25,1), opacity 135ms ease;
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
@@ -3442,6 +3442,8 @@
     let matchSwipeRun = 0;
     let matchSwipeFrame = 0;
     let matchSwipeTimer = 0;
+    const matchSwipeSettleMs = 175;
+    const matchSwipeOpacityMs = 135;
     let lastMatchFilter = 'city';
     let editingPetIndex = null;
     let petPhotoData = '';
@@ -3999,7 +4001,7 @@
     function setBackCardProgress(progress, animate = false) {
       const back = document.getElementById('matchCardBack');
       const value = Math.max(0, Math.min(1, progress));
-      back.style.transition = animate ? 'transform .28s cubic-bezier(.2,.75,.25,1), opacity .22s ease' : 'none';
+      back.style.transition = animate ? `transform ${matchSwipeSettleMs}ms cubic-bezier(.2,.75,.25,1), opacity ${matchSwipeOpacityMs}ms ease` : 'none';
       back.style.transform = `translate3d(0, ${18 * (1 - value)}px, ${-28 * (1 - value)}px) scale(${.94 + .06 * value})`;
       back.style.opacity = String(.74 + .26 * value);
     }
@@ -4069,7 +4071,7 @@
       setSwipeCue(initialDx || sign * 12);
       void card.offsetWidth;
       card.style.transition = '';
-      back.style.transition = 'transform .28s cubic-bezier(.2,.75,.25,1), opacity .22s ease';
+      back.style.transition = `transform ${matchSwipeSettleMs}ms cubic-bezier(.2,.75,.25,1), opacity ${matchSwipeOpacityMs}ms ease`;
       matchSwipeFrame = requestAnimationFrame(() => {
         matchSwipeFrame = 0;
         if (swipeRun !== matchSwipeRun || !isSwiping) return;
@@ -4088,7 +4090,7 @@
         resetMatchVisuals();
         isSwiping = false;
         window.setTimeout(() => { suppressMatchClick = false; }, 80);
-      }, 290);
+      }, matchSwipeSettleMs + 5);
     }
 
     function wireMatchDrag() {
