@@ -172,6 +172,22 @@
       font-size: 13px;
       line-height: 1.4;
     }
+    .map-page-header {
+      position: sticky;
+      top: 0;
+      z-index: 45;
+      margin: 0 -24px 12px;
+      padding: 12px 24px 10px;
+      background: rgba(232, 245, 235, .97);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+    }
+    .map-page-header .screen-title {
+      margin: 0 0 4px;
+    }
+    .map-page-header .subtitle {
+      margin: 0;
+    }
 
     .logo {
       width: 156px;
@@ -2924,9 +2940,10 @@
     </section>
 
     <section class="screen" id="map">
-      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <h1 class="screen-title">地圖探索</h1>
-      <p class="subtitle">看見離家最近、評價最穩的寵物保母</p>
+      <div class="map-page-header">
+        <h1 class="screen-title">地圖探索</h1>
+        <p class="subtitle">看見離家最近、評價最穩的寵物保母</p>
+      </div>
       <div class="map-canvas">
         <button class="map-person p1 active" data-map-index="0" aria-label="Mina Chen"></button>
         <button class="map-person p2" data-map-index="1" aria-label="小芸"></button>
@@ -2936,7 +2953,7 @@
           <span class="avatar" id="mapPreviewAvatar"></span>
           <div>
             <strong id="mapPreviewName">Mina Chen · 0.8 km</strong>
-            <p class="meta" id="mapPreviewMeta" style="margin:4px 0 0"><span class="stars">★★★★★</span> 4.9 · 今日 19:00 可約</p>
+            <p class="meta" id="mapPreviewMeta" style="margin:4px 0 0"><span class="stars">★★★★★</span> 4.9 · 126 則評價</p>
           </div>
         </button>
       </div>
@@ -2952,7 +2969,6 @@
     </section>
 
     <section class="screen" id="mapList">
-      <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
       <div class="page-heading">
         <button class="screen-back" data-back aria-label="返回地圖">‹</button>
         <h1 class="screen-title">附近寵物保母</h1>
@@ -3939,7 +3955,7 @@
       selectedCaregiverIndex = index;
       const data = caregivers[index] || caregivers[0];
       document.getElementById('mapPreviewName').textContent = `${data.name} · ${data.distance.replace('距離 ', '')}`;
-      document.getElementById('mapPreviewMeta').innerHTML = `<span class="stars">★★★★★</span> ${compactMeta(data)} · ${data.nearest.split(' · ')[0]}`;
+      document.getElementById('mapPreviewMeta').innerHTML = `<span class="stars">★★★★★</span> ${compactMeta(data)}`;
       document.querySelectorAll('[data-map-index]').forEach(point => {
         point.classList.toggle('active', Number(point.dataset.mapIndex) === index);
       });
@@ -3959,14 +3975,13 @@
     function mapRowTemplate(item, rank) {
       const { data, index } = item;
       const ratingScore = data.rating.split(' · ')[0];
-      const nearestTime = data.nearest.split(' · ')[0];
       return `
         <button class="map-caregiver-row" data-map-list-index="${index}">
           <span class="map-rank">#${rank}</span>
           <span class="mini-avatar"></span>
           <span>
             <strong>${data.name}</strong>
-            <small><span class="stars">★★★★★</span> ${ratingScore} · ${nearestTime}</small>
+            <small><span class="stars">★★★★★</span> ${ratingScore}</small>
           </span>
           <span class="map-distance">${data.distance.replace('距離 ', '')}</span>
         </button>
