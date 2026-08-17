@@ -2828,6 +2828,177 @@
       border-radius: 16px;
     }
 
+    /* 2026-08-17 UI sync: certification, sitter summaries and chat refresh. */
+    .name-cert-row {
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .name-cert-row h2,
+    .name-cert-row h3,
+    .name-cert-row strong {
+      min-width: 0;
+      margin: 0;
+    }
+    .cert-badge {
+      width: 24px;
+      height: 24px;
+      flex: 0 0 24px;
+      display: inline-grid;
+      place-items: center;
+      line-height: 1;
+    }
+    .cert-badge.platform-cert {
+      color: #fff;
+      background: #1769ff;
+      clip-path: polygon(50% 0%,61% 9%,75% 4%,82% 18%,96% 22%,91% 38%,100% 50%,91% 62%,96% 78%,82% 82%,75% 96%,61% 91%,50% 100%,39% 91%,25% 96%,18% 82%,4% 78%,9% 62%,0 50%,9% 38%,4% 22%,18% 18%,25% 4%,39% 9%);
+      font-size: 15px;
+      font-weight: 1000;
+    }
+    .cert-badge.identity-cert {
+      border-radius: 50%;
+      background: #0b7b3a;
+    }
+    .cert-badge.identity-cert svg { width: 100%; height: 100%; display: block; }
+    .cert-badge.small-cert { width: 20px; height: 20px; flex-basis: 20px; font-size: 12px; }
+    .match-name-row { align-items: center; }
+    .match-name-row .name-cert-row { flex: 1; }
+    .match-name-row .name-cert-row h2 { flex: 0 1 auto; }
+    .detail-title-row { gap: 8px; }
+
+    #time .caregiver-mini {
+      height: 122px;
+      min-height: 122px;
+      padding: 13px 16px;
+      align-items: stretch;
+    }
+    #time .caregiver-mini .avatar { height: 96px; }
+    #time .caregiver-mini > .verified-icon { display: none; }
+    .time-caregiver-body {
+      height: 96px;
+      padding-right: 0;
+      grid-template-rows: 24px 18px 22px 16px;
+      row-gap: 5px;
+    }
+    .time-caregiver-top {
+      display: flex;
+      grid-template-columns: none;
+      gap: 8px;
+    }
+    .time-caregiver-top h3 { max-width: 120px; }
+    .time-caregiver-top .cert-badge { width: 20px; height: 20px; flex-basis: 20px; }
+    .time-rating-row {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 10px;
+      white-space: nowrap;
+    }
+    .time-rating-row .stars { letter-spacing: 0; font-size: 10px; }
+
+    .sitter-summary-card {
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 14px;
+    }
+    .sitter-summary-copy { gap: 7px; }
+    .sitter-summary-card > .verified-icon { display: none; }
+    .sitter-summary-copy .name-cert-row { height: 24px; }
+    .sitter-summary-copy .name-cert-row h3 { font-size: 20px; line-height: 24px; }
+    .sitter-activity-line {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 18px;
+    }
+    .sitter-summary-card.demand-detail-sitter { grid-template-columns: 72px minmax(0, 1fr); }
+
+    .assistance-picker { margin-top: 18px; }
+    .assistance-picker > label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .assistance-options {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .assistance-chip {
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .assistance-chip.active {
+      border-color: var(--green);
+      color: #fff;
+      background: var(--green);
+    }
+    .assistance-other { margin-top: 10px; }
+    .assistance-other[hidden] { display: none; }
+    .demand-detail-chip { background: var(--green); color: #fff; }
+    .demand-detail-chip.inactive { background: #fff; color: var(--muted); }
+
+    .activity-date {
+      margin: 16px 0 4px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      text-align: center;
+    }
+    .chat-refresh-region {
+      height: 0;
+      margin: 0;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      opacity: 0;
+      background: #fff;
+      border: 0;
+      box-shadow: none;
+      transition: height .22s ease, margin .22s ease, opacity .16s ease;
+    }
+    .chat-refresh-region.refreshing {
+      height: 54px;
+      margin: 12px 0 0;
+      opacity: 1;
+      border: 1px solid var(--line);
+    }
+    .chat-refresh-spinner {
+      width: 25px;
+      height: 25px;
+      border: 3px solid #cae7d4;
+      border-top-color: var(--green);
+      border-radius: 50%;
+    }
+    .chat-refresh-region.refreshing .chat-refresh-spinner {
+      animation: chatRefreshSpin .68s linear infinite;
+    }
+    @keyframes chatRefreshSpin { to { transform: rotate(360deg); } }
+
+    .cert-icons { right: 24px; gap: 8px; }
+    .cert-icons .cert-badge,
+    .cert-icons .verified-icon { width: 32px; height: 32px; flex-basis: 32px; }
+    .cert-icons .platform-cert { font-size: 19px; }
+    .cert-row .cert-badge { width: 34px; height: 34px; flex-basis: 34px; }
+
+    .map-person-copy { min-width: 0; }
+    .map-person-copy .name-cert-row { max-width: 100%; }
+    .map-person-copy .name-cert-row strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     @media (max-width: 460px) {
       body { background: var(--cream); }
       .phone { box-shadow: none; }
@@ -2915,14 +3086,11 @@
         <article class="card match-card match-card-back" id="matchCardBack" aria-hidden="true"></article>
         <article class="card match-card match-card-front" id="matchCard" data-go="detail">
           <div class="photo-hero pet-shape" id="matchPhoto">
-            <span class="verified-icon" style="position:absolute;left:18px;top:20px" aria-label="已實名認證">
-              <svg class="identity-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="m21.1 12.6 1.95 1.95 3.5-4.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
             <span class="hot" id="matchHot">本區熱門</span>
             <span class="pet-dot"></span>
           </div>
           <div class="match-name-row">
-            <h2 id="matchName">Mina Chen</h2>
+            <span class="name-cert-row"><h2 id="matchName">Mina Chen</h2><span class="cert-badge platform-cert" aria-label="平台認證">✓</span></span>
             <span class="distance" id="matchDistance">距離 0.8 km</span>
           </div>
           <p class="meta"><span class="stars" id="matchStars">★★★★★</span>　<span id="matchRating">4.9 · 126 則評價 · 瀏覽 2,431</span></p>
@@ -3003,11 +3171,9 @@
         <span class="pet-dot"></span>
       </div>
       <div class="detail-card">
-        <div class="detail-title-row">
+        <div class="detail-title-row name-cert-row">
           <h2 id="detailName">Mina Chen</h2>
-          <span class="verified-icon" aria-label="已實名認證">
-            <svg class="identity-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="m21.1 12.6 1.95 1.95 3.5-4.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
+          <span id="detailCert"><span class="cert-badge platform-cert" aria-label="平台認證">✓</span></span>
         </div>
         <p class="meta"><span class="stars">★★★★★</span>　<span id="detailMeta">4.9 · 126 則評價 · 0.8 km</span></p>
         <p class="meta" id="detailIntro">專長照顧貓咪與小型犬，可協助餵藥、清貓砂、散步、即時照片回報。</p>
@@ -3031,10 +3197,8 @@
       <div class="caregiver-mini card">
         <span class="avatar"></span>
         <div class="time-caregiver-body">
-          <div class="time-caregiver-top">
-            <h3 id="timeName">Mina Chen</h3>
-            <span class="time-rating-pill"><span class="star">★</span><span id="timeRating">4.9</span><span id="timeReviews">126 則評價</span></span>
-          </div>
+          <div class="time-caregiver-top name-cert-row"><h3 id="timeName">Mina Chen</h3><span id="timeCert"><span class="cert-badge platform-cert" aria-label="平台認證">✓</span></span></div>
+          <div class="time-rating-row"><span class="stars">★★★★★</span><span id="timeRating">4.9</span><span>·</span><span id="timeReviews">126 則評價</span></div>
           <div class="time-info-grid" aria-label="寵物保母摘要資訊">
             <span class="time-info" id="timeViews">瀏覽 2,431</span>
             <span class="time-info" id="timeDistance">0.8 km</span>
@@ -3042,9 +3206,6 @@
           </div>
           <p class="meta" id="timeIntro">貓咪餵食、清砂、陪玩回報</p>
         </div>
-        <span class="verified-icon" aria-label="已實名認證">
-          <svg class="identity-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="m21.1 12.6 1.95 1.95 3.5-4.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </span>
       </div>
       <div class="card month-card">
         <div class="month-head"><strong>2026 七月</strong><span class="month-next">›</span></div>
@@ -3093,7 +3254,7 @@
         <h1 class="screen-title">填寫需求</h1>
       </div>
       <p class="subtitle">確認服務內容，送出後進入預約確認</p>
-      <div class="sitter-summary-card card" data-sitter-summary></div>
+      <div class="sitter-summary-card card" data-sitter-summary data-summary-kind="demand"></div>
       <div class="service-form">
         <p class="service-time-label">服務時間區間</p>
         <div class="service-time-grid">
@@ -3110,7 +3271,11 @@
           <button class="pet-create-button" type="button" data-create-pet-from-demand>建立寵物資料</button>
         </div>
       </div>
-      <div class="field"><label>需要協助事項</label><textarea class="textarea">餵乾糧與罐罐，清理貓砂，補水，陪玩 15 分鐘。</textarea></div>
+      <div class="assistance-picker" data-assistance-picker>
+        <label>需要協助事項</label>
+        <div class="assistance-options"><button class="assistance-chip active" type="button" data-assistance-chip>餵食</button><button class="assistance-chip active" type="button" data-assistance-chip>清砂</button><button class="assistance-chip active" type="button" data-assistance-chip>陪玩</button><button class="assistance-chip" type="button" data-assistance-chip data-other-chip>其他</button></div>
+        <input class="input assistance-other" data-assistance-other hidden placeholder="請輸入其他需要協助事項" maxlength="100">
+      </div>
       <div class="field"><label>注意事項</label><textarea class="textarea">麻糬比較怕生，進門後先讓牠聞味道，不要直接抱牠。</textarea></div>
       <div class="field"><label>回報需求</label><textarea class="textarea">完成餵食、清砂後各拍一張照片，離開前回報門窗狀態。</textarea></div>
       <div class="field"><label>寵物保母服務費</label><input class="input" id="careFee" value="200" inputmode="numeric"></div>
@@ -3135,25 +3300,25 @@
         <span class="status">進行中</span>
         <h3>Mina Chen 到府照護</h3>
         <p class="meta">服務中，每 30 分鐘回報照片與狀態。</p>
-        <div class="book-actions"><button class="btn" data-go="bookingReport">查看回報</button><button class="btn light" data-go="bookingChat">聯絡寵物保母</button></div>
+        <div class="book-actions"><button class="btn" data-go="bookingReport" data-index="0">查看回報</button><button class="btn light" data-go="bookingChat" data-index="0">聯絡寵物保母</button></div>
       </article>
       <article class="card book-card" data-booking-status="upcoming">
         <span class="status" style="color:var(--clay)">即將服務</span>
         <h3>小芸 · 到府餵食</h3>
         <p class="meta">今天 18:30 開始，寵物保母已確認接案。</p>
-        <div class="book-actions"><button class="btn clay" data-go="bookingDetail">查看詳情</button><button class="btn light" style="color:var(--clay);border-color:var(--clay)" onclick="toast('已設定服務提醒')">提醒我</button></div>
+        <div class="book-actions"><button class="btn clay" data-go="bookingDetail" data-index="1">查看詳情</button><button class="btn light" style="color:var(--clay);border-color:var(--clay)" onclick="toast('已設定服務提醒')">提醒我</button></div>
       </article>
       <article class="card book-card" data-booking-status="confirming">
         <span class="status" style="color:#b77a13">需求確認中</span>
         <h3>Emma Wu · 到府照護</h3>
         <p class="meta">需求已送出，等待寵物保母確認接案。</p>
-        <div class="book-actions"><button class="btn" data-go="bookingDetail">查看需求</button><button class="btn light" data-go="bookingEdit">修改</button></div>
+        <div class="book-actions"><button class="btn" data-go="bookingDetail" data-index="6">查看需求</button><button class="btn light" data-go="bookingEdit" data-index="6">修改</button></div>
       </article>
       <article class="card book-card" data-booking-status="pending">
         <span class="status" style="color:var(--green-2)">待服務</span>
         <h3>柏宇 · 散步陪伴</h3>
         <p class="meta">明天 09:00 預約，等待服務開始。</p>
-        <div class="book-actions"><button class="btn" style="background:var(--green-2)" data-go="bookingDetail">查看需求</button><button class="btn light" style="color:var(--green-2);border-color:var(--green-2)" data-go="bookingEdit">修改</button></div>
+        <div class="book-actions"><button class="btn" style="background:var(--green-2)" data-go="bookingDetail" data-index="2">查看需求</button><button class="btn light" style="color:var(--green-2);border-color:var(--green-2)" data-go="bookingEdit" data-index="2">修改</button></div>
       </article>
       <article class="card book-card" data-booking-status="payout">
         <span class="status" style="color:var(--clay)">待撥款</span>
@@ -3170,7 +3335,8 @@
         <h1 class="screen-title">服務回報</h1>
       </div>
       <p class="subtitle">查看本次服務進度與寵物保母回報</p>
-      <div class="sitter-summary-card card" data-sitter-summary></div>
+      <div class="sitter-summary-card card" data-sitter-summary data-summary-kind="report"></div>
+      <div class="activity-date">今天 12/01</div>
       <div class="report-timeline">
         <div class="report-entry"><span class="report-time">14:01</span><article class="report-card card"><h3>寵物保母開始服務</h3><p>已抵達服務地址，確認門窗與麻糬狀態正常。</p></article></div>
         <div class="report-entry"><span class="report-time">14:12</span><article class="report-card card"><div class="report-photo"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10" r="2" fill="currentColor"/><path d="m5 17 4-4 3 3 2-2 5 3" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><h3>完成餵食</h3><p>已補乾糧、罐罐與飲水，麻糬有正常進食。</p></article></div>
@@ -3184,8 +3350,14 @@
         <h1 class="screen-title">聯絡寵物保母</h1>
       </div>
       <p class="subtitle">Mina Chen · 本次服務留言板</p>
-      <div class="sitter-summary-card card" data-sitter-summary></div>
+      <div class="chat-refresh-region card" id="chatRefreshRegion" aria-live="polite"><span class="chat-refresh-spinner" aria-hidden="true"></span></div>
+      <div class="sitter-summary-card card" data-sitter-summary data-summary-kind="chat"></div>
       <div class="chat-board card" id="chatBoard">
+        <div class="activity-date">昨天 11/30</div>
+        <div class="chat-message owner"><div class="chat-bubble">明天下午到府前，再麻煩先訊息通知。</div><div class="chat-meta">20:18<span class="chat-status">保母已讀</span></div></div>
+        <div class="chat-message sitter"><div class="chat-bubble">好的，我抵達樓下時會先通知您。</div><div class="chat-meta">20:21</div></div>
+        <div class="chat-message owner"><div class="chat-bubble">門禁與飼料位置都放在需求詳情裡了，謝謝。</div><div class="chat-meta">20:24<span class="chat-status">保母已讀</span></div></div>
+        <div class="activity-date">今天 12/01</div>
         <div class="chat-message sitter"><div class="chat-bubble">我已經到達囉，先確認麻糬的狀態。</div><div class="chat-meta">14:03</div></div>
         <div class="chat-message owner"><div class="chat-bubble">好的沒問題，麻煩您了。</div><div class="chat-meta">14:05<span class="chat-status">保母已讀</span></div></div>
         <div class="chat-message sitter"><div class="chat-bubble">餵食完成後會再拍照回報給您。</div><div class="chat-meta">14:10</div></div>
@@ -3201,7 +3373,7 @@
         <h1 class="screen-title">需求詳情</h1>
       </div>
       <p class="subtitle">訂單 CP20261201008</p>
-      <div class="sitter-summary-card demand-detail-sitter card" data-sitter-summary data-demand-detail-sitter></div>
+      <div class="sitter-summary-card demand-detail-sitter card" data-sitter-summary data-demand-detail-sitter data-summary-kind="detail"></div>
 
       <section class="demand-detail-section">
         <h3>本次服務時間</h3>
@@ -3217,7 +3389,8 @@
       </section>
       <section class="demand-detail-section">
         <h3>需要協助的事項</h3>
-        <div class="demand-detail-assistance"><span class="demand-detail-chip">餵食</span><span class="demand-detail-chip">清砂</span><span class="demand-detail-chip">陪玩</span><span class="demand-detail-chip inactive">餵藥</span></div>
+        <div class="demand-detail-assistance"><span class="demand-detail-chip">餵食</span><span class="demand-detail-chip">清砂</span><span class="demand-detail-chip">陪玩</span><span class="demand-detail-chip">其他</span></div>
+        <div class="demand-detail-card demand-detail-copy" style="margin-top:10px">每日擦拭眼周，並補充飲水。</div>
       </section>
       <section class="demand-detail-section">
         <h3>注意事項</h3>
@@ -3239,11 +3412,15 @@
         <h1 class="screen-title">修改需求</h1>
       </div>
       <p class="subtitle">變更後將重新進入需求確認中</p>
-      <div class="sitter-summary-card card" data-sitter-summary></div>
+      <div class="sitter-summary-card card" data-sitter-summary data-summary-kind="edit"></div>
       <div class="service-form"><p class="service-time-label">服務時間區間</p><div class="service-time-grid"><div class="service-time-box"><span>開始時間</span><strong>12/01 14:00</strong></div><div class="service-time-box"><span>結束時間</span><strong>12/01 15:00</strong></div></div></div>
       <div class="field"><label>服務地址</label><input class="input" value="台北市大安區和平東路一段 88 號"></div>
       <div class="field"><label>寵物資訊</label><select class="select" id="editDemandPetSelect" aria-label="修改需求的寵物資訊"></select></div>
-      <div class="field"><label>需要協助事項</label><textarea class="textarea">餵乾糧與罐罐，清理貓砂，補水，陪玩 15 分鐘。</textarea></div>
+      <div class="assistance-picker" data-assistance-picker>
+        <label>需要協助事項</label>
+        <div class="assistance-options"><button class="assistance-chip active" type="button" data-assistance-chip>餵食</button><button class="assistance-chip active" type="button" data-assistance-chip>清砂</button><button class="assistance-chip active" type="button" data-assistance-chip>陪玩</button><button class="assistance-chip active" type="button" data-assistance-chip data-other-chip>其他</button></div>
+        <input class="input assistance-other" data-assistance-other value="每日擦拭眼周，並補充飲水。" maxlength="100">
+      </div>
       <div class="field"><label>注意事項</label><textarea class="textarea">麻糬比較怕生，進門後先讓牠聞味道，不要直接抱牠。</textarea></div>
       <div class="field"><label>回報需求</label><textarea class="textarea">完成餵食、清砂後各拍一張照片，離開前回報門窗狀態。</textarea></div>
       <button class="btn full" style="margin-top:18px" data-change-demand>變更需求</button>
@@ -3256,6 +3433,7 @@
         <button class="upload-btn">上傳<br>大頭照</button>
         <div><h2>小安</h2></div>
         <div class="cert-icons">
+          <button class="cert-badge platform-cert" onclick="openCertModal('platform')" aria-label="查看平台認證">✓</button>
           <button class="verified-icon" onclick="openCertModal('identity')" aria-label="查看實名認證">
             <svg class="identity-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="m21.1 12.6 1.95 1.95 3.5-4.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
@@ -3270,7 +3448,7 @@
         <button class="btn light">開始認證</button>
       </div>
       <div class="menu-list">
-        <button class="menu-item" onclick="openCertModal('all')"><span>認證狀態<small>查看實名與手機狀態</small></span><span>›</span></button>
+        <button class="menu-item" onclick="openCertModal('all')"><span>認證狀態<small>查看平台、實名與手機狀態</small></span><span>›</span></button>
         <button class="menu-item" data-go="pets"><span>我的毛孩<small>管理寵物資料與照護注意事項</small></span><span>›</span></button>
         <button class="menu-item" data-go="finance"><span>付款與收款<small>交易紀錄、撥款、發票資料</small></span><span>›</span></button>
       </div>
@@ -3468,6 +3646,8 @@
     let editingPetIndex = null;
     let petPhotoData = '';
     let petFormReturnScreen = 'pets';
+    let chatRefreshing = false;
+    let chatGestureStart = null;
     let reviewRating = 5;
     const pets = [
       {
@@ -3485,6 +3665,7 @@
     const caregivers = [
       {
         name: 'Mina Chen',
+        certification: 'platform',
         distance: '距離 0.8 km',
         rating: '4.9 · 126 則評價 · 瀏覽 2,431',
         intro: '8 年養貓經驗，熟悉餵藥、陪玩與每日照片回報。今晚 19:00 後可預約。',
@@ -3499,6 +3680,7 @@
       },
       {
         name: '小芸',
+        certification: 'identity',
         distance: '距離 1.2 km',
         rating: '4.8 · 88 則評價 · 瀏覽 1,902',
         intro: '熟悉貓咪分離焦慮與餵藥，可協助清砂、補水、每日短影片回報。',
@@ -3513,6 +3695,7 @@
       },
       {
         name: '柏宇',
+        certification: '',
         distance: '距離 1.6 km',
         rating: '4.7 · 64 則評價 · 瀏覽 1,284',
         intro: '大型犬散步與陪伴經驗多，能回報路線、喝水與便便狀態。',
@@ -3527,6 +3710,11 @@
       }
     ];
     const extraCaregiverNames = ['Nina Lin', '阿哲', '小雨', 'Emma Wu', '張維', 'Lulu', 'Sam Chen', '安琪', 'Kenji', '佩佩', 'Rita Huang', '阿峰', 'June', 'Leo Wang', '芯怡', 'Hana', '明軒', 'Coco', 'Ivy Lin', '小晴', 'Oliver'];
+    const caregiverCertification = {
+      'Mina Chen': 'platform', 'Nina Lin': 'platform', 'Emma Wu': 'platform',
+      '小芸': 'identity', '阿哲': 'identity', '張維': 'identity',
+      '柏宇': '', '小雨': ''
+    };
     extraCaregiverNames.forEach((name, i) => {
       const base = caregivers[i % 3];
       const distanceValue = (1.9 + i * 0.23).toFixed(1);
@@ -3534,6 +3722,9 @@
       caregivers.push({
         ...base,
         name,
+        certification: Object.prototype.hasOwnProperty.call(caregiverCertification, name)
+          ? caregiverCertification[name]
+          : (i % 3 === 0 ? 'platform' : i % 3 === 1 ? 'identity' : ''),
         distance: `距離 ${distanceValue} km`,
         rating: `${ratingValue} · ${72 + i * 7} 則評價 · 瀏覽 ${980 + i * 111}`,
         intro: `${name} 可協助到府陪伴、餵食與照片回報，依距離排序目前為附近第 ${i + 4} 位。`,
@@ -3728,6 +3919,9 @@
       }
       if (id === 'demand' || id === 'bookingEdit') renderPetPickers();
       currentScreen = id;
+      if (id === 'bookingReport' || id === 'bookingChat') {
+        requestAnimationFrame(() => scrollToLatestActivity(id, false));
+      }
     }
 
     function navigate(id) {
@@ -3752,11 +3946,10 @@
       const id = name => withIds ? ` id="${name}"` : '';
       return `
         <div class="photo-hero pet-shape"${id('matchPhoto')} style="background:${escapeHtml(data.color)}">
-          <span class="verified-icon" style="position:absolute;left:18px;top:20px" aria-label="已實名認證">${identityMarkSvg()}</span>
           <span class="hot"${id('matchHot')}>${escapeHtml(data.hot)}</span>
           <span class="pet-dot" style="background:${escapeHtml(data.dot)}"></span>
         </div>
-        <div class="match-name-row"><h2${id('matchName')}>${escapeHtml(data.name)}</h2><span class="distance"${id('matchDistance')}>${escapeHtml(data.distance)}</span></div>
+        <div class="match-name-row"><span class="name-cert-row"><h2${id('matchName')}>${escapeHtml(data.name)}</h2>${certBadgeHtml(data.certification)}</span><span class="distance"${id('matchDistance')}>${escapeHtml(data.distance)}</span></div>
         <p class="meta"><span class="stars"${id('matchStars')}>★★★★★</span>　<span${id('matchRating')}>${escapeHtml(data.rating)}</span></p>
         <p class="meta"${id('matchIntro')}>${escapeHtml(data.intro)}</p>
         <div class="nearest">最近可預約 <span${id('matchNearest')}>${escapeHtml(data.nearest)}</span></div>`;
@@ -3794,28 +3987,40 @@
       return '<svg class="identity-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="m21.1 12.6 1.95 1.95 3.5-4.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     }
 
+    function certBadgeHtml(type, small = false) {
+      const sizeClass = small ? ' small-cert' : '';
+      if (type === 'platform') return `<span class="cert-badge platform-cert${sizeClass}" aria-label="平台認證">✓</span>`;
+      if (type === 'identity') return `<span class="cert-badge identity-cert${sizeClass}" aria-label="實名認證">${identityMarkSvg()}</span>`;
+      return '';
+    }
+
     function renderSitterSummaries() {
       const data = caregivers[selectedCaregiverIndex] || caregivers[0];
       const parts = caregiverMetaParts(data);
       document.querySelectorAll('[data-sitter-summary]').forEach(card => {
+        const kind = card.dataset.summaryKind || 'demand';
+        const nameRow = `<div class="name-cert-row"><h3>${escapeHtml(data.name)}</h3>${certBadgeHtml(data.certification, true)}</div>`;
+        const ratingRow = `<div class="sitter-rating-line"><span class="stars">★★★★★</span><span>${escapeHtml(parts.score)} · ${escapeHtml(parts.reviews)}</span></div>`;
         if (card.hasAttribute('data-demand-detail-sitter')) {
           card.innerHTML = `
             <span class="avatar" aria-hidden="true"></span>
             <div class="sitter-summary-copy">
-              <h3>${escapeHtml(data.name)}</h3>
-              <div class="sitter-rating-line"><span class="stars">★★★★★</span><span>${escapeHtml(parts.score)} · ${escapeHtml(parts.reviews)}</span></div>
+              ${nameRow}
+              ${ratingRow}
               <span class="demand-detail-confirmed">保母已確認</span>
             </div>`;
           return;
         }
+        let thirdRow = `<div class="sitter-summary-meta"><span>${escapeHtml(parts.views)}</span><span>${escapeHtml(parts.distance)}</span><span>${escapeHtml(parts.serviceType)}</span></div>`;
+        if (kind === 'report') thirdRow = '<div class="sitter-activity-line">14:01 開始服務 · 12/01 14:00-15:00</div>';
+        if (kind === 'chat' || kind === 'edit') thirdRow = '<div class="sitter-activity-line">12/01 14:00-15:00 · 到府照護</div>';
         card.innerHTML = `
           <span class="avatar" aria-hidden="true"></span>
           <div class="sitter-summary-copy">
-            <h3>${escapeHtml(data.name)}</h3>
-            <div class="sitter-rating-line"><span class="stars">★★★★★</span><span>${escapeHtml(parts.score)} · ${escapeHtml(parts.reviews)}</span></div>
-            <div class="sitter-summary-meta"><span>${escapeHtml(parts.views)}</span><span>${escapeHtml(parts.distance)}</span><span>${escapeHtml(parts.serviceType)}</span></div>
-          </div>
-          <span class="verified-icon" aria-label="已實名認證">${identityMarkSvg()}</span>`;
+            ${nameRow}
+            ${ratingRow}
+            ${thirdRow}
+          </div>`;
       });
     }
 
@@ -3827,6 +4032,7 @@
     function renderDetail() {
       const data = caregivers[selectedCaregiverIndex] || caregivers[0];
       document.getElementById('detailName').textContent = data.name;
+      document.getElementById('detailCert').innerHTML = certBadgeHtml(data.certification);
       document.getElementById('detailMeta').textContent = `${compactMeta(data)} · ${data.distance.replace('距離 ', '')}`;
       document.getElementById('detailIntro').textContent = data.detail;
       syncDetailFavoriteButton();
@@ -3836,6 +4042,7 @@
       const data = caregivers[selectedCaregiverIndex] || caregivers[0];
       const parts = caregiverMetaParts(data);
       document.getElementById('timeName').textContent = data.name;
+      document.getElementById('timeCert').innerHTML = certBadgeHtml(data.certification, true);
       document.getElementById('timeRating').textContent = parts.score;
       document.getElementById('timeReviews').textContent = parts.reviews;
       document.getElementById('timeViews').textContent = parts.views;
@@ -3893,14 +4100,9 @@
             <article class="card favorite-card">
               <span class="favorite-new-tag">NEW</span>
               <div class="favorite-card-main">
-                <div class="favorite-photo">
-                  <span class="verified-icon" aria-label="已實名認證">
-                    <svg class="identity-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="m21.1 12.6 1.95 1.95 3.5-4.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </span>
-                  <span class="pet-dot"></span>
-                </div>
+                <div class="favorite-photo"><span class="pet-dot"></span></div>
                 <div class="favorite-copy">
-                  <h2>${data.name}</h2>
+                  <div class="name-cert-row"><h2>${data.name}</h2>${certBadgeHtml(data.certification)}</div>
                   <p class="meta" style="margin:0"><span class="stars">★★★★★</span> ${compactMeta(data)}</p>
                   <p class="distance" style="margin:6px 0 0">${data.distance} · 大安區</p>
                   <p class="favorite-intro">${data.detail}</p>
@@ -3931,7 +4133,7 @@
           <div class="favorite-suggestion-main">
             <div class="favorite-photo suggestion-photo"><span class="pet-dot"></span></div>
             <div class="favorite-suggestion-copy">
-              <h2>${suggestion.name}</h2>
+              <div class="name-cert-row"><h2>${suggestion.name}</h2>${certBadgeHtml(suggestion.certification)}</div>
               <p class="meta"><span class="stars">★★★★★</span> ${compactMeta(suggestion)}</p>
               <p class="distance">${suggestion.distance} · 大安區</p>
               <p class="favorite-intro">${suggestion.detail}</p>
@@ -3983,8 +4185,8 @@
         <button class="map-caregiver-row" data-map-list-index="${index}">
           <span class="map-rank">#${rank}</span>
           <span class="mini-avatar"></span>
-          <span>
-            <strong>${data.name}</strong>
+          <span class="map-person-copy">
+            <span class="name-cert-row"><strong>${data.name}</strong>${certBadgeHtml(data.certification, true)}</span>
             <small><span class="stars">★★★★★</span> ${ratingScore}</small>
           </span>
           <span class="map-distance">${data.distance.replace('距離 ', '')}</span>
@@ -4256,7 +4458,10 @@
       const title = document.getElementById('modalTitle');
       const copy = document.getElementById('modalCopy');
       const body = document.getElementById('modalBody');
-      if (type === 'identity') {
+      if (type === 'platform') {
+        title.textContent = '平台認證提示';
+        copy.textContent = '藍色勾勾代表此帳號已通過 Copaws 平台審核；保母卡片會優先展示平台認證。';
+      } else if (type === 'identity') {
         title.textContent = '實名認證提示';
         copy.textContent = '這是點擊實名認證 icon 後出現的 tips，讓用戶快速理解此帳號已完成平台驗證。';
       } else if (type === 'phone') {
@@ -4264,9 +4469,13 @@
         copy.textContent = '這是點擊手機認證 icon 後出現的 tips，代表此帳號已通過手機驗證。';
       } else {
         title.textContent = '認證狀態';
-        copy.textContent = '此區塊整理目前帳號的實名與手機驗證狀態。';
+        copy.textContent = '此區塊整理目前帳號的平台、實名與手機驗證狀態。';
       }
       body.innerHTML = `
+        <div class="cert-row">
+          <div><strong>已平台認證</strong><span>帳號與服務資料已通過 Copaws 平台審核</span></div>
+          <span class="cert-badge platform-cert" aria-label="平台認證">✓</span>
+        </div>
         <div class="cert-row">
           <div><strong>已實名認證</strong><span>身分證與本人資料已通過平台確認</span></div>
           <span class="verified-icon"><svg class="identity-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="m21.1 12.6 1.95 1.95 3.5-4.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -4390,6 +4599,51 @@
       board.insertBefore(node, quickReplies);
       document.getElementById('chatInput').value = '';
       board.scrollTop = board.scrollHeight;
+      scrollToLatestActivity('bookingChat', true);
+    }
+
+    function scrollToLatestActivity(screenId, smooth = true) {
+      const screen = document.getElementById(screenId);
+      if (!screen) return;
+      requestAnimationFrame(() => {
+        screen.scrollTo({ top: screen.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+        if (screenId === 'bookingChat') {
+          const board = document.getElementById('chatBoard');
+          if (board) board.scrollTop = board.scrollHeight;
+        }
+      });
+    }
+
+    function runChatRefresh() {
+      if (chatRefreshing || currentScreen !== 'bookingChat') return;
+      const region = document.getElementById('chatRefreshRegion');
+      if (!region) return;
+      chatRefreshing = true;
+      document.getElementById('bookingChat').scrollTo({ top: 0, behavior: 'smooth' });
+      region.classList.add('refreshing');
+      region.setAttribute('aria-label', '正在更新聊天室');
+      window.setTimeout(() => {
+        region.classList.remove('refreshing');
+        region.setAttribute('aria-label', '聊天室已更新');
+        window.setTimeout(() => {
+          chatRefreshing = false;
+          scrollToLatestActivity('bookingChat', true);
+          toast('已更新至最新訊息');
+        }, 230);
+      }, 850);
+    }
+
+    function beginChatRefreshGesture(event) {
+      if (currentScreen !== 'bookingChat' || chatRefreshing) return;
+      chatGestureStart = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
+    }
+
+    function finishChatRefreshGesture(event) {
+      if (!chatGestureStart || currentScreen !== 'bookingChat') return;
+      const dx = event.clientX - chatGestureStart.x;
+      const dy = event.clientY - chatGestureStart.y;
+      chatGestureStart = null;
+      if (dy < -58 && Math.abs(dy) > Math.abs(dx) * 1.25) runChatRefresh();
     }
 
     function renderSlots() {
@@ -4487,6 +4741,20 @@
         event.preventDefault();
         petToggle.classList.toggle('active');
         toast(`已${petToggle.classList.contains('active') ? '選取' : '取消'}：${petToggle.textContent.trim()}`);
+        return;
+      }
+      const assistanceChip = event.target.closest('[data-assistance-chip]');
+      if (assistanceChip) {
+        event.preventDefault();
+        assistanceChip.classList.toggle('active');
+        if (assistanceChip.hasAttribute('data-other-chip')) {
+          const picker = assistanceChip.closest('[data-assistance-picker]');
+          const otherInput = picker?.querySelector('[data-assistance-other]');
+          if (otherInput) {
+            otherInput.hidden = !assistanceChip.classList.contains('active');
+            if (!otherInput.hidden) requestAnimationFrame(() => otherInput.focus());
+          }
+        }
         return;
       }
       const mapListItem = event.target.closest('[data-map-list-index]');
@@ -4634,6 +4902,11 @@
     });
 
     document.getElementById('petNotes').addEventListener('input', updatePetNotesCount);
+
+    const bookingChatScreen = document.getElementById('bookingChat');
+    bookingChatScreen.addEventListener('pointerdown', beginChatRefreshGesture, { passive: true });
+    bookingChatScreen.addEventListener('pointerup', finishChatRefreshGesture, { passive: true });
+    bookingChatScreen.addEventListener('pointercancel', () => { chatGestureStart = null; }, { passive: true });
 
     document.getElementById('careFee').addEventListener('input', event => {
       const base = Math.max(0, parseInt(event.target.value.replace(/\D/g, ''), 10) || 0);
