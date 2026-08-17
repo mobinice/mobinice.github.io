@@ -1546,14 +1546,44 @@
       background: #fefbf4;
       box-shadow: none;
     }
-    .favorites-summary {
-      padding: 14px 18px;
-      border-radius: 18px;
-      margin: 14px 0 22px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: none;
+    .favorite-filter {
+      display: grid;
+      gap: 7px;
+      margin: 12px 0 20px;
+    }
+    .favorite-filter label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .favorite-search-wrap {
+      position: relative;
+    }
+    .favorite-search-wrap svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      color: var(--green);
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .favorite-search {
+      width: 100%;
+      height: 48px;
+      padding: 0 44px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      outline: none;
+    }
+    .favorite-search:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(11, 127, 68, .1);
     }
     .favorite-card {
       padding: 24px;
@@ -1626,21 +1656,6 @@
       width: 17px;
       height: 17px;
     }
-    .favorite-new-tag {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 66px;
-      height: 28px;
-      display: grid;
-      place-items: center;
-      border-radius: 0 24px 0 14px;
-      background: var(--green);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0;
-    }
     .favorite-copy h2 {
       margin: 0 0 7px;
       font-size: 24px;
@@ -1697,75 +1712,116 @@
       border-radius: 999px;
       font-size: 13px;
     }
-    .favorites-other-title {
-      margin: 28px 0 14px;
-      font-size: 22px;
-      line-height: 1.2;
-    }
-    .favorite-suggestion-card {
-      padding: 24px;
-    }
-    .favorite-suggestion-main {
-      position: relative;
-      display: grid;
-      grid-template-columns: 94px minmax(0, 1fr);
-      gap: 16px;
-      align-items: start;
-    }
-    .favorite-photo.suggestion-photo {
-      width: 94px;
-      height: 108px;
-    }
-    .favorite-suggestion-copy {
-      height: 108px;
-      padding-right: 48px;
-      display: grid;
-      grid-template-rows: 24px 16px 16px 34px;
-      row-gap: 6px;
-      overflow: hidden;
-    }
-    .favorite-suggestion-copy h2,
-    .favorite-suggestion-copy p {
-      margin: 0;
-    }
-    .favorite-suggestion-copy h2 {
-      font-size: 20px;
-      line-height: 24px;
-    }
-    .favorite-suggestion-copy .meta,
-    .favorite-suggestion-copy .distance {
-      min-width: 0;
-      font-size: 12px;
-      line-height: 16px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .favorite-suggestion-copy .favorite-intro {
-      margin: 0;
-      line-height: 17px;
-    }
-    .favorite-suggestion-save {
-      position: absolute;
-      top: -8px;
-      right: 0;
-      width: 48px;
-      height: 36px;
-      padding: 0;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: var(--green-soft);
-      color: var(--green);
+    .favorite-load-marker {
+      min-height: 44px;
       display: grid;
       place-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
     }
-    .favorite-suggestion-save svg {
-      width: 20px;
-      height: 20px;
-      display: block;
+    .favorite-load-marker[hidden] { display: none; }
+
+    .pet-picker-trigger {
+      width: 100%;
+      height: 46px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: left;
     }
-    .favorite-suggestion-card .favorite-actions {
-      margin-top: 16px;
+    .pet-picker-trigger::after {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid var(--green);
+      flex: 0 0 auto;
+    }
+    .modal-layer.pet-picker-mode {
+      align-items: flex-end;
+      padding: 0;
+      backdrop-filter: blur(3px);
+    }
+    .modal-layer.pet-picker-mode .modal {
+      border-radius: 26px 26px 0 0;
+      padding: 28px 24px 26px;
+      position: relative;
+    }
+    .modal-close {
+      display: none;
+      position: absolute;
+      right: 24px;
+      top: 24px;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: #fff;
+      color: var(--muted);
+      font-size: 22px;
+      line-height: 1;
+    }
+    .pet-picker-mode .modal-close { display: grid; place-items: center; }
+    .pet-picker-options {
+      display: grid;
+      gap: 12px;
+    }
+    .pet-picker-option {
+      min-height: 82px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr) 24px;
+      gap: 16px;
+      align-items: center;
+      color: var(--ink);
+      text-align: left;
+    }
+    .pet-picker-option.active {
+      border-color: var(--green);
+      background: #f0f8f1;
+      box-shadow: inset 0 0 0 .5px var(--green);
+    }
+    .pet-picker-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--avatar-green);
+      color: var(--avatar-cream);
+    }
+    .pet-picker-avatar.clay { background: #d78362; }
+    .pet-picker-avatar svg { width: 34px; height: 34px; }
+    .pet-picker-copy strong { display: block; font-size: 16px; }
+    .pet-picker-copy span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .pet-picker-radio {
+      width: 24px;
+      height: 24px;
+      border: 1.5px solid #cfc6b8;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: transparent;
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .pet-picker-option.active .pet-picker-radio {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
     }
 
     .summary-card {
@@ -2973,6 +3029,12 @@
       opacity: 1;
       border: 1px solid var(--line);
     }
+    .chat-refresh-region.pulling {
+      margin-top: 12px;
+      opacity: 1;
+      border: 1px solid var(--line);
+      transition: opacity .12s ease;
+    }
     .chat-refresh-spinner {
       width: 25px;
       height: 25px;
@@ -2982,6 +3044,9 @@
     }
     .chat-refresh-region.refreshing .chat-refresh-spinner {
       animation: chatRefreshSpin .68s linear infinite;
+    }
+    #bookingChat {
+      overscroll-behavior-y: contain;
     }
     @keyframes chatRefreshSpin { to { transform: rotate(360deg); } }
 
@@ -3012,7 +3077,7 @@
 
     <section class="screen no-nav active login-screen" id="login">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <img class="login-logo" src="assets/copaws-a-plan-icon.png?v=clean-20260810" alt="Copaws">
+      <img class="login-logo" src="../A方案Icon.png?v=clean-20260810" alt="Copaws">
       <div class="login-hero">
         <h1>找到離家最近的安心寵物保母</h1>
         <p>不在家時，快速媒合有經驗的養寵人，到家陪伴、餵食與回報。</p>
@@ -3032,7 +3097,7 @@
 
     <section class="screen no-nav otp-screen" id="otp">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <img class="otp-logo" src="assets/copaws-a-plan-icon.png?v=clean-20260810" alt="Copaws">
+      <img class="otp-logo" src="../A方案Icon.png?v=clean-20260810" alt="Copaws">
       <h1 class="screen-title">輸入驗證碼</h1>
       <p class="subtitle">已發送至 0912 345 678，測試版自動填入。</p>
       <div class="otp-row" aria-label="驗證碼 123456">
@@ -3239,12 +3304,15 @@
         <h1 class="screen-title">收藏寵物保母</h1>
       </div>
       <p class="subtitle">已收藏的寵物保母會集中在這裡，可查看卡片與預約時段。</p>
-      <div class="card favorites-summary">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--green)"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg>
-        <div><strong id="favoriteSummary">已收藏 1 位寵物保母</strong><p class="meta" style="margin:2px 0 0">點卡片可查看寵物保母資料與預約入口</p></div>
+      <div class="favorite-filter">
+        <label for="favoriteSearch">保母篩選</label>
+        <div class="favorite-search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input class="favorite-search" id="favoriteSearch" placeholder="輸入寵物保母名字" autocomplete="off">
+        </div>
       </div>
       <div id="favoriteList"></div>
-      <div id="favoriteSuggestions"></div>
+      <div class="favorite-load-marker" id="favoriteLoadMarker" hidden>載入更多收藏...</div>
     </section>
 
     <section class="screen long" id="demand">
@@ -3265,7 +3333,8 @@
       <div class="field"><label>服務地址</label><input class="input" value="台北市大安區和平東路一段 88 號"></div>
       <div class="field pet-picker-field">
         <label>寵物資訊</label>
-        <select class="select" id="demandPetSelect" aria-label="選擇寵物資訊"></select>
+        <button class="pet-picker-trigger" id="demandPetPickerButton" type="button" data-open-pet-picker="demand"><span id="demandPetPickerValue">選擇寵物</span></button>
+        <select id="demandPetSelect" aria-label="選擇寵物資訊" hidden></select>
         <div class="pet-picker-empty" id="demandPetEmpty">
           <div><strong>尚未建立寵物資料</strong><p>建立後即可帶入本次服務需求</p></div>
           <button class="pet-create-button" type="button" data-create-pet-from-demand>建立寵物資料</button>
@@ -3415,7 +3484,7 @@
       <div class="sitter-summary-card card" data-sitter-summary data-summary-kind="edit"></div>
       <div class="service-form"><p class="service-time-label">服務時間區間</p><div class="service-time-grid"><div class="service-time-box"><span>開始時間</span><strong>12/01 14:00</strong></div><div class="service-time-box"><span>結束時間</span><strong>12/01 15:00</strong></div></div></div>
       <div class="field"><label>服務地址</label><input class="input" value="台北市大安區和平東路一段 88 號"></div>
-      <div class="field"><label>寵物資訊</label><select class="select" id="editDemandPetSelect" aria-label="修改需求的寵物資訊"></select></div>
+      <div class="field"><label>寵物資訊</label><button class="pet-picker-trigger" id="editDemandPetPickerButton" type="button" data-open-pet-picker="edit"><span id="editDemandPetPickerValue">選擇寵物</span></button><select id="editDemandPetSelect" aria-label="修改需求的寵物資訊" hidden></select></div>
       <div class="assistance-picker" data-assistance-picker>
         <label>需要協助事項</label>
         <div class="assistance-options"><button class="assistance-chip active" type="button" data-assistance-chip>餵食</button><button class="assistance-chip active" type="button" data-assistance-chip>清砂</button><button class="assistance-chip active" type="button" data-assistance-chip>陪玩</button><button class="assistance-chip active" type="button" data-assistance-chip data-other-chip>其他</button></div>
@@ -3601,13 +3670,14 @@
 
     <nav class="bottom-nav" aria-label="底部導航">
       <button class="nav-item" data-tab="match" data-go="match"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg></span><span>配對</span></button>
-      <button class="nav-item" data-tab="map" data-go="map"><span class="nav-map-icon" aria-hidden="true"><svg class="nav-logo nav-logo-outline" viewBox="0 0 28 28" fill="none"><rect x="2.25" y="2.25" width="23.5" height="23.5" rx="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M14 5.75C10.96 5.75 8.5 8.14 8.5 11.1C8.5 14.9 14 21.25 14 21.25C14 21.25 19.5 14.9 19.5 11.1C19.5 8.14 17.04 5.75 14 5.75Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/><circle cx="12.05" cy="10.1" r=".8" fill="currentColor"/><circle cx="14" cy="9.35" r=".8" fill="currentColor"/><circle cx="15.95" cy="10.1" r=".8" fill="currentColor"/><path d="M11.75 12.75C11.75 11.75 12.78 11.05 14 11.05C15.22 11.05 16.25 11.75 16.25 12.75C16.25 13.75 15.3 14.25 14 14.25C12.7 14.25 11.75 13.75 11.75 12.75Z" stroke="currentColor" stroke-width="1.15"/><path d="M5.5 22.1C7.15 20.7 8.75 20.6 10.35 21.45C11.95 22.3 13.55 22.25 15.15 21.35C16.7 20.48 18.45 20.45 20.35 21.55" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-dasharray="1.4 2.2"/></svg><img class="nav-logo nav-logo-filled" src="assets/copaws-a-plan-icon.png?v=nav-20260810" alt=""></span><span>地圖</span></button>
+      <button class="nav-item" data-tab="map" data-go="map"><span class="nav-map-icon" aria-hidden="true"><svg class="nav-logo nav-logo-outline" viewBox="0 0 28 28" fill="none"><rect x="2.25" y="2.25" width="23.5" height="23.5" rx="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M14 5.75C10.96 5.75 8.5 8.14 8.5 11.1C8.5 14.9 14 21.25 14 21.25C14 21.25 19.5 14.9 19.5 11.1C19.5 8.14 17.04 5.75 14 5.75Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/><circle cx="12.05" cy="10.1" r=".8" fill="currentColor"/><circle cx="14" cy="9.35" r=".8" fill="currentColor"/><circle cx="15.95" cy="10.1" r=".8" fill="currentColor"/><path d="M11.75 12.75C11.75 11.75 12.78 11.05 14 11.05C15.22 11.05 16.25 11.75 16.25 12.75C16.25 13.75 15.3 14.25 14 14.25C12.7 14.25 11.75 13.75 11.75 12.75Z" stroke="currentColor" stroke-width="1.15"/><path d="M5.5 22.1C7.15 20.7 8.75 20.6 10.35 21.45C11.95 22.3 13.55 22.25 15.15 21.35C16.7 20.48 18.45 20.45 20.35 21.55" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-dasharray="1.4 2.2"/></svg><img class="nav-logo nav-logo-filled" src="../A方案Icon.png?v=nav-20260810" alt=""></span><span>地圖</span></button>
       <button class="nav-item" data-tab="bookings" data-go="bookings"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="3" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="1.4" fill="currentColor"/></svg></span><span>預約</span></button>
       <button class="nav-item" data-tab="profile" data-go="profile"><span class="nav-icon"><svg viewBox="0 0 32 28" fill="currentColor" aria-hidden="true"><ellipse cx="4.5" cy="9.5" rx="3" ry="4"/><ellipse cx="12" cy="6" rx="3.5" ry="4.5"/><ellipse cx="20" cy="6" rx="3.5" ry="4.5"/><ellipse cx="27.5" cy="9.5" rx="3" ry="4"/><ellipse cx="16.5" cy="19.5" rx="10" ry="7"/></svg></span><span>個人</span></button>
     </nav>
 
     <div class="modal-layer" id="modalLayer" onclick="closeModal(event)">
       <div class="modal" role="dialog" aria-modal="true">
+        <button class="modal-close" type="button" onclick="hideModal()" aria-label="關閉">×</button>
         <h3 id="modalTitle">認證提示</h3>
         <p id="modalCopy">這是點擊認證 icon 後出現的提示彈窗。</p>
         <div id="modalBody">
@@ -3633,6 +3703,12 @@
     let selectedDate = '16';
     let selectedSlot = '14:00-16:00';
     const favoriteIndexes = new Set([0]);
+    const favoriteOrder = [0];
+    const favoritePageSize = 20;
+    let favoriteVisiblePages = 1;
+    let favoriteQuery = '';
+    let favoriteSavedScrollTop = 0;
+    let restoreFavoritesOnNextVisit = false;
     let mapPage = 1;
     const mapPageSize = 8;
     let isSwiping = false;
@@ -3646,8 +3722,12 @@
     let editingPetIndex = null;
     let petPhotoData = '';
     let petFormReturnScreen = 'pets';
+    const selectedPetIndexes = { demand: 0, edit: 0 };
+    let petPickerContext = 'demand';
+    let pendingPetIndex = 0;
     let chatRefreshing = false;
     let chatGestureStart = null;
+    const chatRefreshThreshold = 62;
     let reviewRating = 5;
     const pets = [
       {
@@ -3807,15 +3887,59 @@
 
     function renderPetPickers() {
       const options = pets.map((pet, index) => `<option value="${index}">${escapeHtml(pet.name || '未命名毛孩')} · ${escapeHtml(pet.type || '未填種類')}</option>`).join('');
-      ['demandPetSelect', 'editDemandPetSelect'].forEach(id => {
-        const select = document.getElementById(id);
+      const pickerConfigs = [
+        { context: 'demand', selectId: 'demandPetSelect', buttonId: 'demandPetPickerButton', valueId: 'demandPetPickerValue' },
+        { context: 'edit', selectId: 'editDemandPetSelect', buttonId: 'editDemandPetPickerButton', valueId: 'editDemandPetPickerValue' }
+      ];
+      pickerConfigs.forEach(({ context, selectId, buttonId, valueId }) => {
+        const select = document.getElementById(selectId);
+        const button = document.getElementById(buttonId);
+        const value = document.getElementById(valueId);
         if (!select) return;
-        const previous = select.value;
         select.innerHTML = options;
-        if (pets.length) select.value = previous && pets[Number(previous)] ? previous : '0';
-        select.hidden = pets.length === 0;
+        if (pets.length) {
+          const selectedIndex = pets[selectedPetIndexes[context]] ? selectedPetIndexes[context] : 0;
+          selectedPetIndexes[context] = selectedIndex;
+          select.value = String(selectedIndex);
+          const pet = pets[selectedIndex];
+          if (value) value.textContent = `${pet.name || '未命名毛孩'} · ${pet.type || '未填種類'}${pet.age ? ` · ${pet.age}` : ''}`;
+        }
+        if (button) button.hidden = pets.length === 0;
       });
       document.getElementById('demandPetEmpty')?.classList.toggle('show', pets.length === 0);
+    }
+
+    function renderPetPickerOptions() {
+      const body = document.getElementById('modalBody');
+      body.innerHTML = `<div class="pet-picker-options">${pets.map((pet, index) => `
+        <button class="pet-picker-option ${index === pendingPetIndex ? 'active' : ''}" type="button" data-pet-picker-index="${index}" aria-pressed="${index === pendingPetIndex}">
+          <span class="pet-picker-avatar ${pet.color === 'clay' ? 'clay' : ''}">${petPawSvg()}</span>
+          <span class="pet-picker-copy"><strong>${escapeHtml(pet.name || '未命名毛孩')}</strong><span>${escapeHtml([pet.type, pet.breed, pet.age || pet.birthday].filter(Boolean).join(' · ') || '資料尚未填寫')}</span></span>
+          <span class="pet-picker-radio" aria-hidden="true">✓</span>
+        </button>
+      `).join('')}</div>`;
+    }
+
+    function openPetPicker(context) {
+      if (!pets.length) {
+        openPetForm(null, context === 'edit' ? 'bookingEdit' : 'demand');
+        return;
+      }
+      petPickerContext = context === 'edit' ? 'edit' : 'demand';
+      pendingPetIndex = pets[selectedPetIndexes[petPickerContext]] ? selectedPetIndexes[petPickerContext] : 0;
+      document.getElementById('modalTitle').textContent = '選擇寵物';
+      document.getElementById('modalCopy').textContent = '選擇本次需要照護的寵物';
+      renderPetPickerOptions();
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      action.textContent = '確認選擇';
+      action.onclick = confirmPetPicker;
+      document.getElementById('modalLayer').classList.add('pet-picker-mode', 'show');
+    }
+
+    function confirmPetPicker() {
+      selectedPetIndexes[petPickerContext] = pendingPetIndex;
+      renderPetPickers();
+      hideModal();
     }
 
     function setPetOption(group, value) {
@@ -3897,15 +4021,24 @@
     }
 
     function go(id) {
+      const preserveFavoritePosition = id === 'favorites' && restoreFavoritesOnNextVisit;
       appScreens.forEach(screen => {
         screen.classList.toggle('active', screen.id === id);
-        if (screen.id === id) screen.scrollTop = 0;
+        if (screen.id === id && !preserveFavoritePosition) screen.scrollTop = 0;
       });
       nav.style.display = screensWithNav.has(id) ? 'grid' : 'none';
       const activeTab = tabByScreen[id] || id;
       navItems.forEach(item => item.classList.toggle('active', item.dataset.tab === activeTab));
       if (id === 'otp') startResend();
-      if (id === 'favorites') renderFavorites();
+      if (id === 'favorites') {
+        renderFavorites();
+        if (preserveFavoritePosition) {
+          requestAnimationFrame(() => {
+            document.getElementById('favorites').scrollTop = favoriteSavedScrollTop;
+            restoreFavoritesOnNextVisit = false;
+          });
+        }
+      }
       if (id === 'pets') renderPets();
       if (id === 'map') renderMapLists();
       if (id === 'mapList') renderMapLists();
@@ -3925,13 +4058,23 @@
     }
 
     function navigate(id) {
+      if (currentScreen === 'favorites' && (id === 'detail' || id === 'time')) {
+        favoriteSavedScrollTop = document.getElementById('favorites').scrollTop;
+      }
+      if (id === 'favorites') {
+        favoriteVisiblePages = 1;
+        favoriteSavedScrollTop = 0;
+        restoreFavoritesOnNextVisit = false;
+      }
       if (currentScreen && currentScreen !== id) backStack.push(currentScreen);
       go(id);
     }
 
     function goBack() {
       const fallback = currentScreen === 'detail' ? 'match' : 'match';
-      go(backStack.pop() || fallback);
+      const target = backStack.pop() || fallback;
+      restoreFavoritesOnNextVisit = target === 'favorites';
+      go(target);
     }
 
     function toast(message) {
@@ -4051,8 +4194,21 @@
       document.getElementById('timeIntro').textContent = parts.serviceDetail;
     }
 
+    function markFavorite(index) {
+      favoriteIndexes.add(index);
+      const previousPosition = favoriteOrder.indexOf(index);
+      if (previousPosition >= 0) favoriteOrder.splice(previousPosition, 1);
+      favoriteOrder.unshift(index);
+    }
+
+    function removeFavorite(index) {
+      favoriteIndexes.delete(index);
+      const position = favoriteOrder.indexOf(index);
+      if (position >= 0) favoriteOrder.splice(position, 1);
+    }
+
     function addCurrentToFavorites() {
-      favoriteIndexes.add(selectedCaregiverIndex);
+      markFavorite(selectedCaregiverIndex);
       updateFavoriteCount();
       renderFavorites();
       syncDetailFavoriteButton();
@@ -4060,10 +4216,10 @@
 
     function toggleCurrentFavorite() {
       if (favoriteIndexes.has(selectedCaregiverIndex)) {
-        favoriteIndexes.delete(selectedCaregiverIndex);
+        removeFavorite(selectedCaregiverIndex);
         toast('已取消收藏');
       } else {
-        favoriteIndexes.add(selectedCaregiverIndex);
+        markFavorite(selectedCaregiverIndex);
         toast('已加入收藏');
       }
       updateFavoriteCount();
@@ -4087,18 +4243,24 @@
 
     function renderFavorites() {
       const list = document.getElementById('favoriteList');
-      const suggestions = document.getElementById('favoriteSuggestions');
-      const summary = document.getElementById('favoriteSummary');
-      if (!list || !suggestions || !summary) return;
-      summary.textContent = `已收藏 ${favoriteIndexes.size} 位寵物保母`;
-      if (!favoriteIndexes.size) {
-        list.innerHTML = '<div class="card favorite-card"><p class="meta" style="margin:0">目前尚未收藏寵物保母，回到配對頁右滑或點愛心即可加入。</p></div>';
+      const marker = document.getElementById('favoriteLoadMarker');
+      const search = document.getElementById('favoriteSearch');
+      if (!list || !marker || !search) return;
+      if (search.value !== favoriteQuery) search.value = favoriteQuery;
+      const orderedIndexes = favoriteOrder.filter(index => favoriteIndexes.has(index) && caregivers[index]);
+      favoriteIndexes.forEach(index => {
+        if (!orderedIndexes.includes(index) && caregivers[index]) orderedIndexes.push(index);
+      });
+      const normalizedQuery = favoriteQuery.trim().toLocaleLowerCase('zh-Hant');
+      const filteredIndexes = orderedIndexes.filter(index => !normalizedQuery || caregivers[index].name.toLocaleLowerCase('zh-Hant').includes(normalizedQuery));
+      const visibleIndexes = filteredIndexes.slice(0, favoriteVisiblePages * favoritePageSize);
+      if (!filteredIndexes.length) {
+        list.innerHTML = `<div class="card favorite-card"><p class="meta" style="margin:0">${normalizedQuery ? '找不到符合名稱的已收藏寵物保母。' : '目前尚未收藏寵物保母，回到配對頁右滑或點愛心即可加入。'}</p></div>`;
       } else {
-        list.innerHTML = Array.from(favoriteIndexes).map(index => {
+        list.innerHTML = visibleIndexes.map(index => {
           const data = caregivers[index];
           return `
             <article class="card favorite-card">
-              <span class="favorite-new-tag">NEW</span>
               <div class="favorite-card-main">
                 <div class="favorite-photo"><span class="pet-dot"></span></div>
                 <div class="favorite-copy">
@@ -4120,38 +4282,12 @@
           `;
         }).join('');
       }
-
-      const suggestionIndex = caregivers.findIndex((_, index) => !favoriteIndexes.has(index));
-      if (suggestionIndex < 0) {
-        suggestions.innerHTML = '';
-        return;
-      }
-      const suggestion = caregivers[suggestionIndex];
-      suggestions.innerHTML = `
-        <h2 class="favorites-other-title">其他可考慮人選</h2>
-        <article class="card favorite-card favorite-suggestion-card">
-          <div class="favorite-suggestion-main">
-            <div class="favorite-photo suggestion-photo"><span class="pet-dot"></span></div>
-            <div class="favorite-suggestion-copy">
-              <div class="name-cert-row"><h2>${suggestion.name}</h2>${certBadgeHtml(suggestion.certification)}</div>
-              <p class="meta"><span class="stars">★★★★★</span> ${compactMeta(suggestion)}</p>
-              <p class="distance">${suggestion.distance} · 大安區</p>
-              <p class="favorite-intro">${suggestion.detail}</p>
-            </div>
-            <button class="favorite-suggestion-save" type="button" aria-label="收藏${suggestion.name}" onclick="saveFavorite(${suggestionIndex})">
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg>
-            </button>
-          </div>
-          <div class="favorite-actions">
-            <button class="btn light" data-go="detail" data-index="${suggestionIndex}">查看寵物保母</button>
-            <button class="btn" data-go="time" data-index="${suggestionIndex}">查看時段預約</button>
-          </div>
-        </article>
-      `;
+      marker.hidden = visibleIndexes.length >= filteredIndexes.length;
+      marker.textContent = marker.hidden ? '' : `繼續下滑載入第 ${favoriteVisiblePages + 1} 頁`;
     }
 
     function saveFavorite(index) {
-      favoriteIndexes.add(index);
+      markFavorite(index);
       updateFavoriteCount();
       renderFavorites();
       toast('已加入收藏');
@@ -4555,7 +4691,7 @@
     }
 
     function hideModal() {
-      document.getElementById('modalLayer').classList.remove('show');
+      document.getElementById('modalLayer').classList.remove('show', 'pet-picker-mode');
     }
 
     function closeModal(event) {
@@ -4618,6 +4754,7 @@
       if (chatRefreshing || currentScreen !== 'bookingChat') return;
       const region = document.getElementById('chatRefreshRegion');
       if (!region) return;
+      resetChatRefreshPull();
       chatRefreshing = true;
       document.getElementById('bookingChat').scrollTo({ top: 0, behavior: 'smooth' });
       region.classList.add('refreshing');
@@ -4633,17 +4770,80 @@
       }, 850);
     }
 
+    function resetChatRefreshPull() {
+      const region = document.getElementById('chatRefreshRegion');
+      if (!region) return;
+      region.classList.remove('pulling');
+      region.style.removeProperty('height');
+    }
+
+    function updateChatRefreshPull(distance) {
+      const region = document.getElementById('chatRefreshRegion');
+      if (!region) return;
+      const height = Math.min(54, Math.max(0, distance) * .72);
+      region.classList.toggle('pulling', height > 0);
+      region.style.height = height > 0 ? `${height}px` : '';
+    }
+
+    function canBeginChatRefresh(target) {
+      const screen = document.getElementById('bookingChat');
+      if (currentScreen !== 'bookingChat' || chatRefreshing || !screen || screen.scrollTop > 2) return false;
+      return !(target instanceof Element && target.closest('input, textarea, select'));
+    }
+
     function beginChatRefreshGesture(event) {
-      if (currentScreen !== 'bookingChat' || chatRefreshing) return;
-      chatGestureStart = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
+      if (event.pointerType === 'touch' || !canBeginChatRefresh(event.target)) return;
+      chatGestureStart = { x: event.clientX, y: event.clientY, pointerId: event.pointerId, source: 'pointer' };
+      event.currentTarget.setPointerCapture?.(event.pointerId);
+    }
+
+    function moveChatRefreshGesture(event) {
+      if (!chatGestureStart || chatGestureStart.source !== 'pointer' || chatGestureStart.pointerId !== event.pointerId) return;
+      const dx = event.clientX - chatGestureStart.x;
+      const dy = event.clientY - chatGestureStart.y;
+      if (dy > 0 && Math.abs(dy) > Math.abs(dx)) updateChatRefreshPull(dy);
     }
 
     function finishChatRefreshGesture(event) {
-      if (!chatGestureStart || currentScreen !== 'bookingChat') return;
+      if (!chatGestureStart || chatGestureStart.source !== 'pointer' || currentScreen !== 'bookingChat') return;
       const dx = event.clientX - chatGestureStart.x;
       const dy = event.clientY - chatGestureStart.y;
       chatGestureStart = null;
-      if (dy < -58 && Math.abs(dy) > Math.abs(dx) * 1.25) runChatRefresh();
+      if (dy >= chatRefreshThreshold && Math.abs(dy) > Math.abs(dx) * 1.2) runChatRefresh();
+      else resetChatRefreshPull();
+    }
+
+    function beginChatRefreshTouch(event) {
+      if (!canBeginChatRefresh(event.target) || event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      chatGestureStart = { x: touch.clientX, y: touch.clientY, identifier: touch.identifier, source: 'touch' };
+    }
+
+    function moveChatRefreshTouch(event) {
+      if (!chatGestureStart || chatGestureStart.source !== 'touch') return;
+      const touch = Array.from(event.touches).find(item => item.identifier === chatGestureStart.identifier);
+      if (!touch) return;
+      const dx = touch.clientX - chatGestureStart.x;
+      const dy = touch.clientY - chatGestureStart.y;
+      if (dy > 0 && Math.abs(dy) > Math.abs(dx)) {
+        event.preventDefault();
+        updateChatRefreshPull(dy);
+      }
+    }
+
+    function finishChatRefreshTouch(event) {
+      if (!chatGestureStart || chatGestureStart.source !== 'touch') return;
+      const touch = Array.from(event.changedTouches).find(item => item.identifier === chatGestureStart.identifier);
+      const start = chatGestureStart;
+      chatGestureStart = null;
+      if (!touch) {
+        resetChatRefreshPull();
+        return;
+      }
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
+      if (dy >= chatRefreshThreshold && Math.abs(dy) > Math.abs(dx) * 1.2) runChatRefresh();
+      else resetChatRefreshPull();
     }
 
     function renderSlots() {
@@ -4703,6 +4903,19 @@
       if (backButton) {
         event.preventDefault();
         goBack();
+        return;
+      }
+      const openPetPickerButton = event.target.closest('[data-open-pet-picker]');
+      if (openPetPickerButton) {
+        event.preventDefault();
+        openPetPicker(openPetPickerButton.dataset.openPetPicker);
+        return;
+      }
+      const petPickerOption = event.target.closest('[data-pet-picker-index]');
+      if (petPickerOption) {
+        event.preventDefault();
+        pendingPetIndex = Number(petPickerOption.dataset.petPickerIndex);
+        renderPetPickerOptions();
         return;
       }
       const newPetButton = event.target.closest('[data-new-pet]');
@@ -4903,10 +5116,33 @@
 
     document.getElementById('petNotes').addEventListener('input', updatePetNotesCount);
 
+    document.getElementById('favoriteSearch').addEventListener('input', event => {
+      favoriteQuery = event.target.value;
+      favoriteVisiblePages = 1;
+      renderFavorites();
+      document.getElementById('favorites').scrollTop = 0;
+    });
+
+    document.getElementById('favorites').addEventListener('scroll', event => {
+      if (currentScreen !== 'favorites') return;
+      const screen = event.currentTarget;
+      const marker = document.getElementById('favoriteLoadMarker');
+      if (marker.hidden || screen.scrollHeight - screen.scrollTop - screen.clientHeight > 140) return;
+      const previousTop = screen.scrollTop;
+      favoriteVisiblePages += 1;
+      renderFavorites();
+      screen.scrollTop = previousTop;
+    }, { passive: true });
+
     const bookingChatScreen = document.getElementById('bookingChat');
     bookingChatScreen.addEventListener('pointerdown', beginChatRefreshGesture, { passive: true });
+    bookingChatScreen.addEventListener('pointermove', moveChatRefreshGesture, { passive: true });
     bookingChatScreen.addEventListener('pointerup', finishChatRefreshGesture, { passive: true });
-    bookingChatScreen.addEventListener('pointercancel', () => { chatGestureStart = null; }, { passive: true });
+    bookingChatScreen.addEventListener('pointercancel', () => { chatGestureStart = null; resetChatRefreshPull(); }, { passive: true });
+    bookingChatScreen.addEventListener('touchstart', beginChatRefreshTouch, { passive: true });
+    bookingChatScreen.addEventListener('touchmove', moveChatRefreshTouch, { passive: false });
+    bookingChatScreen.addEventListener('touchend', finishChatRefreshTouch, { passive: true });
+    bookingChatScreen.addEventListener('touchcancel', () => { chatGestureStart = null; resetChatRefreshPull(); }, { passive: true });
 
     document.getElementById('careFee').addEventListener('input', event => {
       const base = Math.max(0, parseInt(event.target.value.replace(/\D/g, ''), 10) || 0);
