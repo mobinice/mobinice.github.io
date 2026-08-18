@@ -963,11 +963,48 @@
       background: rgba(255, 255, 255, .94);
       border-radius: 20px;
       border: 1px solid var(--line);
-      display: flex;
-      gap: 12px;
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr) auto;
+      column-gap: 12px;
       align-items: center;
+      text-align: left;
     }
     .near-card strong, .near-card p { pointer-events: none; }
+    .map-preview-copy {
+      min-width: 0;
+      display: grid;
+      justify-items: start;
+    }
+    .map-preview-copy .name-cert-row {
+      max-width: 100%;
+    }
+    .map-preview-name {
+      max-width: 100%;
+      overflow: hidden;
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .map-preview-cert:empty { display: none; }
+    .map-preview-meta {
+      max-width: 100%;
+      margin: 4px 0 0;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .map-preview-distance {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+      text-align: right;
+      white-space: nowrap;
+    }
     .near-list-card {
       padding: 18px 22px;
       margin-top: 14px;
@@ -3190,10 +3227,11 @@
         <button class="map-person p4" data-map-index="0" aria-label="附近寵物保母"></button>
         <button class="near-card" id="mapPreviewCard" data-go="detail" aria-label="查看寵物保母卡片">
           <span class="avatar" id="mapPreviewAvatar"></span>
-          <div>
-            <strong id="mapPreviewName">Mina Chen · 0.8 km</strong>
-            <p class="meta" id="mapPreviewMeta" style="margin:4px 0 0"><span class="stars">★★★★★</span> 4.9 · 126 則評價</p>
-          </div>
+          <span class="map-preview-copy">
+            <span class="name-cert-row"><strong class="map-preview-name" id="mapPreviewName">Mina Chen</strong><span class="map-preview-cert" id="mapPreviewCert"><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></span></span>
+            <span class="map-preview-meta" id="mapPreviewMeta"><span class="stars">★★★★★</span> 4.9 · 126 則評價</span>
+          </span>
+          <span class="map-preview-distance" id="mapPreviewDistance">0.8 km</span>
         </button>
       </div>
       <div class="card map-ranking-card">
@@ -4298,8 +4336,11 @@
     function renderMapPreview(index) {
       selectedCaregiverIndex = index;
       const data = caregivers[index] || caregivers[0];
-      document.getElementById('mapPreviewName').textContent = `${data.name} · ${data.distance.replace('距離 ', '')}`;
+      document.getElementById('mapPreviewName').textContent = data.name;
+      document.getElementById('mapPreviewCert').innerHTML = certBadgeHtml(data.certification, true);
+      document.getElementById('mapPreviewDistance').textContent = data.distance.replace('距離 ', '');
       document.getElementById('mapPreviewMeta').innerHTML = `<span class="stars">★★★★★</span> ${compactMeta(data)}`;
+      document.getElementById('mapPreviewCard').setAttribute('aria-label', `查看${data.name}寵物保母卡片`);
       document.querySelectorAll('[data-map-index]').forEach(point => {
         point.classList.toggle('active', Number(point.dataset.mapIndex) === index);
       });
