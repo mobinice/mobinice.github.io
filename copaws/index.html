@@ -3812,9 +3812,9 @@
         <div class="identity-field">
           <label>生日（西元） *</label>
           <div class="identity-birthday-grid">
-            <button class="identity-date-trigger" id="identityBirthYear" type="button" data-birthday-picker="year">西元年 YYYY</button>
-            <button class="identity-date-trigger" id="identityBirthMonth" type="button" data-birthday-picker="month">月份 MM</button>
-            <button class="identity-date-trigger" id="identityBirthDay" type="button" data-birthday-picker="day">日期 DD</button>
+            <button class="identity-date-trigger" id="identityBirthYear" type="button" data-identity-date-picker="birthYear">西元年 YYYY</button>
+            <button class="identity-date-trigger" id="identityBirthMonth" type="button" data-identity-date-picker="birthMonth">月份 MM</button>
+            <button class="identity-date-trigger" id="identityBirthDay" type="button" data-identity-date-picker="birthDay">日期 DD</button>
           </div>
         </div>
 
@@ -3826,8 +3826,8 @@
         <div class="identity-field">
           <label>身分證換／補發日期 *</label>
           <div class="identity-issue-grid">
-            <input class="identity-input" id="identityIssueMonth" inputmode="numeric" maxlength="2" placeholder="月份 MM" aria-label="身分證換補發月份">
-            <input class="identity-input" id="identityIssueDay" inputmode="numeric" maxlength="2" placeholder="日期 DD" aria-label="身分證換補發日期">
+            <button class="identity-date-trigger" id="identityIssueMonth" type="button" data-identity-date-picker="issueMonth">月份 MM</button>
+            <button class="identity-date-trigger" id="identityIssueDay" type="button" data-identity-date-picker="issueDay">日期 DD</button>
           </div>
         </div>
 
@@ -4076,8 +4076,9 @@
     let petPickerContext = 'demand';
     let pendingPetIndex = 0;
     const identityBirthday = { year: '', month: '', day: '' };
-    let birthdayPickerType = 'year';
-    let pendingBirthdayValue = '';
+    const identityIssueDate = { month: '', day: '' };
+    let identityDatePickerType = 'birthYear';
+    let pendingIdentityDateValue = '';
     const identityUploadState = {
       identityIdFrontInput: '',
       identityIdBackInput: '',
@@ -4300,71 +4301,83 @@
       hideModal();
     }
 
-    function getBirthdayOptions(type) {
-      if (type === 'year') {
+    function getIdentityDatePickerConfig(type) {
+      const configs = {
+        birthYear: { state: identityBirthday, key: 'year', kind: 'year', defaultValue: '1992', title: '選擇西元年', copy: '上下滑動選擇出生年份' },
+        birthMonth: { state: identityBirthday, key: 'month', kind: 'month', defaultValue: '8', title: '選擇月份', copy: '選擇出生月份' },
+        birthDay: { state: identityBirthday, key: 'day', kind: 'day', defaultValue: '12', title: '選擇日期', copy: '選擇出生日期' },
+        issueMonth: { state: identityIssueDate, key: 'month', kind: 'month', defaultValue: '8', title: '選擇換／補發月份', copy: '選擇身分證換／補發月份' },
+        issueDay: { state: identityIssueDate, key: 'day', kind: 'day', defaultValue: '12', title: '選擇換／補發日期', copy: '選擇身分證換／補發日期' }
+      };
+      return configs[type] || configs.birthYear;
+    }
+
+    function getIdentityDateOptions(type) {
+      const config = getIdentityDatePickerConfig(type);
+      if (config.kind === 'year') {
         const currentYear = new Date().getFullYear();
         return Array.from({ length: currentYear - 1939 }, (_, index) => currentYear - index);
       }
-      if (type === 'month') return Array.from({ length: 12 }, (_, index) => index + 1);
+      if (config.kind === 'month') return Array.from({ length: 12 }, (_, index) => index + 1);
+      if (type === 'issueDay') return Array.from({ length: 31 }, (_, index) => index + 1);
       const year = Number(identityBirthday.year || 1992);
       const month = Number(identityBirthday.month || 8);
       const dayCount = new Date(year, month, 0).getDate();
       return Array.from({ length: dayCount }, (_, index) => index + 1);
     }
 
-    function renderBirthdayPickerOptions() {
-      const values = getBirthdayOptions(birthdayPickerType);
+    function renderIdentityDatePickerOptions() {
+      const config = getIdentityDatePickerConfig(identityDatePickerType);
+      const values = getIdentityDateOptions(identityDatePickerType);
       const body = document.getElementById('modalBody');
-      body.innerHTML = `<div class="birthday-picker-options ${birthdayPickerType}">${values.map(value => {
-        const label = birthdayPickerType === 'month' ? `${value} 月` : String(value);
-        const isActive = String(value) === String(pendingBirthdayValue);
-        return `<button class="birthday-option ${isActive ? 'active' : ''}" type="button" data-birthday-value="${value}" aria-pressed="${isActive}">${label}</button>`;
+      body.innerHTML = `<div class="birthday-picker-options ${config.kind}">${values.map(value => {
+        const label = config.kind === 'month' ? `${value} 月` : String(value);
+        const isActive = String(value) === String(pendingIdentityDateValue);
+        return `<button class="birthday-option ${isActive ? 'active' : ''}" type="button" data-identity-date-value="${value}" aria-pressed="${isActive}">${label}</button>`;
       }).join('')}</div>`;
-      if (birthdayPickerType === 'year') {
+      if (config.kind === 'year') {
         requestAnimationFrame(() => body.querySelector('.birthday-option.active')?.scrollIntoView({ block: 'center' }));
       }
     }
 
-    function openBirthdayPicker(type) {
-      birthdayPickerType = ['year', 'month', 'day'].includes(type) ? type : 'year';
-      const defaults = { year: '1992', month: '8', day: '12' };
-      pendingBirthdayValue = identityBirthday[birthdayPickerType] || defaults[birthdayPickerType];
-      const labels = {
-        year: ['選擇西元年', '上下滑動選擇出生年份'],
-        month: ['選擇月份', '選擇出生月份'],
-        day: ['選擇日期', '選擇出生日期']
-      };
-      document.getElementById('modalTitle').textContent = labels[birthdayPickerType][0];
-      document.getElementById('modalCopy').textContent = labels[birthdayPickerType][1];
-      renderBirthdayPickerOptions();
+    function openIdentityDatePicker(type) {
+      identityDatePickerType = type;
+      const config = getIdentityDatePickerConfig(identityDatePickerType);
+      pendingIdentityDateValue = config.state[config.key] || config.defaultValue;
+      document.getElementById('modalTitle').textContent = config.title;
+      document.getElementById('modalCopy').textContent = config.copy;
+      renderIdentityDatePickerOptions();
       const action = document.querySelector('#modalLayer .modal > .btn.full');
       action.textContent = '確認選擇';
-      action.onclick = confirmBirthdayPicker;
+      action.onclick = confirmIdentityDatePicker;
       document.getElementById('modalLayer').classList.remove('pet-picker-mode');
       document.getElementById('modalLayer').classList.add('birthday-picker-mode', 'show');
     }
 
-    function updateBirthdayFields() {
+    function updateIdentityDateFields() {
       const configs = [
-        ['year', 'identityBirthYear', '西元年 YYYY', value => `${value} 年`],
-        ['month', 'identityBirthMonth', '月份 MM', value => `${String(value).padStart(2, '0')} 月`],
-        ['day', 'identityBirthDay', '日期 DD', value => `${String(value).padStart(2, '0')} 日`]
+        [identityBirthday, 'year', 'identityBirthYear', '西元年 YYYY', value => `${value} 年`],
+        [identityBirthday, 'month', 'identityBirthMonth', '月份 MM', value => `${String(value).padStart(2, '0')} 月`],
+        [identityBirthday, 'day', 'identityBirthDay', '日期 DD', value => `${String(value).padStart(2, '0')} 日`],
+        [identityIssueDate, 'month', 'identityIssueMonth', '月份 MM', value => `${String(value).padStart(2, '0')} 月`],
+        [identityIssueDate, 'day', 'identityIssueDay', '日期 DD', value => `${String(value).padStart(2, '0')} 日`]
       ];
-      configs.forEach(([key, id, placeholder, format]) => {
+      configs.forEach(([state, key, id, placeholder, format]) => {
         const field = document.getElementById(id);
-        const value = identityBirthday[key];
+        const value = state[key];
         field.textContent = value ? format(value) : placeholder;
         field.classList.toggle('has-value', Boolean(value));
       });
     }
 
-    function confirmBirthdayPicker() {
-      identityBirthday[birthdayPickerType] = String(pendingBirthdayValue);
-      if (birthdayPickerType === 'year' || birthdayPickerType === 'month') {
-        const maxDay = getBirthdayOptions('day').length;
+    function confirmIdentityDatePicker() {
+      const config = getIdentityDatePickerConfig(identityDatePickerType);
+      config.state[config.key] = String(pendingIdentityDateValue);
+      if (identityDatePickerType === 'birthYear' || identityDatePickerType === 'birthMonth') {
+        const maxDay = getIdentityDateOptions('birthDay').length;
         if (Number(identityBirthday.day) > maxDay) identityBirthday.day = String(maxDay);
       }
-      updateBirthdayFields();
+      updateIdentityDateFields();
       hideModal();
     }
 
@@ -4393,8 +4406,8 @@
       event.preventDefault();
       const fullName = document.getElementById('identityFullName').value.trim();
       const identityNumber = document.getElementById('identityNumber').value.trim();
-      const issueMonth = Number(document.getElementById('identityIssueMonth').value);
-      const issueDay = Number(document.getElementById('identityIssueDay').value);
+      const issueMonth = Number(identityIssueDate.month);
+      const issueDay = Number(identityIssueDate.day);
       if (!fullName) return toast('請輸入身分證上的本名');
       if (!identityBirthday.year || !identityBirthday.month || !identityBirthday.day) return toast('請完整選擇生日');
       if (!/^[A-Za-z][12]\d{8}$/.test(identityNumber)) return toast('請輸入正確的身分證字號');
@@ -5414,17 +5427,18 @@
         goBack();
         return;
       }
-      const birthdayPickerButton = event.target.closest('[data-birthday-picker]');
-      if (birthdayPickerButton) {
+      const identityDatePickerButton = event.target.closest('[data-identity-date-picker]');
+      if (identityDatePickerButton) {
         event.preventDefault();
-        openBirthdayPicker(birthdayPickerButton.dataset.birthdayPicker);
+        event.stopPropagation();
+        openIdentityDatePicker(identityDatePickerButton.dataset.identityDatePicker);
         return;
       }
-      const birthdayOption = event.target.closest('[data-birthday-value]');
-      if (birthdayOption) {
+      const identityDateOption = event.target.closest('[data-identity-date-value]');
+      if (identityDateOption) {
         event.preventDefault();
-        pendingBirthdayValue = birthdayOption.dataset.birthdayValue;
-        renderBirthdayPickerOptions();
+        pendingIdentityDateValue = identityDateOption.dataset.identityDateValue;
+        renderIdentityDatePickerOptions();
         return;
       }
       const identityUploadButton = event.target.closest('[data-identity-upload]');
@@ -5639,12 +5653,6 @@
     document.getElementById('identityNumber').addEventListener('input', event => {
       event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
     });
-    ['identityIssueMonth', 'identityIssueDay'].forEach(id => {
-      document.getElementById(id).addEventListener('input', event => {
-        event.target.value = event.target.value.replace(/\D/g, '').slice(0, 2);
-      });
-    });
-
     document.getElementById('petPhotoTrigger').addEventListener('click', () => {
       document.getElementById('petPhotoInput').click();
     });
