@@ -4501,16 +4501,28 @@
       let dx = 0;
       let dy = 0;
       let activePointerId = null;
+      let activePointerType = '';
       let gesture = 'idle';
       let dragging = false;
       let frame = 0;
+      let gestureStartedAt = 0;
+      let lastMoveX = 0;
+      let lastMoveAt = 0;
+      let velocityX = 0;
+      let hasMoved = false;
 
       function resetDragState(preserveVisual = false) {
         dragging = false;
         activePointerId = null;
+        activePointerType = '';
         gesture = 'idle';
         dx = 0;
         dy = 0;
+        gestureStartedAt = 0;
+        lastMoveX = 0;
+        lastMoveAt = 0;
+        velocityX = 0;
+        hasMoved = false;
         if (frame) cancelAnimationFrame(frame);
         frame = 0;
         document.getElementById('match').style.overflowY = '';
@@ -4533,15 +4545,29 @@
       function finishDrag(event, forceCancel = false) {
         if (!dragging) return;
         if (event?.pointerId != null && activePointerId != null && event.pointerId !== activePointerId) return;
-        if (event?.clientX != null && event?.clientY != null) {
+        const pointerType = activePointerType;
+        const releaseAt = event?.timeStamp >= gestureStartedAt ? event.timeStamp : performance.now();
+        const elapsed = Math.max(1, releaseAt - gestureStartedAt);
+        if (!forceCancel && event?.type === 'pointerup' && Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
           const finalDx = event.clientX - startX;
           const finalDy = event.clientY - startY;
-          if (Math.abs(finalDx) >= Math.abs(dx)) dx = finalDx;
-          if (Math.abs(finalDy) >= Math.abs(dy)) dy = finalDy;
+          const sameDirection = dx === 0 || finalDx === 0 || Math.sign(finalDx) === Math.sign(dx);
+          if (gesture === 'horizontal' && sameDirection && Math.abs(finalDx) >= Math.abs(dx)) dx = finalDx;
+          if (gesture === 'horizontal' && Math.abs(finalDy) >= Math.abs(dy)) dy = finalDy;
         }
         const pointerId = activePointerId;
-        const horizontalIntent = gesture === 'horizontal' || (Math.abs(dx) > 92 && Math.abs(dx) >= Math.abs(dy));
-        const shouldSwipe = !forceCancel && horizontalIntent && Math.abs(dx) > 92;
+        const averageVelocityX = dx / elapsed;
+        const velocityMatchesDirection = velocityX === 0 || dx === 0 || Math.sign(velocityX) === Math.sign(dx);
+        const releaseVelocity = Math.max(Math.abs(averageVelocityX), velocityMatchesDirection ? Math.abs(velocityX) : 0);
+        const horizontalIntent = gesture === 'horizontal'
+          || (pointerType === 'mouse' && Math.abs(dx) >= 92 && Math.abs(dx) >= Math.abs(dy));
+        const isTouchFlick = pointerType !== 'mouse'
+          && gesture === 'horizontal'
+          && hasMoved
+          && Math.abs(dx) >= 42
+          && elapsed <= 240
+          && releaseVelocity >= .45;
+        const shouldSwipe = !forceCancel && horizontalIntent && (Math.abs(dx) >= 92 || isTouchFlick);
         const swipeDirection = dx > 0 ? 'right' : 'left';
         const releaseDx = dx;
         if (frame) {
@@ -4568,12 +4594,17 @@
         if (isSwiping) return;
         dragging = true;
         activePointerId = event.pointerId;
+        activePointerType = event.pointerType || 'mouse';
         gesture = 'pending';
         startX = event.clientX;
         startY = event.clientY;
         dx = 0;
         dy = 0;
-        try { card.setPointerCapture(event.pointerId); } catch {}
+        gestureStartedAt = event.timeStamp || performance.now();
+        lastMoveX = startX;
+        lastMoveAt = gestureStartedAt;
+        velocityX = 0;
+        hasMoved = false;
       });
 
       card.addEventListener('pointermove', event => {
@@ -4581,6 +4612,15 @@
         if (activePointerId !== event.pointerId) return;
         dx = event.clientX - startX;
         dy = event.clientY - startY;
+        const moveAt = event.timeStamp || performance.now();
+        const moveElapsed = moveAt - lastMoveAt;
+        if (moveElapsed > 0 && moveElapsed < 120) {
+          const instantVelocityX = (event.clientX - lastMoveX) / moveElapsed;
+          velocityX = velocityX * .35 + instantVelocityX * .65;
+        }
+        lastMoveX = event.clientX;
+        lastMoveAt = moveAt;
+        if (Math.abs(dx) >= 3 || Math.abs(dy) >= 3) hasMoved = true;
         if (gesture === 'pending') {
           if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
           if (Math.abs(dy) > Math.abs(dx) * 1.15) {
@@ -4600,13 +4640,16 @@
       }, { passive: false });
 
       card.addEventListener('pointerup', event => finishDrag(event));
-      card.addEventListener('pointercancel', event => finishDrag(event));
-      card.addEventListener('lostpointercapture', event => finishDrag(event));
+      card.addEventListener('pointercancel', event => finishDrag(event, true));
+      card.addEventListener('lostpointercapture', event => {
+        if (!dragging || event.pointerId !== activePointerId) return;
+        finishDrag(null, activePointerType !== 'mouse');
+      });
       window.addEventListener('pointerup', event => finishDrag(event), true);
-      window.addEventListener('pointercancel', event => finishDrag(event), true);
-      window.addEventListener('blur', () => finishDrag(null));
+      window.addEventListener('pointercancel', event => finishDrag(event, true), true);
+      window.addEventListener('blur', () => finishDrag(null, activePointerType !== 'mouse'));
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) finishDrag(null);
+        if (document.hidden) finishDrag(null, activePointerType !== 'mouse');
       });
       card.addEventListener('dragstart', event => event.preventDefault());
 
