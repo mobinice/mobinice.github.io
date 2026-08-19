@@ -4250,8 +4250,7 @@
     function addCurrentToFavorites() {
       markFavorite(selectedCaregiverIndex);
       updateFavoriteCount();
-      renderFavorites();
-      syncDetailFavoriteButton();
+      // The favorites screen renders on entry; keep the swipe animation path frame-light.
     }
 
     function toggleCurrentFavorite() {
@@ -4542,13 +4541,13 @@
         setSwipeCue(dx);
       }
 
-      function finishDrag(event, forceCancel = false) {
+      function finishDrag(event, forceCancel = false, useReleaseCoordinates = true) {
         if (!dragging) return;
         if (event?.pointerId != null && activePointerId != null && event.pointerId !== activePointerId) return;
         const pointerType = activePointerType;
         const releaseAt = event?.timeStamp >= gestureStartedAt ? event.timeStamp : performance.now();
         const elapsed = Math.max(1, releaseAt - gestureStartedAt);
-        if (!forceCancel && event?.type === 'pointerup' && Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
+        if (!forceCancel && useReleaseCoordinates && event?.type === 'pointerup' && Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
           const finalDx = event.clientX - startX;
           const finalDy = event.clientY - startY;
           const sameDirection = dx === 0 || finalDx === 0 || Math.sign(finalDx) === Math.sign(dx);
@@ -4640,13 +4639,13 @@
       }, { passive: false });
 
       card.addEventListener('pointerup', event => finishDrag(event));
-      card.addEventListener('pointercancel', event => finishDrag(event, true));
+      card.addEventListener('pointercancel', event => finishDrag(event, false, false));
       card.addEventListener('lostpointercapture', event => {
         if (!dragging || event.pointerId !== activePointerId) return;
         finishDrag(null, activePointerType !== 'mouse');
       });
       window.addEventListener('pointerup', event => finishDrag(event), true);
-      window.addEventListener('pointercancel', event => finishDrag(event, true), true);
+      window.addEventListener('pointercancel', event => finishDrag(event, false, false), true);
       window.addEventListener('blur', () => finishDrag(null, activePointerType !== 'mouse'));
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) finishDrag(null, activePointerType !== 'mouse');
