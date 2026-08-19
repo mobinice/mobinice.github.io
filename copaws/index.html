@@ -2554,6 +2554,7 @@
     }
     .profile-screen .sitter-card h2 {
       margin: 0 0 8px;
+      font-size: 24px;
       line-height: 30px;
     }
     .profile-screen .sitter-card p {
@@ -2563,9 +2564,17 @@
       line-height: 16px !important;
     }
     .profile-screen .sitter-card .btn {
+      width: 132px;
       min-height: 40px;
       height: 40px;
       border-radius: 16px;
+    }
+    .profile-screen .sitter-card.identity-pending .btn {
+      border-color: #fff4d9;
+      background: #fff4d9;
+      color: var(--green);
+      cursor: default;
+      opacity: 1;
     }
 
     .identity-review-screen {
@@ -3784,10 +3793,10 @@
           </button>
         </div>
       </div>
-      <div class="sitter-card">
-        <h2>成為寵物保母</h2>
-        <p style="margin:0 0 18px;line-height:1.5">上傳身分證完成實名認證，建立服務區域、價格與可預約日曆。</p>
-        <button class="btn light" data-go="identityReview">開始認證</button>
+      <div class="sitter-card" id="profileIdentityCard">
+        <h2 id="profileIdentityTitle">成為寵物保母</h2>
+        <p id="profileIdentityCopy" style="margin:0 0 18px;line-height:1.5">上傳身分證完成實名認證，建立服務區域、價格與可預約日曆。</p>
+        <button class="btn light" id="profileIdentityAction" data-go="identityReview">開始認證</button>
       </div>
       <div class="menu-list">
         <button class="menu-item" onclick="openCertModal('all')"><span>認證狀態<small>查看平台、實名與手機狀態</small></span><span>›</span></button>
@@ -4077,6 +4086,7 @@
     let pendingPetIndex = 0;
     const identityBirthday = { year: '', month: '', day: '' };
     const identityIssueDate = { month: '', day: '' };
+    let identityReviewStatus = sessionStorage.getItem('copawsIdentityReviewStatus') || 'not_started';
     let identityDatePickerType = 'birthYear';
     let pendingIdentityDateValue = '';
     const identityUploadState = {
@@ -4416,7 +4426,31 @@
       if (!identityUploadState.identityIdBackInput) return toast('請上傳身分證反面照片');
       if (!identityUploadState.identityPoliceInput) return toast('請上傳 2023 年以後申請的良民證');
       if (!document.getElementById('identityAgreement').checked) return toast('請先同意保母服務說明');
-      toast('實名認證資料已送出，等待平台審核');
+      identityReviewStatus = 'pending';
+      sessionStorage.setItem('copawsIdentityReviewStatus', identityReviewStatus);
+      renderProfileIdentityStatus();
+      backStack.length = 0;
+      go('profile');
+      toast('實名認證資料已送出，平台審核中');
+    }
+
+    function renderProfileIdentityStatus() {
+      const card = document.getElementById('profileIdentityCard');
+      const title = document.getElementById('profileIdentityTitle');
+      const copy = document.getElementById('profileIdentityCopy');
+      const action = document.getElementById('profileIdentityAction');
+      if (!card || !title || !copy || !action) return;
+      const isPending = identityReviewStatus === 'pending';
+      card.classList.toggle('identity-pending', isPending);
+      title.textContent = isPending ? '實名認證審核中' : '成為寵物保母';
+      copy.textContent = isPending
+        ? '資料已送出，平台正在審核，完成後會透過通知告知。'
+        : '上傳身分證完成實名認證，建立服務區域、價格與可預約日曆。';
+      action.textContent = isPending ? '審核中' : '開始認證';
+      action.disabled = isPending;
+      action.setAttribute('aria-disabled', String(isPending));
+      if (isPending) action.removeAttribute('data-go');
+      else action.dataset.go = 'identityReview';
     }
 
     function setPetOption(group, value) {
@@ -4517,6 +4551,7 @@
         }
       }
       if (id === 'pets') renderPets();
+      if (id === 'profile') renderProfileIdentityStatus();
       if (id === 'map') renderMapLists();
       if (id === 'mapList') renderMapLists();
       if (id === 'detail') renderDetail();
