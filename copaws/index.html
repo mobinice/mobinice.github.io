@@ -1786,12 +1786,14 @@
       border-top: 8px solid var(--green);
       flex: 0 0 auto;
     }
-    .modal-layer.pet-picker-mode {
+    .modal-layer.pet-picker-mode,
+    .modal-layer.birthday-picker-mode {
       align-items: flex-end;
       padding: 0;
       backdrop-filter: blur(3px);
     }
-    .modal-layer.pet-picker-mode .modal {
+    .modal-layer.pet-picker-mode .modal,
+    .modal-layer.birthday-picker-mode .modal {
       border-radius: 26px 26px 0 0;
       padding: 28px 24px 26px;
       position: relative;
@@ -1810,7 +1812,8 @@
       font-size: 22px;
       line-height: 1;
     }
-    .pet-picker-mode .modal-close { display: grid; place-items: center; }
+    .pet-picker-mode .modal-close,
+    .birthday-picker-mode .modal-close { display: grid; place-items: center; }
     .pet-picker-options {
       display: grid;
       gap: 12px;
@@ -2564,6 +2567,236 @@
       height: 40px;
       border-radius: 16px;
     }
+
+    .identity-review-screen {
+      padding-top: 0;
+      padding-bottom: 54px;
+    }
+    .identity-review-screen > .subtitle {
+      margin: 0 0 24px 48px;
+    }
+    .identity-review-form {
+      display: grid;
+      gap: 22px;
+    }
+    .identity-field > label,
+    .identity-section-title {
+      display: block;
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 18px;
+    }
+    .identity-input,
+    .identity-date-trigger {
+      width: 100%;
+      min-width: 0;
+      height: 52px;
+      padding: 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .94);
+      color: var(--ink);
+      outline: 0;
+      font-size: 14px;
+      text-align: left;
+    }
+    .identity-input:focus,
+    .identity-date-trigger:focus-visible {
+      border-color: rgba(11, 107, 58, .5);
+      box-shadow: 0 0 0 4px rgba(11, 107, 58, .08);
+    }
+    .identity-date-trigger {
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .identity-date-trigger.has-value { color: var(--ink); font-weight: 800; }
+    .identity-birthday-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .identity-issue-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .identity-section-copy {
+      margin: -4px 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 18px;
+    }
+    .identity-section-copy.emphasis { color: var(--green); }
+    .identity-upload-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .identity-upload-card {
+      min-width: 0;
+      min-height: 134px;
+      padding: 14px 12px 10px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .94);
+      color: var(--ink);
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 8px;
+      text-align: center;
+    }
+    .identity-upload-card.wide {
+      width: 100%;
+      min-height: 150px;
+      padding: 20px 24px;
+      grid-template-columns: 80px minmax(0, 1fr);
+      justify-items: stretch;
+      text-align: left;
+    }
+    .identity-upload-icon {
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--green-soft);
+      color: var(--green);
+      display: grid;
+      place-items: center;
+    }
+    .identity-upload-card.wide .identity-upload-icon {
+      width: 80px;
+      height: 80px;
+      grid-row: 1 / span 2;
+      align-self: center;
+    }
+    .identity-upload-icon svg { width: 28px; height: 28px; }
+    .identity-upload-card strong {
+      min-width: 0;
+      font-size: 14px;
+      line-height: 20px;
+    }
+    .identity-upload-card.wide strong {
+      align-self: end;
+      font-size: 18px;
+    }
+    .identity-upload-action {
+      width: 100%;
+      min-width: 0;
+      height: 28px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: var(--green);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 900;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .identity-upload-card.wide .identity-upload-action {
+      height: 36px;
+      align-self: start;
+      font-size: 12px;
+    }
+    .identity-upload-card.has-file {
+      border-color: var(--green);
+      background: #f0f8f1;
+      box-shadow: inset 0 0 0 .5px var(--green);
+    }
+    .identity-upload-input { display: none; }
+    .identity-privacy-note {
+      margin: 6px 0 0;
+      padding: 14px 20px;
+      border-radius: 16px;
+      background: rgba(232, 245, 233, .92);
+      color: var(--green);
+      font-size: 12px;
+      line-height: 18px;
+    }
+    .identity-agreement {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 20px;
+    }
+    .identity-agreement input {
+      width: 22px;
+      height: 22px;
+      margin: 0;
+      accent-color: var(--green);
+    }
+    .identity-agreement button {
+      padding: 0;
+      color: var(--green);
+      font-weight: 900;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .identity-agreement small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .identity-submit {
+      width: 100%;
+      min-height: 52px;
+      border-radius: 999px;
+      background: var(--green);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+    }
+    .identity-submit-copy {
+      margin: -12px 0 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .birthday-picker-mode .modal {
+      min-height: 430px;
+      max-height: min(430px, 78dvh);
+      overflow: hidden;
+    }
+    .birthday-picker-options {
+      display: grid;
+      gap: 8px;
+    }
+    .birthday-picker-options.year {
+      max-height: 240px;
+      overflow-y: auto;
+      padding-right: 2px;
+      scrollbar-width: none;
+    }
+    .birthday-picker-options.year::-webkit-scrollbar { display: none; }
+    .birthday-picker-options.month { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .birthday-picker-options.day { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+    .birthday-option {
+      min-width: 0;
+      height: 42px;
+      padding: 0 4px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .birthday-option.active {
+      border-color: var(--green);
+      background: #f0f8f1;
+      color: var(--green);
+      box-shadow: inset 0 0 0 .5px var(--green);
+    }
+    .birthday-picker-mode .modal > .btn.full { margin-top: 18px !important; }
 
     .pet-screen {
       padding-top: 0;
@@ -3554,13 +3787,90 @@
       <div class="sitter-card">
         <h2>成為寵物保母</h2>
         <p style="margin:0 0 18px;line-height:1.5">上傳身分證完成實名認證，建立服務區域、價格與可預約日曆。</p>
-        <button class="btn light">開始認證</button>
+        <button class="btn light" data-go="identityReview">開始認證</button>
       </div>
       <div class="menu-list">
         <button class="menu-item" onclick="openCertModal('all')"><span>認證狀態<small>查看平台、實名與手機狀態</small></span><span>›</span></button>
         <button class="menu-item" data-go="pets"><span>我的毛孩<small>管理寵物資料與照護注意事項</small></span><span>›</span></button>
         <button class="menu-item" data-go="finance"><span>付款與收款<small>交易紀錄、撥款、發票資料</small></span><span>›</span></button>
       </div>
+    </section>
+
+    <section class="screen no-nav identity-review-screen" id="identityReview">
+      <div class="page-heading">
+        <button class="screen-back" data-back aria-label="返回個人設定">‹</button>
+        <h1 class="screen-title">實名認證審核</h1>
+      </div>
+      <p class="subtitle">完成資料上傳後，平台將進行寵物保母資格審核</p>
+
+      <form class="identity-review-form" id="identityReviewForm" novalidate>
+        <div class="identity-field">
+          <label for="identityFullName">本名 *</label>
+          <input class="identity-input" id="identityFullName" autocomplete="name" placeholder="請輸入身分證上的本名">
+        </div>
+
+        <div class="identity-field">
+          <label>生日（西元） *</label>
+          <div class="identity-birthday-grid">
+            <button class="identity-date-trigger" id="identityBirthYear" type="button" data-birthday-picker="year">西元年 YYYY</button>
+            <button class="identity-date-trigger" id="identityBirthMonth" type="button" data-birthday-picker="month">月份 MM</button>
+            <button class="identity-date-trigger" id="identityBirthDay" type="button" data-birthday-picker="day">日期 DD</button>
+          </div>
+        </div>
+
+        <div class="identity-field">
+          <label for="identityNumber">身分證字號 *</label>
+          <input class="identity-input" id="identityNumber" autocomplete="off" maxlength="10" placeholder="請輸入身分證字號">
+        </div>
+
+        <div class="identity-field">
+          <label>身分證換／補發日期 *</label>
+          <div class="identity-issue-grid">
+            <input class="identity-input" id="identityIssueMonth" inputmode="numeric" maxlength="2" placeholder="月份 MM" aria-label="身分證換補發月份">
+            <input class="identity-input" id="identityIssueDay" inputmode="numeric" maxlength="2" placeholder="日期 DD" aria-label="身分證換補發日期">
+          </div>
+        </div>
+
+        <div>
+          <span class="identity-section-title">身分證照片 *</span>
+          <p class="identity-section-copy">請確保四角完整、文字清楚且無反光</p>
+          <div class="identity-upload-grid">
+            <button class="identity-upload-card" id="identityIdFrontCard" type="button" data-identity-upload="identityIdFrontInput">
+              <span class="identity-upload-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><rect x="4" y="9" width="24" height="18" rx="4" stroke="currentColor" stroke-width="2"/><path d="M11 9l3-4h6l3 4" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="16" cy="18" r="5" stroke="currentColor" stroke-width="2"/></svg></span>
+              <strong>身分證正面</strong>
+              <span class="identity-upload-action" data-upload-label>選擇照片</span>
+            </button>
+            <button class="identity-upload-card" id="identityIdBackCard" type="button" data-identity-upload="identityIdBackInput">
+              <span class="identity-upload-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><rect x="4" y="9" width="24" height="18" rx="4" stroke="currentColor" stroke-width="2"/><path d="M11 9l3-4h6l3 4" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="16" cy="18" r="5" stroke="currentColor" stroke-width="2"/></svg></span>
+              <strong>身分證反面</strong>
+              <span class="identity-upload-action" data-upload-label>選擇照片</span>
+            </button>
+          </div>
+          <input class="identity-upload-input" id="identityIdFrontInput" type="file" accept="image/*">
+          <input class="identity-upload-input" id="identityIdBackInput" type="file" accept="image/*">
+        </div>
+
+        <div>
+          <span class="identity-section-title">良民證 *</span>
+          <p class="identity-section-copy emphasis">請上傳 2023 年以後申請的良民證照片</p>
+          <button class="identity-upload-card wide" id="identityPoliceCard" type="button" data-identity-upload="identityPoliceInput">
+            <span class="identity-upload-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><rect x="4" y="9" width="24" height="18" rx="4" stroke="currentColor" stroke-width="2"/><path d="M11 9l3-4h6l3 4" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="16" cy="18" r="5" stroke="currentColor" stroke-width="2"/></svg></span>
+            <strong>上傳良民證</strong>
+            <span class="identity-upload-action" data-upload-label>選擇照片</span>
+          </button>
+          <input class="identity-upload-input" id="identityPoliceInput" type="file" accept="image/*">
+        </div>
+
+        <p class="identity-privacy-note">上傳資料僅供平台進行身分與寵物保母資格審核。<br>上傳之所有文件平台不會另作他途，<br>並依資料安全規範妥善保管。</p>
+
+        <div class="identity-agreement">
+          <input id="identityAgreement" type="checkbox" aria-label="同意保母服務說明">
+          <div>我已閱讀並同意 <button type="button" data-service-statement>保母服務說明 *</button><small>送出前請先勾選同意</small></div>
+        </div>
+
+        <button class="identity-submit" type="submit">送出審核</button>
+        <p class="identity-submit-copy">送出後資料將進入平台審核流程</p>
+      </form>
     </section>
 
     <section class="screen pet-screen" id="pets">
@@ -3765,6 +4075,14 @@
     const selectedPetIndexes = { demand: 0, edit: 0 };
     let petPickerContext = 'demand';
     let pendingPetIndex = 0;
+    const identityBirthday = { year: '', month: '', day: '' };
+    let birthdayPickerType = 'year';
+    let pendingBirthdayValue = '';
+    const identityUploadState = {
+      identityIdFrontInput: '',
+      identityIdBackInput: '',
+      identityPoliceInput: ''
+    };
     let chatRefreshing = false;
     let chatGestureStart = null;
     const chatRefreshThreshold = 62;
@@ -3980,6 +4298,112 @@
       selectedPetIndexes[petPickerContext] = pendingPetIndex;
       renderPetPickers();
       hideModal();
+    }
+
+    function getBirthdayOptions(type) {
+      if (type === 'year') {
+        const currentYear = new Date().getFullYear();
+        return Array.from({ length: currentYear - 1939 }, (_, index) => currentYear - index);
+      }
+      if (type === 'month') return Array.from({ length: 12 }, (_, index) => index + 1);
+      const year = Number(identityBirthday.year || 1992);
+      const month = Number(identityBirthday.month || 8);
+      const dayCount = new Date(year, month, 0).getDate();
+      return Array.from({ length: dayCount }, (_, index) => index + 1);
+    }
+
+    function renderBirthdayPickerOptions() {
+      const values = getBirthdayOptions(birthdayPickerType);
+      const body = document.getElementById('modalBody');
+      body.innerHTML = `<div class="birthday-picker-options ${birthdayPickerType}">${values.map(value => {
+        const label = birthdayPickerType === 'month' ? `${value} 月` : String(value);
+        const isActive = String(value) === String(pendingBirthdayValue);
+        return `<button class="birthday-option ${isActive ? 'active' : ''}" type="button" data-birthday-value="${value}" aria-pressed="${isActive}">${label}</button>`;
+      }).join('')}</div>`;
+      if (birthdayPickerType === 'year') {
+        requestAnimationFrame(() => body.querySelector('.birthday-option.active')?.scrollIntoView({ block: 'center' }));
+      }
+    }
+
+    function openBirthdayPicker(type) {
+      birthdayPickerType = ['year', 'month', 'day'].includes(type) ? type : 'year';
+      const defaults = { year: '1992', month: '8', day: '12' };
+      pendingBirthdayValue = identityBirthday[birthdayPickerType] || defaults[birthdayPickerType];
+      const labels = {
+        year: ['選擇西元年', '上下滑動選擇出生年份'],
+        month: ['選擇月份', '選擇出生月份'],
+        day: ['選擇日期', '選擇出生日期']
+      };
+      document.getElementById('modalTitle').textContent = labels[birthdayPickerType][0];
+      document.getElementById('modalCopy').textContent = labels[birthdayPickerType][1];
+      renderBirthdayPickerOptions();
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      action.textContent = '確認選擇';
+      action.onclick = confirmBirthdayPicker;
+      document.getElementById('modalLayer').classList.remove('pet-picker-mode');
+      document.getElementById('modalLayer').classList.add('birthday-picker-mode', 'show');
+    }
+
+    function updateBirthdayFields() {
+      const configs = [
+        ['year', 'identityBirthYear', '西元年 YYYY', value => `${value} 年`],
+        ['month', 'identityBirthMonth', '月份 MM', value => `${String(value).padStart(2, '0')} 月`],
+        ['day', 'identityBirthDay', '日期 DD', value => `${String(value).padStart(2, '0')} 日`]
+      ];
+      configs.forEach(([key, id, placeholder, format]) => {
+        const field = document.getElementById(id);
+        const value = identityBirthday[key];
+        field.textContent = value ? format(value) : placeholder;
+        field.classList.toggle('has-value', Boolean(value));
+      });
+    }
+
+    function confirmBirthdayPicker() {
+      identityBirthday[birthdayPickerType] = String(pendingBirthdayValue);
+      if (birthdayPickerType === 'year' || birthdayPickerType === 'month') {
+        const maxDay = getBirthdayOptions('day').length;
+        if (Number(identityBirthday.day) > maxDay) identityBirthday.day = String(maxDay);
+      }
+      updateBirthdayFields();
+      hideModal();
+    }
+
+    function openServiceStatement() {
+      const layer = document.getElementById('modalLayer');
+      layer.classList.remove('pet-picker-mode', 'birthday-picker-mode');
+      document.getElementById('modalTitle').textContent = '保母服務說明';
+      document.getElementById('modalCopy').textContent = '本區將說明寵物保母接案、服務回報、資料使用及平台審核規範。';
+      document.getElementById('modalBody').innerHTML = '<div class="report-item"><strong>內容後續補充</strong><span>正式條款確認後，會在此完整呈現並保留版本紀錄。</span></div>';
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      action.textContent = '知道了';
+      action.onclick = hideModal;
+      layer.classList.add('show');
+    }
+
+    function updateIdentityUpload(input) {
+      const card = document.querySelector(`[data-identity-upload="${input.id}"]`);
+      const file = input.files?.[0];
+      identityUploadState[input.id] = file?.name || '';
+      card?.classList.toggle('has-file', Boolean(file));
+      const label = card?.querySelector('[data-upload-label]');
+      if (label) label.textContent = file ? file.name : '選擇照片';
+    }
+
+    function submitIdentityReview(event) {
+      event.preventDefault();
+      const fullName = document.getElementById('identityFullName').value.trim();
+      const identityNumber = document.getElementById('identityNumber').value.trim();
+      const issueMonth = Number(document.getElementById('identityIssueMonth').value);
+      const issueDay = Number(document.getElementById('identityIssueDay').value);
+      if (!fullName) return toast('請輸入身分證上的本名');
+      if (!identityBirthday.year || !identityBirthday.month || !identityBirthday.day) return toast('請完整選擇生日');
+      if (!/^[A-Za-z][12]\d{8}$/.test(identityNumber)) return toast('請輸入正確的身分證字號');
+      if (issueMonth < 1 || issueMonth > 12 || issueDay < 1 || issueDay > 31) return toast('請輸入正確的換／補發月日');
+      if (!identityUploadState.identityIdFrontInput) return toast('請上傳身分證正面照片');
+      if (!identityUploadState.identityIdBackInput) return toast('請上傳身分證反面照片');
+      if (!identityUploadState.identityPoliceInput) return toast('請上傳 2023 年以後申請的良民證');
+      if (!document.getElementById('identityAgreement').checked) return toast('請先同意保母服務說明');
+      toast('實名認證資料已送出，等待平台審核');
     }
 
     function setPetOption(group, value) {
@@ -4776,7 +5200,7 @@
     }
 
     function hideModal() {
-      document.getElementById('modalLayer').classList.remove('show', 'pet-picker-mode');
+      document.getElementById('modalLayer').classList.remove('show', 'pet-picker-mode', 'birthday-picker-mode');
     }
 
     function closeModal(event) {
@@ -4990,6 +5414,30 @@
         goBack();
         return;
       }
+      const birthdayPickerButton = event.target.closest('[data-birthday-picker]');
+      if (birthdayPickerButton) {
+        event.preventDefault();
+        openBirthdayPicker(birthdayPickerButton.dataset.birthdayPicker);
+        return;
+      }
+      const birthdayOption = event.target.closest('[data-birthday-value]');
+      if (birthdayOption) {
+        event.preventDefault();
+        pendingBirthdayValue = birthdayOption.dataset.birthdayValue;
+        renderBirthdayPickerOptions();
+        return;
+      }
+      const identityUploadButton = event.target.closest('[data-identity-upload]');
+      if (identityUploadButton) {
+        event.preventDefault();
+        document.getElementById(identityUploadButton.dataset.identityUpload)?.click();
+        return;
+      }
+      if (event.target.closest('[data-service-statement]')) {
+        event.preventDefault();
+        openServiceStatement();
+        return;
+      }
       const openPetPickerButton = event.target.closest('[data-open-pet-picker]');
       if (openPetPickerButton) {
         event.preventDefault();
@@ -5182,6 +5630,19 @@
         // map preview already set selectedCaregiverIndex
       }
       navigate(target.dataset.go);
+    });
+
+    document.getElementById('identityReviewForm').addEventListener('submit', submitIdentityReview);
+    document.querySelectorAll('.identity-upload-input').forEach(input => {
+      input.addEventListener('change', () => updateIdentityUpload(input));
+    });
+    document.getElementById('identityNumber').addEventListener('input', event => {
+      event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+    });
+    ['identityIssueMonth', 'identityIssueDay'].forEach(id => {
+      document.getElementById(id).addEventListener('input', event => {
+        event.target.value = event.target.value.replace(/\D/g, '').slice(0, 2);
+      });
     });
 
     document.getElementById('petPhotoTrigger').addEventListener('click', () => {
