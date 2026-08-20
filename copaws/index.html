@@ -1777,6 +1777,7 @@
       font-weight: 700;
       text-align: left;
     }
+    .pet-picker-trigger[hidden] { display: none; }
     .pet-picker-trigger::after {
       content: "";
       width: 0;
@@ -3377,7 +3378,7 @@
     #match .photo-hero { height: 220px; }
     #match .action-row { padding-top: 18px; }
 
-    .quick-demand-screen { padding-top: 14px; }
+    .quick-demand-screen { padding-top: 0; }
     .quick-demand-screen .screen-title { margin-top: 0; }
     .quick-demand-calendar {
       margin-top: 12px;
@@ -3400,12 +3401,19 @@
     }
     .quick-month-trigger span:last-child { font-size: 24px; line-height: 1; }
     .quick-calendar-grid .date {
-      border-color: transparent;
-      background: transparent;
+      border-color: var(--line);
+      background: #fff;
+      color: var(--muted);
     }
     .quick-calendar-grid .date.available {
-      border-color: transparent;
+      border-color: var(--green);
       background: var(--green-soft);
+      color: var(--green);
+    }
+    .quick-calendar-grid .date.active {
+      border-color: var(--green);
+      color: #fff;
+      background: var(--green);
     }
     .quick-calendar-grid .date:disabled {
       color: #c5bfb5;
@@ -3422,21 +3430,22 @@
       font-size: 17px;
       line-height: 1.2;
     }
-    .quick-periods {
-      display: grid;
-      grid-template-columns: repeat(4,minmax(0,1fr));
-      gap: 8px;
-    }
-    .quick-period {
-      height: 38px;
+    .quick-time-trigger {
+      width: 100%;
+      height: 52px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       border: 1px solid var(--line);
-      border-radius: 999px;
-      color: var(--muted);
+      border-radius: 14px;
+      color: var(--ink);
       background: #fff;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 900;
+      text-align: left;
     }
-    .quick-period.active { color:#fff; background:var(--green); border-color:var(--green); }
+    .quick-time-trigger span:last-child { color:var(--green); font-size:22px; line-height:1; }
     .quick-location-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -3451,13 +3460,29 @@
     .quick-demand-summary p { margin:6px 0 0; font-size:13px; font-weight:800; line-height:1.45; }
     .quick-demand-summary small { display:block; margin-top:4px; color:var(--muted); line-height:1.4; }
 
-    .request-list-screen { padding-top: 12px; }
+    .request-list-screen { padding-top: 0; }
+    .request-list-sticky {
+      margin: 0 -24px 4px;
+      padding: 10px 24px 8px;
+      position: sticky;
+      top: 0;
+      z-index: 45;
+      background: rgba(232, 245, 235, .97);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+    }
     .request-list-head {
+      min-height: 54px;
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       gap: 12px;
     }
+    .request-list-title-group { min-width: 0; display: flex; align-items: center; gap: 10px; }
+    .request-list-copy { min-width: 0; }
+    .request-list-copy .screen-title { margin: 0 0 3px; }
+    .request-list-copy .subtitle { margin: 0; }
+    .request-list-mode-switch { margin: 8px 0 0; }
     .request-add-button {
       width: 44px;
       height: 44px;
@@ -3573,6 +3598,7 @@
 
     .quick-month-mode .modal { max-height: 88%; overflow-y:auto; }
     .quick-month-mode .modal > .btn.full,
+    .quick-time-mode .modal > .btn.full,
     .decision-mode .modal > .btn.full { display:none; }
     .quick-picker-heading { display:flex; justify-content:space-between; align-items:center; margin:8px 0; }
     .quick-picker-heading strong { font-size:14px; }
@@ -3591,6 +3617,21 @@
     .quick-picker-option.active { color:#fff; background:var(--green); border-color:var(--green); }
     .quick-picker-option:disabled { color:#bdb6ab; background:#f1eee7; border-color:#f1eee7; cursor:default; }
     .quick-picker-rule { margin:12px 0 0!important; font-size:11px; }
+    .quick-time-picker-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:12px; }
+    .quick-time-picker-column strong { display:block; margin-bottom:8px; color:var(--muted); font-size:12px; text-align:center; }
+    .quick-time-options { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+    .quick-time-option {
+      min-width:0;
+      height:40px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      color:var(--ink);
+      background:#fff;
+      font-size:12px;
+      font-weight:900;
+    }
+    .quick-time-option.active { color:#fff; background:var(--green); border-color:var(--green); }
+    .quick-time-option:disabled { color:#bdb6ab; background:#f1eee7; border-color:#f1eee7; cursor:default; }
     .modal-inline-actions { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px; }
     .modal-inline-actions .btn { min-height:48px; border-radius:16px; }
     .decision-summary {
@@ -3607,6 +3648,77 @@
     .decline-reasons { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .decline-reason { min-height:42px; border:1px solid var(--line); border-radius:14px; background:#fff; color:var(--muted); font-size:11px; font-weight:900; }
     .decline-reason.active { color:#fff; background:var(--green); border-color:var(--green); }
+
+    .time-month-trigger {
+      width: 100%;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--ink);
+      font-size: 22px;
+      font-weight: 900;
+      text-align: left;
+    }
+    .time-month-trigger span:last-child {
+      color: var(--green);
+      font-size: 30px;
+      line-height: 1;
+    }
+    .availability-month-mode {
+      align-items: center;
+      padding: 20px 24px 56px;
+      backdrop-filter: blur(3px);
+    }
+    .availability-month-mode .modal {
+      width: 100%;
+      max-width: 380px;
+      min-height: 426px;
+      padding: 24px 24px 28px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .availability-month-mode .modal > .btn.full { display:none; }
+    .availability-month-options { display:grid; gap:12px; }
+    .availability-month-option {
+      width:100%;
+      height:50px;
+      padding:0 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--ink);
+      background:#fff;
+      font-size:15px;
+      text-align:left;
+    }
+    .availability-month-option.active {
+      color:var(--green);
+      border-color:var(--green);
+      background:var(--green-soft);
+      font-weight:900;
+    }
+    .availability-month-check { min-width:20px; text-align:center; font-weight:900; }
+    .availability-month-rule {
+      margin:28px 0 0!important;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+    }
+    .availability-month-close {
+      width:100%;
+      min-height:48px;
+      margin-top:12px;
+      border-radius:8px;
+      color:#fff;
+      background:var(--green);
+      font-size:14px;
+      font-weight:900;
+    }
 
     @media (max-width: 460px) {
       body { background: var(--cream); }
@@ -3689,7 +3801,7 @@
         </button>
       </div>
       <div class="match-mode-switch" aria-label="媒合方式">
-        <button type="button" data-go="quickDemand">快速發需求</button>
+        <button type="button" data-go="requestList">快速發需求</button>
         <button class="active" type="button" aria-current="page">自己挑保母</button>
       </div>
       <div class="chips">
@@ -3725,7 +3837,7 @@
     </section>
 
     <section class="screen long quick-demand-screen" id="quickDemand">
-      <h1 class="screen-title">快速發需求</h1>
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回需求列表">‹</button><h1 class="screen-title">快速發需求</h1></div>
       <p class="subtitle">先選時間與區域，讓合適的寵物保母主動接案</p>
       <div class="match-mode-switch" aria-label="媒合方式">
         <button class="active" type="button" aria-current="page">快速發需求</button>
@@ -3741,11 +3853,18 @@
         <p class="quick-calendar-hint">綠色日期為可選日期；過去日期不可選擇。</p>
       </div>
       <h2 class="quick-section-title">服務時間區段</h2>
-      <div class="quick-periods"><button class="quick-period" data-quick-period="morning">上午</button><button class="quick-period active" data-quick-period="afternoon">下午</button><button class="quick-period" data-quick-period="evening">晚上</button><button class="quick-period" data-quick-period="custom">自訂</button></div>
-      <div class="service-time-grid" style="margin-top:14px"><div class="field" style="margin:0"><label>開始時間</label><input class="input" id="quickStartTime" value="14:00" inputmode="numeric"></div><div class="field" style="margin:0"><label>結束時間</label><input class="input" id="quickEndTime" value="16:00" inputmode="numeric"></div></div>
+      <div class="service-time-grid"><div class="field" style="margin:0"><label>開始時間</label><button class="quick-time-trigger" id="quickStartTime" type="button" data-open-quick-time="start"><span data-quick-time-value>00:00</span><span aria-hidden="true">›</span></button></div><div class="field" style="margin:0"><label>結束時間</label><button class="quick-time-trigger" id="quickEndTime" type="button" data-open-quick-time="end"><span data-quick-time-value>00:00</span><span aria-hidden="true">›</span></button></div></div>
       <h2 class="quick-section-title">指定服務區域</h2>
       <div class="quick-location-grid"><div class="field" style="margin:0"><label>縣市</label><select class="select" id="quickCity"><option>台北市</option><option>新北市</option><option>桃園市</option></select></div><div class="field" style="margin:0"><label>行政區</label><select class="select" id="quickDistrict"><option>大安區</option><option>信義區</option><option>松山區</option></select></div></div>
-      <div class="field"><label>寵物資訊</label><select class="select" id="quickPet"><option>麻糬 · 貓咪 · 3 歲</option><option>豆豆 · 狗狗 · 5 歲</option></select></div>
+      <div class="field pet-picker-field">
+        <label>寵物資訊</label>
+        <button class="pet-picker-trigger" id="quickPetPickerButton" type="button" data-open-pet-picker="quick"><span id="quickPetPickerValue">選擇寵物</span></button>
+        <select id="quickPet" aria-label="快速發需求的寵物資訊" hidden></select>
+        <div class="pet-picker-empty" id="quickPetEmpty">
+          <div><strong>尚未建立寵物資料</strong><p>建立後即可帶入快速需求</p></div>
+          <button class="pet-create-button" type="button" data-create-pet-for-context="quick">建立寵物資料</button>
+        </div>
+      </div>
       <div class="assistance-picker" data-assistance-picker id="quickAssistance">
         <label>需要協助事項</label>
         <div class="assistance-options"><button class="assistance-chip active" type="button" data-assistance-chip>餵食</button><button class="assistance-chip active" type="button" data-assistance-chip>清砂</button><button class="assistance-chip active" type="button" data-assistance-chip>陪玩</button><button class="assistance-chip" type="button" data-assistance-chip data-other-chip>其他</button></div>
@@ -3757,7 +3876,10 @@
     </section>
 
     <section class="screen long request-list-screen" id="requestList">
-      <div class="request-list-head"><div><h1 class="screen-title">需求列表</h1><p class="subtitle">管理已送出的需求與接案狀態</p></div><button class="request-add-button" type="button" data-go="quickDemand" aria-label="新增需求">＋</button></div>
+      <div class="request-list-sticky">
+        <div class="request-list-head"><div class="request-list-title-group"><div class="request-list-copy"><h1 class="screen-title">需求列表</h1><p class="subtitle">管理已送出的需求與接案狀態</p></div></div><button class="request-add-button" type="button" data-go="quickDemand" aria-label="新增需求">＋</button></div>
+        <div class="match-mode-switch request-list-mode-switch" aria-label="媒合方式"><button class="active" type="button" aria-current="page">快速發需求</button><button type="button" data-go="match">自己挑保母</button></div>
+      </div>
       <p class="request-sort-note">最新送出的需求會排在最上方</p>
       <div class="request-filter-row"><button class="chip active" data-request-filter="all">全部</button><button class="chip" data-request-filter="waiting">等待接案</button><button class="chip" data-request-filter="applicants">已有申請</button></div>
       <div id="requestListContainer"></div>
@@ -3897,9 +4019,9 @@
         </div>
       </div>
       <div class="card month-card">
-        <div class="month-head"><strong>2026 七月</strong><span class="month-next">›</span></div>
+        <div class="month-head"><button class="time-month-trigger" type="button" data-open-availability-month aria-label="選擇可預約月份"><span id="timeMonthLabel">2026 七月</span><span aria-hidden="true">›</span></button></div>
         <div class="weekday-grid"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
-        <div class="month-grid" aria-label="2026 七月可預約日期">
+        <div class="month-grid" id="timeCalendar" aria-label="2026 七月可預約日期">
           <button class="date" data-date="1">1</button><button class="date" data-date="2">2</button><button class="date" data-date="3">3</button><button class="date" data-date="4">4</button><button class="date" data-date="5">5</button><button class="date" data-date="6">6</button><button class="date" data-date="7">7</button>
           <button class="date" data-date="8">8</button><button class="date" data-date="9">9</button><button class="date available" data-date="10">10</button><button class="date available" data-date="11">11</button><button class="date available" data-date="12">12</button><button class="date" data-date="13">13</button><button class="date" data-date="14">14</button>
           <button class="date" data-date="15">15</button><button class="date active" data-date="16">16</button><button class="date" data-date="17">17</button><button class="date available" data-date="18">18</button><button class="date" data-date="19">19</button><button class="date" data-date="20">20</button><button class="date" data-date="21">21</button>
@@ -4394,7 +4516,7 @@
     const nav = document.querySelector('.bottom-nav');
     const navItems = Array.from(document.querySelectorAll('.nav-item'));
     const screensWithNav = new Set(['match', 'quickDemand', 'requestList', 'requestApplicants', 'requestEdit', 'matchedDemand', 'map', 'mapList', 'detail', 'time', 'demand', 'bookings', 'bookingReport', 'bookingChat', 'bookingDetail', 'bookingEdit', 'profile', 'pets', 'favorites', 'finance']);
-    const tabByScreen = { match: 'match', quickDemand: 'match', requestList: 'bookings', requestApplicants: 'bookings', requestEdit: 'bookings', matchedDemand: 'bookings', detail: 'match', time: 'bookings', demand: 'bookings', map: 'map', mapList: 'map', bookings: 'bookings', bookingReport: 'bookings', bookingChat: 'bookings', bookingDetail: 'bookings', bookingEdit: 'bookings', profile: 'profile', pets: 'profile', finance: 'profile', favorites: 'match' };
+    const tabByScreen = { match: 'match', quickDemand: 'match', requestList: 'match', requestApplicants: 'match', requestEdit: 'match', matchedDemand: 'match', detail: 'match', time: 'bookings', demand: 'bookings', map: 'map', mapList: 'map', bookings: 'bookings', bookingReport: 'bookings', bookingChat: 'bookings', bookingDetail: 'bookings', bookingEdit: 'bookings', profile: 'profile', pets: 'profile', finance: 'profile', favorites: 'match' };
     let currentScreen = 'login';
     const backStack = [];
     let resend = 60;
@@ -4403,6 +4525,12 @@
     let selectedCaregiverIndex = 0;
     let selectedDate = '16';
     let selectedSlot = '14:00-16:00';
+    const sitterAvailabilityMonths = [
+      { year: 2026, month: 7, availableDays: [10, 11, 12, 16, 18, 22] },
+      { year: 2026, month: 9, availableDays: [3, 7, 12, 18, 26] },
+      { year: 2026, month: 12, availableDays: [1, 6, 12, 20, 24] }
+    ];
+    let selectedAvailabilityMonthIndex = 0;
     const favoriteIndexes = new Set([0]);
     const favoriteOrder = [0];
     const favoritePageSize = 20;
@@ -4423,7 +4551,7 @@
     let editingPetIndex = null;
     let petPhotoData = '';
     let petFormReturnScreen = 'pets';
-    const selectedPetIndexes = { demand: 0, edit: 0 };
+    const selectedPetIndexes = { demand: 0, edit: 0, quick: 0 };
     let petPickerContext = 'demand';
     let pendingPetIndex = 0;
     const identityBirthday = { year: '', month: '', day: '' };
@@ -4443,6 +4571,11 @@
     const quickDemandDate = { year: 2026, month: 12, day: 12 };
     let pendingQuickYear = quickDemandDate.year;
     let pendingQuickMonth = quickDemandDate.month;
+    let quickStartTime = '00:00';
+    let quickEndTime = '00:00';
+    let quickTimePickerType = 'start';
+    let pendingQuickHour = '00';
+    let pendingQuickMinute = '00';
     let requestFilter = 'all';
     let editingQuickRequestId = '';
     let selectedApplicantIndex = 0;
@@ -4625,10 +4758,12 @@
       if (!node) return;
       const city = document.getElementById('quickCity')?.value || '台北市';
       const district = document.getElementById('quickDistrict')?.value || '大安區';
-      const start = document.getElementById('quickStartTime')?.value || '14:00';
-      const end = document.getElementById('quickEndTime')?.value || '16:00';
+      const pet = pets[selectedPetIndexes.quick] || pets[0];
+      const petName = pet?.name || '尚未選擇寵物';
+      const start = quickStartTime;
+      const end = quickEndTime;
       const tasks = Array.from(document.querySelectorAll('#quickAssistance [data-assistance-chip].active')).map(item => item.textContent.trim());
-      node.innerHTML = `<strong>本次需求</strong><p>${quickDemandDateLabel()} ${escapeHtml(start)}-${escapeHtml(end)} · ${escapeHtml(city)}${escapeHtml(district)}</p><small>麻糬 · ${escapeHtml(tasks.join('、') || '尚未選擇協助事項')}</small>`;
+      node.innerHTML = `<strong>本次需求</strong><p>${quickDemandDateLabel()} ${escapeHtml(start)}-${escapeHtml(end)} · ${escapeHtml(city)}${escapeHtml(district)}</p><small>${escapeHtml(petName)} · ${escapeHtml(tasks.join('、') || '尚未選擇協助事項')}</small>`;
     }
 
     function renderQuickMonthPicker() {
@@ -4654,6 +4789,53 @@
       renderQuickMonthPicker();
       document.getElementById('modalLayer').classList.remove('pet-picker-mode', 'birthday-picker-mode', 'decision-mode');
       document.getElementById('modalLayer').classList.add('quick-month-mode', 'show');
+    }
+
+    function quickTimeToMinutes(value) {
+      const [hour, minute] = String(value).split(':').map(Number);
+      return (hour * 60) + minute;
+    }
+
+    function renderQuickTimePicker() {
+      const earliest = quickTimePickerType === 'end' ? quickTimeToMinutes(quickStartTime) : 0;
+      document.getElementById('modalBody').innerHTML = `
+        <div class="quick-time-picker-grid">
+          <div class="quick-time-picker-column"><strong>小時</strong><div class="quick-time-options">${Array.from({ length:24 }, (_, hour) => String(hour).padStart(2,'0')).map(hour => {
+            const disabled = quickTimePickerType === 'end' && ((Number(hour) * 60) + 59) < earliest;
+            return `<button class="quick-time-option ${hour === pendingQuickHour ? 'active' : ''}" type="button" data-quick-hour="${hour}" ${disabled ? 'disabled' : ''}>${hour}</button>`;
+          }).join('')}</div></div>
+          <div class="quick-time-picker-column"><strong>分鐘</strong><div class="quick-time-options">${['00','15','30','45'].map(minute => {
+            const candidate = (Number(pendingQuickHour) * 60) + Number(minute);
+            const disabled = quickTimePickerType === 'end' && candidate < earliest;
+            return `<button class="quick-time-option ${minute === pendingQuickMinute ? 'active' : ''}" type="button" data-quick-minute="${minute}" ${disabled ? 'disabled' : ''}>${minute}</button>`;
+          }).join('')}</div></div>
+        </div>
+        <p class="quick-picker-rule">${quickTimePickerType === 'end' ? `結束時間不得早於開始時間 ${quickStartTime}。` : '開始與結束時間均預設為 00:00。'}</p>
+        <div class="modal-inline-actions"><button class="btn light" type="button" data-cancel-modal>取消</button><button class="btn" type="button" data-confirm-quick-time>確認時間</button></div>`;
+    }
+
+    function openQuickTimePicker(type) {
+      quickTimePickerType = type === 'end' ? 'end' : 'start';
+      const current = quickTimePickerType === 'end' ? quickEndTime : quickStartTime;
+      [pendingQuickHour, pendingQuickMinute] = current.split(':');
+      document.getElementById('modalTitle').textContent = quickTimePickerType === 'end' ? '選擇結束時間' : '選擇開始時間';
+      document.getElementById('modalCopy').textContent = quickTimePickerType === 'end' ? '結束時間不能小於開始時間' : '選擇服務開始的小時與分鐘';
+      renderQuickTimePicker();
+      document.getElementById('modalLayer').classList.remove('pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'decision-mode');
+      document.getElementById('modalLayer').classList.add('quick-time-mode', 'show');
+    }
+
+    function confirmQuickTime() {
+      const value = `${pendingQuickHour}:${pendingQuickMinute}`;
+      if (quickTimePickerType === 'end' && quickTimeToMinutes(value) < quickTimeToMinutes(quickStartTime)) return toast('結束時間不能小於開始時間');
+      if (quickTimePickerType === 'start') {
+        quickStartTime = value;
+        if (quickTimeToMinutes(quickEndTime) < quickTimeToMinutes(quickStartTime)) quickEndTime = quickStartTime;
+      } else quickEndTime = value;
+      document.querySelector('#quickStartTime [data-quick-time-value]').textContent = quickStartTime;
+      document.querySelector('#quickEndTime [data-quick-time-value]').textContent = quickEndTime;
+      updateQuickDemandSummary();
+      hideModal();
     }
 
     function confirmQuickMonth() {
@@ -4698,16 +4880,18 @@
     function submitQuickDemand() {
       const city = document.getElementById('quickCity').value;
       const district = document.getElementById('quickDistrict').value;
-      const start = document.getElementById('quickStartTime').value.trim();
-      const end = document.getElementById('quickEndTime').value.trim();
+      const pet = pets[selectedPetIndexes.quick] || pets[0];
+      const start = quickStartTime;
+      const end = quickEndTime;
       const note = document.getElementById('quickNote').value.trim();
       const tasks = Array.from(document.querySelectorAll('#quickAssistance [data-assistance-chip].active')).map(item => item.textContent.trim());
       const now = getTaipeiToday();
       const selectedNumber = Number(`${quickDemandDate.year}${String(quickDemandDate.month).padStart(2,'0')}${String(quickDemandDate.day).padStart(2,'0')}`);
       const todayNumber = Number(`${now.year}${String(now.month).padStart(2,'0')}${String(now.day).padStart(2,'0')}`);
       if (selectedNumber < todayNumber) return toast('服務日期不能早於今天');
+      if (quickTimeToMinutes(end) < quickTimeToMinutes(start)) return toast('結束時間不能小於開始時間');
       const dayName = ['日','一','二','三','四','五','六'][new Date(quickDemandDate.year, quickDemandDate.month - 1, quickDemandDate.day).getDay()];
-      quickRequests.unshift({ id:`request-${Date.now()}`, status:'waiting', location:`${city}${district}`, date:`${quickDemandDate.month}/${quickDemandDate.day}（${dayName}）${start}-${end}`, iso:`${quickDemandDate.year}-${String(quickDemandDate.month).padStart(2,'0')}-${String(quickDemandDate.day).padStart(2,'0')}T${start}:00+08:00`, service:`麻糬 · ${tasks.join('、') || '到府照護'}`, note, fee:400 });
+      quickRequests.unshift({ id:`request-${Date.now()}`, status:'waiting', location:`${city}${district}`, date:`${quickDemandDate.month}/${quickDemandDate.day}（${dayName}）${start}-${end}`, iso:`${quickDemandDate.year}-${String(quickDemandDate.month).padStart(2,'0')}-${String(quickDemandDate.day).padStart(2,'0')}T${start}:00+08:00`, service:`${pet?.name || '未命名毛孩'} · ${tasks.join('、') || '到府照護'}`, note, fee:400 });
       requestFilter = 'all';
       renderRequestList();
       backStack.length = 0;
@@ -4898,7 +5082,8 @@
       const options = pets.map((pet, index) => `<option value="${index}">${escapeHtml(pet.name || '未命名毛孩')} · ${escapeHtml(pet.type || '未填種類')}</option>`).join('');
       const pickerConfigs = [
         { context: 'demand', selectId: 'demandPetSelect', buttonId: 'demandPetPickerButton', valueId: 'demandPetPickerValue' },
-        { context: 'edit', selectId: 'editDemandPetSelect', buttonId: 'editDemandPetPickerButton', valueId: 'editDemandPetPickerValue' }
+        { context: 'edit', selectId: 'editDemandPetSelect', buttonId: 'editDemandPetPickerButton', valueId: 'editDemandPetPickerValue' },
+        { context: 'quick', selectId: 'quickPet', buttonId: 'quickPetPickerButton', valueId: 'quickPetPickerValue' }
       ];
       pickerConfigs.forEach(({ context, selectId, buttonId, valueId }) => {
         const select = document.getElementById(selectId);
@@ -4916,6 +5101,7 @@
         if (button) button.hidden = pets.length === 0;
       });
       document.getElementById('demandPetEmpty')?.classList.toggle('show', pets.length === 0);
+      document.getElementById('quickPetEmpty')?.classList.toggle('show', pets.length === 0);
     }
 
     function renderPetPickerOptions() {
@@ -4930,11 +5116,12 @@
     }
 
     function openPetPicker(context) {
+      petPickerContext = ['demand', 'edit', 'quick'].includes(context) ? context : 'demand';
       if (!pets.length) {
-        openPetForm(null, context === 'edit' ? 'bookingEdit' : 'demand');
+        const returnScreen = { edit: 'bookingEdit', quick: 'quickDemand', demand: 'demand' }[petPickerContext];
+        openPetForm(null, returnScreen);
         return;
       }
-      petPickerContext = context === 'edit' ? 'edit' : 'demand';
       pendingPetIndex = pets[selectedPetIndexes[petPickerContext]] ? selectedPetIndexes[petPickerContext] : 0;
       document.getElementById('modalTitle').textContent = '選擇寵物';
       document.getElementById('modalCopy').textContent = '選擇本次需要照護的寵物';
@@ -4948,6 +5135,7 @@
     function confirmPetPicker() {
       selectedPetIndexes[petPickerContext] = pendingPetIndex;
       renderPetPickers();
+      if (petPickerContext === 'quick') updateQuickDemandSummary();
       hideModal();
     }
 
@@ -5204,6 +5392,7 @@
       if (id === 'matchedDemand') renderMatchedDemand(editingQuickRequestId);
       if (id === 'time') {
         renderTimeCaregiver();
+        renderTimeCalendar();
         renderSlots();
       }
       if (['demand', 'bookingReport', 'bookingChat', 'bookingDetail', 'bookingEdit', 'matchedDemand'].includes(id)) {
@@ -5895,7 +6084,7 @@
     }
 
     function hideModal() {
-      document.getElementById('modalLayer').classList.remove('show', 'pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'decision-mode');
+      document.getElementById('modalLayer').classList.remove('show', 'pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'quick-time-mode', 'decision-mode', 'availability-month-mode');
     }
 
     function closeModal(event) {
@@ -6050,21 +6239,72 @@
       else resetChatRefreshPull();
     }
 
+    function currentAvailabilityMonth() {
+      return sitterAvailabilityMonths[selectedAvailabilityMonthIndex] || sitterAvailabilityMonths[0];
+    }
+
+    function renderTimeCalendar() {
+      const calendar = document.getElementById('timeCalendar');
+      const label = document.getElementById('timeMonthLabel');
+      if (!calendar || !label) return;
+      const config = currentAvailabilityMonth();
+      const availableDays = new Set(config.availableDays);
+      const firstWeekday = new Date(config.year, config.month - 1, 1).getDay();
+      const days = new Date(config.year, config.month, 0).getDate();
+      const cells = Array.from({ length:firstWeekday }, () => '<span aria-hidden="true"></span>');
+      for (let day = 1; day <= days; day += 1) {
+        const available = availableDays.has(day);
+        const active = String(day) === selectedDate;
+        cells.push(`<button class="date ${available ? 'available' : ''} ${active ? 'active' : ''}" type="button" data-date="${day}" ${available ? '' : 'disabled'}>${day}</button>`);
+      }
+      label.textContent = `${config.year} ${chineseMonth(config.month)}`;
+      calendar.setAttribute('aria-label', `${config.year} ${chineseMonth(config.month)}可預約日期`);
+      calendar.innerHTML = cells.join('');
+    }
+
+    function renderAvailabilityMonthPicker() {
+      document.getElementById('modalBody').innerHTML = `
+        <div class="availability-month-options">
+          ${sitterAvailabilityMonths.map((item, index) => `<button class="availability-month-option ${index === selectedAvailabilityMonthIndex ? 'active' : ''}" type="button" data-availability-month="${index}"><span>${item.year} ${chineseMonth(item.month)}</span><span class="availability-month-check" aria-hidden="true">${index === selectedAvailabilityMonthIndex ? '✓' : ''}</span></button>`).join('')}
+        </div>
+        <p class="availability-month-rule">沒有設定服務時段的月份不會出現在清單中</p>
+        <button class="availability-month-close" type="button" data-close-availability-month>關閉</button>`;
+    }
+
+    function openAvailabilityMonthPicker() {
+      document.getElementById('modalTitle').textContent = '選擇可預約月份';
+      document.getElementById('modalCopy').textContent = '僅顯示寵物保母已設定服務時段的月份';
+      renderAvailabilityMonthPicker();
+      document.getElementById('modalLayer').classList.remove('pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'quick-time-mode', 'decision-mode');
+      document.getElementById('modalLayer').classList.add('availability-month-mode', 'show');
+    }
+
+    function selectAvailabilityMonth(index) {
+      if (!sitterAvailabilityMonths[index]) return;
+      selectedAvailabilityMonthIndex = index;
+      selectedDate = String(currentAvailabilityMonth().availableDays[0]);
+      selectedSlot = '';
+      renderTimeCalendar();
+      renderSlots();
+      renderAvailabilityMonthPicker();
+    }
+
     function renderSlots() {
       const row = document.getElementById('slotRow');
       const title = document.getElementById('slotTitle');
       const slots = slotsByDate[selectedDate] || slotsByDate['16'];
+      const config = currentAvailabilityMonth();
       const available = slots.find(slot => slot.status === 'available');
       if (!slots.some(slot => slot.time === selectedSlot && slot.status === 'available')) {
         selectedSlot = available ? available.time : '';
       }
-      title.textContent = `7/${selectedDate} 可預約時段`;
+      title.textContent = `${config.month}/${selectedDate} 可預約時段`;
       row.innerHTML = slots.map(slot => {
         const disabled = slot.status === 'booked';
         const active = slot.time === selectedSlot && !disabled;
         return `<button class="slot ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}" data-slot="${slot.time}" ${disabled ? 'aria-disabled="true"' : ''}>${slot.time}${disabled ? '<small>已預約</small>' : active ? '<small>已選擇</small>' : ''}</button>`;
       }).join('');
-      document.querySelectorAll('.date').forEach(date => {
+      document.querySelectorAll('#timeCalendar .date').forEach(date => {
         date.classList.toggle('active', date.dataset.date === selectedDate);
       });
     }
@@ -6135,7 +6375,48 @@
         confirmQuickMonth();
         return;
       }
+      const quickTimeTrigger = event.target.closest('[data-open-quick-time]');
+      if (quickTimeTrigger) {
+        event.preventDefault();
+        openQuickTimePicker(quickTimeTrigger.dataset.openQuickTime);
+        return;
+      }
+      const quickHour = event.target.closest('[data-quick-hour]');
+      if (quickHour) {
+        event.preventDefault();
+        pendingQuickHour = quickHour.dataset.quickHour;
+        renderQuickTimePicker();
+        return;
+      }
+      const quickMinute = event.target.closest('[data-quick-minute]');
+      if (quickMinute) {
+        event.preventDefault();
+        pendingQuickMinute = quickMinute.dataset.quickMinute;
+        renderQuickTimePicker();
+        return;
+      }
+      if (event.target.closest('[data-confirm-quick-time]')) {
+        event.preventDefault();
+        confirmQuickTime();
+        return;
+      }
       if (event.target.closest('[data-cancel-modal]')) {
+        event.preventDefault();
+        hideModal();
+        return;
+      }
+      if (event.target.closest('[data-open-availability-month]')) {
+        event.preventDefault();
+        openAvailabilityMonthPicker();
+        return;
+      }
+      const availabilityMonth = event.target.closest('[data-availability-month]');
+      if (availabilityMonth) {
+        event.preventDefault();
+        selectAvailabilityMonth(Number(availabilityMonth.dataset.availabilityMonth));
+        return;
+      }
+      if (event.target.closest('[data-close-availability-month]')) {
         event.preventDefault();
         hideModal();
         return;
@@ -6145,19 +6426,6 @@
         event.preventDefault();
         quickDemandDate.day = Number(quickDate.dataset.quickDate);
         renderQuickDemandCalendar();
-        return;
-      }
-      const quickPeriod = event.target.closest('[data-quick-period]');
-      if (quickPeriod) {
-        event.preventDefault();
-        document.querySelectorAll('[data-quick-period]').forEach(button => button.classList.toggle('active', button === quickPeriod));
-        const presets = { morning:['09:00','11:00'], afternoon:['14:00','16:00'], evening:['19:00','21:00'] };
-        const preset = presets[quickPeriod.dataset.quickPeriod];
-        if (preset) {
-          document.getElementById('quickStartTime').value = preset[0];
-          document.getElementById('quickEndTime').value = preset[1];
-        }
-        updateQuickDemandSummary();
         return;
       }
       if (event.target.closest('[data-submit-quick-demand]')) {
@@ -6284,10 +6552,12 @@
         openPetForm(null, currentScreen);
         return;
       }
-      const demandPetButton = event.target.closest('[data-create-pet-from-demand]');
-      if (demandPetButton) {
+      const createPetButton = event.target.closest('[data-create-pet-for-context], [data-create-pet-from-demand]');
+      if (createPetButton) {
         event.preventDefault();
-        openPetForm(null, 'demand');
+        const context = createPetButton.dataset.createPetForContext || 'demand';
+        const returnScreen = { quick: 'quickDemand', edit: 'bookingEdit', demand: 'demand' }[context] || 'demand';
+        openPetForm(null, returnScreen);
         return;
       }
       const editPetButton = event.target.closest('[data-edit-pet]');
@@ -6520,9 +6790,6 @@
       document.getElementById('feeTotal').textContent = `NT$ ${base + service}`;
     });
 
-    ['quickStartTime', 'quickEndTime'].forEach(id => {
-      document.getElementById(id).addEventListener('input', updateQuickDemandSummary);
-    });
     ['quickCity', 'quickDistrict', 'quickPet'].forEach(id => {
       document.getElementById(id).addEventListener('change', updateQuickDemandSummary);
     });
