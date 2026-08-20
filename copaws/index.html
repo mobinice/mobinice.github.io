@@ -179,7 +179,7 @@
       top: 0;
       z-index: 45;
       margin: 0 -24px 12px;
-      padding: 12px 24px 10px;
+      padding: 18px 24px 10px;
       background: rgba(232, 245, 235, .97);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
@@ -572,6 +572,7 @@
       padding: 0 8px;
       white-space: nowrap;
     }
+    #bookings > .screen-title { margin-top: 18px; }
     .match-head {
       position: relative;
       padding-right: 58px;
@@ -1788,13 +1789,17 @@
       flex: 0 0 auto;
     }
     .modal-layer.pet-picker-mode,
-    .modal-layer.birthday-picker-mode {
+    .modal-layer.birthday-picker-mode,
+    .modal-layer.region-picker-mode,
+    .modal-layer.request-date-mode {
       align-items: flex-end;
       padding: 0;
       backdrop-filter: blur(3px);
     }
     .modal-layer.pet-picker-mode .modal,
-    .modal-layer.birthday-picker-mode .modal {
+    .modal-layer.birthday-picker-mode .modal,
+    .modal-layer.region-picker-mode .modal,
+    .modal-layer.request-date-mode .modal {
       border-radius: 26px 26px 0 0;
       padding: 28px 24px 26px;
       position: relative;
@@ -1814,7 +1819,36 @@
       line-height: 1;
     }
     .pet-picker-mode .modal-close,
-    .birthday-picker-mode .modal-close { display: grid; place-items: center; }
+    .birthday-picker-mode .modal-close,
+    .region-picker-mode .modal-close,
+    .request-date-mode .modal-close { display: grid; place-items: center; }
+    .region-picker-options { display:grid; gap:12px; }
+    .region-picker-option {
+      min-height: 64px;
+      padding: 0 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border:1px solid var(--line);
+      border-radius:16px;
+      color:var(--ink);
+      background:#fff;
+      font-size:14px;
+      font-weight:900;
+      text-align:left;
+    }
+    .region-picker-option::after {
+      content:"";
+      width:22px;
+      height:22px;
+      border:1px solid var(--line);
+      border-radius:50%;
+    }
+    .region-picker-option.active { color:var(--green); border-color:var(--green); background:#f0f8f1; }
+    .region-picker-option.active::after { content:"\2713"; display:grid; place-items:center; color:#fff; background:var(--green); border-color:var(--green); font-size:12px; }
+    .request-date-calendar { margin-top:4px; padding:16px; box-shadow:none; }
+    .request-date-calendar .month-head { margin-bottom:12px; }
+    .request-date-calendar .month-grid { margin-top:8px; }
     .pet-picker-options {
       display: grid;
       gap: 12px;
@@ -1893,7 +1927,8 @@
       min-height: 154px;
       margin-top: 12px;
       box-shadow: none;
-      transition: opacity .18s ease, transform .18s ease;
+      scroll-margin-top: 18px;
+      transition: opacity .18s ease, transform .18s ease, border-color .2s ease, box-shadow .2s ease;
     }
     .book-card.hidden {
       display: none;
@@ -1910,6 +1945,22 @@
       width: 116px;
       border-radius: 999px;
       font-size: 13px;
+    }
+    .book-actions.three { gap: 8px; }
+    .book-actions.three .btn {
+      width: auto;
+      min-width: 0;
+      flex: 1 1 0;
+      padding: 0 6px;
+      font-size: 11px;
+    }
+    .book-card.booking-focus {
+      border: 2px solid var(--green);
+      box-shadow: 0 0 0 4px rgba(8, 107, 58, .12);
+      animation: booking-focus-pulse .75s ease 2;
+    }
+    @keyframes booking-focus-pulse {
+      50% { box-shadow: 0 0 0 8px rgba(8, 107, 58, .08); }
     }
     .booking-empty {
       display: none;
@@ -3447,6 +3498,36 @@
       text-align: left;
     }
     .quick-time-trigger span:last-child { color:var(--green); font-size:22px; line-height:1; }
+    .picker-trigger {
+      width: 100%;
+      height: 52px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--ink);
+      background: #fff;
+      font-size: 14px;
+      font-weight: 900;
+      text-align: left;
+    }
+    .picker-trigger::after {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 7px solid var(--green);
+      flex: 0 0 auto;
+    }
+    .request-date-trigger { height: 54px; align-items: flex-start; padding-top: 8px; }
+    .request-date-trigger::after { margin-top: 13px; }
+    .request-date-copy { display: grid; gap: 2px; }
+    .request-date-copy small { color: var(--muted); font-size: 10px; font-weight: 700; }
+    .request-date-copy strong { font-size: 14px; }
     .quick-location-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -3460,6 +3541,7 @@
     .quick-demand-summary strong { color:var(--green); font-size:13px; }
     .quick-demand-summary p { margin:6px 0 0; font-size:13px; font-weight:800; line-height:1.45; }
     .quick-demand-summary small { display:block; margin-top:4px; color:var(--muted); line-height:1.4; }
+    .quick-fee-helper { margin: 6px 2px 0; color:var(--muted); font-size:11px; line-height:1.4; }
 
     .request-list-screen { padding-top: 0; }
     .request-list-sticky {
@@ -3560,6 +3642,20 @@
       font-size:12px;
     }
     .request-price strong { color:var(--green); font-size:20px; }
+    .request-booking-progress {
+      width: 100%;
+      margin-top: 12px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+      color: var(--green);
+      background: transparent;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .request-booking-progress span { font-size: 17px; line-height: 1; }
     .request-empty { padding:24px; text-align:center; color:var(--muted); box-shadow:none; }
 
     .applicant-request-card { margin: 10px 0 22px; }
@@ -3840,10 +3936,6 @@
     <section class="screen long quick-demand-screen" id="quickDemand">
       <div class="page-heading"><button class="screen-back" data-back aria-label="返回需求列表">‹</button><h1 class="screen-title">快速發需求</h1></div>
       <p class="subtitle">先選時間與區域，讓合適的寵物保母主動接案</p>
-      <div class="match-mode-switch" aria-label="媒合方式">
-        <button class="active" type="button" aria-current="page">快速發需求</button>
-        <button type="button" data-go="match">自己挑保母</button>
-      </div>
       <div class="card quick-demand-calendar">
         <div class="month-head">
           <strong style="font-size:18px">服務日期</strong>
@@ -3856,7 +3948,7 @@
       <h2 class="quick-section-title">服務時間區段</h2>
       <div class="service-time-grid"><div class="field" style="margin:0"><label>開始時間</label><button class="quick-time-trigger" id="quickStartTime" type="button" data-open-quick-time="start"><span data-quick-time-value>00:00</span><span aria-hidden="true">›</span></button></div><div class="field" style="margin:0"><label>結束時間</label><button class="quick-time-trigger" id="quickEndTime" type="button" data-open-quick-time="end"><span data-quick-time-value>00:00</span><span aria-hidden="true">›</span></button></div></div>
       <h2 class="quick-section-title">指定服務區域</h2>
-      <div class="quick-location-grid"><div class="field" style="margin:0"><label>縣市</label><select class="select" id="quickCity"><option>台北市</option><option>新北市</option><option>桃園市</option></select></div><div class="field" style="margin:0"><label>行政區</label><select class="select" id="quickDistrict"><option>大安區</option><option>信義區</option><option>松山區</option></select></div></div>
+      <div class="quick-location-grid"><div class="field" style="margin:0"><label>縣市</label><button class="picker-trigger" type="button" data-open-region-picker="quick-city"><span id="quickCityValue">台北市</span></button><select id="quickCity" hidden><option>台北市</option><option>新北市</option><option>桃園市</option></select></div><div class="field" style="margin:0"><label>行政區</label><button class="picker-trigger" type="button" data-open-region-picker="quick-district"><span id="quickDistrictValue">大安區</span></button><select id="quickDistrict" hidden><option>大安區</option><option>信義區</option><option>松山區</option></select></div></div>
       <div class="field pet-picker-field">
         <label>寵物資訊</label>
         <button class="pet-picker-trigger" id="quickPetPickerButton" type="button" data-open-pet-picker="quick"><span id="quickPetPickerValue">選擇寵物</span></button>
@@ -3872,6 +3964,7 @@
         <input class="input assistance-other" data-assistance-other hidden placeholder="請輸入其他需要協助事項" maxlength="100">
       </div>
       <div class="field"><label>需求補充</label><textarea class="textarea" id="quickNote">每日換水，離開前確認門窗上鎖。</textarea></div>
+      <div class="field"><label>照護費</label><input class="input" id="quickCareFee" value="400" inputmode="numeric"><p class="quick-fee-helper">平台服務費 15% 將額外向飼主收取</p></div>
       <div class="card quick-demand-summary" id="quickDemandSummary"></div>
       <button class="btn full" style="margin-top:18px" type="button" data-submit-quick-demand>送出需求，開始配對</button>
     </section>
@@ -3898,9 +3991,9 @@
       <div class="page-heading"><button class="screen-back" data-back aria-label="返回需求列表">‹</button><h1 class="screen-title">修改需求</h1></div>
       <p class="subtitle">調整服務內容，送出後重新確認</p>
       <div class="card pending-demand-card"><h3>等待寵物保母接案</h3><p>送出變更後將重新開放媒合</p></div>
-      <div class="service-form"><p class="service-time-label">服務時間區間</p><div class="service-time-grid"><div class="field" style="margin:0"><label>開始時間</label><input class="input" id="requestEditStart" value="12/12 14:00"></div><div class="field" style="margin:0"><label>結束時間</label><input class="input" id="requestEditEnd" value="12/12 16:00"></div></div></div>
-      <div class="field"><label>服務地址</label><input class="input" id="requestEditLocation" value="台北市大安區信義路三段 88 號"></div>
-      <div class="field"><label>寵物資訊</label><select class="select" id="requestEditPet"><option>麻糬 · 貓咪 · 3 歲</option><option>豆豆 · 狗狗 · 5 歲</option></select></div>
+      <div class="service-form"><p class="service-time-label">服務時間區間</p><div class="service-time-grid"><div class="field" style="margin:0"><button class="picker-trigger request-date-trigger" id="requestEditStart" type="button" data-open-request-date><span class="request-date-copy"><small>開始時間</small><strong id="requestEditStartValue">12/12 14:00</strong></span></button></div><div class="field" style="margin:0"><button class="picker-trigger request-date-trigger" id="requestEditEnd" type="button" data-open-request-date><span class="request-date-copy"><small>結束時間</small><strong id="requestEditEndValue">12/12 16:00</strong></span></button></div></div></div>
+      <div class="quick-location-grid"><div class="field" style="margin:0"><label>縣市</label><button class="picker-trigger" type="button" data-open-region-picker="requestEdit-city"><span id="requestEditCityValue">台北市</span></button><input id="requestEditCity" value="台北市" hidden></div><div class="field" style="margin:0"><label>行政區</label><button class="picker-trigger" type="button" data-open-region-picker="requestEdit-district"><span id="requestEditDistrictValue">大安區</span></button><input id="requestEditDistrict" value="大安區" hidden></div></div>
+      <div class="field"><label>寵物資訊</label><button class="pet-picker-trigger" id="requestEditPetPickerButton" type="button" data-open-pet-picker="requestEdit"><span id="requestEditPetPickerValue">麻糬 · 貓 · 3 歲</span></button><select id="requestEditPet" aria-label="修改快速需求的寵物資訊" hidden></select></div>
       <div class="assistance-picker" data-assistance-picker id="requestEditAssistance"><label>需要協助事項</label><div class="assistance-options"><button class="assistance-chip active" type="button" data-assistance-chip>餵食</button><button class="assistance-chip active" type="button" data-assistance-chip>清砂</button><button class="assistance-chip active" type="button" data-assistance-chip>陪玩</button><button class="assistance-chip" type="button" data-assistance-chip data-other-chip>其他</button></div><input class="input assistance-other" data-assistance-other hidden placeholder="請輸入其他需要協助事項"></div>
       <div class="field"><label>注意事項</label><textarea class="textarea" id="requestEditNote">每日換水，離開前確認門窗上鎖。</textarea></div>
       <div class="field"><label>照護費</label><input class="input" id="requestEditFee" value="400" inputmode="numeric"></div>
@@ -4112,35 +4205,35 @@
         <button class="chip active" data-booking-filter="all">全部</button><button class="chip" data-booking-filter="confirming">需求確認中</button><button class="chip" data-booking-filter="pending">待服務</button><button class="chip" data-booking-filter="active">進行中</button><button class="chip" data-booking-filter="payout">待撥款</button>
       </div>
       <p class="subtitle" style="margin-top:-12px">依預約狀態快速切換與管理需求</p>
-      <article class="card book-card" data-booking-status="active">
+      <article class="card book-card" data-booking-status="active" data-booking-id="matched" tabindex="-1">
         <span class="status">進行中</span>
         <h3>Mina Chen 到府照護</h3>
         <p class="meta">服務中，每 30 分鐘回報照片與狀態。</p>
-        <div class="book-actions"><button class="btn" data-go="bookingReport" data-index="0">查看回報</button><button class="btn light" data-go="bookingChat" data-index="0">聯絡寵物保母</button></div>
+        <div class="book-actions three"><button class="btn" data-go="bookingDetail" data-index="0">查看需求</button><button class="btn light" data-go="bookingReport" data-index="0">查看回報</button><button class="btn light" data-go="bookingChat" data-index="0">聯絡保母</button></div>
       </article>
-      <article class="card book-card" data-booking-status="upcoming">
+      <article class="card book-card" data-booking-status="upcoming" data-booking-id="upcoming">
         <span class="status" style="color:var(--clay)">即將服務</span>
         <h3>小芸 · 到府餵食</h3>
         <p class="meta">今天 18:30 開始，寵物保母已確認接案。</p>
-        <div class="book-actions"><button class="btn clay" data-go="bookingDetail" data-index="1">查看詳情</button><button class="btn light" style="color:var(--clay);border-color:var(--clay)" onclick="toast('已設定服務提醒')">提醒我</button></div>
+        <div class="book-actions"><button class="btn clay" data-go="bookingDetail" data-index="1">查看需求</button><button class="btn light" style="color:var(--clay);border-color:var(--clay)" onclick="toast('已設定服務提醒')">提醒我</button></div>
       </article>
-      <article class="card book-card" data-booking-status="confirming">
+      <article class="card book-card" data-booking-status="confirming" data-booking-id="confirming">
         <span class="status" style="color:#b77a13">需求確認中</span>
         <h3>Emma Wu · 到府照護</h3>
         <p class="meta">需求已送出，等待寵物保母確認接案。</p>
         <div class="book-actions"><button class="btn" data-go="bookingDetail" data-index="6">查看需求</button><button class="btn light" data-go="bookingEdit" data-index="6">修改</button></div>
       </article>
-      <article class="card book-card" data-booking-status="pending">
+      <article class="card book-card" data-booking-status="pending" data-booking-id="pending">
         <span class="status" style="color:var(--green-2)">待服務</span>
         <h3>柏宇 · 散步陪伴</h3>
         <p class="meta">明天 09:00 預約，等待服務開始。</p>
         <div class="book-actions"><button class="btn" style="background:var(--green-2)" data-go="bookingDetail" data-index="2">查看需求</button><button class="btn light" style="color:var(--green-2);border-color:var(--green-2)" data-go="bookingEdit" data-index="2">修改</button></div>
       </article>
-      <article class="card book-card" data-booking-status="payout">
+      <article class="card book-card" data-booking-status="payout" data-booking-id="payout">
         <span class="status" style="color:var(--clay)">待撥款</span>
         <h3>Nina · 到府陪伴</h3>
         <p class="meta">服務已完成，留下評價後立即完成交易並撥款。</p>
-        <div class="book-actions"><button class="btn clay" data-open-review>留下評價</button></div>
+        <div class="book-actions"><button class="btn clay" data-open-review>留下評價</button><button class="btn light" style="color:var(--clay);border-color:var(--clay)" data-go="bookingDetail" data-index="4">查看需求</button></div>
       </article>
       <div class="card booking-empty" id="bookingEmpty">目前沒有符合篩選的預約。</div>
     </section>
@@ -4552,7 +4645,7 @@
     let editingPetIndex = null;
     let petPhotoData = '';
     let petFormReturnScreen = 'pets';
-    const selectedPetIndexes = { demand: 0, edit: 0, quick: 0 };
+    const selectedPetIndexes = { demand: 0, edit: 0, quick: 0, requestEdit: 0 };
     let petPickerContext = 'demand';
     let pendingPetIndex = 0;
     const identityBirthday = { year: '', month: '', day: '' };
@@ -4577,6 +4670,16 @@
     let quickTimePickerType = 'start';
     let pendingQuickHour = '00';
     let pendingQuickMinute = '00';
+    const regionOptions = {
+      '台北市': ['大安區', '信義區', '松山區'],
+      '新北市': ['板橋區', '新店區', '中和區'],
+      '桃園市': ['桃園區', '中壢區', '龜山區']
+    };
+    let regionPickerContext = 'quick';
+    let regionPickerKind = 'city';
+    let pendingRegionValue = '台北市';
+    const requestEditDate = { year: 2026, month: 12, day: 12 };
+    let pendingRequestEditDay = 12;
     let requestFilter = 'all';
     let editingQuickRequestId = '';
     let selectedApplicantIndex = 0;
@@ -4584,7 +4687,7 @@
     const quickRequests = [
       { id:'waiting', status:'waiting', location:'台北市大安區', date:'12/12（六）14:00-16:00', iso:'2026-12-12T14:00:00+08:00', service:'麻糬 · 餵食、清砂、陪玩', note:'離開前確認門窗上鎖。', fee:400 },
       { id:'applicants', status:'applicants', location:'台北市信義區', date:'12/18（五）19:00-21:00', iso:'2026-12-18T19:00:00+08:00', service:'豆豆 · 餵食、散步、照片回報', note:'散步約 20 分鐘。', fee:520, applicants:3 },
-      { id:'matched', status:'matched', location:'台北市松山區', date:'12/26（六）10:00-12:00', iso:'2026-12-26T10:00:00+08:00', service:'麻糬 · 餵食、清砂、陪玩', note:'寵物保母 Mina Chen', fee:460, sitter:'Mina Chen' }
+      { id:'matched', status:'matched', location:'台北市松山區', date:'12/26（六）10:00-12:00', iso:'2026-12-26T10:00:00+08:00', service:'麻糬 · 餵食、清砂、陪玩', note:'寵物保母 Mina Chen', fee:460, sitter:'Mina Chen', bookingId:'matched' }
     ];
     const requestApplicants = [
       { name:'Mina Chen', certification:'identity', rating:'4.9 · 126 則評價', facts:'瀏覽 2,431 · 0.8 km · 到府照護', intro:'8 年養貓經驗，熟悉餵藥、清砂與照片回報。' },
@@ -4757,14 +4860,16 @@
     function updateQuickDemandSummary() {
       const node = document.getElementById('quickDemandSummary');
       if (!node) return;
-      const city = document.getElementById('quickCity')?.value || '台北市';
-      const district = document.getElementById('quickDistrict')?.value || '大安區';
+      const city = document.getElementById('quickCityValue')?.textContent.trim() || document.getElementById('quickCity')?.value || '台北市';
+      const district = document.getElementById('quickDistrictValue')?.textContent.trim() || document.getElementById('quickDistrict')?.value || '大安區';
       const pet = pets[selectedPetIndexes.quick] || pets[0];
       const petName = pet?.name || '尚未選擇寵物';
       const start = quickStartTime;
       const end = quickEndTime;
+      const fee = Math.max(0, Number(document.getElementById('quickCareFee')?.value.replace(/\D/g, '') || 0));
+      const serviceFee = Math.round(fee * .15);
       const tasks = Array.from(document.querySelectorAll('#quickAssistance [data-assistance-chip].active')).map(item => item.textContent.trim());
-      node.innerHTML = `<strong>本次需求</strong><p>${quickDemandDateLabel()} ${escapeHtml(start)}-${escapeHtml(end)} · ${escapeHtml(city)}${escapeHtml(district)}</p><small>${escapeHtml(petName)} · ${escapeHtml(tasks.join('、') || '尚未選擇協助事項')}</small>`;
+      node.innerHTML = `<strong>本次需求</strong><p>${quickDemandDateLabel()} ${escapeHtml(start)}-${escapeHtml(end)} · ${escapeHtml(city)}${escapeHtml(district)}</p><small>${escapeHtml(petName)} · ${escapeHtml(tasks.join('、') || '尚未選擇協助事項')}</small><small>照護費 NT$ ${fee} · 平台服務費 NT$ ${serviceFee} · 總計 NT$ ${fee + serviceFee}</small>`;
     }
 
     function renderQuickMonthPicker() {
@@ -4851,6 +4956,95 @@
       hideModal();
     }
 
+    function regionFieldIds(context, kind) {
+      const prefix = context === 'requestEdit' ? 'requestEdit' : 'quick';
+      const suffix = kind === 'district' ? 'District' : 'City';
+      return { field: `${prefix}${suffix}`, value: `${prefix}${suffix}Value` };
+    }
+
+    function currentRegionValue(context, kind) {
+      const ids = regionFieldIds(context, kind);
+      return document.getElementById(ids.field)?.value || (kind === 'city' ? '台北市' : '大安區');
+    }
+
+    function availableRegionOptions(context, kind) {
+      if (kind === 'city') return Object.keys(regionOptions);
+      return regionOptions[currentRegionValue(context, 'city')] || [];
+    }
+
+    function renderRegionPicker() {
+      document.getElementById('modalBody').innerHTML = `<div class="region-picker-options">${availableRegionOptions(regionPickerContext, regionPickerKind).map(value => `<button class="region-picker-option ${value === pendingRegionValue ? 'active' : ''}" type="button" data-region-value="${escapeHtml(value)}">${escapeHtml(value)}</button>`).join('')}</div>`;
+    }
+
+    function openRegionPicker(target) {
+      const [context, kind] = String(target || '').split('-');
+      regionPickerContext = context === 'requestEdit' ? 'requestEdit' : 'quick';
+      regionPickerKind = kind === 'district' ? 'district' : 'city';
+      pendingRegionValue = currentRegionValue(regionPickerContext, regionPickerKind);
+      document.getElementById('modalTitle').textContent = regionPickerKind === 'city' ? '選擇縣市' : '選擇行政區';
+      document.getElementById('modalCopy').textContent = regionPickerKind === 'city' ? '選擇本次服務所在縣市' : '選擇本次服務所在行政區';
+      renderRegionPicker();
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      action.textContent = '確認選擇';
+      action.onclick = confirmRegionPicker;
+      document.getElementById('modalLayer').classList.remove('pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'quick-time-mode', 'decision-mode', 'request-date-mode');
+      document.getElementById('modalLayer').classList.add('region-picker-mode', 'show');
+    }
+
+    function confirmRegionPicker() {
+      const ids = regionFieldIds(regionPickerContext, regionPickerKind);
+      const field = document.getElementById(ids.field);
+      const value = document.getElementById(ids.value);
+      if (field) field.value = pendingRegionValue;
+      if (value) value.textContent = pendingRegionValue;
+      if (regionPickerKind === 'city') {
+        const districtIds = regionFieldIds(regionPickerContext, 'district');
+        const districtOptions = regionOptions[pendingRegionValue] || [];
+        const district = districtOptions[0] || '';
+        const districtField = document.getElementById(districtIds.field);
+        const districtValue = document.getElementById(districtIds.value);
+        if (districtField) {
+          districtField.replaceChildren(...districtOptions.map(option => new Option(option, option)));
+          districtField.value = district;
+        }
+        if (districtValue) districtValue.textContent = district;
+      }
+      if (regionPickerContext === 'quick') updateQuickDemandSummary();
+      hideModal();
+    }
+
+    function renderRequestEditDatePicker() {
+      const firstWeekday = new Date(requestEditDate.year, requestEditDate.month - 1, 1).getDay();
+      const days = new Date(requestEditDate.year, requestEditDate.month, 0).getDate();
+      const cells = Array.from({ length: firstWeekday }, () => '<span aria-hidden="true"></span>');
+      for (let day = 1; day <= days; day += 1) {
+        cells.push(`<button class="date available ${day === pendingRequestEditDay ? 'active' : ''}" type="button" data-request-edit-date="${day}">${day}</button>`);
+      }
+      document.getElementById('modalBody').innerHTML = `<div class="card request-date-calendar"><div class="month-head"><strong>${requestEditDate.year} ${chineseMonth(requestEditDate.month)}</strong></div><div class="weekday-grid"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="month-grid quick-calendar-grid">${cells.join('')}</div></div>`;
+    }
+
+    function openRequestEditDatePicker() {
+      pendingRequestEditDay = requestEditDate.day;
+      document.getElementById('modalTitle').textContent = '選擇服務日期';
+      document.getElementById('modalCopy').textContent = '開始與結束時間會套用同一個服務日期';
+      renderRequestEditDatePicker();
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      action.textContent = '確認日期';
+      action.onclick = confirmRequestEditDate;
+      document.getElementById('modalLayer').classList.remove('pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'quick-time-mode', 'decision-mode', 'region-picker-mode');
+      document.getElementById('modalLayer').classList.add('request-date-mode', 'show');
+    }
+
+    function confirmRequestEditDate() {
+      requestEditDate.day = pendingRequestEditDay;
+      const prefix = `${requestEditDate.month}/${requestEditDate.day}`;
+      const start = document.getElementById('requestEditStartValue');
+      const end = document.getElementById('requestEditEndValue');
+      if (start) start.textContent = `${prefix} ${start.textContent.match(/\d{2}:\d{2}$/)?.[0] || '14:00'}`;
+      if (end) end.textContent = `${prefix} ${end.textContent.match(/\d{2}:\d{2}$/)?.[0] || '16:00'}`;
+      hideModal();
+    }
+
     function requestStatusMeta(request) {
       if (request.status === 'applicants') return { label:`已有 ${request.applicants || 3} 位申請`, className:'applicants' };
       if (request.status === 'matched') return { label:'已配對成功', className:'matched' };
@@ -4867,6 +5061,7 @@
         ${editable ? `<div class="request-card-actions"><button class="request-icon-button" type="button" data-edit-request="${request.id}" aria-label="編輯需求"><svg viewBox="0 0 24 24" fill="none"><path d="m5 16 10-10 3 3L8 19l-4 1 1-4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button><button class="request-icon-button delete" type="button" data-delete-request="${request.id}" aria-label="刪除需求"><svg viewBox="0 0 24 24" fill="none"><path d="M7 8v11h10V8M5 6h14M9 6V4h6v2M10 10v6M14 10v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>` : ''}
         <div class="request-lines"><div class="request-line"><span>地點</span><strong>${escapeHtml(request.location)}</strong></div><div class="request-line"><span>日期</span><strong>${escapeHtml(request.date)}</strong></div><div class="request-line"><span>服務內容</span><strong>${escapeHtml(request.service)}<br>${escapeHtml(request.note || '')}</strong></div></div>
         <div class="request-price"><span>照護費</span><strong>NT$ ${Number(request.fee).toLocaleString()}</strong></div>
+        ${!compact && request.status === 'matched' ? `<button class="request-booking-progress" type="button" data-jump-booking="${escapeHtml(request.bookingId || request.id)}">跳轉預約看進度 <span aria-hidden="true">→</span></button>` : ''}
       </article>`;
     }
 
@@ -4885,6 +5080,7 @@
       const start = quickStartTime;
       const end = quickEndTime;
       const note = document.getElementById('quickNote').value.trim();
+      const fee = Math.max(0, Number(document.getElementById('quickCareFee').value.replace(/\D/g, '') || 0));
       const tasks = Array.from(document.querySelectorAll('#quickAssistance [data-assistance-chip].active')).map(item => item.textContent.trim());
       const now = getTaipeiToday();
       const selectedNumber = Number(`${quickDemandDate.year}${String(quickDemandDate.month).padStart(2,'0')}${String(quickDemandDate.day).padStart(2,'0')}`);
@@ -4892,7 +5088,7 @@
       if (selectedNumber < todayNumber) return toast('服務日期不能早於今天');
       if (quickTimeToMinutes(end) < quickTimeToMinutes(start)) return toast('結束時間不能小於開始時間');
       const dayName = ['日','一','二','三','四','五','六'][new Date(quickDemandDate.year, quickDemandDate.month - 1, quickDemandDate.day).getDay()];
-      quickRequests.unshift({ id:`request-${Date.now()}`, status:'waiting', location:`${city}${district}`, date:`${quickDemandDate.month}/${quickDemandDate.day}（${dayName}）${start}-${end}`, iso:`${quickDemandDate.year}-${String(quickDemandDate.month).padStart(2,'0')}-${String(quickDemandDate.day).padStart(2,'0')}T${start}:00+08:00`, service:`${pet?.name || '未命名毛孩'} · ${tasks.join('、') || '到府照護'}`, note, fee:400 });
+      quickRequests.unshift({ id:`request-${Date.now()}`, status:'waiting', location:`${city}${district}`, date:`${quickDemandDate.month}/${quickDemandDate.day}（${dayName}）${start}-${end}`, iso:`${quickDemandDate.year}-${String(quickDemandDate.month).padStart(2,'0')}-${String(quickDemandDate.day).padStart(2,'0')}T${start}:00+08:00`, service:`${pet?.name || '未命名毛孩'} · ${tasks.join('、') || '到府照護'}`, note, fee });
       requestFilter = 'all';
       renderRequestList();
       backStack.length = 0;
@@ -4916,9 +5112,24 @@
       editingQuickRequestId = id;
       const timeMatch = request.date.match(/^(.+?)(\d{2}:\d{2})-(\d{2}:\d{2})$/);
       const datePrefix = timeMatch?.[1]?.trim() || request.date.split(' ')[0];
-      document.getElementById('requestEditStart').value = `${datePrefix} ${timeMatch?.[2] || '14:00'}`;
-      document.getElementById('requestEditEnd').value = `${datePrefix} ${timeMatch?.[3] || '16:00'}`;
-      document.getElementById('requestEditLocation').value = request.location;
+      const dateParts = datePrefix.match(/(\d{1,2})\/(\d{1,2})/);
+      if (dateParts) {
+        requestEditDate.year = Number(request.iso?.slice(0, 4)) || 2026;
+        requestEditDate.month = Number(dateParts[1]);
+        requestEditDate.day = Number(dateParts[2]);
+      }
+      document.getElementById('requestEditStartValue').textContent = `${requestEditDate.month}/${requestEditDate.day} ${timeMatch?.[2] || '14:00'}`;
+      document.getElementById('requestEditEndValue').textContent = `${requestEditDate.month}/${requestEditDate.day} ${timeMatch?.[3] || '16:00'}`;
+      const city = Object.keys(regionOptions).find(item => request.location.startsWith(item)) || '台北市';
+      const district = regionOptions[city].find(item => request.location.includes(item)) || regionOptions[city][0];
+      document.getElementById('requestEditCity').value = city;
+      document.getElementById('requestEditCityValue').textContent = city;
+      document.getElementById('requestEditDistrict').value = district;
+      document.getElementById('requestEditDistrictValue').textContent = district;
+      const petName = request.service.split('·')[0].trim();
+      const petIndex = Math.max(0, pets.findIndex(pet => pet.name === petName));
+      selectedPetIndexes.requestEdit = petIndex;
+      renderPetPickers();
       document.getElementById('requestEditNote').value = request.note || '';
       document.getElementById('requestEditFee').value = request.fee;
       updateRequestEditFee();
@@ -4936,16 +5147,21 @@
     function saveRequestEdit() {
       const request = quickRequests.find(item => item.id === editingQuickRequestId);
       if (!request) return;
-      request.location = document.getElementById('requestEditLocation').value.trim();
+      request.location = `${document.getElementById('requestEditCity').value}${document.getElementById('requestEditDistrict').value}`;
       request.note = document.getElementById('requestEditNote').value.trim();
       request.fee = Math.max(0, Number(document.getElementById('requestEditFee').value.replace(/\D/g,'') || 0));
-      const start = document.getElementById('requestEditStart').value.trim();
-      const end = document.getElementById('requestEditEnd').value.trim();
+      const start = document.getElementById('requestEditStartValue').textContent.trim();
+      const end = document.getElementById('requestEditEndValue').textContent.trim();
       const startMatch = start.match(/^(.+?)\s+(\d{2}:\d{2})$/);
       const endTime = end.match(/(\d{2}:\d{2})$/)?.[1];
-      if (startMatch && endTime) request.date = `${startMatch[1]}${startMatch[2]}-${endTime}`;
+      if (startMatch && endTime) {
+        const dayName = ['日','一','二','三','四','五','六'][new Date(requestEditDate.year, requestEditDate.month - 1, requestEditDate.day).getDay()];
+        request.date = `${requestEditDate.month}/${requestEditDate.day}（${dayName}）${startMatch[2]}-${endTime}`;
+        request.iso = `${requestEditDate.year}-${String(requestEditDate.month).padStart(2,'0')}-${String(requestEditDate.day).padStart(2,'0')}T${startMatch[2]}:00+08:00`;
+      }
       const tasks = Array.from(document.querySelectorAll('#requestEditAssistance [data-assistance-chip].active')).map(item => item.textContent.trim());
-      request.service = `麻糬 · ${tasks.join('、') || '到府照護'}`;
+      const pet = pets[selectedPetIndexes.requestEdit] || pets[0];
+      request.service = `${pet?.name || '未命名毛孩'} · ${tasks.join('、') || '到府照護'}`;
       request.status = 'waiting';
       renderRequestList();
       backStack.length = 0;
@@ -5084,7 +5300,8 @@
       const pickerConfigs = [
         { context: 'demand', selectId: 'demandPetSelect', buttonId: 'demandPetPickerButton', valueId: 'demandPetPickerValue' },
         { context: 'edit', selectId: 'editDemandPetSelect', buttonId: 'editDemandPetPickerButton', valueId: 'editDemandPetPickerValue' },
-        { context: 'quick', selectId: 'quickPet', buttonId: 'quickPetPickerButton', valueId: 'quickPetPickerValue' }
+        { context: 'quick', selectId: 'quickPet', buttonId: 'quickPetPickerButton', valueId: 'quickPetPickerValue' },
+        { context: 'requestEdit', selectId: 'requestEditPet', buttonId: 'requestEditPetPickerButton', valueId: 'requestEditPetPickerValue' }
       ];
       pickerConfigs.forEach(({ context, selectId, buttonId, valueId }) => {
         const select = document.getElementById(selectId);
@@ -5117,9 +5334,9 @@
     }
 
     function openPetPicker(context) {
-      petPickerContext = ['demand', 'edit', 'quick'].includes(context) ? context : 'demand';
+      petPickerContext = ['demand', 'edit', 'quick', 'requestEdit'].includes(context) ? context : 'demand';
       if (!pets.length) {
-        const returnScreen = { edit: 'bookingEdit', quick: 'quickDemand', demand: 'demand' }[petPickerContext];
+        const returnScreen = { edit: 'bookingEdit', quick: 'quickDemand', demand: 'demand', requestEdit: 'requestEdit' }[petPickerContext];
         openPetForm(null, returnScreen);
         return;
       }
@@ -5362,6 +5579,9 @@
 
     function go(id) {
       const preserveFavoritePosition = id === 'favorites' && restoreFavoritesOnNextVisit;
+      if (id !== 'bookings') {
+        document.querySelectorAll('.book-card.booking-focus').forEach(card => card.classList.remove('booking-focus'));
+      }
       appScreens.forEach(screen => {
         screen.classList.toggle('active', screen.id === id);
         if (screen.id === id && !preserveFavoritePosition) screen.scrollTop = 0;
@@ -6085,7 +6305,7 @@
     }
 
     function hideModal() {
-      document.getElementById('modalLayer').classList.remove('show', 'pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'quick-time-mode', 'decision-mode', 'availability-month-mode');
+      document.getElementById('modalLayer').classList.remove('show', 'pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'quick-time-mode', 'decision-mode', 'availability-month-mode', 'region-picker-mode', 'request-date-mode');
     }
 
     function closeModal(event) {
@@ -6106,6 +6326,20 @@
       document.getElementById('bookingEmpty').classList.toggle('show', visible === 0);
       document.querySelectorAll('[data-booking-filter]').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.bookingFilter === filter);
+      });
+    }
+
+    function focusBookingCard(bookingId) {
+      const screen = document.getElementById('bookings');
+      if (!screen) return;
+      filterBookings('all');
+      document.querySelectorAll('.book-card.booking-focus').forEach(card => card.classList.remove('booking-focus'));
+      requestAnimationFrame(() => {
+        const card = screen.querySelector(`[data-booking-id="${CSS.escape(String(bookingId || ''))}"]`);
+        if (!card) return;
+        card.classList.add('booking-focus');
+        card.focus({ preventScroll: true });
+        screen.scrollTo({ top: Math.max(0, card.offsetTop - 18), behavior: 'smooth' });
       });
     }
 
@@ -6422,6 +6656,31 @@
         hideModal();
         return;
       }
+      const regionTrigger = event.target.closest('[data-open-region-picker]');
+      if (regionTrigger) {
+        event.preventDefault();
+        openRegionPicker(regionTrigger.dataset.openRegionPicker);
+        return;
+      }
+      const regionOption = event.target.closest('[data-region-value]');
+      if (regionOption) {
+        event.preventDefault();
+        pendingRegionValue = regionOption.dataset.regionValue;
+        renderRegionPicker();
+        return;
+      }
+      if (event.target.closest('[data-open-request-date]')) {
+        event.preventDefault();
+        openRequestEditDatePicker();
+        return;
+      }
+      const requestEditDateOption = event.target.closest('[data-request-edit-date]');
+      if (requestEditDateOption) {
+        event.preventDefault();
+        pendingRequestEditDay = Number(requestEditDateOption.dataset.requestEditDate);
+        renderRequestEditDatePicker();
+        return;
+      }
       const quickDate = event.target.closest('[data-quick-date]');
       if (quickDate) {
         event.preventDefault();
@@ -6458,6 +6717,14 @@
       if (event.target.closest('[data-confirm-delete-request]')) {
         event.preventDefault();
         confirmDeleteRequest();
+        return;
+      }
+      const jumpBookingProgress = event.target.closest('[data-jump-booking]');
+      if (jumpBookingProgress) {
+        event.preventDefault();
+        event.stopPropagation();
+        navigate('bookings');
+        focusBookingCard(jumpBookingProgress.dataset.jumpBooking);
         return;
       }
       const openRequest = event.target.closest('[data-open-request]');
@@ -6557,7 +6824,7 @@
       if (createPetButton) {
         event.preventDefault();
         const context = createPetButton.dataset.createPetForContext || 'demand';
-        const returnScreen = { quick: 'quickDemand', edit: 'bookingEdit', demand: 'demand' }[context] || 'demand';
+        const returnScreen = { quick: 'quickDemand', edit: 'bookingEdit', demand: 'demand', requestEdit: 'requestEdit' }[context] || 'demand';
         openPetForm(null, returnScreen);
         return;
       }
@@ -6793,6 +7060,10 @@
 
     ['quickCity', 'quickDistrict', 'quickPet'].forEach(id => {
       document.getElementById(id).addEventListener('change', updateQuickDemandSummary);
+    });
+    document.getElementById('quickCareFee').addEventListener('input', event => {
+      event.target.value = event.target.value.replace(/\D/g, '');
+      updateQuickDemandSummary();
     });
     document.querySelector('#quickAssistance [data-assistance-other]').addEventListener('input', updateQuickDemandSummary);
     document.getElementById('requestEditFee').addEventListener('input', updateRequestEditFee);
