@@ -47,6 +47,11 @@
 
     button, input, textarea { font: inherit; }
     button { cursor: pointer; border: 0; background: transparent; }
+    img {
+      display: block;
+      max-width: 100%;
+      object-position: center;
+    }
 
     .phone-shell {
       width: min(428px, 100vw);
@@ -313,7 +318,7 @@
       -webkit-overflow-scrolling: touch;
       padding-left: 20px;
       padding-right: 20px;
-      padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
     }
     #register .screen-title {
       margin: 14px 0 2px;
@@ -401,6 +406,7 @@
     .login-logo {
       width: 140px;
       height: 140px;
+      aspect-ratio: 1;
       object-fit: contain;
       display: block;
       margin: 14px auto 14px;
@@ -502,6 +508,7 @@
     .otp-logo {
       width: 140px;
       height: 140px;
+      aspect-ratio: 1;
       object-fit: contain;
       display: block;
       margin: 14px auto 14px;
@@ -707,6 +714,20 @@
       position: relative;
       overflow: hidden;
     }
+    .photo-hero > img,
+    .detail-hero > img,
+    .favorite-photo > img,
+    .avatar > img,
+    .mini-avatar > img,
+    .applicant-avatar > img,
+    .pet-photo > img,
+    .pet-upload-preview > img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center;
+    }
     .pet-shape::before {
       content: "";
       position: absolute;
@@ -861,6 +882,7 @@
     .nav-logo {
       width: 28px;
       height: 28px;
+      aspect-ratio: 1;
       object-fit: contain;
       display: block;
     }
@@ -1069,6 +1091,7 @@
     .mini-avatar {
       width: 40px;
       height: 40px;
+      aspect-ratio: 1;
       border-radius: 15px;
       background:
         radial-gradient(circle at 72% 63%, var(--avatar-yellow) 0 9%, transparent 10%),
@@ -1179,6 +1202,7 @@
     .avatar {
       width: 54px;
       height: 54px;
+      aspect-ratio: 1;
       border-radius: 18px;
       background:
         radial-gradient(circle at 72% 63%, var(--avatar-yellow) 0 9%, transparent 10%),
@@ -1646,6 +1670,7 @@
     .favorite-photo {
       width: 104px;
       height: 120px;
+      aspect-ratio: 13 / 15;
       border-radius: 18px;
       background: var(--avatar-green);
       position: relative;
@@ -1936,24 +1961,20 @@
     .book-card .status { font-size: 13px; font-weight: 900; color: var(--green); }
     .book-card h3 { margin: 14px 0 6px; font-size: 21px; }
     .book-actions {
-      display: flex;
-      gap: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, 104px);
+      gap: 8px;
       margin-top: 14px;
     }
     .book-actions .btn {
-      min-height: 34px;
-      width: 116px;
+      width: 104px;
+      min-height: 32px;
+      height: 32px;
+      padding: 0 6px;
       border-radius: 999px;
       font-size: 13px;
     }
-    .book-actions.three { gap: 8px; }
-    .book-actions.three .btn {
-      width: auto;
-      min-width: 0;
-      flex: 1 1 0;
-      padding: 0 6px;
-      font-size: 11px;
-    }
+    .book-actions .btn:first-child { font-size: 14px; }
     .book-card.booking-focus {
       outline: 0;
       border: 2px solid var(--green);
@@ -2995,6 +3016,7 @@
     .pet-photo {
       width: 88px;
       height: 104px;
+      aspect-ratio: 11 / 13;
       border-radius: 16px;
       display: grid;
       place-items: center;
@@ -3075,6 +3097,7 @@
     .pet-upload-preview {
       width: 88px;
       height: 88px;
+      aspect-ratio: 1;
       border: 1px solid var(--line);
       border-radius: 16px;
       background: var(--green-soft);
@@ -3979,6 +4002,73 @@
       #match .circle-action { width: 42px; height: 42px; }
     }
 
+    @media (max-height: 720px) and (max-width: 699px) {
+      #register {
+        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      }
+      #register .screen-title {
+        margin-top: 8px;
+        font-size: 25px;
+        line-height: 1.05;
+      }
+      #register .subtitle {
+        margin-bottom: 8px;
+        font-size: 11.5px;
+        line-height: 1.25;
+      }
+      #register .register-card {
+        padding: 12px 20px 13px;
+        border-radius: 24px;
+      }
+      #register .register-grid {
+        gap: 6px 12px;
+      }
+      #register .field label {
+        margin-bottom: 3px;
+        font-size: 11px;
+      }
+      #register .register-grid .input,
+      #register .register-grid .select {
+        height: 36px;
+        border-radius: 12px;
+        font-size: 12.5px;
+      }
+      #register .register-grid .birth-input {
+        font-size: 14px;
+      }
+      #register .register-grid .chips {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+      }
+      #register .register-grid .chip {
+        width: 100%;
+        min-width: 0;
+        height: 30px;
+        font-size: 11px;
+      }
+      #register .terms-list {
+        gap: 4px;
+        margin-top: 1px;
+      }
+      #register .terms-row {
+        gap: 7px;
+        font-size: 11px;
+      }
+      #register .terms-row input {
+        width: 16px;
+        height: 16px;
+      }
+      #register .terms-row input:checked::after {
+        inset: -3px 0 0;
+        font-size: 15px;
+      }
+      #register .register-submit {
+        height: 48px;
+        margin-top: 8px;
+      }
+    }
+
     @media (min-width: 700px) {
       body { padding: 16px; }
       .phone-shell {
@@ -3993,6 +4083,11 @@
     @media (max-width: 460px) {
       body { background: var(--cream); }
       .phone { box-shadow: none; }
+    }
+
+    @media (max-width: 390px) {
+      .book-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .book-actions .btn { width: 100%; }
     }
   </style>
 </head>
