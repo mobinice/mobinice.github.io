@@ -1962,12 +1962,16 @@
     .book-card h3 { margin: 14px 0 6px; font-size: 21px; }
     .book-actions {
       display: grid;
-      grid-template-columns: repeat(3, 104px);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
+      width: 100%;
+      max-width: 100%;
       margin-top: 14px;
     }
     .book-actions .btn {
-      width: 104px;
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
       min-height: 32px;
       height: 32px;
       padding: 0 6px;
@@ -4085,9 +4089,14 @@
       .phone { box-shadow: none; }
     }
 
-    @media (max-width: 390px) {
-      .book-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .book-actions .btn { width: 100%; }
+    @media (max-width: 340px) {
+      .book-card { padding-left: 16px; padding-right: 16px; }
+      .book-actions { gap: 6px; }
+      .book-actions .btn,
+      .book-actions .btn:first-child {
+        padding-inline: 2px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
