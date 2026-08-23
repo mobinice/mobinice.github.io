@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Copaws 飼主端 Demo Prototype</title>
   <link rel="icon" type="image/png" href="assets/copaws-a-plan-icon.png">
   <link rel="apple-touch-icon" href="assets/copaws-a-plan-icon.png">
@@ -594,7 +594,7 @@
     .favorite-entry svg { width: 26px; height: 26px; filter: drop-shadow(0 4px 8px rgba(54, 44, 28, .12)); }
     .favorite-count {
       position: absolute;
-      right: -9px;
+      right: -2px;
       top: -10px;
       min-width: 18px;
       height: 18px;
@@ -1955,6 +1955,7 @@
       font-size: 11px;
     }
     .book-card.booking-focus {
+      outline: 0;
       border: 2px solid var(--green);
       box-shadow: 0 0 0 4px rgba(8, 107, 58, .12);
       animation: booking-focus-pulse .75s ease 2;
@@ -1962,14 +1963,91 @@
     @keyframes booking-focus-pulse {
       50% { box-shadow: 0 0 0 8px rgba(8, 107, 58, .08); }
     }
+    .global-state {
+      width: 100%;
+      min-height: 430px;
+      padding: 42px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .global-state-icon {
+      width: 84px;
+      height: 84px;
+      margin-bottom: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--green);
+      background: rgba(232, 245, 233, .96);
+    }
+    .global-state.error .global-state-icon {
+      color: var(--clay);
+      background: #ffe8df;
+    }
+    .global-state-icon svg { width: 44px; height: 44px; }
+    .global-state h2 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+    .global-state p {
+      max-width: 320px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+      white-space: pre-line;
+    }
+    .global-state-actions {
+      width: min(324px, 100%);
+      margin-top: 34px;
+      display: grid;
+      gap: 12px;
+    }
+    .global-state-actions .btn { width: 100%; min-height: 54px; }
+    .global-state-secondary {
+      min-height: 42px;
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 900;
+    }
+    .global-state-primary-content {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+    }
+    .global-state-primary-content svg { width: 18px; height: 18px; }
+    .global-state.is-retrying .global-state-primary-content svg {
+      animation: global-state-spin .7s linear infinite;
+    }
+    .global-state-screen {
+      display: block;
+      padding-top: 0;
+      padding-bottom: 40px;
+    }
+    .global-state-screen .global-state {
+      height: 100%;
+      min-height: 0;
+      padding-top: 250px;
+      justify-content: flex-start;
+    }
+    .global-state-screen > div { width: 100%; height: 100%; }
+    @keyframes global-state-spin { to { transform: rotate(360deg); } }
     .booking-empty {
       display: none;
-      padding: 34px 24px;
       margin-top: 16px;
-      text-align: center;
-      color: var(--muted);
     }
     .booking-empty.show { display: block; }
+    .booking-empty .global-state { min-height: 330px; padding: 28px 18px; }
+    .booking-empty .global-state-icon { width: 72px; height: 72px; margin-bottom: 22px; }
+    .booking-empty .global-state-icon svg { width: 38px; height: 38px; }
+    .booking-empty .global-state h2 { font-size: 22px; }
+    .booking-empty .global-state-actions { margin-top: 24px; }
 
     .demand-detail-screen > .subtitle {
       margin-bottom: 0;
@@ -3664,6 +3742,14 @@
       margin-bottom: 16px;
       padding: 18px;
       box-shadow: none;
+      cursor: pointer;
+      transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+    }
+    .applicant-card:hover { border-color: rgba(11,107,58,.42); }
+    .applicant-card:focus-visible {
+      outline: 0;
+      border-color: var(--green);
+      box-shadow: 0 0 0 4px rgba(11,107,58,.12);
     }
     .applicant-main {
       display: grid;
@@ -3815,6 +3901,93 @@
       background:var(--green);
       font-size:14px;
       font-weight:900;
+    }
+
+    @media (max-height: 880px) {
+      #match {
+        display: flex;
+        flex-direction: column;
+        overflow-y: hidden;
+        padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+      }
+      #match .match-head,
+      #match .match-mode-switch,
+      #match > .chips,
+      #match .action-row { flex: 0 0 auto; }
+      #match .screen-title { margin-top: 10px; font-size: 27px; }
+      #match .match-head .subtitle { font-size: 12px; }
+      #match .match-mode-switch { height: 40px; margin: 8px 0; }
+      #match > .chips { gap: 8px; margin: 4px 0 8px; padding-bottom: 4px; }
+      #match > .chips .chip { height: 32px; padding: 0 14px; }
+      #match .match-card-stack {
+        width: auto;
+        align-self: stretch;
+        margin-left: 0;
+        margin-right: 0;
+        height: auto;
+        min-height: 340px;
+        max-height: 515px;
+        flex: 1 1 auto;
+      }
+      #match .match-card {
+        height: 100%;
+        min-height: 0;
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+      }
+      #match .photo-hero {
+        height: auto;
+        min-height: 145px;
+        max-height: 220px;
+        flex: 1 1 auto;
+      }
+      #match .match-name-row { margin-top: 12px; }
+      #match .match-name-row h2 { font-size: 26px; }
+      #match .match-card > .meta { margin: 7px 0 0; line-height: 1.35; }
+      #match .match-card > p.meta:last-of-type {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+      #match .nearest { margin-top: auto; padding: 10px 14px; border-radius: 14px; font-size: 13px; }
+      #match .nearest span { margin-top: 3px; font-size: 12px; }
+      #match .action-row { gap: 24px; padding: 8px 40px 4px; }
+      #match .circle-action { width: 44px; height: 44px; }
+    }
+
+    @media (max-height: 760px) {
+      .bottom-nav { height: 80px; }
+      .nav-item { gap: 5px; }
+      .nav-item.active::after { bottom: 8px; }
+      #match { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+      #match .screen-title { margin-top: 6px; font-size: 25px; }
+      #match .match-head .subtitle { font-size: 11px; }
+      #match .match-mode-switch { height: 38px; margin: 5px 0; }
+      #match > .chips { margin: 2px 0 5px; padding-bottom: 2px; }
+      #match > .chips .chip { height: 30px; font-size: 12px; }
+      #match .match-card-stack { min-height: 320px; }
+      #match .match-card { padding: 13px 15px; }
+      #match .photo-hero { min-height: 118px; }
+      #match .match-name-row { margin-top: 9px; }
+      #match .match-name-row h2 { font-size: 23px; }
+      #match .match-card > .meta { margin-top: 5px; font-size: 11px; }
+      #match .match-card > p.meta:last-of-type { -webkit-line-clamp: 1; }
+      #match .nearest { padding: 8px 12px; }
+      #match .action-row { padding-top: 5px; }
+      #match .circle-action { width: 42px; height: 42px; }
+    }
+
+    @media (min-width: 700px) {
+      body { padding: 16px; }
+      .phone-shell {
+        width: min(560px, calc(100vw - 32px));
+        height: min(939px, calc(100dvh - 32px));
+      }
+      .phone { border-radius: 24px; }
+      #match .match-card-stack { width: min(100%, 500px); align-self: center; }
+      #match .action-row { width: min(100%, 420px); align-self: center; }
     }
 
     @media (max-width: 460px) {
@@ -4235,7 +4408,7 @@
         <p class="meta">服務已完成，留下評價後立即完成交易並撥款。</p>
         <div class="book-actions"><button class="btn clay" data-open-review>留下評價</button><button class="btn light" style="color:var(--clay);border-color:var(--clay)" data-go="bookingDetail" data-index="4">查看需求</button></div>
       </article>
-      <div class="card booking-empty" id="bookingEmpty">目前沒有符合篩選的預約。</div>
+      <div class="booking-empty" id="bookingEmpty"></div>
     </section>
 
     <section class="screen booking-flow-screen" id="bookingReport">
@@ -4585,6 +4758,14 @@
       <button class="btn full" style="margin-top:18px" onclick="toast('電子發票 PDF 已準備下載')">下載 PDF</button>
     </section>
 
+    <section class="screen no-nav global-state-screen" id="globalEmpty" aria-label="全域空資料狀態">
+      <div id="globalEmptyPreview"></div>
+    </section>
+
+    <section class="screen no-nav global-state-screen" id="globalError" aria-label="全域載入失敗狀態">
+      <div id="globalErrorPreview"></div>
+    </section>
+
     <nav class="bottom-nav" aria-label="底部導航">
       <button class="nav-item" data-tab="match" data-go="match"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg></span><span>配對</span></button>
       <button class="nav-item" data-tab="map" data-go="map"><span class="nav-map-icon" aria-hidden="true"><svg class="nav-logo nav-logo-outline" viewBox="0 0 28 28" fill="none"><rect x="2.25" y="2.25" width="23.5" height="23.5" rx="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M14 5.75C10.96 5.75 8.5 8.14 8.5 11.1C8.5 14.9 14 21.25 14 21.25C14 21.25 19.5 14.9 19.5 11.1C19.5 8.14 17.04 5.75 14 5.75Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/><circle cx="12.05" cy="10.1" r=".8" fill="currentColor"/><circle cx="14" cy="9.35" r=".8" fill="currentColor"/><circle cx="15.95" cy="10.1" r=".8" fill="currentColor"/><path d="M11.75 12.75C11.75 11.75 12.78 11.05 14 11.05C15.22 11.05 16.25 11.75 16.25 12.75C16.25 13.75 15.3 14.25 14 14.25C12.7 14.25 11.75 13.75 11.75 12.75Z" stroke="currentColor" stroke-width="1.15"/><path d="M5.5 22.1C7.15 20.7 8.75 20.6 10.35 21.45C11.95 22.3 13.55 22.25 15.15 21.35C16.7 20.48 18.45 20.45 20.35 21.55" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-dasharray="1.4 2.2"/></svg><img class="nav-logo nav-logo-filled" src="assets/copaws-a-plan-icon.png" alt=""></span><span>地圖</span></button>
@@ -4632,6 +4813,9 @@
     let favoriteQuery = '';
     let favoriteSavedScrollTop = 0;
     let restoreFavoritesOnNextVisit = false;
+    let applicantSavedScrollTop = 0;
+    let restoreApplicantsOnNextVisit = false;
+    let globalRetryContext = { screen: 'match', scrollTop: 0, retry: null };
     let mapPage = 1;
     const mapPageSize = 8;
     let isSwiping = false;
@@ -5103,7 +5287,7 @@
       if (!request || !summary || !list) return;
       summary.innerHTML = requestCardHtml(request, true);
       document.getElementById('requestApplicantCount').textContent = `申請保母 ${requestApplicants.length} 位`;
-      list.innerHTML = requestApplicants.map((applicant, index) => `<article class="card applicant-card"><div class="applicant-main"><span class="avatar applicant-avatar"></span><div class="applicant-copy"><span class="name-cert-row"><h2>${escapeHtml(applicant.name)}</h2>${certBadgeHtml(applicant.certification, true)}</span><p><span class="stars">★★★★★</span>　${escapeHtml(applicant.rating)}</p><p class="applicant-facts">${escapeHtml(applicant.facts)}</p><p class="meta">${escapeHtml(applicant.intro)}</p></div></div><div class="applicant-actions"><button class="btn light" type="button" data-decline-applicant="${index}">婉拒</button><button class="btn" type="button" data-accept-applicant="${index}">接受</button></div></article>`).join('');
+      list.innerHTML = requestApplicants.map((applicant, index) => `<article class="card applicant-card" data-applicant-detail="${index}" tabindex="0" aria-label="查看 ${escapeHtml(applicant.name)} 的保母詳情"><div class="applicant-main"><span class="avatar applicant-avatar"></span><div class="applicant-copy"><span class="name-cert-row"><h2>${escapeHtml(applicant.name)}</h2>${certBadgeHtml(applicant.certification, true)}</span><p><span class="stars">★★★★★</span>　${escapeHtml(applicant.rating)}</p><p class="applicant-facts">${escapeHtml(applicant.facts)}</p><p class="meta">${escapeHtml(applicant.intro)}</p></div></div><div class="applicant-actions"><button class="btn light" type="button" data-decline-applicant="${index}">婉拒</button><button class="btn" type="button" data-accept-applicant="${index}">接受</button></div></article>`).join('');
     }
 
     function openRequestEdit(id) {
@@ -5219,10 +5403,23 @@
       if (!applicant || !request) return;
       request.status = 'matched';
       request.sitter = applicant.name;
+      request.bookingId = 'matched';
+      const sitterIndex = caregivers.findIndex(item => item.name === applicant.name);
+      if (sitterIndex >= 0) selectedCaregiverIndex = sitterIndex;
+      const linkedBooking = document.querySelector('.book-card[data-booking-id="matched"] h2');
+      if (linkedBooking) linkedBooking.textContent = `${applicant.name} 到府照護`;
       renderRequestList();
       backStack.length = 0;
       go('requestList');
       toast(`已接受 ${applicant.name}，配對成功`);
+    }
+
+    function openApplicantDetail(index) {
+      const applicant = requestApplicants[index];
+      if (!applicant) return;
+      const sitterIndex = caregivers.findIndex(item => item.name === applicant.name);
+      selectedCaregiverIndex = sitterIndex >= 0 ? sitterIndex : 0;
+      navigate('detail');
     }
 
     function renderMatchedDemand(requestId = '') {
@@ -5579,12 +5776,13 @@
 
     function go(id) {
       const preserveFavoritePosition = id === 'favorites' && restoreFavoritesOnNextVisit;
+      const preserveApplicantPosition = id === 'requestApplicants' && restoreApplicantsOnNextVisit;
       if (id !== 'bookings') {
         document.querySelectorAll('.book-card.booking-focus').forEach(card => card.classList.remove('booking-focus'));
       }
       appScreens.forEach(screen => {
         screen.classList.toggle('active', screen.id === id);
-        if (screen.id === id && !preserveFavoritePosition) screen.scrollTop = 0;
+        if (screen.id === id && !preserveFavoritePosition && !preserveApplicantPosition) screen.scrollTop = 0;
       });
       nav.style.display = screensWithNav.has(id) ? 'grid' : 'none';
       const activeTab = tabByScreen[id] || id;
@@ -5609,7 +5807,15 @@
         updateQuickDemandSummary();
       }
       if (id === 'requestList') renderRequestList();
-      if (id === 'requestApplicants') renderRequestApplicants();
+      if (id === 'requestApplicants') {
+        renderRequestApplicants();
+        if (preserveApplicantPosition) {
+          requestAnimationFrame(() => {
+            document.getElementById('requestApplicants').scrollTop = applicantSavedScrollTop;
+            restoreApplicantsOnNextVisit = false;
+          });
+        }
+      }
       if (id === 'matchedDemand') renderMatchedDemand(editingQuickRequestId);
       if (id === 'time') {
         renderTimeCaregiver();
@@ -5630,6 +5836,9 @@
       if (currentScreen === 'favorites' && (id === 'detail' || id === 'time')) {
         favoriteSavedScrollTop = document.getElementById('favorites').scrollTop;
       }
+      if (currentScreen === 'requestApplicants' && id === 'detail') {
+        applicantSavedScrollTop = document.getElementById('requestApplicants').scrollTop;
+      }
       if (id === 'favorites') {
         favoriteVisiblePages = 1;
         favoriteSavedScrollTop = 0;
@@ -5643,6 +5852,7 @@
       const fallback = currentScreen === 'detail' ? 'match' : 'match';
       const target = backStack.pop() || fallback;
       restoreFavoritesOnNextVisit = target === 'favorites';
+      restoreApplicantsOnNextVisit = currentScreen === 'detail' && target === 'requestApplicants';
       go(target);
     }
 
@@ -5809,6 +6019,63 @@
       button.setAttribute('aria-label', saved ? '取消收藏寵物保母' : '收藏寵物保母');
     }
 
+    function globalStateMarkup(type, options = {}) {
+      const isError = type === 'error';
+      const title = options.title || (isError ? '內容載入失敗' : '目前沒有資料');
+      const message = options.message || (isError ? '請檢查網路連線後再試一次。' : '新的內容會顯示在這裡。');
+      const primaryLabel = options.primaryLabel || (isError ? '重新載入' : '開始新增');
+      const primaryAction = isError ? 'data-global-retry' : (options.primaryAction || 'data-go="match"');
+      const icon = isError
+        ? '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11a8 8 0 1 1-2.35-5.65L20 7.7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 3v4.7h-4.7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 10h7M8.5 14h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="17" cy="18" r="2.2" fill="#e5ad40"/></svg>';
+      const primaryIcon = isError
+        ? '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11a8 8 0 1 1-2.35-5.65L20 7.7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 3v4.7h-4.7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        : (options.primaryIcon === false ? '' : '<span aria-hidden="true">＋</span>');
+      return `<div class="global-state ${isError ? 'error' : 'empty'}" role="${isError ? 'alert' : 'status'}"><div class="global-state-icon">${icon}</div><h2>${escapeHtml(title)}</h2><p>${escapeHtml(message)}</p><div class="global-state-actions"><button class="btn" type="button" ${primaryAction}><span class="global-state-primary-content">${primaryIcon}<span>${escapeHtml(primaryLabel)}</span></span></button>${isError ? '<button class="global-state-secondary" type="button" data-global-state-back>返回上一頁</button>' : ''}</div></div>`;
+    }
+
+    function openGlobalLoadError(retry, returnScreen = currentScreen) {
+      const source = document.getElementById(returnScreen);
+      globalRetryContext = { screen: returnScreen, scrollTop: source?.scrollTop || 0, retry: typeof retry === 'function' ? retry : null };
+      navigate('globalError');
+    }
+
+    async function retryGlobalState(button) {
+      if (!button || button.disabled) return;
+      const state = button.closest('.global-state');
+      const label = button.querySelector('.global-state-primary-content span:last-child');
+      button.disabled = true;
+      state?.classList.add('is-retrying');
+      if (label) label.textContent = '重新載入中…';
+      try {
+        if (globalRetryContext.retry) await globalRetryContext.retry();
+        else await new Promise(resolve => setTimeout(resolve, 650));
+        const target = globalRetryContext.screen || 'match';
+        backStack.length = 0;
+        go(target);
+        requestAnimationFrame(() => {
+          const screen = document.getElementById(target);
+          if (screen) screen.scrollTop = globalRetryContext.scrollTop || 0;
+        });
+        toast('內容已重新載入');
+      } catch (error) {
+        toast('重新載入失敗，請再試一次');
+      } finally {
+        button.disabled = false;
+        state?.classList.remove('is-retrying');
+        if (label) label.textContent = '重新載入';
+      }
+    }
+
+    function renderGlobalStatePreviews() {
+      const empty = document.getElementById('globalEmptyPreview');
+      const error = document.getElementById('globalErrorPreview');
+      const bookingEmpty = document.getElementById('bookingEmpty');
+      if (empty) empty.innerHTML = globalStateMarkup('empty', { message: '新的內容會顯示在這裡。\n你也可以先建立第一筆資料。' });
+      if (error) error.innerHTML = globalStateMarkup('error');
+      if (bookingEmpty) bookingEmpty.innerHTML = globalStateMarkup('empty', { title: '目前沒有預約', message: '這個狀態還沒有預約內容。', primaryLabel: '查看其他預約', primaryAction: 'data-booking-filter-reset', primaryIcon: false });
+    }
+
     function renderFavorites() {
       const list = document.getElementById('favoriteList');
       const marker = document.getElementById('favoriteLoadMarker');
@@ -5823,7 +6090,9 @@
       const filteredIndexes = orderedIndexes.filter(index => !normalizedQuery || caregivers[index].name.toLocaleLowerCase('zh-Hant').includes(normalizedQuery));
       const visibleIndexes = filteredIndexes.slice(0, favoriteVisiblePages * favoritePageSize);
       if (!filteredIndexes.length) {
-        list.innerHTML = `<div class="card favorite-card"><p class="meta" style="margin:0">${normalizedQuery ? '找不到符合名稱的已收藏寵物保母。' : '目前尚未收藏寵物保母，回到配對頁右滑或點愛心即可加入。'}</p></div>`;
+        list.innerHTML = globalStateMarkup('empty', normalizedQuery
+          ? { title: '找不到寵物保母', message: '請確認名字或改用其他關鍵字。', primaryLabel: '清除篩選', primaryAction: 'data-clear-favorite-search', primaryIcon: false }
+          : { title: '尚未收藏寵物保母', message: '回到配對頁右滑或點愛心即可加入收藏。', primaryLabel: '前往配對', primaryIcon: false });
       } else {
         list.innerHTML = visibleIndexes.map(index => {
           const data = caregivers[index];
@@ -6749,6 +7018,12 @@
         acceptApplicant(Number(acceptApplicantButton.dataset.acceptApplicant));
         return;
       }
+      const applicantDetail = event.target.closest('[data-applicant-detail]');
+      if (applicantDetail) {
+        event.preventDefault();
+        openApplicantDetail(Number(applicantDetail.dataset.applicantDetail));
+        return;
+      }
       const declineReason = event.target.closest('[data-decline-reason]');
       if (declineReason) {
         event.preventDefault();
@@ -6940,6 +7215,30 @@
         filterBookings(filterButton.dataset.bookingFilter);
         return;
       }
+      if (event.target.closest('[data-clear-favorite-search]')) {
+        event.preventDefault();
+        favoriteQuery = '';
+        favoriteVisiblePages = 1;
+        renderFavorites();
+        document.getElementById('favoriteSearch').focus();
+        return;
+      }
+      if (event.target.closest('[data-booking-filter-reset]')) {
+        event.preventDefault();
+        filterBookings('all');
+        return;
+      }
+      const retryButton = event.target.closest('[data-global-retry]');
+      if (retryButton) {
+        event.preventDefault();
+        retryGlobalState(retryButton);
+        return;
+      }
+      if (event.target.closest('[data-global-state-back]')) {
+        event.preventDefault();
+        goBack();
+        return;
+      }
       const transactionFilter = event.target.closest('[data-transaction-filter]');
       if (transactionFilter) {
         event.preventDefault();
@@ -6996,6 +7295,14 @@
         // map preview already set selectedCaregiverIndex
       }
       navigate(target.dataset.go);
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const applicantDetail = event.target.closest('[data-applicant-detail]');
+      if (!applicantDetail || event.target.closest('button')) return;
+      event.preventDefault();
+      openApplicantDetail(Number(applicantDetail.dataset.applicantDetail));
     });
 
     document.getElementById('identityReviewForm').addEventListener('submit', submitIdentityReview);
@@ -7069,6 +7376,7 @@
     document.getElementById('requestEditFee').addEventListener('input', updateRequestEditFee);
 
     renderCaregiver();
+    renderGlobalStatePreviews();
     renderMapPreview(0);
     renderMapLists();
     updateFavoriteCount();
@@ -7080,7 +7388,16 @@
     renderRequestApplicants();
     updateRequestEditFee();
     wireMatchDrag();
-    go('login');
+    const previewState = new URLSearchParams(window.location.search).get('state');
+    if (previewState === 'empty') {
+      globalRetryContext = { screen: 'match', scrollTop: 0, retry: null };
+      go('globalEmpty');
+    } else if (previewState === 'error') {
+      globalRetryContext = { screen: 'match', scrollTop: 0, retry: null };
+      go('globalError');
+    } else {
+      go('login');
+    }
   </script>
 </body>
 </html>
