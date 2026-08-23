@@ -566,20 +566,40 @@
       background: var(--green);
       border-color: var(--green);
     }
-    #bookings > .chips {
+    .shared-filter-trigger {
+      width: 48px;
+      height: 46px;
+      flex: 0 0 48px;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--green);
+      background: rgba(255,255,255,.92);
+    }
+    .shared-filter-trigger svg { width: 24px; height: 24px; }
+    .filter-toolbar {
+      width: min(368px, 100%);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 48px;
+      align-items: center;
       gap: 8px;
-      overflow: visible;
-      padding-bottom: 0;
+      margin: 14px 0 16px;
     }
-    #bookings > .chips .chip {
-      width: 100%;
-      min-width: 0;
-      padding: 0 8px;
-      white-space: nowrap;
+    .filter-toolbar .match-mode-switch { width: 100%; margin: 0; }
+    .bookings-head {
+      position: relative;
+      min-height: 68px;
+      margin-top: 18px;
+      padding-right: 60px;
     }
-    #bookings > .screen-title { margin-top: 18px; }
+    .bookings-head .screen-title { margin: 0; }
+    .bookings-head .subtitle { margin: 3px 0 0; }
+    .bookings-head .shared-filter-trigger {
+      position: absolute;
+      right: 0;
+      top: 3px;
+    }
     .match-head {
       position: relative;
       padding-right: 58px;
@@ -2477,19 +2497,11 @@
     .finance-summary div { min-width: 0; }
     .finance-summary span { display: block; color: var(--muted); font-size: 11px; }
     .finance-summary strong { display: block; margin-top: 5px; color: var(--green); font-size: 20px; }
-    .finance-filters { margin-top: 16px; }
-    .finance-filter-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .finance-filter-row .chip {
-      min-width: 0;
-      width: 100%;
-      height: 32px;
-      padding: 0 6px;
-      font-size: 11px;
+    .finance-screen .page-heading { position: relative; padding-right: 58px; }
+    .finance-screen .page-heading .shared-filter-trigger {
+      position: absolute;
+      right: 24px;
+      top: 3px;
     }
     .transaction-list {
       margin-top: 18px;
@@ -3528,8 +3540,8 @@
     }
     #match .screen-title { margin-top: 18px; }
     #match .match-head .subtitle { margin-bottom: 0; }
-    #match .match-mode-switch { margin-top: 13.35px; }
-    #match .chips { margin-top: 10px; }
+    #match .filter-toolbar { margin-top: 13.35px; }
+    #match .filter-toolbar .match-mode-switch { margin: 0; }
     #match .match-card-stack { height: 515px; }
     #match .match-card { min-height: 515px; }
     #match .photo-hero { height: 220px; }
@@ -3671,6 +3683,8 @@
     .request-list-copy .screen-title { margin: 0 0 3px; }
     .request-list-copy .subtitle { margin: 0; }
     .request-list-mode-switch { margin: 14px 0 0; }
+    .request-list-filter-toolbar { margin: 14px 0 0; }
+    .request-list-filter-toolbar .request-list-mode-switch { margin: 0; }
     .request-add-button {
       width: 44px;
       height: 44px;
@@ -3682,13 +3696,89 @@
       flex: 0 0 auto;
     }
     .request-sort-note { margin: 2px 0 10px; color:var(--muted); font-size:11px; }
-    .request-filter-row {
-      display: grid;
-      grid-template-columns: repeat(3,minmax(0,1fr));
-      gap: 8px;
-      margin: 10px 0 18px;
+    .request-list-screen > .request-sort-note { margin-top: 10px; }
+
+    .filter-picker-mode .modal {
+      max-height: calc(100% - 32px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
     }
-    .request-filter-row .chip { width:100%; min-width:0; padding:0 6px; font-size:11px; }
+    .filter-picker-mode .modal > .btn.full { display: none; }
+    .shared-filter-section { margin-top: 20px; }
+    .shared-filter-section > strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+    .shared-filter-region {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--ink);
+      background: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      text-align: left;
+    }
+    .shared-filter-region::after { content: "›"; color: var(--green); font-size: 24px; }
+    .shared-filter-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .shared-filter-options.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .shared-filter-option {
+      min-width: 0;
+      min-height: 36px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .shared-filter-option.active {
+      color: #fff;
+      border-color: var(--green);
+      background: var(--green);
+    }
+    .filter-location-grid {
+      max-height: 430px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+    .filter-location-option {
+      min-height: 38px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .filter-location-option.active {
+      color: #fff;
+      border-color: var(--green);
+      background: var(--green);
+    }
+    .filter-location-note { margin: 14px 0 0 !important; font-size: 11px; }
+    .shared-filter-actions {
+      display: grid;
+      grid-template-columns: minmax(0, .82fr) minmax(0, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .shared-filter-actions .btn { min-width: 0; min-height: 50px; }
     .request-card {
       width: 100%;
       margin-bottom: 16px;
@@ -3938,14 +4028,13 @@
         padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
       }
       #match .match-head,
-      #match .match-mode-switch,
-      #match > .chips,
+      #match .filter-toolbar,
       #match .action-row { flex: 0 0 auto; }
       #match .screen-title { margin-top: 10px; font-size: 27px; }
       #match .match-head .subtitle { font-size: 12px; }
-      #match .match-mode-switch { height: 40px; margin: 8px 0; }
-      #match > .chips { gap: 8px; margin: 4px 0 8px; padding-bottom: 4px; }
-      #match > .chips .chip { height: 32px; padding: 0 14px; }
+      #match .filter-toolbar { margin: 8px 0; }
+      #match .filter-toolbar .match-mode-switch,
+      #match .filter-toolbar .shared-filter-trigger { height: 40px; }
       #match .match-card-stack {
         width: auto;
         align-self: stretch;
@@ -3991,9 +4080,9 @@
       #match { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
       #match .screen-title { margin-top: 6px; font-size: 25px; }
       #match .match-head .subtitle { font-size: 11px; }
-      #match .match-mode-switch { height: 38px; margin: 5px 0; }
-      #match > .chips { margin: 2px 0 5px; padding-bottom: 2px; }
-      #match > .chips .chip { height: 30px; font-size: 12px; }
+      #match .filter-toolbar { margin: 5px 0; }
+      #match .filter-toolbar .match-mode-switch,
+      #match .filter-toolbar .shared-filter-trigger { height: 38px; }
       #match .match-card-stack { min-height: 320px; }
       #match .match-card { padding: 13px 15px; }
       #match .photo-hero { min-height: 118px; }
@@ -4174,12 +4263,14 @@
           <span class="favorite-count" id="favoriteCount">1</span>
         </button>
       </div>
-      <div class="match-mode-switch" aria-label="媒合方式">
-        <button type="button" data-go="requestList">快速發需求</button>
-        <button class="active" type="button" aria-current="page">自己挑保母</button>
-      </div>
-      <div class="chips">
-        <button class="chip active" data-match-filter="city">台北市</button><button class="chip" data-match-filter="district">大安區</button><button class="chip" data-match-filter="today">今日可約</button><button class="chip" data-match-filter="pet">貓狗皆可</button>
+      <div class="filter-toolbar">
+        <div class="match-mode-switch" aria-label="媒合方式">
+          <button type="button" data-go="requestList">快速發需求</button>
+          <button class="active" type="button" aria-current="page">自己挑保母</button>
+        </div>
+        <button class="shared-filter-trigger" type="button" data-open-shared-filter="match" aria-label="篩選寵物保母">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="6" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="12" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="18" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/></svg>
+        </button>
       </div>
       <div class="match-card-stack">
         <article class="card match-card match-card-back" id="matchCardBack" aria-hidden="true"></article>
@@ -4249,10 +4340,12 @@
     <section class="screen long request-list-screen" id="requestList">
       <div class="request-list-sticky">
         <div class="request-list-head"><div class="request-list-title-group"><div class="request-list-copy"><h1 class="screen-title">需求列表</h1><p class="subtitle">管理已送出的需求與接案狀態</p></div></div><button class="request-add-button" type="button" data-go="quickDemand" aria-label="新增需求">＋</button></div>
-        <div class="match-mode-switch request-list-mode-switch" aria-label="媒合方式"><button class="active" type="button" aria-current="page">快速發需求</button><button type="button" data-go="match">自己挑保母</button></div>
+        <div class="filter-toolbar request-list-filter-toolbar">
+          <div class="match-mode-switch request-list-mode-switch" aria-label="媒合方式"><button class="active" type="button" aria-current="page">快速發需求</button><button type="button" data-go="match">自己挑保母</button></div>
+          <button class="shared-filter-trigger" type="button" data-open-shared-filter="requestList" aria-label="篩選需求列表"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="6" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="12" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="18" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/></svg></button>
+        </div>
       </div>
       <p class="request-sort-note">最新送出的需求會排在最上方</p>
-      <div class="request-filter-row"><button class="chip active" data-request-filter="all">全部</button><button class="chip" data-request-filter="waiting">等待接案</button><button class="chip" data-request-filter="applicants">已有申請</button></div>
       <div id="requestListContainer"></div>
     </section>
 
@@ -4476,12 +4569,11 @@
 
     <section class="screen" id="bookings">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <h1 class="screen-title">我的預約</h1>
-      <p class="subtitle">進行中服務會在這裡集中管理</p>
-      <div class="chips">
-        <button class="chip active" data-booking-filter="all">全部</button><button class="chip" data-booking-filter="confirming">需求確認中</button><button class="chip" data-booking-filter="pending">待服務</button><button class="chip" data-booking-filter="active">進行中</button><button class="chip" data-booking-filter="payout">待撥款</button>
+      <div class="bookings-head">
+        <h1 class="screen-title">我的預約</h1>
+        <p class="subtitle">進行中服務會在這裡集中管理</p>
+        <button class="shared-filter-trigger" type="button" data-open-shared-filter="bookings" aria-label="篩選我的預約"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="6" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="12" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="18" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/></svg></button>
       </div>
-      <p class="subtitle" style="margin-top:-12px">依預約狀態快速切換與管理需求</p>
       <article class="card book-card" data-booking-status="active" data-booking-id="matched" tabindex="-1">
         <span class="status">進行中</span>
         <h3>Mina Chen 到府照護</h3>
@@ -4813,27 +4905,20 @@
     </section>
 
     <section class="screen finance-screen" id="finance">
-      <div class="page-heading"><button class="screen-back" data-back aria-label="返回上一頁">‹</button><h1 class="screen-title">付款與收款</h1></div>
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回上一頁">‹</button><h1 class="screen-title">付款與收款</h1><button class="shared-filter-trigger" type="button" data-open-shared-filter="finance" aria-label="篩選交易紀錄"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="6" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="12" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="18" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/></svg></button></div>
       <p class="subtitle">查看交易紀錄、訂單款項與平台撥款</p>
-      <div class="finance-filters">
-        <div class="finance-filter-row" id="transactionStatusFilters">
-          <button class="chip active" data-transaction-filter="all">全部</button><button class="chip" data-transaction-filter="paid">已付款</button><button class="chip" data-transaction-filter="payout">待撥款</button>
-          <button class="chip" data-transaction-filter="pending">待完成</button><button class="chip" data-transaction-filter="complete">已完成</button><button class="chip" data-transaction-filter="refund">退款／取消</button>
-        </div>
-        <div class="finance-filter-row"><button class="chip active">近 30 天</button><button class="chip">近 3 個月</button><button class="chip">自訂範圍</button></div>
-      </div>
       <div class="finance-summary card"><div><span>近 30 天支出</span><strong>− NT$ 4,280</strong></div><div><span>近 30 天收入</span><strong>＋ NT$ 2,560</strong></div></div>
       <div class="transaction-list" id="transactionList">
-        <article class="transaction-item card" data-transaction-status="payout pending" data-go="transactionProgress"><div><h3>訂單付款 · Mina Chen</h3><p>待平台撥款 · 剩餘 3 天自動完成</p></div><strong class="transaction-amount minus">− NT$ 1,380</strong><button class="transaction-complete" data-open-review>立即完成</button></article>
-        <article class="transaction-item card" data-transaction-status="paid" data-go="transactionProgress"><div><h3>訂單付款 · 小芸</h3><p>已付款 · 2026/07/10 18:32</p></div><strong class="transaction-amount minus">− NT$ 980</strong></article>
-        <article class="transaction-item card income" data-transaction-status="refund" data-go="transactionProgress"><div><h3>訂單退款 · 柏宇</h3><p>退款完成 · 2026/07/09 11:20</p></div><strong class="transaction-amount plus">＋ NT$ 720</strong></article>
-        <article class="transaction-item card" data-transaction-status="complete" data-go="transactionComplete"><div><h3>訂單付款 · Nina Lin</h3><p>已完成 · 2026/07/08 20:15</p></div><strong class="transaction-amount minus">− NT$ 1,380</strong></article>
-        <article class="transaction-item card income" data-transaction-status="complete" data-go="transactionProgress"><div><h3>寵物保母服務收入</h3><p>已撥款 · 2026/07/08 16:40</p></div><strong class="transaction-amount plus">＋ NT$ 850</strong></article>
-        <article class="transaction-item card" data-transaction-status="paid" data-go="transactionProgress"><div><h3>訂單付款 · Emma Wu</h3><p>已付款 · 2026/07/07 09:18</p></div><strong class="transaction-amount minus">− NT$ 640</strong></article>
-        <article class="transaction-item card income" data-transaction-status="refund" data-go="transactionProgress"><div><h3>取消訂單退款</h3><p>退款完成 · 2026/07/06 14:08</p></div><strong class="transaction-amount plus">＋ NT$ 520</strong></article>
-        <article class="transaction-item card income" data-transaction-status="payout" data-go="transactionProgress"><div><h3>寵物保母服務收入</h3><p>待平台撥款 · 2026/07/05 19:30</p></div><strong class="transaction-amount plus">＋ NT$ 1,020</strong></article>
-        <article class="transaction-item card" data-transaction-status="complete" data-go="transactionComplete"><div><h3>訂單付款 · 阿哲</h3><p>已完成 · 2026/07/04 12:22</p></div><strong class="transaction-amount minus">− NT$ 760</strong></article>
-        <article class="transaction-item card" data-transaction-status="pending" data-go="transactionProgress"><div><h3>訂單付款 · 小雨</h3><p>待完成 · 2026/07/03 18:45</p></div><strong class="transaction-amount minus">− NT$ 620</strong></article>
+        <article class="transaction-item card" data-transaction-status="payout pending" data-transaction-date="2026-08-10" data-go="transactionProgress"><div><h3>訂單付款 · Mina Chen</h3><p>待平台撥款 · 剩餘 3 天自動完成</p></div><strong class="transaction-amount minus">− NT$ 1,380</strong><button class="transaction-complete" data-open-review>立即完成</button></article>
+        <article class="transaction-item card" data-transaction-status="paid" data-transaction-date="2026-07-10" data-go="transactionProgress"><div><h3>訂單付款 · 小芸</h3><p>已付款 · 2026/07/10 18:32</p></div><strong class="transaction-amount minus">− NT$ 980</strong></article>
+        <article class="transaction-item card income" data-transaction-status="refund" data-transaction-date="2026-07-09" data-go="transactionProgress"><div><h3>訂單退款 · 柏宇</h3><p>退款完成 · 2026/07/09 11:20</p></div><strong class="transaction-amount plus">＋ NT$ 720</strong></article>
+        <article class="transaction-item card" data-transaction-status="complete" data-transaction-date="2026-07-08" data-go="transactionComplete"><div><h3>訂單付款 · Nina Lin</h3><p>已完成 · 2026/07/08 20:15</p></div><strong class="transaction-amount minus">− NT$ 1,380</strong></article>
+        <article class="transaction-item card income" data-transaction-status="complete" data-transaction-date="2026-07-08" data-go="transactionProgress"><div><h3>寵物保母服務收入</h3><p>已撥款 · 2026/07/08 16:40</p></div><strong class="transaction-amount plus">＋ NT$ 850</strong></article>
+        <article class="transaction-item card" data-transaction-status="paid" data-transaction-date="2026-07-07" data-go="transactionProgress"><div><h3>訂單付款 · Emma Wu</h3><p>已付款 · 2026/07/07 09:18</p></div><strong class="transaction-amount minus">− NT$ 640</strong></article>
+        <article class="transaction-item card income" data-transaction-status="refund" data-transaction-date="2026-07-06" data-go="transactionProgress"><div><h3>取消訂單退款</h3><p>退款完成 · 2026/07/06 14:08</p></div><strong class="transaction-amount plus">＋ NT$ 520</strong></article>
+        <article class="transaction-item card income" data-transaction-status="payout" data-transaction-date="2026-07-05" data-go="transactionProgress"><div><h3>寵物保母服務收入</h3><p>待平台撥款 · 2026/07/05 19:30</p></div><strong class="transaction-amount plus">＋ NT$ 1,020</strong></article>
+        <article class="transaction-item card" data-transaction-status="complete" data-transaction-date="2026-07-04" data-go="transactionComplete"><div><h3>訂單付款 · 阿哲</h3><p>已完成 · 2026/07/04 12:22</p></div><strong class="transaction-amount minus">− NT$ 760</strong></article>
+        <article class="transaction-item card" data-transaction-status="pending" data-transaction-date="2026-07-03" data-go="transactionProgress"><div><h3>訂單付款 · 小雨</h3><p>待完成 · 2026/07/03 18:45</p></div><strong class="transaction-amount minus">− NT$ 620</strong></article>
       </div>
       <div class="pagination"><button class="page-btn" disabled>‹</button><span>第 1 / 2 頁 · 共 12 筆</span><button class="page-btn" onclick="toast('已切換至第 2 頁')">›</button></div>
     </section>
@@ -4929,7 +5014,6 @@
     let matchSwipeTimer = 0;
     const matchSwipeSettleMs = 175;
     const matchSwipeOpacityMs = 135;
-    let lastMatchFilter = 'city';
     let editingPetIndex = null;
     let petPhotoData = '';
     let petFormReturnScreen = 'pets';
@@ -4959,13 +5043,432 @@
     let pendingQuickHour = '00';
     let pendingQuickMinute = '00';
     const regionOptions = {
-      '台北市': ['大安區', '信義區', '松山區'],
-      '新北市': ['板橋區', '新店區', '中和區'],
-      '桃園市': ['桃園區', '中壢區', '龜山區']
+      "台北市": [
+        "松山區",
+        "信義區",
+        "大安區",
+        "中山區",
+        "中正區",
+        "大同區",
+        "萬華區",
+        "文山區",
+        "南港區",
+        "內湖區",
+        "士林區",
+        "北投區"
+      ],
+      "台中市": [
+        "中區",
+        "東區",
+        "南區",
+        "西區",
+        "北區",
+        "西屯區",
+        "南屯區",
+        "北屯區",
+        "豐原區",
+        "東勢區",
+        "大甲區",
+        "清水區",
+        "沙鹿區",
+        "梧棲區",
+        "后里區",
+        "神岡區",
+        "潭子區",
+        "大雅區",
+        "新社區",
+        "石岡區",
+        "外埔區",
+        "大安區",
+        "烏日區",
+        "大肚區",
+        "龍井區",
+        "霧峰區",
+        "太平區",
+        "大里區",
+        "和平區"
+      ],
+      "基隆市": [
+        "中正區",
+        "七堵區",
+        "暖暖區",
+        "仁愛區",
+        "中山區",
+        "安樂區",
+        "信義區"
+      ],
+      "台南市": [
+        "新營區",
+        "鹽水區",
+        "白河區",
+        "柳營區",
+        "後壁區",
+        "東山區",
+        "麻豆區",
+        "下營區",
+        "六甲區",
+        "官田區",
+        "大內區",
+        "佳里區",
+        "學甲區",
+        "西港區",
+        "七股區",
+        "將軍區",
+        "北門區",
+        "新化區",
+        "善化區",
+        "新市區",
+        "安定區",
+        "山上區",
+        "玉井區",
+        "楠西區",
+        "南化區",
+        "左鎮區",
+        "仁德區",
+        "歸仁區",
+        "關廟區",
+        "龍崎區",
+        "永康區",
+        "東區",
+        "南區",
+        "北區",
+        "安南區",
+        "安平區",
+        "中西區"
+      ],
+      "高雄市": [
+        "鹽埕區",
+        "鼓山區",
+        "左營區",
+        "楠梓區",
+        "三民區",
+        "新興區",
+        "前金區",
+        "苓雅區",
+        "前鎮區",
+        "旗津區",
+        "小港區",
+        "鳳山區",
+        "林園區",
+        "大寮區",
+        "大樹區",
+        "大社區",
+        "仁武區",
+        "鳥松區",
+        "岡山區",
+        "橋頭區",
+        "燕巢區",
+        "田寮區",
+        "阿蓮區",
+        "路竹區",
+        "湖內區",
+        "茄萣區",
+        "永安區",
+        "彌陀區",
+        "梓官區",
+        "旗山區",
+        "美濃區",
+        "六龜區",
+        "甲仙區",
+        "杉林區",
+        "內門區",
+        "茂林區",
+        "桃源區",
+        "那瑪夏區"
+      ],
+      "新北市": [
+        "板橋區",
+        "三重區",
+        "中和區",
+        "永和區",
+        "新莊區",
+        "新店區",
+        "樹林區",
+        "鶯歌區",
+        "三峽區",
+        "淡水區",
+        "汐止區",
+        "瑞芳區",
+        "土城區",
+        "蘆洲區",
+        "五股區",
+        "泰山區",
+        "林口區",
+        "深坑區",
+        "石碇區",
+        "坪林區",
+        "三芝區",
+        "石門區",
+        "八里區",
+        "平溪區",
+        "雙溪區",
+        "貢寮區",
+        "金山區",
+        "萬里區",
+        "烏來區"
+      ],
+      "宜蘭縣": [
+        "宜蘭市",
+        "羅東鎮",
+        "蘇澳鎮",
+        "頭城鎮",
+        "礁溪鄉",
+        "壯圍鄉",
+        "員山鄉",
+        "冬山鄉",
+        "五結鄉",
+        "三星鄉",
+        "大同鄉",
+        "南澳鄉"
+      ],
+      "桃園市": [
+        "桃園區",
+        "中壢區",
+        "大溪區",
+        "楊梅區",
+        "蘆竹區",
+        "大園區",
+        "龜山區",
+        "八德區",
+        "龍潭區",
+        "平鎮區",
+        "新屋區",
+        "觀音區",
+        "復興區"
+      ],
+      "嘉義市": [
+        "東區",
+        "西區"
+      ],
+      "新竹縣": [
+        "竹北市",
+        "竹東鎮",
+        "新埔鎮",
+        "關西鎮",
+        "湖口鄉",
+        "新豐鄉",
+        "芎林鄉",
+        "橫山鄉",
+        "北埔鄉",
+        "寶山鄉",
+        "峨眉鄉",
+        "尖石鄉",
+        "五峰鄉"
+      ],
+      "苗栗縣": [
+        "苗栗市",
+        "苑裡鎮",
+        "通霄鎮",
+        "竹南鎮",
+        "頭份市",
+        "後龍鎮",
+        "卓蘭鎮",
+        "大湖鄉",
+        "公館鄉",
+        "銅鑼鄉",
+        "南庄鄉",
+        "頭屋鄉",
+        "三義鄉",
+        "西湖鄉",
+        "造橋鄉",
+        "三灣鄉",
+        "獅潭鄉",
+        "泰安鄉"
+      ],
+      "南投縣": [
+        "南投市",
+        "埔里鎮",
+        "草屯鎮",
+        "竹山鎮",
+        "集集鎮",
+        "名間鄉",
+        "鹿谷鄉",
+        "中寮鄉",
+        "魚池鄉",
+        "國姓鄉",
+        "水里鄉",
+        "信義鄉",
+        "仁愛鄉"
+      ],
+      "彰化縣": [
+        "彰化市",
+        "鹿港鎮",
+        "和美鎮",
+        "線西鄉",
+        "伸港鄉",
+        "福興鄉",
+        "秀水鄉",
+        "花壇鄉",
+        "芬園鄉",
+        "員林市",
+        "溪湖鎮",
+        "田中鎮",
+        "大村鄉",
+        "埔鹽鄉",
+        "埔心鄉",
+        "永靖鄉",
+        "社頭鄉",
+        "二水鄉",
+        "北斗鎮",
+        "二林鎮",
+        "田尾鄉",
+        "埤頭鄉",
+        "芳苑鄉",
+        "大城鄉",
+        "竹塘鄉",
+        "溪州鄉"
+      ],
+      "新竹市": [
+        "東區",
+        "北區",
+        "香山區"
+      ],
+      "雲林縣": [
+        "斗六市",
+        "斗南鎮",
+        "虎尾鎮",
+        "西螺鎮",
+        "土庫鎮",
+        "北港鎮",
+        "古坑鄉",
+        "大埤鄉",
+        "莿桐鄉",
+        "林內鄉",
+        "二崙鄉",
+        "崙背鄉",
+        "麥寮鄉",
+        "東勢鄉",
+        "褒忠鄉",
+        "台西鄉",
+        "元長鄉",
+        "四湖鄉",
+        "口湖鄉",
+        "水林鄉"
+      ],
+      "嘉義縣": [
+        "太保市",
+        "朴子市",
+        "布袋鎮",
+        "大林鎮",
+        "民雄鄉",
+        "溪口鄉",
+        "新港鄉",
+        "六腳鄉",
+        "東石鄉",
+        "義竹鄉",
+        "鹿草鄉",
+        "水上鄉",
+        "中埔鄉",
+        "竹崎鄉",
+        "梅山鄉",
+        "番路鄉",
+        "大埔鄉",
+        "阿里山鄉"
+      ],
+      "屏東縣": [
+        "屏東市",
+        "潮州鎮",
+        "東港鎮",
+        "恆春鎮",
+        "萬丹鄉",
+        "長治鄉",
+        "麟洛鄉",
+        "九如鄉",
+        "里港鄉",
+        "鹽埔鄉",
+        "高樹鄉",
+        "萬巒鄉",
+        "內埔鄉",
+        "竹田鄉",
+        "新埤鄉",
+        "枋寮鄉",
+        "新園鄉",
+        "崁頂鄉",
+        "林邊鄉",
+        "南州鄉",
+        "佳冬鄉",
+        "琉球鄉",
+        "車城鄉",
+        "滿州鄉",
+        "枋山鄉",
+        "三地門鄉",
+        "霧台鄉",
+        "瑪家鄉",
+        "泰武鄉",
+        "來義鄉",
+        "春日鄉",
+        "獅子鄉",
+        "牡丹鄉"
+      ],
+      "花蓮縣": [
+        "花蓮市",
+        "鳳林鎮",
+        "玉里鎮",
+        "新城鄉",
+        "吉安鄉",
+        "壽豐鄉",
+        "光復鄉",
+        "豐濱鄉",
+        "瑞穗鄉",
+        "富里鄉",
+        "秀林鄉",
+        "萬榮鄉",
+        "卓溪鄉"
+      ],
+      "台東縣": [
+        "台東市",
+        "成功鎮",
+        "關山鎮",
+        "卑南鄉",
+        "鹿野鄉",
+        "池上鄉",
+        "東河鄉",
+        "長濱鄉",
+        "太麻里鄉",
+        "大武鄉",
+        "綠島鄉",
+        "海端鄉",
+        "延平鄉",
+        "金峰鄉",
+        "達仁鄉",
+        "蘭嶼鄉"
+      ],
+      "金門縣": [
+        "金城鎮",
+        "金沙鎮",
+        "金湖鎮",
+        "金寧鄉",
+        "烈嶼鄉",
+        "烏坵鄉"
+      ],
+      "澎湖縣": [
+        "馬公市",
+        "湖西鄉",
+        "白沙鄉",
+        "西嶼鄉",
+        "望安鄉",
+        "七美鄉"
+      ],
+      "連江縣": [
+        "南竿鄉",
+        "北竿鄉",
+        "莒光鄉",
+        "東引鄉"
+      ]
     };
     let regionPickerContext = 'quick';
     let regionPickerKind = 'city';
     let pendingRegionValue = '台北市';
+    const sharedFilterState = {
+      match: { city:'台北市', district:'大安區', availability:'any', pet:'any', distance:'any' },
+      requestList: { status:'all' },
+      bookings: { status:'all' },
+      finance: { status:'all', time:'30' }
+    };
+    let sharedFilterContext = 'match';
+    let sharedFilterDraft = null;
+    let sharedLocationStage = 'city';
+    const transactionReferenceDate = new Date('2026-08-10T23:59:59+08:00');
     const requestEditDate = { year: 2026, month: 12, day: 12 };
     let pendingRequestEditDay = 12;
     let requestFilter = 'all';
@@ -5283,6 +5786,9 @@
       const ids = regionFieldIds(regionPickerContext, regionPickerKind);
       const field = document.getElementById(ids.field);
       const value = document.getElementById(ids.value);
+      if (field instanceof HTMLSelectElement && regionPickerKind === 'city') {
+        field.replaceChildren(...Object.keys(regionOptions).map(option => new Option(option, option)));
+      }
       if (field) field.value = pendingRegionValue;
       if (value) value.textContent = pendingRegionValue;
       if (regionPickerKind === 'city') {
@@ -6678,7 +7184,7 @@
     }
 
     function hideModal() {
-      document.getElementById('modalLayer').classList.remove('show', 'pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'quick-time-mode', 'decision-mode', 'availability-month-mode', 'region-picker-mode', 'request-date-mode');
+      document.getElementById('modalLayer').classList.remove('show', 'pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'quick-time-mode', 'decision-mode', 'availability-month-mode', 'region-picker-mode', 'request-date-mode', 'filter-picker-mode');
     }
 
     function closeModal(event) {
@@ -6686,6 +7192,7 @@
     }
 
     function filterBookings(filter) {
+      sharedFilterState.bookings.status = filter;
       const cards = Array.from(document.querySelectorAll('.book-card'));
       let visible = 0;
       cards.forEach(card => {
@@ -6716,9 +7223,16 @@
       });
     }
 
-    function filterTransactions(filter) {
+    function filterTransactions(filter, timeRange = sharedFilterState.finance.time) {
+      sharedFilterState.finance.status = filter;
+      sharedFilterState.finance.time = timeRange;
+      const days = timeRange === '30' ? 30 : timeRange === '90' ? 90 : null;
       document.querySelectorAll('.transaction-item').forEach(item => {
-        item.hidden = filter !== 'all' && !item.dataset.transactionStatus.split(' ').includes(filter);
+        const statusMatches = filter === 'all' || item.dataset.transactionStatus.split(' ').includes(filter);
+        const itemDate = new Date(`${item.dataset.transactionDate || '2026-08-10'}T12:00:00+08:00`);
+        const age = Math.floor((transactionReferenceDate - itemDate) / 86400000);
+        const timeMatches = days === null || (age >= 0 && age <= days);
+        item.hidden = !(statusMatches && timeMatches);
       });
       document.querySelectorAll('[data-transaction-filter]').forEach(button => {
         button.classList.toggle('active', button.dataset.transactionFilter === filter);
@@ -6917,37 +7431,120 @@
       });
     }
 
-    function getSelectedMatchFilters() {
-      return Array.from(document.querySelectorAll('[data-match-filter].active')).map(item => item.dataset.matchFilter);
-    }
-
     function getFilteredCaregivers() {
-      const selected = getSelectedMatchFilters();
-      const exact = caregivers.filter(caregiver => selected.every(filter => caregiver.filters.includes(filter)));
-      return exact.length ? exact : caregivers.filter(caregiver => caregiver.filters.includes('city'));
+      const state = sharedFilterState.match;
+      const filtered = caregivers.filter(caregiver => {
+        const distance = Number.parseFloat(caregiver.distance.match(/[\d.]+/)?.[0] || '0');
+        const copy = `${caregiver.intro} ${caregiver.detail}`;
+        if (state.availability === 'today' && !caregiver.nearest.includes('今天')) return false;
+        if (state.availability === 'tomorrow' && !caregiver.nearest.includes('明天')) return false;
+        if (state.pet === 'cat' && !/貓|清砂|餵藥/.test(copy)) return false;
+        if (state.pet === 'dog' && !/犬|散步/.test(copy)) return false;
+        if (state.pet === 'other') return false;
+        if (state.distance !== 'any' && distance > Number(state.distance)) return false;
+        return true;
+      });
+      return filtered.length ? filtered : caregivers;
     }
 
-    function toggleMatchFilter(button) {
-      const filters = Array.from(document.querySelectorAll('[data-match-filter]'));
-      const activeCount = filters.filter(item => item.classList.contains('active')).length;
-      if (button.classList.contains('active') && activeCount === 1) {
-        toast('至少保留一個篩選條件');
-        return;
+    function sharedFilterOptions(group, options, activeValue, twoColumns = false) {
+      return `<div class="shared-filter-options ${twoColumns ? 'two' : ''}">${options.map(([value, label]) => `<button class="shared-filter-option ${value === activeValue ? 'active' : ''}" type="button" data-shared-filter-group="${group}" data-shared-filter-value="${value}">${label}</button>`).join('')}</div>`;
+    }
+
+    function sharedFilterActions() {
+      return '<div class="shared-filter-actions"><button class="btn light" type="button" data-clear-shared-filter>清除</button><button class="btn" type="button" data-apply-shared-filter>套用篩選</button></div>';
+    }
+
+    function renderSharedFilterModal() {
+      const draft = sharedFilterDraft;
+      const body = document.getElementById('modalBody');
+      if (!draft || !body) return;
+      if (sharedFilterContext === 'match') {
+        body.innerHTML = `
+          <div class="shared-filter-section"><strong>地區</strong><button class="shared-filter-region" type="button" data-open-shared-location>${escapeHtml(draft.city)} · ${escapeHtml(draft.district)}</button></div>
+          <div class="shared-filter-section"><strong>可預約</strong>${sharedFilterOptions('availability', [['any','不限'],['today','今天'],['tomorrow','明天']], draft.availability)}</div>
+          <div class="shared-filter-section"><strong>寵物類型</strong>${sharedFilterOptions('pet', [['any','全部'],['dog','狗狗'],['cat','貓咪'],['other','其他']], draft.pet, true)}</div>
+          <div class="shared-filter-section"><strong>距離</strong>${sharedFilterOptions('distance', [['any','不限'],['1','1 km'],['3','3 km'],['5','5 km']], draft.distance, true)}</div>
+          ${sharedFilterActions()}`;
+      } else if (sharedFilterContext === 'requestList') {
+        body.innerHTML = `<div class="shared-filter-section"><strong>需求狀態</strong>${sharedFilterOptions('status', [['all','全部'],['waiting','等待接案'],['applicants','已有申請'],['matched','配對成功']], draft.status, true)}</div>${sharedFilterActions()}`;
+      } else if (sharedFilterContext === 'bookings') {
+        body.innerHTML = `<div class="shared-filter-section"><strong>預約狀態</strong>${sharedFilterOptions('status', [['all','全部'],['confirming','需求確認中'],['pending','待服務'],['active','進行中'],['payout','待撥款']], draft.status, true)}</div>${sharedFilterActions()}`;
+      } else {
+        body.innerHTML = `
+          <div class="shared-filter-section"><strong>交易狀態</strong>${sharedFilterOptions('status', [['all','全部'],['paid','已付款'],['payout','待撥款'],['pending','待完成'],['complete','已完成'],['refund','退款／取消']], draft.status)}</div>
+          <div class="shared-filter-section"><strong>時間範圍</strong>${sharedFilterOptions('time', [['30','近 30 天'],['90','近 3 個月'],['custom','自訂範圍']], draft.time)}</div>
+          ${sharedFilterActions()}`;
       }
-      const willActivate = !button.classList.contains('active');
-      button.classList.toggle('active');
-      if (willActivate) lastMatchFilter = button.dataset.matchFilter;
-      const selected = filters.filter(item => item.classList.contains('active')).map(item => item.textContent.trim());
-      const filtered = getFilteredCaregivers();
-      const focusedIndex = filtered.findIndex(caregiver => caregiver.focus === lastMatchFilter);
-      caregiverIndex = focusedIndex >= 0 ? focusedIndex : 0;
-      renderCaregiver();
-      const card = document.getElementById('matchCard');
-      card.classList.remove('resetting');
-      void card.offsetWidth;
-      card.classList.add('resetting');
-      window.setTimeout(() => card.classList.remove('resetting'), 240);
-      toast(selected.length ? `已套用：${selected.join('、')}` : '已清除篩選');
+    }
+
+    function openSharedFilter(context) {
+      sharedFilterContext = Object.prototype.hasOwnProperty.call(sharedFilterState, context) ? context : 'match';
+      sharedFilterDraft = { ...sharedFilterState[sharedFilterContext] };
+      const labels = { match:'自己挑保母', requestList:'快速發需求', bookings:'我的預約', finance:'付款與收款' };
+      document.getElementById('modalTitle').textContent = sharedFilterContext === 'finance' ? '篩選交易' : '篩選條件';
+      document.getElementById('modalCopy').textContent = labels[sharedFilterContext];
+      renderSharedFilterModal();
+      document.getElementById('modalLayer').classList.remove('pet-picker-mode','birthday-picker-mode','quick-month-mode','quick-time-mode','decision-mode','availability-month-mode','region-picker-mode','request-date-mode');
+      document.getElementById('modalLayer').classList.add('filter-picker-mode','show');
+    }
+
+    function renderSharedLocationPicker() {
+      const body = document.getElementById('modalBody');
+      if (!body || !sharedFilterDraft) return;
+      const isCity = sharedLocationStage === 'city';
+      const values = isCity ? Object.keys(regionOptions) : (regionOptions[sharedFilterDraft.city] || []);
+      const selected = isCity ? sharedFilterDraft.city : sharedFilterDraft.district;
+      document.getElementById('modalTitle').textContent = isCity ? '選擇城市' : '選擇行政區';
+      document.getElementById('modalCopy').textContent = isCity ? '先選擇縣市，再選擇行政區' : `${sharedFilterDraft.city} · 共 ${values.length} 區`;
+      body.innerHTML = `
+        <div class="filter-location-grid">${values.map(value => `<button class="filter-location-option ${value === selected ? 'active' : ''}" type="button" data-shared-location-value="${escapeHtml(value)}">${escapeHtml(value)}</button>`).join('')}</div>
+        <p class="filter-location-note">${isCity ? '全台 22 縣市；點選後會自動進入行政區。' : '行政區會依選擇的城市同步更新。'}</p>
+        <div class="shared-filter-actions"><button class="btn light" type="button" data-shared-location-back>${isCity ? '返回篩選' : '返回城市'}</button><button class="btn" type="button" data-confirm-shared-location ${isCity ? 'disabled' : ''}>${isCity ? '請選擇城市' : '確認地區'}</button></div>`;
+    }
+
+    function openSharedLocationPicker(stage = 'city') {
+      sharedLocationStage = stage;
+      renderSharedLocationPicker();
+    }
+
+    function selectSharedLocation(value) {
+      if (!sharedFilterDraft) return;
+      if (sharedLocationStage === 'city') {
+        sharedFilterDraft.city = value;
+        sharedFilterDraft.district = regionOptions[value]?.[0] || '';
+        sharedLocationStage = 'district';
+      } else {
+        sharedFilterDraft.district = value;
+      }
+      renderSharedLocationPicker();
+    }
+
+    function clearSharedFilter() {
+      const defaults = {
+        match: { city:'台北市', district:'大安區', availability:'any', pet:'any', distance:'any' },
+        requestList: { status:'all' }, bookings: { status:'all' }, finance: { status:'all', time:'30' }
+      };
+      sharedFilterDraft = { ...defaults[sharedFilterContext] };
+      renderSharedFilterModal();
+    }
+
+    function applySharedFilter() {
+      if (!sharedFilterDraft) return;
+      sharedFilterState[sharedFilterContext] = { ...sharedFilterDraft };
+      if (sharedFilterContext === 'match') {
+        caregiverIndex = 0;
+        renderCaregiver();
+      } else if (sharedFilterContext === 'requestList') {
+        requestFilter = sharedFilterState.requestList.status;
+        renderRequestList();
+      } else if (sharedFilterContext === 'bookings') {
+        filterBookings(sharedFilterState.bookings.status);
+      } else {
+        filterTransactions(sharedFilterState.finance.status, sharedFilterState.finance.time);
+      }
+      hideModal();
+      toast('已套用篩選');
     }
 
     document.addEventListener('click', event => {
@@ -7300,10 +7897,55 @@
         renderSlots();
         return;
       }
-      const matchFilter = event.target.closest('[data-match-filter]');
-      if (matchFilter) {
+      const sharedFilterButton = event.target.closest('[data-open-shared-filter]');
+      if (sharedFilterButton) {
         event.preventDefault();
-        toggleMatchFilter(matchFilter);
+        openSharedFilter(sharedFilterButton.dataset.openSharedFilter);
+        return;
+      }
+      const sharedFilterOption = event.target.closest('[data-shared-filter-group]');
+      if (sharedFilterOption) {
+        event.preventDefault();
+        sharedFilterDraft[sharedFilterOption.dataset.sharedFilterGroup] = sharedFilterOption.dataset.sharedFilterValue;
+        renderSharedFilterModal();
+        return;
+      }
+      if (event.target.closest('[data-open-shared-location]')) {
+        event.preventDefault();
+        openSharedLocationPicker('city');
+        return;
+      }
+      const sharedLocationOption = event.target.closest('[data-shared-location-value]');
+      if (sharedLocationOption) {
+        event.preventDefault();
+        selectSharedLocation(sharedLocationOption.dataset.sharedLocationValue);
+        return;
+      }
+      if (event.target.closest('[data-shared-location-back]')) {
+        event.preventDefault();
+        if (sharedLocationStage === 'district') openSharedLocationPicker('city');
+        else {
+          document.getElementById('modalTitle').textContent = '篩選條件';
+          document.getElementById('modalCopy').textContent = '自己挑保母';
+          renderSharedFilterModal();
+        }
+        return;
+      }
+      if (event.target.closest('[data-confirm-shared-location]')) {
+        event.preventDefault();
+        document.getElementById('modalTitle').textContent = '篩選條件';
+        document.getElementById('modalCopy').textContent = '自己挑保母';
+        renderSharedFilterModal();
+        return;
+      }
+      if (event.target.closest('[data-clear-shared-filter]')) {
+        event.preventDefault();
+        clearSharedFilter();
+        return;
+      }
+      if (event.target.closest('[data-apply-shared-filter]')) {
+        event.preventDefault();
+        applySharedFilter();
         return;
       }
       const detailFavorite = event.target.closest('#detailFavoriteButton');
