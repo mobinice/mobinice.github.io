@@ -273,6 +273,15 @@
       font-size: 15px;
       padding: 0 10px;
     }
+    .register-picker-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .register-grid .birth-input.register-picker-trigger { justify-content: center; }
     .register-grid .chips { gap: 8px; }
     .register-grid .chip {
       min-width: 68px;
@@ -4234,11 +4243,11 @@
       <div class="card register-card">
         <div class="register-grid">
           <div class="field"><label>暱稱 *</label><input class="input" value="小安"></div>
-          <div class="field"><label>生日 *</label><input class="input birth-input" value="1992年8月12日" aria-label="生日"></div>
+          <div class="field"><label>生日 *</label><button class="input birth-input register-picker-trigger" type="button" data-open-registration-picker="birthday" aria-haspopup="dialog" aria-label="選擇生日"><span id="registerBirthdayValue">1992年8月12日</span></button><input id="registerBirthdayInput" value="1992-08-12" hidden></div>
           <div class="field span-2"><label>通訊 Email</label><input class="input" value="hello@copaws.tw"></div>
           <div class="field span-2"><label>通訊電話</label><input class="input" value="0912 345 678"></div>
-          <div class="field"><label>性別</label><select class="select"><option>請選擇</option><option>女</option><option>男</option><option>不透露</option></select></div>
-          <div class="field"><label>興趣</label><select class="select"><option>攝影、散步</option><option>寵物訓練</option><option>居家整理</option><option>戶外運動</option></select></div>
+          <div class="field"><label>性別</label><button class="select register-picker-trigger" type="button" data-open-registration-picker="gender" aria-haspopup="dialog"><span id="registerGenderValue">請選擇</span></button><input id="registerGenderInput" value="請選擇" hidden></div>
+          <div class="field"><label>興趣</label><button class="select register-picker-trigger" type="button" data-open-registration-picker="interest" aria-haspopup="dialog"><span id="registerInterestValue">攝影、散步</span></button><input id="registerInterestInput" value="攝影、散步" hidden></div>
           <div class="field span-2">
             <label>喜歡的寵物類別</label>
             <div class="chips" data-toggle-group="pet-types"><button class="chip" type="button">狗狗</button><button class="chip active" type="button">貓咪</button><button class="chip" type="button">爬蟲</button><button class="chip" type="button">其他</button></div>
@@ -5020,6 +5029,19 @@
     const selectedPetIndexes = { demand: 0, edit: 0, quick: 0, requestEdit: 0 };
     let petPickerContext = 'demand';
     let pendingPetIndex = 0;
+    const registrationProfile = {
+      birthday: { year: 1992, month: 8, day: 12 },
+      gender: '請選擇',
+      interest: '攝影、散步'
+    };
+    const registrationPickerOptions = {
+      gender: ['請選擇', '女', '男', '不透露'],
+      interest: ['攝影、散步', '寵物訓練', '居家整理', '戶外運動']
+    };
+    let registrationPickerType = '';
+    let registrationBirthdayStage = 'year';
+    let pendingRegistrationValue = '';
+    let pendingRegistrationBirthday = { ...registrationProfile.birthday };
     const identityBirthday = { year: '', month: '', day: '' };
     const identityIssueDate = { month: '', day: '' };
     let identityReviewStatus = sessionStorage.getItem('copawsIdentityReviewStatus') || 'not_started';
@@ -5761,6 +5783,88 @@
     function availableRegionOptions(context, kind) {
       if (kind === 'city') return Object.keys(regionOptions);
       return regionOptions[currentRegionValue(context, 'city')] || [];
+    }
+
+    function registrationBirthdayValues() {
+      if (registrationBirthdayStage === 'year') {
+        return Array.from({ length: 87 }, (_, index) => 2026 - index);
+      }
+      if (registrationBirthdayStage === 'month') {
+        return Array.from({ length: 12 }, (_, index) => index + 1);
+      }
+      const days = new Date(pendingRegistrationBirthday.year, pendingRegistrationBirthday.month, 0).getDate();
+      return Array.from({ length: days }, (_, index) => index + 1);
+    }
+
+    function renderRegistrationPicker() {
+      const body = document.getElementById('modalBody');
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      if (registrationPickerType === 'birthday') {
+        const stageLabels = { year: '西元年', month: '月份', day: '日期' };
+        const selected = pendingRegistrationBirthday[registrationBirthdayStage];
+        body.innerHTML = `<div class="birthday-picker-options ${registrationBirthdayStage}">${registrationBirthdayValues().map(value => {
+          const suffix = registrationBirthdayStage === 'year' ? ' 年' : registrationBirthdayStage === 'month' ? ' 月' : ' 日';
+          return `<button class="birthday-option ${Number(value) === Number(selected) ? 'active' : ''}" type="button" data-registration-picker-value="${value}" aria-pressed="${Number(value) === Number(selected)}">${value}${suffix}</button>`;
+        }).join('')}</div>`;
+        document.getElementById('modalTitle').textContent = `選擇${stageLabels[registrationBirthdayStage]}`;
+        document.getElementById('modalCopy').textContent = '依序選擇西元年、月份與日期';
+        action.textContent = registrationBirthdayStage === 'day' ? '確認生日' : '下一步';
+        requestAnimationFrame(() => body.querySelector('.birthday-option.active')?.scrollIntoView({ block: 'center' }));
+        return;
+      }
+      const options = registrationPickerOptions[registrationPickerType] || [];
+      body.innerHTML = `<div class="region-picker-options">${options.map(value => `<button class="region-picker-option ${value === pendingRegistrationValue ? 'active' : ''}" type="button" data-registration-picker-value="${value}" aria-pressed="${value === pendingRegistrationValue}">${value}</button>`).join('')}</div>`;
+      document.getElementById('modalTitle').textContent = registrationPickerType === 'gender' ? '選擇性別' : '選擇興趣';
+      document.getElementById('modalCopy').textContent = '選擇後確認，資料會回填至基本資料';
+      action.textContent = '確認選擇';
+    }
+
+    function openRegistrationPicker(type) {
+      registrationPickerType = ['birthday', 'gender', 'interest'].includes(type) ? type : 'gender';
+      if (registrationPickerType === 'birthday') {
+        registrationBirthdayStage = 'year';
+        pendingRegistrationBirthday = { ...registrationProfile.birthday };
+      } else {
+        pendingRegistrationValue = registrationProfile[registrationPickerType];
+      }
+      renderRegistrationPicker();
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      action.onclick = confirmRegistrationPicker;
+      const layer = document.getElementById('modalLayer');
+      layer.classList.remove('pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'quick-time-mode', 'decision-mode', 'availability-month-mode', 'region-picker-mode', 'request-date-mode', 'filter-picker-mode');
+      layer.classList.add(registrationPickerType === 'birthday' ? 'birthday-picker-mode' : 'region-picker-mode', 'show');
+    }
+
+    function selectRegistrationPicker(value) {
+      if (registrationPickerType === 'birthday') {
+        pendingRegistrationBirthday[registrationBirthdayStage] = Number(value);
+        if (registrationBirthdayStage !== 'year') {
+          const maxDay = new Date(pendingRegistrationBirthday.year, pendingRegistrationBirthday.month, 0).getDate();
+          pendingRegistrationBirthday.day = Math.min(pendingRegistrationBirthday.day, maxDay);
+        }
+      } else {
+        pendingRegistrationValue = value;
+      }
+      renderRegistrationPicker();
+    }
+
+    function confirmRegistrationPicker() {
+      if (registrationPickerType === 'birthday' && registrationBirthdayStage !== 'day') {
+        registrationBirthdayStage = registrationBirthdayStage === 'year' ? 'month' : 'day';
+        renderRegistrationPicker();
+        return;
+      }
+      if (registrationPickerType === 'birthday') {
+        Object.assign(registrationProfile.birthday, pendingRegistrationBirthday);
+        document.getElementById('registerBirthdayValue').textContent = `${registrationProfile.birthday.year}年${registrationProfile.birthday.month}月${registrationProfile.birthday.day}日`;
+        document.getElementById('registerBirthdayInput').value = `${registrationProfile.birthday.year}-${String(registrationProfile.birthday.month).padStart(2, '0')}-${String(registrationProfile.birthday.day).padStart(2, '0')}`;
+      } else {
+        registrationProfile[registrationPickerType] = pendingRegistrationValue;
+        const key = registrationPickerType === 'gender' ? 'Gender' : 'Interest';
+        document.getElementById(`register${key}Value`).textContent = pendingRegistrationValue;
+        document.getElementById(`register${key}Input`).value = pendingRegistrationValue;
+      }
+      hideModal();
     }
 
     function renderRegionPicker() {
@@ -7630,6 +7734,18 @@
       if (regionTrigger) {
         event.preventDefault();
         openRegionPicker(regionTrigger.dataset.openRegionPicker);
+        return;
+      }
+      const registrationTrigger = event.target.closest('[data-open-registration-picker]');
+      if (registrationTrigger) {
+        event.preventDefault();
+        openRegistrationPicker(registrationTrigger.dataset.openRegistrationPicker);
+        return;
+      }
+      const registrationOption = event.target.closest('[data-registration-picker-value]');
+      if (registrationOption) {
+        event.preventDefault();
+        selectRegistrationPicker(registrationOption.dataset.registrationPickerValue);
         return;
       }
       const regionOption = event.target.closest('[data-region-value]');
