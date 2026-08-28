@@ -2752,6 +2752,14 @@
       cursor: default;
       opacity: 1;
     }
+    .profile-screen .sitter-card.identity-rejected {
+      background: #b74b3d;
+    }
+    .profile-screen .sitter-card.identity-rejected .btn {
+      border-color: #fff4d9;
+      background: #fff4d9;
+      color: #8f2e21;
+    }
 
     .identity-review-screen {
       padding-top: 0;
@@ -5044,7 +5052,10 @@
     let pendingRegistrationBirthday = { ...registrationProfile.birthday };
     const identityBirthday = { year: '', month: '', day: '' };
     const identityIssueDate = { month: '', day: '' };
-    let identityReviewStatus = sessionStorage.getItem('copawsIdentityReviewStatus') || 'not_started';
+    const identityReviewQueryStatus = new URLSearchParams(window.location.search).get('identity-review');
+    let identityReviewStatus = ['pending', 'rejected'].includes(identityReviewQueryStatus)
+      ? identityReviewQueryStatus
+      : sessionStorage.getItem('copawsIdentityReviewStatus') || 'not_started';
     let identityDatePickerType = 'birthYear';
     let pendingIdentityDateValue = '';
     const identityUploadState = {
@@ -6398,12 +6409,18 @@
       const action = document.getElementById('profileIdentityAction');
       if (!card || !title || !copy || !action) return;
       const isPending = identityReviewStatus === 'pending';
+      const isRejected = identityReviewStatus === 'rejected';
       card.classList.toggle('identity-pending', isPending);
-      title.textContent = isPending ? '實名認證審核中' : '成為寵物保母';
+      card.classList.toggle('identity-rejected', isRejected);
+      title.textContent = isPending
+        ? '實名認證審核中'
+        : isRejected ? '實名認證未通過' : '成為寵物保母';
       copy.textContent = isPending
         ? '資料已送出，平台正在審核，完成後會透過通知告知。'
-        : '上傳身分證完成實名認證，建立服務區域、價格與可預約日曆。';
-      action.textContent = isPending ? '審核中' : '開始認證';
+        : isRejected
+          ? '退回原因：身分證照片不清楚，請重新上傳後送審。'
+          : '上傳身分證完成實名認證，建立服務區域、價格與可預約日曆。';
+      action.textContent = isPending ? '審核中' : isRejected ? '再次審核' : '開始認證';
       action.disabled = isPending;
       action.setAttribute('aria-disabled', String(isPending));
       if (isPending) action.removeAttribute('data-go');
