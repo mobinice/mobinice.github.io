@@ -5411,6 +5411,12 @@
     let matchSwipeTimer = 0;
     const matchSwipeSettleMs = 175;
     const matchSwipeOpacityMs = 135;
+    const cardSwipeIntentThreshold = 8;
+    const cardSwipeDistanceThreshold = 92;
+    const cardSwipeTouchMinDistance = 42;
+    const cardSwipeTouchMaxDuration = 240;
+    const cardSwipeTouchMinVelocity = .45;
+    const cardSwipeClickReleaseDelayMs = 80;
     let editingPetIndex = null;
     let petPhotoData = '';
     let petFormReturnScreen = 'pets';
@@ -5455,11 +5461,6 @@
     let sitterMeetingContext = 'sitter';
     let sitterMeetingConfirmed = false;
     let sitterRegionDirect = false;
-    let sitterSwipePointer = null;
-    let sitterSwipeStartX = 0;
-    let sitterSwipeStartY = 0;
-    let sitterSwipeStartedAt = 0;
-    let sitterSwipeHorizontal = false;
     const quickDemandDate = { year: 2026, month: 12, day: 12 };
     let pendingQuickYear = quickDemandDate.year;
     let pendingQuickMonth = quickDemandDate.month;
@@ -7066,39 +7067,144 @@
       const yes = document.getElementById('sitterSwipeYes');
       if (!card || card.dataset.swipeWired) return;
       card.dataset.swipeWired = 'true';
+
+      let activePointerId = null;
+      let activePointerType = '';
+      let startX = 0;
+      let startY = 0;
+      let dx = 0;
+      let dy = 0;
+      let gesture = 'idle';
+      let gestureStartedAt = 0;
+      let lastMoveX = 0;
+      let lastMoveAt = 0;
+      let velocityX = 0;
+      let hasMoved = false;
+      let suppressClick = false;
+      let suppressClickTimer = 0;
+      let animating = false;
+
+      function releaseClickSuppression(delay = cardSwipeClickReleaseDelayMs) {
+        if (suppressClickTimer) clearTimeout(suppressClickTimer);
+        suppressClickTimer = window.setTimeout(() => {
+          suppressClick = false;
+          suppressClickTimer = 0;
+        }, delay);
+      }
+
+      function resetPointerState() {
+        activePointerId = null;
+        activePointerType = '';
+        gesture = 'idle';
+        dx = 0;
+        dy = 0;
+        gestureStartedAt = 0;
+        lastMoveX = 0;
+        lastMoveAt = 0;
+        velocityX = 0;
+        hasMoved = false;
+        card.classList.remove('dragging');
+      }
+
+      function resetVisuals() {
+        card.style.transition = '';
+        card.style.transform = '';
+        card.style.opacity = '';
+        no.style.opacity = '0';
+        yes.style.opacity = '0';
+      }
+
       card.addEventListener('pointerdown', event => {
-        if (event.target.closest('button')) return;
-        sitterSwipePointer = event.pointerId;
-        sitterSwipeStartX = event.clientX;
-        sitterSwipeStartY = event.clientY;
-        sitterSwipeStartedAt = performance.now();
-        sitterSwipeHorizontal = false;
-        try { card.setPointerCapture?.(event.pointerId); } catch (_) {}
+        if (event.target.closest('button, a, input, textarea, select')) return;
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        if (animating || activePointerId !== null) return;
+        if (suppressClickTimer) clearTimeout(suppressClickTimer);
+        suppressClickTimer = 0;
+        suppressClick = false;
+        activePointerId = event.pointerId;
+        activePointerType = event.pointerType || 'mouse';
+        startX = event.clientX;
+        startY = event.clientY;
+        dx = 0;
+        dy = 0;
+        gesture = 'pending';
+        gestureStartedAt = event.timeStamp || performance.now();
+        lastMoveX = startX;
+        lastMoveAt = gestureStartedAt;
+        velocityX = 0;
+        hasMoved = false;
       });
+
       card.addEventListener('pointermove', event => {
-        if (sitterSwipePointer !== event.pointerId) return;
-        const dx = event.clientX - sitterSwipeStartX;
-        const dy = event.clientY - sitterSwipeStartY;
-        if (!sitterSwipeHorizontal && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.1) sitterSwipeHorizontal = true;
-        if (!sitterSwipeHorizontal) return;
+        if (activePointerId !== event.pointerId || animating) return;
+        dx = event.clientX - startX;
+        dy = event.clientY - startY;
+        const moveAt = event.timeStamp || performance.now();
+        const moveElapsed = moveAt - lastMoveAt;
+        if (moveElapsed > 0 && moveElapsed < 120) {
+          const instantVelocityX = (event.clientX - lastMoveX) / moveElapsed;
+          velocityX = velocityX * .35 + instantVelocityX * .65;
+        }
+        lastMoveX = event.clientX;
+        lastMoveAt = moveAt;
+        if (Math.abs(dx) >= 3 || Math.abs(dy) >= 3) hasMoved = true;
+        if (gesture === 'pending') {
+          if (Math.abs(dx) < cardSwipeIntentThreshold && Math.abs(dy) < cardSwipeIntentThreshold) return;
+          if (Math.abs(dy) > Math.abs(dx) * 1.15) {
+            gesture = 'vertical';
+            suppressClick = true;
+            return;
+          }
+          gesture = 'horizontal';
+          suppressClick = true;
+          if (activePointerType === 'mouse') {
+            try { card.setPointerCapture(event.pointerId); } catch {}
+          }
+          card.classList.add('dragging');
+        }
+        if (gesture !== 'horizontal') return;
         event.preventDefault();
         const rotate = Math.max(-9, Math.min(9, dx / 22));
         card.style.transform = `translate3d(${dx}px,0,0) rotate(${rotate}deg)`;
         no.style.opacity = String(Math.max(0, Math.min(1, -dx / 100)));
         yes.style.opacity = String(Math.max(0, Math.min(1, dx / 100)));
-      });
-      const finish = event => {
-        if (sitterSwipePointer !== event.pointerId) return;
-        const dx = event.clientX - sitterSwipeStartX;
-        const elapsed = Math.max(1, performance.now() - sitterSwipeStartedAt);
-        const velocity = Math.abs(dx) / elapsed;
-        const velocityDistance = Math.min(72, card.clientWidth * .18);
-        const accepted = event.type !== 'pointercancel' && sitterSwipeHorizontal && (Math.abs(dx) > card.clientWidth * .28 || (Math.abs(dx) > velocityDistance && velocity > .65));
-        sitterSwipePointer = null;
-        try { card.releasePointerCapture?.(event.pointerId); } catch (_) {}
+      }, { passive: false });
+
+      function finish(event, forceCancel = false, useReleaseCoordinates = true) {
+        if (activePointerId === null) return;
+        if (event?.pointerId != null && event.pointerId !== activePointerId) return;
+        const pointerId = activePointerId;
+        const pointerType = activePointerType;
+        const releaseAt = event?.timeStamp >= gestureStartedAt ? event.timeStamp : performance.now();
+        const elapsed = Math.max(1, releaseAt - gestureStartedAt);
+        if (!forceCancel && useReleaseCoordinates && event?.type === 'pointerup' && Number.isFinite(event.clientX)) {
+          const finalDx = event.clientX - startX;
+          const sameDirection = dx === 0 || finalDx === 0 || Math.sign(finalDx) === Math.sign(dx);
+          if (gesture === 'horizontal' && sameDirection && Math.abs(finalDx) >= Math.abs(dx)) dx = finalDx;
+        }
+        const averageVelocityX = dx / elapsed;
+        const velocityMatchesDirection = velocityX === 0 || dx === 0 || Math.sign(velocityX) === Math.sign(dx);
+        const releaseVelocity = Math.max(Math.abs(averageVelocityX), velocityMatchesDirection ? Math.abs(velocityX) : 0);
+        const horizontalIntent = gesture === 'horizontal'
+          || (pointerType === 'mouse' && Math.abs(dx) >= cardSwipeDistanceThreshold && Math.abs(dx) >= Math.abs(dy));
+        const isTouchFlick = pointerType !== 'mouse'
+          && gesture === 'horizontal'
+          && hasMoved
+          && Math.abs(dx) >= cardSwipeTouchMinDistance
+          && elapsed <= cardSwipeTouchMaxDuration
+          && releaseVelocity >= cardSwipeTouchMinVelocity;
+        const accepted = !forceCancel && horizontalIntent
+          && (Math.abs(dx) >= cardSwipeDistanceThreshold || isTouchFlick);
+        const releaseDx = dx;
+        if (gesture !== 'pending' || hasMoved) suppressClick = true;
+        resetPointerState();
+        try {
+          if (pointerId != null && card.hasPointerCapture(pointerId)) card.releasePointerCapture(pointerId);
+        } catch {}
         card.style.transition = 'transform 150ms ease, opacity 120ms ease';
         if (accepted) {
-          card.style.transform = `translate3d(${dx > 0 ? card.clientWidth * 1.2 : -card.clientWidth * 1.2}px,0,0) rotate(${dx > 0 ? 10 : -10}deg)`;
+          animating = true;
+          card.style.transform = `translate3d(${releaseDx > 0 ? card.clientWidth * 1.2 : -card.clientWidth * 1.2}px,0,0) rotate(${releaseDx > 0 ? 10 : -10}deg)`;
           card.style.opacity = '0';
           setTimeout(() => {
             card.style.transition = 'none';
@@ -7106,19 +7212,39 @@
             card.style.opacity = '';
             no.style.opacity = '0';
             yes.style.opacity = '0';
-            if (dx > 0) openSitterAcceptModal();
+            if (releaseDx > 0) openSitterAcceptModal();
             else { sitterDemandIndex += 1; renderSitterDemand(); toast('已略過並顯示下一筆需求'); }
-            requestAnimationFrame(() => { card.style.transition = ''; });
+            requestAnimationFrame(() => {
+              card.style.transition = '';
+              animating = false;
+              releaseClickSuppression();
+            });
           }, 130);
         } else {
           card.style.transform = '';
           no.style.opacity = '0';
           yes.style.opacity = '0';
-          setTimeout(() => { card.style.transition = ''; }, 160);
+          setTimeout(() => {
+            resetVisuals();
+            releaseClickSuppression();
+          }, 160);
         }
-      };
-      card.addEventListener('pointerup', finish);
-      card.addEventListener('pointercancel', finish);
+      }
+
+      card.addEventListener('pointerup', event => finish(event));
+      card.addEventListener('pointercancel', event => finish(event, false, false));
+      card.addEventListener('lostpointercapture', event => {
+        if (activePointerId === null || event.pointerId !== activePointerId) return;
+        finish(null, activePointerType !== 'mouse', false);
+      });
+      window.addEventListener('pointerup', event => finish(event), true);
+      window.addEventListener('pointercancel', event => finish(event, false, false), true);
+      card.addEventListener('dragstart', event => event.preventDefault());
+      card.addEventListener('click', event => {
+        if (!suppressClick) return;
+        event.preventDefault();
+        event.stopPropagation();
+      }, true);
     }
 
     function go(id) {
@@ -7657,7 +7783,7 @@
         renderCaregiver();
         resetMatchVisuals();
         isSwiping = false;
-        window.setTimeout(() => { suppressMatchClick = false; }, 80);
+        window.setTimeout(() => { suppressMatchClick = false; }, cardSwipeClickReleaseDelayMs);
       }, matchSwipeSettleMs + 5);
     }
 
@@ -7728,14 +7854,14 @@
         const velocityMatchesDirection = velocityX === 0 || dx === 0 || Math.sign(velocityX) === Math.sign(dx);
         const releaseVelocity = Math.max(Math.abs(averageVelocityX), velocityMatchesDirection ? Math.abs(velocityX) : 0);
         const horizontalIntent = gesture === 'horizontal'
-          || (pointerType === 'mouse' && Math.abs(dx) >= 92 && Math.abs(dx) >= Math.abs(dy));
+          || (pointerType === 'mouse' && Math.abs(dx) >= cardSwipeDistanceThreshold && Math.abs(dx) >= Math.abs(dy));
         const isTouchFlick = pointerType !== 'mouse'
           && gesture === 'horizontal'
           && hasMoved
-          && Math.abs(dx) >= 42
-          && elapsed <= 240
-          && releaseVelocity >= .45;
-        const shouldSwipe = !forceCancel && horizontalIntent && (Math.abs(dx) >= 92 || isTouchFlick);
+          && Math.abs(dx) >= cardSwipeTouchMinDistance
+          && elapsed <= cardSwipeTouchMaxDuration
+          && releaseVelocity >= cardSwipeTouchMinVelocity;
+        const shouldSwipe = !forceCancel && horizontalIntent && (Math.abs(dx) >= cardSwipeDistanceThreshold || isTouchFlick);
         const swipeDirection = dx > 0 ? 'right' : 'left';
         const releaseDx = dx;
         if (frame) {
@@ -7753,7 +7879,7 @@
         }
         card.style.transform = '';
         card.style.opacity = '';
-        window.setTimeout(() => { suppressMatchClick = false; }, 80);
+        window.setTimeout(() => { suppressMatchClick = false; }, cardSwipeClickReleaseDelayMs);
       }
 
       card.addEventListener('pointerdown', event => {
@@ -7790,7 +7916,7 @@
         lastMoveAt = moveAt;
         if (Math.abs(dx) >= 3 || Math.abs(dy) >= 3) hasMoved = true;
         if (gesture === 'pending') {
-          if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+          if (Math.abs(dx) < cardSwipeIntentThreshold && Math.abs(dy) < cardSwipeIntentThreshold) return;
           if (Math.abs(dy) > Math.abs(dx) * 1.15) {
             finishDrag(event, true);
             return;
@@ -7798,7 +7924,9 @@
           gesture = 'horizontal';
           suppressMatchClick = true;
           document.getElementById('match').style.overflowY = 'hidden';
-          try { card.setPointerCapture(event.pointerId); } catch {}
+          if (activePointerType === 'mouse') {
+            try { card.setPointerCapture(event.pointerId); } catch {}
+          }
           card.classList.add('dragging');
         }
         if (gesture !== 'horizontal') return;
