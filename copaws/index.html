@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Copaws 飼主端 Demo Prototype</title>
+  <title>Copaws Interactive Prototype</title>
   <link rel="icon" type="image/png" href="assets/copaws-a-plan-icon.png">
   <link rel="apple-touch-icon" href="assets/copaws-a-plan-icon.png">
   <style>
@@ -136,8 +136,8 @@
       font-weight: 900;
     }
     .screen-back {
-      width: 38px;
-      height: 38px;
+      width: 44px;
+      height: 44px;
       margin: 2px 0 8px -8px;
       border-radius: 50%;
       display: grid;
@@ -933,6 +933,8 @@
     .nav-logo-filled { display: none !important; }
     .nav-item[data-tab="map"].active .nav-logo-outline { display: none; }
     .nav-item[data-tab="map"].active .nav-logo-filled { display: block !important; }
+    .nav-item[data-sitter-tab="sitterMap"].active .nav-logo-outline { display: none; }
+    .nav-item[data-sitter-tab="sitterMap"].active .nav-logo-filled { display: block !important; }
 
     .map-canvas {
       height: 430px;
@@ -1863,8 +1865,8 @@
       position: absolute;
       right: 24px;
       top: 24px;
-      width: 34px;
-      height: 34px;
+      width: 44px;
+      height: 44px;
       border: 1px solid var(--line);
       border-radius: 50%;
       background: #fff;
@@ -2466,6 +2468,7 @@
       margin-top: auto;
       padding-top: 12px;
     }
+    .quick-replies button { min-height:46px; }
     .quick-reply {
       flex: 0 0 auto;
       height: 34px;
@@ -3385,6 +3388,8 @@
     }
     .cert-badge.identity-cert svg { width: 100%; height: 100%; display: block; }
     .cert-badge.small-cert { width: 20px; height: 20px; flex-basis: 20px; font-size: 12px; }
+    .verified-icon.small-cert { width:20px; height:20px; flex:0 0 20px; }
+    .verified-icon.small-cert svg { width:20px; height:20px; }
     .match-name-row { align-items: center; }
     .match-name-row .name-cert-row { flex: 1; }
     .match-name-row .name-cert-row h2 { flex: 0 1 auto; }
@@ -3751,7 +3756,7 @@
     .shared-filter-options.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .shared-filter-option {
       min-width: 0;
-      min-height: 36px;
+      min-height: 46px;
       padding: 0 8px;
       border: 1px solid var(--line);
       border-radius: 999px;
@@ -3774,7 +3779,7 @@
       padding-right: 2px;
     }
     .filter-location-option {
-      min-height: 38px;
+      min-height: 46px;
       padding: 0 8px;
       border: 1px solid var(--line);
       border-radius: 999px;
@@ -4037,6 +4042,212 @@
       font-weight:900;
     }
 
+    .sitter-head {
+      min-height: 84px;
+      margin: 0 -4px 12px;
+      padding-top: 18px;
+      position: relative;
+    }
+    .sitter-head .screen-title { margin: 0 52px 4px 0; }
+    .sitter-head .subtitle { margin: 0; }
+    .sitter-head .shared-filter-trigger { position: absolute; top: 14px; right: 0; }
+    .owner-summary-card {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border-radius: 18px;
+    }
+    .owner-summary-card.compact { grid-template-columns: 54px minmax(0, 1fr); padding: 10px 12px; gap: 10px; }
+    .owner-summary-card .avatar { width: 72px; height: 72px; margin: 0; border-radius: 16px; }
+    .owner-summary-card.compact .avatar { width: 54px; height: 54px; border-radius: 12px; }
+    .owner-summary-copy { min-width: 0; }
+    .owner-summary-copy .name-cert-row { min-width: 0; gap: 8px; }
+    .owner-summary-copy h2,
+    .owner-summary-copy h3 { margin: 0; font-size: 20px; line-height: 24px; }
+    .owner-summary-copy .rating-line { margin: 5px 0 4px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .owner-summary-copy .owner-facts { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .sitter-demand-card {
+      padding: 18px;
+      border-radius: 22px;
+      touch-action: pan-y;
+      will-change: transform;
+      transition: transform .18s ease, opacity .18s ease;
+    }
+    .sitter-demand-card.dragging { transition: none; }
+    .sitter-demand-card.leaving { opacity: 0; }
+    .sitter-demand-top,
+    .sitter-fee-row,
+    .sitter-section-title,
+    .sitter-income-head,
+    .sitter-metric-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .sitter-status-pill {
+      min-height: 28px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      color: var(--green);
+      background: var(--green-soft);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .sitter-distance { color: var(--green); font-size: 13px; font-weight: 900; }
+    .sitter-demand-card .owner-summary-card { padding: 14px 0 10px; border: 0; box-shadow: none; background: transparent; }
+    .sitter-info-box {
+      margin-top: 10px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: var(--green-soft);
+    }
+    .sitter-info-box span,
+    .sitter-label { display: block; margin-bottom: 5px; color: var(--green); font-size: 12px; font-weight: 900; }
+    .sitter-info-box strong { font-size: 17px; line-height: 1.3; }
+    .sitter-field { margin-top: 16px; }
+    .sitter-field > span { display: block; margin-bottom: 7px; color: var(--muted); font-size: 12px; font-weight: 800; }
+    .sitter-field > strong,
+    .sitter-readonly {
+      display: block;
+      width: 100%;
+      min-height: 48px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,.86);
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .sitter-assistance { display: flex; flex-wrap: wrap; gap: 8px; }
+    .sitter-assistance span {
+      min-width: 70px;
+      min-height: 32px;
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      text-align: center;
+    }
+    .sitter-assistance span.active { color: #fff; border-color: var(--green); background: var(--green); }
+    .sitter-fee-row { margin-top: 18px; align-items: end; }
+    .sitter-fee-row small { display: block; margin-top: 4px; color: var(--muted); }
+    .sitter-fee-row strong { color: var(--green); font-size: 25px; }
+    .sitter-dual-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+    .sitter-dual-actions .btn { min-width: 0; padding-inline: 8px; }
+    .sitter-hint { margin: 14px 0 0; color: var(--muted); font-size: 12px; text-align: center; }
+    .sitter-case-card { margin-bottom: 12px; padding: 16px; border-radius: 16px; box-shadow: none; }
+    .sitter-case-card h3 { margin: 8px 0 6px; font-size: 18px; }
+    .sitter-case-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .sitter-case-actions { display: flex; gap: 24px; margin-top: 14px; }
+    .sitter-case-actions button { min-height: 44px; color: var(--green); font-size: 12px; font-weight: 900; }
+    .sitter-status-blue { color: #2673d8; }
+    .sitter-status-clay { color: var(--clay); }
+    .sitter-status-gold { color: #b77a13; }
+    .sitter-map-region {
+      width: 100%;
+      min-height: 48px;
+      margin-bottom: 12px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: #fff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .sitter-map-list { margin-top: 14px; padding: 18px; border-radius: 18px; }
+    .sitter-map-row { display: grid; grid-template-columns: 30px 46px minmax(0,1fr) auto; gap: 9px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .sitter-map-row:last-child { border-bottom: 0; }
+    .sitter-map-row .avatar { width: 46px; height: 46px; margin: 0; border-radius: 12px; }
+    .sitter-map-row-copy { min-width:0; display:grid; gap:3px; text-align:left; }
+    .sitter-map-row-copy .name-cert-row { min-width:0; gap:8px; }
+    .sitter-map-row-copy > span:last-child { color:var(--muted); font-size:10px; line-height:1.35; }
+    .sitter-map-row strong { font-size: 13px; }
+    .sitter-map-row p { margin: 3px 0 0; color: var(--muted); font-size: 10px; }
+    .sitter-map-row .rank,
+    .sitter-map-row .district { color: var(--green); font-size: 11px; font-weight: 900; }
+    .sitter-timeline { margin: 18px 0; }
+    .sitter-timeline-row { position: relative; min-height: 48px; padding-left: 80px; display: flex; align-items: center; font-size: 12px; }
+    .sitter-timeline-row::before { content:""; position:absolute; left:17px; top:0; bottom:0; width:3px; background:#c8dfcc; }
+    .sitter-timeline-row::after { content:""; position:absolute; left:9px; top:17px; width:19px; height:19px; border-radius:50%; background:var(--green); }
+    .sitter-timeline-row.pending::after { background:#9a958a; }
+    .sitter-timeline-row time { position:absolute; left:36px; color:var(--muted); font-size:10px; }
+    .sitter-report-upload { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    .sitter-report-upload button { min-height:130px; border:1px solid var(--line); border-radius:14px; background:#fff; color:var(--green); font-weight:900; }
+    .sitter-report-upload button:first-child { background:var(--green-soft); }
+    .sitter-income-summary { padding:18px; border-radius:16px; color:#fff; background:var(--green); }
+    .sitter-income-summary strong { display:block; margin-top:8px; font-size:25px; }
+    .sitter-income-list { margin-top:16px; display:grid; gap:10px; }
+    .sitter-income-item { padding:14px; display:grid; grid-template-columns:38px minmax(0,1fr) auto; gap:10px; align-items:center; border-radius:14px; box-shadow:none; }
+    .sitter-income-sign { width:34px; height:34px; border-radius:50%; display:grid; place-items:center; color:var(--green); background:var(--green-soft); font-size:20px; }
+    .sitter-income-sign.minus { color:var(--clay); background:#ffebe6; }
+    .sitter-income-item h3 { margin:0; font-size:13px; }
+    .sitter-income-item p { margin:4px 0 0; color:var(--muted); font-size:10px; }
+    .sitter-income-item > strong { color:var(--green); font-size:12px; }
+    .sitter-income-item > strong.minus { color:var(--clay); }
+    .sitter-profile-card { padding:16px; display:grid; grid-template-columns:72px minmax(0,1fr); gap:14px; align-items:center; border-radius:18px; }
+    .sitter-profile-upload { width:72px; height:72px; border:1px solid var(--green); border-radius:16px; color:var(--green); background:var(--green-soft); font-size:11px; font-weight:900; }
+    .sitter-profile-card h2 { margin:0 0 4px; }
+    .sitter-cert-list { display:flex; gap:8px; margin-top:8px; align-items:center; }
+    .sitter-performance { margin:14px 0; padding:18px; display:grid; grid-template-columns:repeat(3,1fr); gap:8px; border-radius:16px; color:#fff; background:var(--green); }
+    .sitter-performance strong { display:block; font-size:20px; }
+    .sitter-performance span { font-size:9px; }
+    .sitter-menu { display:grid; gap:10px; }
+    .sitter-menu button { width:100%; min-height:64px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--line); border-radius:14px; background:#fff; text-align:left; }
+    .sitter-menu strong { display:block; margin-bottom:4px; font-size:14px; }
+    .sitter-menu small { color:var(--muted); font-size:10px; }
+    .sitter-edit-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .sitter-photo-slot { aspect-ratio:1; border:1px solid var(--line); border-radius:14px; display:grid; place-items:center; color:var(--green); background:#fff; font-size:11px; font-weight:900; }
+    .sitter-photo-slot.primary { border-color:var(--green); background:var(--green-soft); }
+    .growth-score { padding:18px; display:grid; grid-template-columns:1fr 1fr; color:#fff; background:var(--green); border-radius:16px; }
+    .growth-score strong { display:block; font-size:28px; }
+    .growth-metrics { display:grid; gap:10px; margin:16px 0 22px; }
+    .growth-metric { min-height:46px; padding:0 14px; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--line); border-radius:12px; background:#fff; font-size:12px; }
+    .growth-metric strong { color:var(--green); }
+    .sitter-review-card { margin-bottom:10px; padding:14px; border-radius:14px; box-shadow:none; }
+    .sitter-review-card p { font-size:12px; line-height:1.45; }
+    .sitter-nav { grid-template-columns: repeat(4, 1fr); }
+    .sitter-nav .nav-item .money-tab-icon { font-size:27px; font-weight:900; line-height:1; }
+    .meeting-modal .modal { max-width: 380px; padding: 20px; }
+    .meeting-modal .modal-close { display:grid; place-items:center; right:16px; top:16px; }
+    .meeting-modal .modal > .btn.full { display:none; }
+    .meeting-modal .owner-summary-card.compact { grid-template-columns:64px minmax(0,1fr); }
+    .meeting-modal .owner-summary-card.compact .avatar { width:64px; height:64px; }
+    .meeting-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:14px; }
+    .meeting-actions .btn { min-width:0; min-height:48px; }
+    .sitter-decline-modal .modal-close { display:grid; place-items:center; }
+    .sitter-decline-modal .modal > .btn.full { display:grid; }
+    .meeting-summary { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .meeting-check-row { min-height: 44px; margin-top: 12px; display:flex; align-items:center; gap:10px; font-size:13px; font-weight:900; }
+    .meeting-check-row input { width:24px; height:24px; margin:0; accent-color:var(--green); flex:0 0 auto; }
+    .meeting-rule { margin:12px 0; color:var(--muted); font-size:12px; line-height:1.45; }
+    .service-statement-link { min-height:44px; display:flex; align-items:center; color:var(--green); font-size:12px; font-weight:900; }
+    .sitter-swipe-indicator { position:absolute; z-index:6; top:45%; width:54px; height:54px; border:3px solid currentColor; border-radius:50%; display:grid; place-items:center; opacity:0; font-size:30px; font-weight:900; pointer-events:none; }
+    .sitter-swipe-indicator.no { left:12px; color:#d84935; }
+    .sitter-swipe-indicator.yes { right:12px; color:var(--green); }
+    #sitterAvailabilityCalendar { padding:12px; }
+    #sitterAvailabilityCalendar .weekdays,
+    #sitterAvailabilityCalendar .days { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:2px; }
+    #sitterAvailabilityCalendar .weekdays { margin:8px 0; color:var(--muted); font-size:11px; font-weight:800; text-align:center; }
+    #sitterAvailabilityCalendar .day { width:100%; min-width:0; min-height:44px; aspect-ratio:1; border:1px solid var(--line); border-radius:50%; color:var(--muted); background:#fff; font-size:12px; font-weight:800; }
+    #sitterAvailabilityCalendar .day.available { color:var(--green); border-color:var(--green); background:var(--green-soft); }
+    #sitterAvailabilityCalendar .day.active { color:#fff; border-color:var(--green); background:var(--green); }
+    #sitterAvailabilityCalendar .day:disabled { opacity:.3; }
+    #sitterMap { padding-left:clamp(24px,9.8vw,42px); padding-right:clamp(24px,9.8vw,42px); }
+
+    @media (max-width: 360px) {
+      .sitter-demand-card { padding: 14px; }
+      .owner-summary-card { grid-template-columns: 62px minmax(0,1fr); gap:10px; }
+      .owner-summary-card .avatar { width:62px; height:62px; }
+      .sitter-dual-actions { gap:8px; }
+      .sitter-map-row { grid-template-columns:24px 42px minmax(0,1fr) auto; gap:6px; }
+    }
+
     @media (max-height: 880px) {
       #match {
         display: flex;
@@ -4221,8 +4432,8 @@
       <div class="card login-card">
         <label>選擇身份</label>
         <div class="login-role-row">
-          <button class="login-role active">我是飼主</button>
-          <button class="login-role">我是寵物保母</button>
+          <button class="login-role active" type="button" data-login-role="owner">我是飼主</button>
+          <button class="login-role" type="button" data-login-role="sitter">我是寵物保母</button>
         </div>
         <label>手機號碼</label>
         <input class="input login-input" value="0912 345 678">
@@ -4267,7 +4478,7 @@
           </div>
         </div>
       </div>
-      <button class="btn full register-submit" data-go="match">註冊</button>
+      <button class="btn full register-submit" id="registerSubmit" data-go="match">註冊</button>
     </section>
 
     <section class="screen" id="match">
@@ -4591,6 +4802,12 @@
         <p class="subtitle">進行中服務會在這裡集中管理</p>
         <button class="shared-filter-trigger" type="button" data-open-shared-filter="bookings" aria-label="篩選我的預約"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="6" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="12" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="18" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/></svg></button>
       </div>
+      <article class="card book-card" data-booking-status="meeting" data-booking-id="meeting">
+        <span class="status" style="color:#2673d8">待雙方見面</span>
+        <h3>小安 · Mina Chen 到府照護</h3>
+        <p class="meta">接受後，需由你與寵物保母分別確認完成見面，案件才會進入即將服務。</p>
+        <div class="book-actions"><button class="btn" data-go="bookingDetail" data-index="0">查看需求</button><button class="btn light" data-owner-meeting>確認已見面</button></div>
+      </article>
       <article class="card book-card" data-booking-status="active" data-booking-id="matched" tabindex="-1">
         <span class="status">進行中</span>
         <h3>Mina Chen 到府照護</h3>
@@ -4964,6 +5181,157 @@
       <button class="btn full" style="margin-top:18px" onclick="toast('電子發票 PDF 已準備下載')">下載 PDF</button>
     </section>
 
+    <section class="screen" id="sitterMatch">
+      <header class="sitter-head">
+        <h1 class="screen-title">附近新需求</h1>
+        <p class="subtitle">依你的服務區域與空檔，快速找到合適案件</p>
+        <button class="shared-filter-trigger" type="button" data-open-sitter-filter="demands" aria-label="篩選可接需求"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="6" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="12" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="18" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/></svg></button>
+      </header>
+      <div style="position:relative">
+        <span class="sitter-swipe-indicator no" id="sitterSwipeNo">×</span>
+        <span class="sitter-swipe-indicator yes" id="sitterSwipeYes">○</span>
+        <article class="card sitter-demand-card" id="sitterDemandCard" data-go="sitterDemandDetail" tabindex="0" aria-label="查看飼主小安的需求">
+          <div class="sitter-demand-top"><span class="sitter-status-pill">新需求</span><span class="sitter-distance">距離 1.1 km</span></div>
+          <div class="owner-summary-card"><span class="avatar"></span><div class="owner-summary-copy"><div class="name-cert-row"><h2>飼主 小安</h2><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></div><p class="rating-line"><span class="stars">★★★★★</span> 4.9 · 18 則評價</p><p class="owner-facts">麻糬 · 貓咪 · 3 歲 · 母</p></div></div>
+          <div class="sitter-info-box"><span>服務時間</span><strong>12/12（六）14:00–16:00</strong></div>
+          <div class="sitter-field"><span>服務區域</span><b>台北市大安區 · 信義路三段</b></div>
+          <div class="sitter-field"><span>協助事項</span><div class="sitter-assistance"><span class="active">餵食</span><span class="active">清砂</span><span class="active">陪玩</span><span>照片回報</span></div></div>
+          <div class="sitter-field"><div class="sitter-readonly">每日換水，離開前確認門窗上鎖。</div></div>
+          <div class="sitter-fee-row"><div><span class="sitter-label">本次照護費</span><small>平台確認完成後逐筆撥款</small></div><strong>NT$ 400</strong></div>
+          <div class="sitter-dual-actions"><button class="btn light" type="button" data-sitter-skip>略過</button><button class="btn" type="button" data-sitter-accept>接受需求</button></div>
+        </article>
+      </div>
+      <p class="sitter-hint" id="sitterDemandHint">今天還有 8 筆符合你的可接案件</p>
+    </section>
+
+    <section class="screen long" id="sitterMap">
+      <header class="sitter-head"><h1 class="screen-title">地圖探索</h1><p class="subtitle">查看已發布需求的附近飼主</p></header>
+      <button class="sitter-map-region" type="button" data-open-sitter-region><span>需求地區：<b id="sitterMapRegion">台北市大安區</b></span><span>›</span></button>
+      <div class="map-canvas">
+        <button class="map-person p1" type="button" data-sitter-map-owner="0" aria-label="查看飼主小安需求"></button>
+        <button class="map-person p2" type="button" data-sitter-map-owner="1" aria-label="查看飼主柏宇需求"></button>
+        <button class="map-person p3" type="button" data-sitter-map-owner="2" aria-label="查看飼主小雨需求"></button>
+        <button class="near-card" type="button" data-go="sitterDemandDetail" aria-label="查看選中的飼主需求"><span class="avatar"></span><span class="map-preview-copy"><span class="name-cert-row"><strong id="sitterMapOwnerName">飼主 小安</strong><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></span><span class="map-preview-rating"><span class="stars">★★★★★</span> 4.9 · 18 則評價</span></span><strong class="map-preview-distance" id="sitterMapOwnerDistrict">大安區</strong></button>
+      </div>
+      <section class="card sitter-map-list"><div class="sitter-section-title"><div><h3 style="margin:0">附近 20 位飼主</h3><p class="subtitle" style="margin:4px 0 0">依需求區域與服務時間排序</p></div></div><div id="sitterMapListRows"></div><button class="btn full" type="button" data-sitter-map-more style="margin-top:12px">查看更多</button></section>
+    </section>
+
+    <section class="screen long" id="sitterDemandDetail">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回上一頁">‹</button><h1 class="screen-title">需求詳情</h1></div>
+      <p class="subtitle">確認服務內容後再決定是否接案</p>
+      <div class="card owner-summary-card"><span class="avatar"></span><div class="owner-summary-copy"><div class="name-cert-row"><h2>飼主 小安</h2><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></div><p class="rating-line"><span class="stars">★★★★★</span> 4.9 · 18 則評價</p><p class="owner-facts">麻糬 · 貓咪 · 3 歲 · 母</p></div></div>
+      <div class="sitter-field"><span>服務時間</span><strong>2026/12/12（六）14:00–16:00</strong></div>
+      <div class="sitter-field"><span>服務地址</span><strong>台北市大安區信義路三段 88 號</strong></div>
+      <div class="sitter-field"><span>需要協助的事項</span><div class="sitter-assistance"><span class="active">餵食</span><span class="active">清砂</span><span class="active">陪玩</span><span>照片回報</span></div></div>
+      <div class="sitter-field"><span>照護注意事項</span><div class="sitter-readonly">每日換水，離開前確認門窗上鎖。怕陌生人，請先讓麻糬熟悉氣味。</div></div>
+      <div class="sitter-fee-row"><div><span class="sitter-label">本次照護費</span><small>服務費由照護費內扣</small></div><strong>NT$ 400</strong></div>
+      <div class="sitter-dual-actions"><button class="btn light" type="button" data-sitter-decline>婉拒</button><button class="btn" type="button" data-sitter-accept>接受需求</button></div>
+    </section>
+
+    <section class="screen long" id="sitterCases">
+      <header class="sitter-head"><h1 class="screen-title">我的案件</h1><p class="subtitle">接受進度與服務集中管理</p><button class="shared-filter-trigger" type="button" data-open-sitter-filter="cases" aria-label="篩選我的案件"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="6" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="12" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="18" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/></svg></button></header>
+      <div id="sitterCaseList">
+        <article class="card sitter-case-card" data-sitter-case-status="confirming"><b class="sitter-status-blue">需求確認中</b><h3>麻糬 · 到府照護</h3><p>等待飼主確認你的申請。</p><div class="sitter-case-actions"><button data-go="sitterDemandDetail">查看詳情</button><button data-sitter-manage="confirming">管理案件</button></div></article>
+        <article class="card sitter-case-card" data-sitter-case-status="meeting"><b class="sitter-status-blue">待雙方見面</b><h3>小安 · 麻糬</h3><p>等待你與飼主分別確認完成實體見面。</p><div class="sitter-case-actions"><button data-go="sitterDemandDetail">查看詳情</button><button data-sitter-meeting>確認已見面</button></div></article>
+        <article class="card sitter-case-card" data-sitter-case-status="upcoming"><b class="sitter-status-clay">即將服務</b><h3>小芸 · 到府餵食</h3><p>今天 18:30 開始，請提前確認路線。</p><div class="sitter-case-actions"><button data-go="sitterDemandDetail">查看詳情</button><button data-go="sitterService">管理案件</button></div></article>
+        <article class="card sitter-case-card" data-sitter-case-status="active"><b>進行中</b><h3>柏宇 · 散步陪伴</h3><p>服務中，請依需求提交照片回報。</p><div class="sitter-case-actions"><button data-go="sitterDemandDetail">查看詳情</button><button data-go="sitterService">回報服務</button></div></article>
+        <article class="card sitter-case-card" data-sitter-case-status="payout"><b class="sitter-status-gold">待撥款</b><h3>Nina · 到府陪伴</h3><p>飼主確認完成後，平台將逐筆撥款。</p><div class="sitter-case-actions"><button data-go="sitterDemandDetail">查看詳情</button><button data-go="sitterIncomeDetail">管理案件</button></div></article>
+      </div>
+    </section>
+
+    <section class="screen long" id="sitterService">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回我的案件">‹</button><h1 class="screen-title">服務詳情</h1></div>
+      <p class="subtitle">訂單 CP20261212006</p>
+      <div class="card owner-summary-card"><span class="avatar"></span><div class="owner-summary-copy"><div class="name-cert-row"><h2>飼主 小安</h2><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></div><p class="rating-line"><span class="stars">★★★★★</span> 4.9 · 18 則評價</p><p class="owner-facts">麻糬 · 貓咪 · 3 歲 · 母</p></div></div>
+      <div class="sitter-field"><span>本次服務時間</span><strong>2026/12/12 14:00–16:00 · 共 2 小時</strong></div>
+      <div class="sitter-field"><span>服務地址</span><strong>台北市大安區信義路三段 88 號</strong></div>
+      <div class="sitter-field"><span>服務進度</span><div class="sitter-timeline"><div class="sitter-timeline-row"><time>12/10</time><b>雙方已確認見面</b></div><div class="sitter-timeline-row"><time>14:00</time><b>已到達並開始服務</b></div><div class="sitter-timeline-row"><time>14:28</time><b>餵食完成 · 已回報</b></div><div class="sitter-timeline-row"><time>14:54</time><b>清砂完成 · 已回報</b></div><div class="sitter-timeline-row pending"><time>16:00</time><b>完成服務</b></div></div></div>
+      <div class="sitter-dual-actions"><button class="btn light" type="button" data-go="sitterChat">聯絡飼主</button><button class="btn" type="button" data-go="sitterReport">新增回報</button></div>
+      <button class="btn full" type="button" data-sitter-complete style="margin-top:12px">完成服務</button>
+      <p class="sitter-hint">完成服務後款項將進入待平台撥款。</p>
+    </section>
+
+    <section class="screen long" id="sitterReport">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回服務詳情">‹</button><h1 class="screen-title">新增服務回報</h1></div>
+      <p class="subtitle">讓飼主掌握服務進度與寵物狀態</p>
+      <div class="card owner-summary-card"><span class="avatar"></span><div class="owner-summary-copy"><div class="name-cert-row"><h2>飼主 小安</h2><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></div><p class="rating-line"><span class="stars">★★★★★</span> 4.9 · 18 則評價</p><p class="owner-facts">麻糬 · 貓咪 · 3 歲 · 母</p></div></div>
+      <div class="sitter-field"><span>回報項目</span><div class="sitter-assistance" id="sitterReportItems"><span class="active">餵食</span><span>清砂</span><span>陪玩</span><span>其他</span></div></div>
+      <div class="sitter-field"><span>上傳照片</span><div class="sitter-report-upload"><button type="button" data-sitter-add-photo>＋<br>新增照片</button><button type="button">✓<br><small>餵食完成.jpg</small></button></div></div>
+      <div class="field"><label>回報文字</label><textarea class="textarea" id="sitterReportText">麻糬已吃完罐頭，也有正常喝水，精神狀況良好。</textarea></div>
+      <div class="sitter-field"><span>回報時間</span><button class="sitter-map-region" type="button" data-sitter-report-time><span>2026/12/12　14:28</span><span>›</span></button></div>
+      <button class="btn full" type="button" data-sitter-submit-report>送出回報</button>
+    </section>
+
+    <section class="screen" id="sitterChat">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回服務詳情">‹</button><h1 class="screen-title">聯絡飼主</h1></div>
+      <p class="subtitle">訂單 CP20261212006</p>
+      <div class="card owner-summary-card"><span class="avatar"></span><div class="owner-summary-copy"><div class="name-cert-row"><h2>飼主 小安</h2><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></div><p class="rating-line"><span class="stars">★★★★★</span> 4.9 · 18 則評價</p><p class="owner-facts">麻糬 · 貓咪 · 3 歲 · 母</p></div></div>
+      <div class="chat-board card" id="sitterChatBoard"><div class="activity-date">今天 2026/12/12</div><div class="chat-message sitter"><div class="chat-bubble">麻糬今天有正常吃飯嗎？</div><div class="chat-meta">14:20<span class="chat-status">已送達</span></div></div><div class="chat-message owner"><div class="chat-bubble">有的，已完成餵食，照片也回報囉。</div><div class="chat-meta">14:22<span class="chat-status">飼主已讀</span></div></div></div>
+      <div class="quick-replies"><button type="button" data-sitter-quick-reply="好的沒問題">好的沒問題</button><button type="button" data-sitter-quick-reply="稍等我回覆您">稍等我回覆您</button></div>
+      <div class="chat-compose"><input class="input" id="sitterChatInput" placeholder="輸入留言…"><button class="btn" type="button" data-sitter-chat-send aria-label="送出留言">↑</button></div>
+      <p class="sitter-hint">請勿在留言中提供信用卡或敏感個資</p>
+    </section>
+
+    <section class="screen" id="sitterAvailability">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回個人">‹</button><h1 class="screen-title">可服務時段</h1></div>
+      <p class="subtitle">選擇日期並儲存可服務時段</p>
+      <div class="card" style="padding:18px"><div class="sitter-section-title"><div><h3 style="margin:0">本月可服務</h3><p class="subtitle" style="margin:5px 0 0">只有已儲存時段可供飼主預約</p></div><strong style="color:var(--green);font-size:24px">18 天</strong></div></div>
+      <div class="calendar card" id="sitterAvailabilityCalendar"><div class="time-month-trigger" style="margin:0 0 10px"><strong>2026 十二月</strong><span>›</span></div><div class="weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="days"><button class="day" type="button" data-sitter-availability-day="1">1</button><button class="day available" type="button" data-sitter-availability-day="2">2</button><button class="day available" type="button" data-sitter-availability-day="3">3</button><button class="day" type="button" data-sitter-availability-day="4">4</button><button class="day available" type="button" data-sitter-availability-day="5">5</button><button class="day" type="button" data-sitter-availability-day="6">6</button><button class="day" type="button" data-sitter-availability-day="7">7</button><button class="day" type="button" data-sitter-availability-day="8">8</button><button class="day available" type="button" data-sitter-availability-day="9">9</button><button class="day available" type="button" data-sitter-availability-day="10">10</button><button class="day" type="button" data-sitter-availability-day="11">11</button><button class="day available" type="button" data-sitter-availability-day="12">12</button><button class="day" type="button" data-sitter-availability-day="13">13</button><button class="day" type="button" data-sitter-availability-day="14">14</button><button class="day" type="button" data-sitter-availability-day="15">15</button><button class="day available active" type="button" data-sitter-availability-day="16">16</button><button class="day available" type="button" data-sitter-availability-day="17">17</button><button class="day available" type="button" data-sitter-availability-day="18">18</button><button class="day" type="button" data-sitter-availability-day="19">19</button><button class="day" type="button" data-sitter-availability-day="20">20</button><button class="day" type="button" data-sitter-availability-day="21">21</button><button class="day available" type="button" data-sitter-availability-day="22">22</button><button class="day available" type="button" data-sitter-availability-day="23">23</button><button class="day" type="button" data-sitter-availability-day="24">24</button><button class="day" type="button" data-sitter-availability-day="25">25</button><button class="day available" type="button" data-sitter-availability-day="26">26</button><button class="day" type="button" data-sitter-availability-day="27">27</button><button class="day" type="button" data-sitter-availability-day="28">28</button><button class="day available" type="button" data-sitter-availability-day="29">29</button><button class="day available" type="button" data-sitter-availability-day="30">30</button><button class="day" type="button" data-sitter-availability-day="31">31</button><button class="day" disabled>32</button><button class="day" disabled>33</button><button class="day" disabled>34</button><button class="day" disabled>35</button></div></div>
+      <div class="sitter-field"><span id="sitterAvailabilityDateLabel">12/16 可服務時段</span><div class="slots" id="sitterAvailabilitySlots"><button class="slot active" type="button">09:00–12:00</button><button class="slot active" type="button">14:00–18:00</button><button class="slot" type="button">19:00–21:00</button></div></div>
+      <button class="btn full" type="button" data-save-sitter-availability>儲存可服務時段</button>
+    </section>
+
+    <section class="screen long" id="sitterIncome">
+      <header class="sitter-head"><h1 class="screen-title">收入與撥款</h1><p class="subtitle">查看服務收入、平台服務費與撥款狀態</p><button class="shared-filter-trigger" type="button" data-open-sitter-filter="income" aria-label="篩選收入交易"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="6" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="12" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="18" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/></svg></button></header>
+      <div class="sitter-income-summary"><span>可撥款餘額</span><strong>NT$ 8,670</strong><small>待撥款 NT$ 1,020</small></div>
+      <div class="sitter-income-head" style="margin-top:18px"><h2 style="font-size:18px">交易紀錄</h2><span class="meta">共 12 筆</span></div>
+      <div class="sitter-income-list" id="sitterIncomeList">
+        <button class="card sitter-income-item" type="button" data-income-status="pending" data-go="sitterIncomeDetail"><span class="sitter-income-sign">＋</span><span><h3>保母服務收入</h3><p>麻糬 · 到府照護 · 2026/12/12</p></span><strong>＋ NT$ 1,020</strong></button>
+        <button class="card sitter-income-item" type="button" data-income-status="paid" data-go="sitterIncomeDetail"><span class="sitter-income-sign">＋</span><span><h3>保母服務收入</h3><p>小芸 · 到府餵食 · 2026/12/11</p></span><strong>＋ NT$ 850</strong></button>
+        <button class="card sitter-income-item" type="button" data-income-status="deducted" data-go="sitterIncomeDetail"><span class="sitter-income-sign minus">−</span><span><h3>平台服務費 15%</h3><p>訂單 CP20261208004</p></span><strong class="minus">− NT$ 180</strong></button>
+        <button class="card sitter-income-item" type="button" data-income-status="refund" data-go="sitterIncomeDetail"><span class="sitter-income-sign">＋</span><span><h3>訂單退款返還</h3><p>柏宇 · 散步陪伴</p></span><strong>＋ NT$ 460</strong></button>
+      </div>
+    </section>
+
+    <section class="screen long" id="sitterIncomeDetail">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回收入與撥款">‹</button><h1 class="screen-title">交易明細</h1></div>
+      <p class="subtitle">訂單 CP20261212006</p>
+      <div class="sitter-income-summary"><span>本次實際撥款</span><strong>NT$ 1,020</strong><small>目前狀態：待平台撥款</small></div>
+      <div class="card" style="padding:18px;margin-top:14px"><div class="money-row"><span>寵物保母服務費</span><strong>NT$ 1,200</strong></div><div class="money-row"><span>平台服務費 15%</span><strong>− NT$ 180</strong></div><div class="money-row total"><span>實際撥款</span><strong>NT$ 1,020</strong></div></div>
+      <div class="sitter-timeline"><div class="sitter-timeline-row"><time>12/10</time><b>接受需求</b></div><div class="sitter-timeline-row"><time>12/11</time><b>雙方確認完成見面</b></div><div class="sitter-timeline-row"><time>12/12</time><b>服務完成</b></div><div class="sitter-timeline-row pending"><time>待處理</time><b>平台撥款</b></div></div>
+    </section>
+
+    <section class="screen long" id="sitterProfile">
+      <header class="sitter-head"><h1 class="screen-title">個人</h1><p class="subtitle">管理寵物保母資料、認證與服務設定</p></header>
+      <div class="card sitter-profile-card"><button class="sitter-profile-upload" type="button">上傳<br>大頭照</button><div><h2>小安</h2><p class="meta">寵物保母 · 接案中</p><div class="sitter-cert-list"><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span><span class="verified-icon"><svg class="identity-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="m21.1 12.6 1.95 1.95 3.5-4.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="verified-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="8" y="3.5" width="8" height="17" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/></svg></span></div></div></div>
+      <div class="sitter-performance"><div><strong>4.9</strong><span>平均評分</span></div><div><strong>18</strong><span>完成案件</span></div><div><strong>98%</strong><span>回覆率</span></div></div>
+      <div class="sitter-menu"><button type="button" data-go="sitterEdit"><span><strong>編輯寵物保母檔案</strong><small>服務介紹、接受類型、區域與照護費</small></span><span>›</span></button><button type="button" data-go="sitterAvailability"><span><strong>可服務時段</strong><small>選擇日期並管理已儲存時段</small></span><span>›</span></button><button type="button" data-cert="all"><span><strong>認證狀態</strong><small>平台、實名與手機認證</small></span><span>›</span></button><button type="button" data-go="sitterIncome"><span><strong>收入與撥款</strong><small>交易紀錄、待撥款與已撥款</small></span><span>›</span></button><button type="button" data-go="sitterGrowth"><span><strong>評價與成長</strong><small>評分、回覆率與服務品質</small></span><span>›</span></button></div>
+    </section>
+
+    <section class="screen long" id="sitterEdit">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回個人">‹</button><h1 class="screen-title">編輯保母檔案</h1></div>
+      <p class="subtitle">完整資料能提高飼主接受與配對機會</p>
+      <div class="sitter-field"><span>大頭照與服務照片</span><div class="sitter-edit-grid"><button class="sitter-photo-slot primary" type="button">上傳大頭照</button><button class="sitter-photo-slot" type="button">＋<br>服務照片</button><button class="sitter-photo-slot" type="button">＋<br>服務照片</button></div></div>
+      <div class="field"><label>服務介紹</label><textarea class="textarea">8 年養貓經驗，熟悉餵藥、清砂與陪伴，服務後提供照片回報。</textarea></div>
+      <div class="sitter-field"><span>可照護寵物</span><div class="sitter-assistance"><span class="active">貓咪</span><span class="active">狗狗</span><span>兔子</span><span>其他</span></div></div>
+      <div class="sitter-field"><span>服務項目</span><div class="sitter-assistance"><span class="active">到府餵食</span><span class="active">散步陪伴</span><span>住宿照護</span></div></div>
+      <div class="field"><label>服務地區</label><button class="select" type="button" data-open-sitter-region>台北市 · 大安區、信義區　›</button></div>
+      <div class="register-grid"><div class="field"><label>基本照護費</label><input class="input" value="NT$ 400"></div><div class="field"><label>計價單位</label><button class="select" type="button">每 2 小時</button></div></div>
+      <div class="field"><label>照護經驗</label><button class="select" type="button">8 年　›</button></div>
+      <div class="sitter-dual-actions"><button class="btn light" type="button" data-save-sitter-profile="draft">儲存檔案</button><button class="btn" type="button" data-save-sitter-profile="preview">儲存並預覽</button></div>
+    </section>
+
+    <section class="screen long" id="sitterGrowth">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回個人">‹</button><h1 class="screen-title">評價與成長</h1></div>
+      <p class="subtitle">追蹤服務品質與飼主回饋</p>
+      <div class="growth-score"><div><strong>4.9</strong><span class="stars">★★★★★</span><small style="display:block;margin-top:6px">126 則評價</small></div><div style="text-align:right"><span>近 30 天</span><strong>＋0.2</strong><small>評分提升</small></div></div>
+      <h2 style="font-size:18px;margin-top:20px">服務品質</h2>
+      <div class="growth-metrics"><div class="growth-metric"><span>準時到達</span><strong>98%</strong></div><div class="growth-metric"><span>服務完成率</span><strong>99%</strong></div><div class="growth-metric"><span>平均回覆速度</span><strong>3 分鐘</strong></div><div class="growth-metric"><span>照片回報完整度</span><strong>96%</strong></div></div>
+      <h2 style="font-size:18px">最新評價</h2>
+      <article class="card sitter-review-card"><div class="sitter-section-title"><span class="stars">★★★★★</span><span class="meta">小安 · 麻糬</span></div><p>回報很仔細，也準時完成餵食和清砂，麻糬看起來很放鬆。</p><small class="meta">2026/12/12</small></article>
+      <article class="card sitter-review-card"><div class="sitter-section-title"><span class="stars">★★★★★</span><span class="meta">柏宇 · 多多</span></div><p>溝通快速，照片回報清楚。</p><small class="meta">2026/12/08</small></article>
+    </section>
+
     <section class="screen no-nav global-state-screen" id="globalEmpty" aria-label="全域空資料狀態">
       <div id="globalEmptyPreview"></div>
     </section>
@@ -4977,6 +5345,13 @@
       <button class="nav-item" data-tab="map" data-go="map"><span class="nav-map-icon" aria-hidden="true"><svg class="nav-logo nav-logo-outline" viewBox="0 0 28 28" fill="none"><rect x="2.25" y="2.25" width="23.5" height="23.5" rx="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M14 5.75C10.96 5.75 8.5 8.14 8.5 11.1C8.5 14.9 14 21.25 14 21.25C14 21.25 19.5 14.9 19.5 11.1C19.5 8.14 17.04 5.75 14 5.75Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/><circle cx="12.05" cy="10.1" r=".8" fill="currentColor"/><circle cx="14" cy="9.35" r=".8" fill="currentColor"/><circle cx="15.95" cy="10.1" r=".8" fill="currentColor"/><path d="M11.75 12.75C11.75 11.75 12.78 11.05 14 11.05C15.22 11.05 16.25 11.75 16.25 12.75C16.25 13.75 15.3 14.25 14 14.25C12.7 14.25 11.75 13.75 11.75 12.75Z" stroke="currentColor" stroke-width="1.15"/><path d="M5.5 22.1C7.15 20.7 8.75 20.6 10.35 21.45C11.95 22.3 13.55 22.25 15.15 21.35C16.7 20.48 18.45 20.45 20.35 21.55" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-dasharray="1.4 2.2"/></svg><img class="nav-logo nav-logo-filled" src="assets/copaws-a-plan-icon.png" alt=""></span><span>地圖</span></button>
       <button class="nav-item" data-tab="bookings" data-go="bookings"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="3" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="1.4" fill="currentColor"/></svg></span><span>預約</span></button>
       <button class="nav-item" data-tab="profile" data-go="profile"><span class="nav-icon"><svg viewBox="0 0 32 28" fill="currentColor" aria-hidden="true"><ellipse cx="4.5" cy="9.5" rx="3" ry="4"/><ellipse cx="12" cy="6" rx="3.5" ry="4.5"/><ellipse cx="20" cy="6" rx="3.5" ry="4.5"/><ellipse cx="27.5" cy="9.5" rx="3" ry="4"/><ellipse cx="16.5" cy="19.5" rx="10" ry="7"/></svg></span><span>個人</span></button>
+    </nav>
+
+    <nav class="bottom-nav sitter-nav" aria-label="寵物保母底部導航">
+      <button class="nav-item" data-sitter-tab="sitterMatch" data-go="sitterMatch"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.8 5.8c-2-2.2-5.2-1.6-6.8.4L12 8.4l-2-2.2C8.4 4.2 5.2 3.6 3.2 5.8c-2.2 2.4-1.5 6 1 8.3L12 21l7.8-6.9c2.5-2.3 3.2-5.9 1-8.3Z"/></svg></span><span>接案</span></button>
+      <button class="nav-item" data-sitter-tab="sitterMap" data-go="sitterMap"><span class="nav-map-icon" aria-hidden="true"><svg class="nav-logo nav-logo-outline" viewBox="0 0 28 28" fill="none"><rect x="2.25" y="2.25" width="23.5" height="23.5" rx="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M14 5.75C10.96 5.75 8.5 8.14 8.5 11.1C8.5 14.9 14 21.25 14 21.25C14 21.25 19.5 14.9 19.5 11.1C19.5 8.14 17.04 5.75 14 5.75Z" stroke="currentColor" stroke-width="1.55" stroke-linejoin="round"/><circle cx="14" cy="11" r="2.2" fill="currentColor"/></svg><img class="nav-logo nav-logo-filled" src="assets/copaws-a-plan-icon.png" alt=""></span><span>地圖</span></button>
+      <button class="nav-item" data-sitter-tab="sitterCases" data-go="sitterCases"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="3" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="1.4" fill="currentColor"/></svg></span><span>行程</span></button>
+      <button class="nav-item" data-sitter-tab="sitterProfile" data-go="sitterProfile"><span class="money-tab-icon" aria-hidden="true">$</span><span>個人</span></button>
     </nav>
 
     <div class="modal-layer" id="modalLayer" onclick="closeModal(event)">
@@ -4995,10 +5370,15 @@
   <script>
     const appScreens = Array.from(document.querySelectorAll('.screen'));
     const nav = document.querySelector('.bottom-nav');
-    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+    const navItems = Array.from(nav.querySelectorAll('.nav-item'));
+    const sitterNav = document.querySelector('.sitter-nav');
+    const sitterNavItems = Array.from(sitterNav.querySelectorAll('.nav-item'));
     const screensWithNav = new Set(['match', 'quickDemand', 'requestList', 'requestApplicants', 'requestEdit', 'matchedDemand', 'map', 'mapList', 'detail', 'time', 'demand', 'bookings', 'bookingReport', 'bookingChat', 'bookingDetail', 'bookingEdit', 'profile', 'pets', 'favorites', 'finance']);
     const tabByScreen = { match: 'match', quickDemand: 'match', requestList: 'match', requestApplicants: 'match', requestEdit: 'match', matchedDemand: 'match', detail: 'match', time: 'bookings', demand: 'bookings', map: 'map', mapList: 'map', bookings: 'bookings', bookingReport: 'bookings', bookingChat: 'bookings', bookingDetail: 'bookings', bookingEdit: 'bookings', profile: 'profile', pets: 'profile', finance: 'profile', favorites: 'match' };
+    const sitterScreensWithNav = new Set(['sitterMatch', 'sitterMap', 'sitterDemandDetail', 'sitterCases', 'sitterService', 'sitterReport', 'sitterChat', 'sitterAvailability', 'sitterIncome', 'sitterIncomeDetail', 'sitterProfile', 'sitterEdit', 'sitterGrowth']);
+    const sitterTabByScreen = { sitterMatch:'sitterMatch', sitterMap:'sitterMap', sitterDemandDetail:'sitterMatch', sitterCases:'sitterCases', sitterService:'sitterCases', sitterReport:'sitterCases', sitterChat:'sitterCases', sitterAvailability:'sitterProfile', sitterIncome:'sitterProfile', sitterIncomeDetail:'sitterProfile', sitterProfile:'sitterProfile', sitterEdit:'sitterProfile', sitterGrowth:'sitterProfile' };
     let currentScreen = 'login';
+    let selectedLoginRole = 'owner';
     const backStack = [];
     let resend = 60;
     let resendTimer;
@@ -5067,6 +5447,19 @@
     let chatGestureStart = null;
     const chatRefreshThreshold = 62;
     let reviewRating = 5;
+    let sitterDemandIndex = 0;
+    let sitterMapVisibleCount = 8;
+    let sitterMapSavedScrollTop = 0;
+    let restoreSitterMapOnNextVisit = false;
+    let sitterFilterContext = 'demands';
+    let sitterMeetingContext = 'sitter';
+    let sitterMeetingConfirmed = false;
+    let sitterRegionDirect = false;
+    let sitterSwipePointer = null;
+    let sitterSwipeStartX = 0;
+    let sitterSwipeStartY = 0;
+    let sitterSwipeStartedAt = 0;
+    let sitterSwipeHorizontal = false;
     const quickDemandDate = { year: 2026, month: 12, day: 12 };
     let pendingQuickYear = quickDemandDate.year;
     let pendingQuickMonth = quickDemandDate.month;
@@ -5496,7 +5889,11 @@
       match: { city:'台北市', district:'大安區', availability:'any', pet:'any', distance:'any' },
       requestList: { status:'all' },
       bookings: { status:'all' },
-      finance: { status:'all', time:'30' }
+      finance: { status:'all', time:'30' },
+      sitterDemands: { city:'台北市', district:'大安區', pet:'any', service:'any' },
+      sitterCases: { status:'all' },
+      sitterIncome: { status:'all', time:'30' },
+      sitterMap: { city:'台北市', district:'大安區' }
     };
     let sharedFilterContext = 'match';
     let sharedFilterDraft = null;
@@ -6361,7 +6758,7 @@
 
     function openServiceStatement() {
       const layer = document.getElementById('modalLayer');
-      layer.classList.remove('pet-picker-mode', 'birthday-picker-mode');
+      layer.classList.remove('pet-picker-mode', 'birthday-picker-mode', 'decision-mode', 'meeting-modal', 'sitter-decline-modal');
       document.getElementById('modalTitle').textContent = '保母服務說明';
       document.getElementById('modalCopy').textContent = '本區將說明寵物保母接案、服務回報、資料使用及平台審核規範。';
       document.getElementById('modalBody').innerHTML = '<div class="report-item"><strong>內容後續補充</strong><span>正式條款確認後，會在此完整呈現並保留版本紀錄。</span></div>';
@@ -6505,19 +6902,242 @@
       if (notes && count) count.textContent = `${notes.value.length} / 100`;
     }
 
+    const sitterDemandSamples = [
+      { name:'飼主 小安', rating:'4.9 · 18 則評價', pet:'麻糬 · 貓咪 · 3 歲 · 母', distance:'距離 1.1 km', time:'12/12（六）14:00–16:00', district:'台北市大安區 · 信義路三段', note:'每日換水，離開前確認門窗上鎖。', fee:'NT$ 400' },
+      { name:'飼主 柏宇', rating:'4.8 · 31 則評價', pet:'多多 · 狗狗 · 5 歲 · 公', distance:'距離 1.6 km', time:'12/13（日）09:00–11:00', district:'台北市大安區 · 和平東路', note:'散步約 20 分鐘，遇到大型犬請保持距離。', fee:'NT$ 520' },
+      { name:'飼主 小雨', rating:'4.9 · 24 則評價', pet:'米糰 · 貓咪 · 2 歲 · 母', distance:'距離 2.4 km', time:'12/14（一）19:00–21:00', district:'台北市信義區 · 光復南路', note:'餵食後請拍照回報，離開前確認冷氣關閉。', fee:'NT$ 460' }
+    ];
+
+    const sitterMapOwners = Array.from({ length: 20 }, (_, index) => {
+      const names = ['飼主 小安','飼主 柏宇','飼主 小雨','飼主 Nina','飼主 阿哲','飼主 小芸'];
+      const pets = ['麻糬 · 貓咪','多多 · 狗狗','米糰 · 貓咪','豆豆 · 狗狗'];
+      const districts = ['大安區','信義區','松山區','中山區'];
+      return {
+        name: names[index % names.length],
+        rating: index % 3 === 1 ? '4.8' : '4.9',
+        reviews: 18 + index * 3,
+        pet: pets[index % pets.length],
+        district: districts[index % districts.length],
+        platform: index % 2 === 0
+      };
+    });
+
+    function renderSitterDemand() {
+      const card = document.getElementById('sitterDemandCard');
+      if (!card) return;
+      const demand = sitterDemandSamples[sitterDemandIndex % sitterDemandSamples.length];
+      card.querySelector('.name-cert-row h2').textContent = demand.name;
+      card.querySelector('.rating-line').innerHTML = `<span class="stars">★★★★★</span> ${escapeHtml(demand.rating)}`;
+      card.querySelector('.owner-facts').textContent = demand.pet;
+      card.querySelector('.sitter-distance').textContent = demand.distance;
+      card.querySelector('.sitter-info-box strong').textContent = demand.time;
+      card.querySelectorAll('.sitter-field')[0].querySelector('b').textContent = demand.district;
+      card.querySelector('.sitter-readonly').textContent = demand.note;
+      card.querySelector('.sitter-fee-row > strong').textContent = demand.fee;
+      card.setAttribute('aria-label', `查看${demand.name}的需求`);
+      document.getElementById('sitterDemandHint').textContent = `今天還有 ${Math.max(1, 8 - sitterDemandIndex)} 筆符合你的可接案件`;
+    }
+
+    function renderSitterMapRows() {
+      const container = document.getElementById('sitterMapListRows');
+      if (!container) return;
+      const visible = sitterMapOwners.slice(0, sitterMapVisibleCount);
+      container.innerHTML = visible.map((owner, index) => `
+        <button class="sitter-map-row" type="button" data-sitter-map-owner="${index}">
+          <b>#${index + 1}</b><span class="avatar"></span>
+          <span class="sitter-map-row-copy"><span class="name-cert-row"><strong>${escapeHtml(owner.name)}</strong>${owner.platform ? '<span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span>' : '<span class="verified-icon small-cert" aria-label="實名認證"><svg class="identity-mark" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span>'}</span><span><span class="stars">★★★★★</span> ${owner.rating} · ${owner.reviews} 則評價</span></span>
+          <strong>${escapeHtml(owner.district)}</strong>
+        </button>`).join('');
+      const more = document.querySelector('[data-sitter-map-more]');
+      if (more) more.hidden = sitterMapVisibleCount >= sitterMapOwners.length;
+    }
+
+    function selectSitterMapOwner(index) {
+      const owner = sitterMapOwners[index % sitterMapOwners.length];
+      document.getElementById('sitterMapOwnerName').textContent = owner.name;
+      document.getElementById('sitterMapOwnerDistrict').textContent = owner.district;
+      const rating = document.querySelector('#sitterMap .map-preview-rating');
+      if (rating) rating.innerHTML = `<span class="stars">★★★★★</span> ${owner.rating} · ${owner.reviews} 則評價`;
+      toast(`已選擇 ${owner.name} 的需求`);
+    }
+
+    function renderSitterFilterModal() {
+      const draft = sharedFilterDraft;
+      if (!draft) return;
+      if (sharedFilterContext === 'sitterDemands') {
+        document.getElementById('modalBody').innerHTML = `
+          <div class="shared-filter-section"><strong>需求地區</strong><button class="shared-filter-region" type="button" data-open-shared-location>${escapeHtml(draft.city)} · ${escapeHtml(draft.district)}</button></div>
+          <div class="shared-filter-section"><strong>寵物類型</strong>${sharedFilterOptions('pet', [['any','全部'],['dog','狗狗'],['cat','貓咪'],['other','其他']], draft.pet, true)}</div>
+          <div class="shared-filter-section"><strong>服務內容</strong>${sharedFilterOptions('service', [['any','全部'],['feed','餵食'],['walk','散步'],['stay','陪伴']], draft.service, true)}</div>${sharedFilterActions()}`;
+      } else if (sharedFilterContext === 'sitterCases') {
+        document.getElementById('modalBody').innerHTML = `<div class="shared-filter-section"><strong>案件狀態</strong>${sharedFilterOptions('status', [['all','全部'],['confirming','需求確認中'],['meeting','待雙方見面'],['upcoming','即將服務'],['active','進行中'],['payout','待撥款']], draft.status, true)}</div>${sharedFilterActions()}`;
+      } else if (sharedFilterContext === 'sitterIncome') {
+        document.getElementById('modalBody').innerHTML = `<div class="shared-filter-section"><strong>交易狀態</strong>${sharedFilterOptions('status', [['all','全部'],['pending','待撥款'],['paid','已撥款'],['deducted','平台服務費'],['refund','退款']], draft.status, true)}</div><div class="shared-filter-section"><strong>時間範圍</strong>${sharedFilterOptions('time', [['30','近 30 天'],['90','近 3 個月'],['all','全部']], draft.time)}</div>${sharedFilterActions()}`;
+      }
+    }
+
+    function openSitterFilter(context) {
+      const key = { demands:'sitterDemands', cases:'sitterCases', income:'sitterIncome' }[context] || 'sitterDemands';
+      sitterFilterContext = context;
+      sharedFilterContext = key;
+      sharedFilterDraft = { ...sharedFilterState[key] };
+      sitterRegionDirect = false;
+      document.getElementById('modalTitle').textContent = '篩選條件';
+      document.getElementById('modalCopy').textContent = { demands:'可接需求', cases:'我的案件', income:'收入與撥款' }[context] || '可接需求';
+      renderSitterFilterModal();
+      document.getElementById('modalLayer').classList.remove('pet-picker-mode','birthday-picker-mode','quick-month-mode','quick-time-mode','decision-mode','availability-month-mode','region-picker-mode','request-date-mode');
+      document.getElementById('modalLayer').classList.add('filter-picker-mode','show');
+    }
+
+    function openSitterRegionPicker() {
+      sharedFilterContext = 'sitterMap';
+      sharedFilterDraft = { ...sharedFilterState.sitterMap };
+      sitterRegionDirect = true;
+      document.getElementById('modalLayer').classList.remove('pet-picker-mode','birthday-picker-mode','quick-month-mode','quick-time-mode','decision-mode','availability-month-mode','region-picker-mode','request-date-mode');
+      document.getElementById('modalLayer').classList.add('filter-picker-mode','show');
+      openSharedLocationPicker('city');
+    }
+
+    function applySitterFilter() {
+      sharedFilterState[sharedFilterContext] = { ...sharedFilterDraft };
+      if (sharedFilterContext === 'sitterCases') {
+        document.querySelectorAll('[data-sitter-case-status]').forEach(card => card.classList.toggle('hidden', sharedFilterDraft.status !== 'all' && card.dataset.sitterCaseStatus !== sharedFilterDraft.status));
+      } else if (sharedFilterContext === 'sitterIncome') {
+        document.querySelectorAll('[data-income-status]').forEach(item => item.classList.toggle('hidden', sharedFilterDraft.status !== 'all' && item.dataset.incomeStatus !== sharedFilterDraft.status));
+      } else {
+        sitterDemandIndex = 0;
+        renderSitterDemand();
+      }
+      hideModal();
+      toast('已套用篩選');
+    }
+
+    function openSitterDeclineModal() {
+      document.getElementById('modalTitle').textContent = '婉拒需求';
+      document.getElementById('modalCopy').textContent = '選擇一個原因，飼主只會看見婉拒結果。';
+      document.getElementById('modalBody').innerHTML = `<div class="shared-filter-options two"><button class="shared-filter-option active" type="button" data-sitter-decline-reason>時段不合</button><button class="shared-filter-option" type="button" data-sitter-decline-reason>距離太遠</button><button class="shared-filter-option" type="button" data-sitter-decline-reason>服務內容不合</button><button class="shared-filter-option" type="button" data-sitter-decline-reason>已有其他安排</button></div><div class="field"><label>補充說明（選填）</label><textarea class="textarea" maxlength="100" placeholder="輸入想告訴飼主的內容"></textarea></div>`;
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      action.textContent = '確認婉拒';
+      action.onclick = () => { hideModal(); sitterDemandIndex += 1; renderSitterDemand(); toast('已婉拒並顯示下一筆需求'); };
+      document.getElementById('modalLayer').classList.add('decision-mode','sitter-decline-modal','show');
+    }
+
+    function openSitterAcceptModal() {
+      document.getElementById('modalTitle').textContent = '接受需求';
+      document.getElementById('modalCopy').textContent = '確認飼主與服務資訊後接受案件。';
+      document.getElementById('modalBody').innerHTML = `<div class="owner-summary-card compact"><span class="avatar"></span><div class="owner-summary-copy"><div class="name-cert-row"><h2>飼主 小安</h2><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></div><p class="rating-line"><span class="stars">★★★★★</span> 4.9 · 18 則評價</p><p class="owner-facts">麻糬 · 貓咪 · 3 歲 · 母</p></div></div><label class="meeting-check-row"><input type="checkbox" data-sitter-accept-check><span>我同意接受需求，並與飼主完成實體見面</span></label><p class="meeting-rule">接受後，需由你與飼主分別確認完成見面，案件才會進入即將服務。</p><button class="service-statement-link" type="button" data-service-statement>查看保母服務說明 ›</button><div class="meeting-actions"><button class="btn light" type="button" data-cancel-modal>返回</button><button class="btn" type="button" data-confirm-sitter-accept disabled>確認接受需求</button></div>`;
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      action.textContent = '確認接受需求';
+      action.disabled = false;
+      action.onclick = null;
+      document.getElementById('modalLayer').classList.add('decision-mode','meeting-modal','show');
+    }
+
+    function openMeetingConfirmation(context) {
+      sitterMeetingContext = context;
+      sitterMeetingConfirmed = false;
+      const otherRole = context === 'owner' ? '寵物保母' : '飼主';
+      document.getElementById('modalTitle').textContent = '確認雙方已見面';
+      document.getElementById('modalCopy').textContent = '雙方都確認後，案件才會進入即將服務。';
+      document.getElementById('modalBody').innerHTML = `<div class="owner-summary-card compact"><span class="avatar"></span><div class="owner-summary-copy"><div class="name-cert-row"><h2>${context === 'owner' ? 'Mina Chen' : '飼主 小安'}</h2><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></div><p class="rating-line"><span class="stars">★★★★★</span> 4.9 · ${context === 'owner' ? '126' : '18'} 則評價</p><p class="owner-facts">${context === 'owner' ? '到府照護 · 12/12 14:00–16:00' : '麻糬 · 貓咪 · 3 歲 · 母'}</p></div></div><label class="meeting-check-row"><input type="checkbox" data-meeting-confirm-check><span>我確認已與${otherRole}完成實體見面</span></label><p class="meeting-rule">接受後，需由你與飼主分別確認完成見面，案件才會進入即將服務。</p><button class="service-statement-link" type="button" data-service-statement>查看保母服務說明 ›</button><div class="meeting-actions"><button class="btn light" type="button" data-cancel-modal>返回</button><button class="btn" type="button" data-confirm-meeting disabled>確認已見面</button></div>`;
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      action.textContent = '確認已見面';
+      action.disabled = false;
+      action.onclick = null;
+      document.getElementById('modalLayer').classList.add('decision-mode','meeting-modal','show');
+    }
+
+    function confirmMeeting() {
+      if (!sitterMeetingConfirmed) return;
+      hideModal();
+      if (sitterMeetingContext === 'owner') {
+        const card = document.querySelector('[data-booking-status="meeting"]');
+        card?.querySelector('p')?.replaceChildren(document.createTextNode('你已確認見面，等待寵物保母確認。'));
+      } else {
+        const card = document.querySelector('[data-sitter-case-status="meeting"]');
+        card?.querySelector('p')?.replaceChildren(document.createTextNode('你已確認見面，等待飼主確認。'));
+      }
+      toast('已確認完成見面，等待另一方確認');
+    }
+
+    function wireSitterDemandSwipe() {
+      const card = document.getElementById('sitterDemandCard');
+      const no = document.getElementById('sitterSwipeNo');
+      const yes = document.getElementById('sitterSwipeYes');
+      if (!card || card.dataset.swipeWired) return;
+      card.dataset.swipeWired = 'true';
+      card.addEventListener('pointerdown', event => {
+        if (event.target.closest('button')) return;
+        sitterSwipePointer = event.pointerId;
+        sitterSwipeStartX = event.clientX;
+        sitterSwipeStartY = event.clientY;
+        sitterSwipeStartedAt = performance.now();
+        sitterSwipeHorizontal = false;
+        try { card.setPointerCapture?.(event.pointerId); } catch (_) {}
+      });
+      card.addEventListener('pointermove', event => {
+        if (sitterSwipePointer !== event.pointerId) return;
+        const dx = event.clientX - sitterSwipeStartX;
+        const dy = event.clientY - sitterSwipeStartY;
+        if (!sitterSwipeHorizontal && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.1) sitterSwipeHorizontal = true;
+        if (!sitterSwipeHorizontal) return;
+        event.preventDefault();
+        const rotate = Math.max(-9, Math.min(9, dx / 22));
+        card.style.transform = `translate3d(${dx}px,0,0) rotate(${rotate}deg)`;
+        no.style.opacity = String(Math.max(0, Math.min(1, -dx / 100)));
+        yes.style.opacity = String(Math.max(0, Math.min(1, dx / 100)));
+      });
+      const finish = event => {
+        if (sitterSwipePointer !== event.pointerId) return;
+        const dx = event.clientX - sitterSwipeStartX;
+        const elapsed = Math.max(1, performance.now() - sitterSwipeStartedAt);
+        const velocity = Math.abs(dx) / elapsed;
+        const velocityDistance = Math.min(72, card.clientWidth * .18);
+        const accepted = event.type !== 'pointercancel' && sitterSwipeHorizontal && (Math.abs(dx) > card.clientWidth * .28 || (Math.abs(dx) > velocityDistance && velocity > .65));
+        sitterSwipePointer = null;
+        try { card.releasePointerCapture?.(event.pointerId); } catch (_) {}
+        card.style.transition = 'transform 150ms ease, opacity 120ms ease';
+        if (accepted) {
+          card.style.transform = `translate3d(${dx > 0 ? card.clientWidth * 1.2 : -card.clientWidth * 1.2}px,0,0) rotate(${dx > 0 ? 10 : -10}deg)`;
+          card.style.opacity = '0';
+          setTimeout(() => {
+            card.style.transition = 'none';
+            card.style.transform = '';
+            card.style.opacity = '';
+            no.style.opacity = '0';
+            yes.style.opacity = '0';
+            if (dx > 0) openSitterAcceptModal();
+            else { sitterDemandIndex += 1; renderSitterDemand(); toast('已略過並顯示下一筆需求'); }
+            requestAnimationFrame(() => { card.style.transition = ''; });
+          }, 130);
+        } else {
+          card.style.transform = '';
+          no.style.opacity = '0';
+          yes.style.opacity = '0';
+          setTimeout(() => { card.style.transition = ''; }, 160);
+        }
+      };
+      card.addEventListener('pointerup', finish);
+      card.addEventListener('pointercancel', finish);
+    }
+
     function go(id) {
       const preserveFavoritePosition = id === 'favorites' && restoreFavoritesOnNextVisit;
       const preserveApplicantPosition = id === 'requestApplicants' && restoreApplicantsOnNextVisit;
+      const preserveSitterMapPosition = id === 'sitterMap' && restoreSitterMapOnNextVisit;
       if (id !== 'bookings') {
         document.querySelectorAll('.book-card.booking-focus').forEach(card => card.classList.remove('booking-focus'));
       }
       appScreens.forEach(screen => {
         screen.classList.toggle('active', screen.id === id);
-        if (screen.id === id && !preserveFavoritePosition && !preserveApplicantPosition) screen.scrollTop = 0;
+        if (screen.id === id && !preserveFavoritePosition && !preserveApplicantPosition && !preserveSitterMapPosition) screen.scrollTop = 0;
       });
       nav.style.display = screensWithNav.has(id) ? 'grid' : 'none';
+      sitterNav.style.display = sitterScreensWithNav.has(id) ? 'grid' : 'none';
       const activeTab = tabByScreen[id] || id;
       navItems.forEach(item => item.classList.toggle('active', item.dataset.tab === activeTab));
+      const activeSitterTab = sitterTabByScreen[id] || id;
+      sitterNavItems.forEach(item => item.classList.toggle('active', item.dataset.sitterTab === activeSitterTab));
       if (id === 'otp') startResend();
       if (id === 'favorites') {
         renderFavorites();
@@ -6557,6 +7177,22 @@
         renderSitterSummaries();
       }
       if (id === 'demand' || id === 'bookingEdit') renderPetPickers();
+      if (id === 'sitterMatch') renderSitterDemand();
+      if (id === 'sitterMap') {
+        renderSitterMapRows();
+        if (preserveSitterMapPosition) {
+          requestAnimationFrame(() => {
+            document.getElementById('sitterMap').scrollTop = sitterMapSavedScrollTop;
+            restoreSitterMapOnNextVisit = false;
+          });
+        }
+      }
+      if (id === 'sitterChat') {
+        requestAnimationFrame(() => {
+          const board = document.getElementById('sitterChatBoard');
+          if (board) board.scrollTop = board.scrollHeight;
+        });
+      }
       currentScreen = id;
       if (id === 'bookingReport' || id === 'bookingChat') {
         requestAnimationFrame(() => scrollToLatestActivity(id, false));
@@ -6569,6 +7205,9 @@
       }
       if (currentScreen === 'requestApplicants' && id === 'detail') {
         applicantSavedScrollTop = document.getElementById('requestApplicants').scrollTop;
+      }
+      if (currentScreen === 'sitterMap' && id === 'sitterDemandDetail') {
+        sitterMapSavedScrollTop = document.getElementById('sitterMap').scrollTop;
       }
       if (id === 'favorites') {
         favoriteVisiblePages = 1;
@@ -6584,6 +7223,7 @@
       const target = backStack.pop() || fallback;
       restoreFavoritesOnNextVisit = target === 'favorites';
       restoreApplicantsOnNextVisit = currentScreen === 'detail' && target === 'requestApplicants';
+      restoreSitterMapOnNextVisit = currentScreen === 'sitterDemandDetail' && target === 'sitterMap';
       go(target);
     }
 
@@ -7305,7 +7945,9 @@
     }
 
     function hideModal() {
-      document.getElementById('modalLayer').classList.remove('show', 'pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'quick-time-mode', 'decision-mode', 'availability-month-mode', 'region-picker-mode', 'request-date-mode', 'filter-picker-mode');
+      document.getElementById('modalLayer').classList.remove('show', 'pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'quick-time-mode', 'decision-mode', 'meeting-modal', 'sitter-decline-modal', 'availability-month-mode', 'region-picker-mode', 'request-date-mode', 'filter-picker-mode');
+      const action = document.querySelector('#modalLayer .modal > .btn.full');
+      if (action) action.disabled = false;
     }
 
     function closeModal(event) {
@@ -7580,6 +8222,10 @@
       const draft = sharedFilterDraft;
       const body = document.getElementById('modalBody');
       if (!draft || !body) return;
+      if (sharedFilterContext.startsWith('sitter')) {
+        renderSitterFilterModal();
+        return;
+      }
       if (sharedFilterContext === 'match') {
         body.innerHTML = `
           <div class="shared-filter-section"><strong>地區</strong><button class="shared-filter-region" type="button" data-open-shared-location>${escapeHtml(draft.city)} · ${escapeHtml(draft.district)}</button></div>
@@ -7590,7 +8236,7 @@
       } else if (sharedFilterContext === 'requestList') {
         body.innerHTML = `<div class="shared-filter-section"><strong>需求狀態</strong>${sharedFilterOptions('status', [['all','全部'],['waiting','等待接案'],['applicants','已有申請'],['matched','配對成功']], draft.status, true)}</div>${sharedFilterActions()}`;
       } else if (sharedFilterContext === 'bookings') {
-        body.innerHTML = `<div class="shared-filter-section"><strong>預約狀態</strong>${sharedFilterOptions('status', [['all','全部'],['confirming','需求確認中'],['pending','待服務'],['active','進行中'],['payout','待撥款']], draft.status, true)}</div>${sharedFilterActions()}`;
+        body.innerHTML = `<div class="shared-filter-section"><strong>預約狀態</strong>${sharedFilterOptions('status', [['all','全部'],['confirming','需求確認中'],['meeting','待雙方見面'],['pending','待服務'],['active','進行中'],['payout','待撥款']], draft.status, true)}</div>${sharedFilterActions()}`;
       } else {
         body.innerHTML = `
           <div class="shared-filter-section"><strong>交易狀態</strong>${sharedFilterOptions('status', [['all','全部'],['paid','已付款'],['payout','待撥款'],['pending','待完成'],['complete','已完成'],['refund','退款／取消']], draft.status)}</div>
@@ -7644,7 +8290,9 @@
     function clearSharedFilter() {
       const defaults = {
         match: { city:'台北市', district:'大安區', availability:'any', pet:'any', distance:'any' },
-        requestList: { status:'all' }, bookings: { status:'all' }, finance: { status:'all', time:'30' }
+        requestList: { status:'all' }, bookings: { status:'all' }, finance: { status:'all', time:'30' },
+        sitterDemands: { city:'台北市', district:'大安區', pet:'any', service:'any' },
+        sitterCases: { status:'all' }, sitterIncome: { status:'all', time:'30' }, sitterMap: { city:'台北市', district:'大安區' }
       };
       sharedFilterDraft = { ...defaults[sharedFilterContext] };
       renderSharedFilterModal();
@@ -7652,6 +8300,10 @@
 
     function applySharedFilter() {
       if (!sharedFilterDraft) return;
+      if (sharedFilterContext.startsWith('sitter')) {
+        applySitterFilter();
+        return;
+      }
       sharedFilterState[sharedFilterContext] = { ...sharedFilterDraft };
       if (sharedFilterContext === 'match') {
         caregiverIndex = 0;
@@ -7673,6 +8325,155 @@
       if (backButton) {
         event.preventDefault();
         goBack();
+        return;
+      }
+      const loginRole = event.target.closest('[data-login-role]');
+      if (loginRole) {
+        event.preventDefault();
+        selectedLoginRole = loginRole.dataset.loginRole;
+        document.querySelectorAll('[data-login-role]').forEach(button => button.classList.toggle('active', button === loginRole));
+        return;
+      }
+      if (event.target.closest('#registerSubmit')) {
+        event.preventDefault();
+        navigate(selectedLoginRole === 'sitter' ? 'sitterMatch' : 'match');
+        return;
+      }
+      const sitterFilter = event.target.closest('[data-open-sitter-filter]');
+      if (sitterFilter) {
+        event.preventDefault();
+        openSitterFilter(sitterFilter.dataset.openSitterFilter);
+        return;
+      }
+      if (event.target.closest('[data-open-sitter-region]')) {
+        event.preventDefault();
+        openSitterRegionPicker();
+        return;
+      }
+      const sitterMapOwner = event.target.closest('[data-sitter-map-owner]');
+      if (sitterMapOwner) {
+        event.preventDefault();
+        selectSitterMapOwner(Number(sitterMapOwner.dataset.sitterMapOwner));
+        return;
+      }
+      if (event.target.closest('[data-sitter-map-more]')) {
+        event.preventDefault();
+        sitterMapVisibleCount = Math.min(sitterMapVisibleCount + 8, sitterMapOwners.length);
+        renderSitterMapRows();
+        return;
+      }
+      if (event.target.closest('[data-sitter-skip]')) {
+        event.preventDefault();
+        event.stopPropagation();
+        sitterDemandIndex += 1;
+        renderSitterDemand();
+        toast('已略過並顯示下一筆需求');
+        return;
+      }
+      if (event.target.closest('[data-sitter-accept]')) {
+        event.preventDefault();
+        event.stopPropagation();
+        openSitterAcceptModal();
+        return;
+      }
+      if (event.target.closest('[data-sitter-decline]')) {
+        event.preventDefault();
+        openSitterDeclineModal();
+        return;
+      }
+      const sitterDeclineReason = event.target.closest('[data-sitter-decline-reason]');
+      if (sitterDeclineReason) {
+        event.preventDefault();
+        document.querySelectorAll('[data-sitter-decline-reason]').forEach(button => button.classList.toggle('active', button === sitterDeclineReason));
+        return;
+      }
+      if (event.target.closest('[data-owner-meeting]')) {
+        event.preventDefault();
+        openMeetingConfirmation('owner');
+        return;
+      }
+      if (event.target.closest('[data-sitter-meeting]')) {
+        event.preventDefault();
+        openMeetingConfirmation('sitter');
+        return;
+      }
+      if (event.target.closest('[data-sitter-manage]')) {
+        event.preventDefault();
+        navigate('sitterDemandDetail');
+        return;
+      }
+      if (event.target.closest('[data-sitter-add-photo]')) {
+        event.preventDefault();
+        toast('已選擇服務回報照片');
+        return;
+      }
+      if (event.target.closest('[data-sitter-report-time]')) {
+        event.preventDefault();
+        document.getElementById('modalTitle').textContent = '選擇回報時間';
+        document.getElementById('modalCopy').textContent = '回報時間不得晚於目前時間。';
+        document.getElementById('modalBody').innerHTML = '<div class="shared-filter-options two"><button class="shared-filter-option active" type="button">14:28</button><button class="shared-filter-option" type="button">14:30</button><button class="shared-filter-option" type="button">14:45</button><button class="shared-filter-option" type="button">15:00</button></div>';
+        const action = document.querySelector('#modalLayer .modal > .btn.full');
+        action.textContent = '確認時間';
+        action.onclick = hideModal;
+        document.getElementById('modalLayer').classList.add('show');
+        return;
+      }
+      if (event.target.closest('[data-sitter-submit-report]')) {
+        event.preventDefault();
+        navigate('sitterService');
+        toast('服務回報已送出');
+        return;
+      }
+      const sitterQuickReply = event.target.closest('[data-sitter-quick-reply]');
+      if (sitterQuickReply) {
+        event.preventDefault();
+        document.getElementById('sitterChatInput').value = sitterQuickReply.dataset.sitterQuickReply;
+        return;
+      }
+      if (event.target.closest('[data-sitter-chat-send]')) {
+        event.preventDefault();
+        const input = document.getElementById('sitterChatInput');
+        const message = input.value.trim();
+        if (!message) return;
+        document.getElementById('sitterChatBoard').insertAdjacentHTML('beforeend', `<div class="chat-message owner"><div class="chat-bubble">${escapeHtml(message)}</div><div class="chat-meta">剛剛<span class="chat-status">已送達</span></div></div>`);
+        input.value = '';
+        requestAnimationFrame(() => { const board = document.getElementById('sitterChatBoard'); board.scrollTop = board.scrollHeight; });
+        return;
+      }
+      const sitterAvailabilityDay = event.target.closest('[data-sitter-availability-day]');
+      if (sitterAvailabilityDay) {
+        event.preventDefault();
+        document.querySelectorAll('[data-sitter-availability-day]').forEach(day => day.classList.toggle('active', day === sitterAvailabilityDay));
+        document.getElementById('sitterAvailabilityDateLabel').textContent = `12/${sitterAvailabilityDay.dataset.sitterAvailabilityDay} 可服務時段`;
+        return;
+      }
+      const sitterAvailabilitySlot = event.target.closest('#sitterAvailabilitySlots .slot');
+      if (sitterAvailabilitySlot) {
+        event.preventDefault();
+        sitterAvailabilitySlot.classList.toggle('active');
+        return;
+      }
+      if (event.target.closest('[data-save-sitter-availability]')) {
+        event.preventDefault();
+        toast('可服務時段已儲存，飼主現在可以預約');
+        return;
+      }
+      if (event.target.closest('[data-sitter-complete]')) {
+        event.preventDefault();
+        navigate('sitterIncomeDetail');
+        toast('服務已完成，款項進入待平台撥款');
+        return;
+      }
+      const sitterProfileSave = event.target.closest('[data-save-sitter-profile]');
+      if (sitterProfileSave) {
+        event.preventDefault();
+        toast(sitterProfileSave.dataset.saveSitterProfile === 'preview' ? '檔案已儲存並更新預覽' : '保母檔案已儲存');
+        return;
+      }
+      const sitterCert = event.target.closest('[data-cert]');
+      if (sitterCert) {
+        event.preventDefault();
+        openCertModal(sitterCert.dataset.cert);
         return;
       }
       if (event.target.closest('[data-open-quick-month]')) {
@@ -7724,6 +8525,18 @@
       if (event.target.closest('[data-confirm-quick-time]')) {
         event.preventDefault();
         confirmQuickTime();
+        return;
+      }
+      if (event.target.closest('[data-confirm-sitter-accept]')) {
+        event.preventDefault();
+        hideModal();
+        navigate('sitterCases');
+        toast('已接受需求，等待雙方確認見面');
+        return;
+      }
+      if (event.target.closest('[data-confirm-meeting]')) {
+        event.preventDefault();
+        confirmMeeting();
         return;
       }
       if (event.target.closest('[data-cancel-modal]')) {
@@ -8057,17 +8870,26 @@
       if (event.target.closest('[data-shared-location-back]')) {
         event.preventDefault();
         if (sharedLocationStage === 'district') openSharedLocationPicker('city');
+        else if (sitterRegionDirect) hideModal();
         else {
           document.getElementById('modalTitle').textContent = '篩選條件';
-          document.getElementById('modalCopy').textContent = '自己挑保母';
+          document.getElementById('modalCopy').textContent = sharedFilterContext.startsWith('sitter') ? '可接需求' : '自己挑保母';
           renderSharedFilterModal();
         }
         return;
       }
       if (event.target.closest('[data-confirm-shared-location]')) {
         event.preventDefault();
+        if (sitterRegionDirect) {
+          sharedFilterState.sitterMap = { ...sharedFilterDraft };
+          document.getElementById('sitterMapRegion').textContent = `${sharedFilterDraft.city}${sharedFilterDraft.district}`;
+          sitterRegionDirect = false;
+          hideModal();
+          toast('已更新需求地區');
+          return;
+        }
         document.getElementById('modalTitle').textContent = '篩選條件';
-        document.getElementById('modalCopy').textContent = '自己挑保母';
+        document.getElementById('modalCopy').textContent = sharedFilterContext.startsWith('sitter') ? '可接需求' : '自己挑保母';
         renderSharedFilterModal();
         return;
       }
@@ -8184,6 +9006,18 @@
       openApplicantDetail(Number(applicantDetail.dataset.applicantDetail));
     });
 
+    document.addEventListener('change', event => {
+      if (event.target.matches('[data-sitter-accept-check]')) {
+        const action = document.querySelector('[data-confirm-sitter-accept]');
+        action.disabled = !event.target.checked;
+      }
+      if (event.target.matches('[data-meeting-confirm-check]')) {
+        sitterMeetingConfirmed = event.target.checked;
+        const action = document.querySelector('[data-confirm-meeting]');
+        action.disabled = !sitterMeetingConfirmed;
+      }
+    });
+
     document.getElementById('identityReviewForm').addEventListener('submit', submitIdentityReview);
     document.querySelectorAll('.identity-upload-input').forEach(input => {
       input.addEventListener('change', () => updateIdentityUpload(input));
@@ -8267,13 +9101,20 @@
     renderRequestApplicants();
     updateRequestEditFee();
     wireMatchDrag();
-    const previewState = new URLSearchParams(window.location.search).get('state');
+    renderSitterDemand();
+    renderSitterMapRows();
+    wireSitterDemandSwipe();
+    const previewParams = new URLSearchParams(window.location.search);
+    const previewState = previewParams.get('state');
+    const previewScreen = previewParams.get('screen');
     if (previewState === 'empty') {
       globalRetryContext = { screen: 'match', scrollTop: 0, retry: null };
       go('globalEmpty');
     } else if (previewState === 'error') {
       globalRetryContext = { screen: 'match', scrollTop: 0, retry: null };
       go('globalError');
+    } else if (previewScreen && document.getElementById(previewScreen)?.classList.contains('screen')) {
+      go(previewScreen);
     } else {
       go('login');
     }
