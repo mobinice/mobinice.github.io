@@ -5242,13 +5242,27 @@
         <button class="map-person p3" type="button" data-sitter-map-owner="2" aria-label="查看飼主小雨需求"></button>
         <button class="near-card" type="button" data-go="sitterDemandDetail" aria-label="查看選中的飼主需求"><span class="avatar"></span><span class="map-preview-copy"><span class="name-cert-row"><strong id="sitterMapOwnerName">飼主 小安</strong><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></span><span class="map-preview-rating"><span class="stars">★★★★★</span> 4.9 · 18 則評價</span></span><strong class="map-preview-distance" id="sitterMapOwnerDistrict">大安區</strong></button>
       </div>
-      <section class="card sitter-map-list"><div class="sitter-section-title"><div><h3 style="margin:0">附近 20 位飼主</h3><p class="subtitle" style="margin:4px 0 0">依需求區域與服務時間排序</p></div></div><div id="sitterMapListRows"></div><button class="btn full" type="button" data-sitter-map-more style="margin-top:12px">查看更多</button></section>
+      <section class="card sitter-map-list"><div class="sitter-section-title"><div><h3 id="sitterMapRankingTitle" style="margin:0">附近 24 位飼主</h3><p class="subtitle" style="margin:4px 0 0">先顯示符合條件的前 20 位，第 21 位起可展開更多</p></div></div><div id="sitterMapListRows"></div><button class="btn full" type="button" data-sitter-map-more style="margin-top:12px">查看更多</button></section>
+    </section>
+
+    <section class="screen long" id="sitterMapList">
+      <div class="page-heading"><button class="screen-back" data-back aria-label="返回保母地圖">‹</button><h1 class="screen-title">附近飼主</h1></div>
+      <p class="subtitle">全部已發布有效需求的飼主依地區與排序條件排列，點擊卡片可查看需求。</p>
+      <section class="card map-expanded-list show">
+        <div class="map-list-toolbar"><div><h3>全部飼主</h3><p id="sitterMapPageSummary">第 1 頁 · 顯示 1-8 / 24</p></div></div>
+        <div id="sitterMapPagedList"></div>
+        <div class="map-pagination" aria-label="附近飼主分頁">
+          <button class="page-btn" id="sitterMapPrevPage" type="button" aria-label="上一頁">‹</button>
+          <span class="page-indicator" id="sitterMapPageIndicator">1 / 3</span>
+          <button class="page-btn" id="sitterMapNextPage" type="button" aria-label="下一頁">›</button>
+        </div>
+      </section>
     </section>
 
     <section class="screen long" id="sitterDemandDetail">
       <div class="page-heading"><button class="screen-back" data-back aria-label="返回上一頁">‹</button><h1 class="screen-title">需求詳情</h1></div>
       <p class="subtitle">確認服務內容後再決定是否接案</p>
-      <div class="card owner-summary-card"><span class="avatar"></span><div class="owner-summary-copy"><div class="name-cert-row"><h2>飼主 小安</h2><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></div><p class="rating-line"><span class="stars">★★★★★</span> 4.9 · 18 則評價</p><p class="owner-facts">麻糬 · 貓咪 · 3 歲 · 母</p></div></div>
+      <div class="card owner-summary-card"><span class="avatar"></span><div class="owner-summary-copy"><div class="name-cert-row"><h2 id="sitterDemandDetailOwnerName">飼主 小安</h2><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></div><p class="rating-line" id="sitterDemandDetailOwnerRating"><span class="stars">★★★★★</span> 4.9 · 18 則評價</p><p class="owner-facts" id="sitterDemandDetailOwnerPet">麻糬 · 貓咪 · 3 歲 · 母</p></div></div>
       <div class="sitter-field"><span>服務時間</span><strong>2026/12/12（六）14:00–16:00</strong></div>
       <div class="sitter-field"><span>服務地址</span><strong>台北市大安區信義路三段 88 號</strong></div>
       <div class="sitter-field"><span>需要協助的事項</span><div class="sitter-assistance"><span class="active">餵食</span><span class="active">清砂</span><span class="active">陪玩</span><span>照片回報</span></div></div>
@@ -5483,9 +5497,14 @@
     const chatRefreshThreshold = 62;
     let reviewRating = 5;
     let sitterDemandIndex = 0;
-    let sitterMapVisibleCount = 8;
+    const sitterMapTopLimit = 20;
+    const sitterMapPageSize = 8;
+    let sitterMapPage = 1;
+    let selectedSitterMapOwnerIndex = 0;
     let sitterMapSavedScrollTop = 0;
     let restoreSitterMapOnNextVisit = false;
+    let sitterMapListSavedScrollTop = 0;
+    let restoreSitterMapListOnNextVisit = false;
     let sitterFilterContext = 'demands';
     let sitterMeetingContext = 'sitter';
     let sitterMeetingConfirmed = false;
@@ -6938,7 +6957,7 @@
       { name:'飼主 小雨', rating:'4.9 · 24 則評價', pet:'米糰 · 貓咪 · 2 歲 · 母', distance:'距離 2.4 km', time:'12/14（一）19:00–21:00', district:'台北市信義區 · 光復南路', note:'餵食後請拍照回報，離開前確認冷氣關閉。', fee:'NT$ 460' }
     ];
 
-    const sitterMapOwners = Array.from({ length: 20 }, (_, index) => {
+    const sitterMapOwners = Array.from({ length: 24 }, (_, index) => {
       const names = ['飼主 小安','飼主 柏宇','飼主 小雨','飼主 Nina','飼主 阿哲','飼主 小芸'];
       const pets = ['麻糬 · 貓咪','多多 · 狗狗','米糰 · 貓咪','豆豆 · 狗狗'];
       const districts = ['大安區','信義區','松山區','中山區'];
@@ -6976,27 +6995,59 @@
       document.getElementById('sitterDemandHint').textContent = `今天還有 ${Math.max(1, 8 - sitterDemandIndex)} 筆符合你的可接案件`;
     }
 
+    function sitterMapRowTemplate(owner, index, opensDetail = false) {
+      return `
+        <button class="sitter-map-row" type="button" ${opensDetail ? `data-sitter-map-detail="${index}"` : `data-sitter-map-owner="${index}"`}>
+          <b class="rank">#${index + 1}</b><span class="avatar"></span>
+          <span class="sitter-map-row-copy"><span class="name-cert-row"><strong>${escapeHtml(owner.name)}</strong>${owner.platform ? '<span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span>' : '<span class="verified-icon small-cert" aria-label="實名認證"><svg class="identity-mark" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span>'}</span><span><span class="stars">★★★★★</span> ${owner.rating} · ${owner.reviews} 則評價</span></span>
+          <strong class="district">${escapeHtml(owner.district)}</strong>
+        </button>`;
+    }
+
     function renderSitterMapRows() {
       const container = document.getElementById('sitterMapListRows');
       if (!container) return;
-      const visible = sitterMapOwners.slice(0, sitterMapVisibleCount);
-      container.innerHTML = visible.map((owner, index) => `
-        <button class="sitter-map-row" type="button" data-sitter-map-owner="${index}">
-          <b>#${index + 1}</b><span class="avatar"></span>
-          <span class="sitter-map-row-copy"><span class="name-cert-row"><strong>${escapeHtml(owner.name)}</strong>${owner.platform ? '<span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span>' : '<span class="verified-icon small-cert" aria-label="實名認證"><svg class="identity-mark" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#0b7b3a"/><circle cx="16" cy="12.2" r="4.25" fill="#fff"/><path d="M8.8 24.5C10.15 20.6 21.85 20.6 23.2 24.5" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span>'}</span><span><span class="stars">★★★★★</span> ${owner.rating} · ${owner.reviews} 則評價</span></span>
-          <strong>${escapeHtml(owner.district)}</strong>
-        </button>`).join('');
+      const visible = sitterMapOwners.slice(0, sitterMapTopLimit);
+      container.innerHTML = visible.map((owner, index) => sitterMapRowTemplate(owner, index)).join('');
+      const title = document.getElementById('sitterMapRankingTitle');
+      if (title) title.textContent = `附近 ${sitterMapOwners.length} 位飼主`;
       const more = document.querySelector('[data-sitter-map-more]');
-      if (more) more.hidden = sitterMapVisibleCount >= sitterMapOwners.length;
+      if (more) more.hidden = sitterMapOwners.length <= sitterMapTopLimit;
     }
 
-    function selectSitterMapOwner(index) {
+    function renderSitterMapPagedList() {
+      const list = document.getElementById('sitterMapPagedList');
+      const summary = document.getElementById('sitterMapPageSummary');
+      const indicator = document.getElementById('sitterMapPageIndicator');
+      const prev = document.getElementById('sitterMapPrevPage');
+      const next = document.getElementById('sitterMapNextPage');
+      if (!list || !summary || !indicator || !prev || !next) return;
+      const totalPages = Math.max(1, Math.ceil(sitterMapOwners.length / sitterMapPageSize));
+      sitterMapPage = Math.max(1, Math.min(sitterMapPage, totalPages));
+      const start = (sitterMapPage - 1) * sitterMapPageSize;
+      const items = sitterMapOwners.slice(start, start + sitterMapPageSize);
+      list.innerHTML = items.map((owner, index) => sitterMapRowTemplate(owner, start + index, true)).join('');
+      summary.textContent = `第 ${sitterMapPage} 頁 · 顯示 ${start + 1}-${Math.min(start + sitterMapPageSize, sitterMapOwners.length)} / ${sitterMapOwners.length}`;
+      indicator.textContent = `${sitterMapPage} / ${totalPages}`;
+      prev.disabled = sitterMapPage <= 1;
+      next.disabled = sitterMapPage >= totalPages;
+    }
+
+    function selectSitterMapOwner(index, openDetail = false) {
+      selectedSitterMapOwnerIndex = index % sitterMapOwners.length;
       const owner = sitterMapOwners[index % sitterMapOwners.length];
       document.getElementById('sitterMapOwnerName').textContent = owner.name;
       document.getElementById('sitterMapOwnerDistrict').textContent = owner.district;
       const rating = document.querySelector('#sitterMap .map-preview-rating');
       if (rating) rating.innerHTML = `<span class="stars">★★★★★</span> ${owner.rating} · ${owner.reviews} 則評價`;
-      toast(`已選擇 ${owner.name} 的需求`);
+      const detailName = document.getElementById('sitterDemandDetailOwnerName');
+      const detailRating = document.getElementById('sitterDemandDetailOwnerRating');
+      const detailPet = document.getElementById('sitterDemandDetailOwnerPet');
+      if (detailName) detailName.textContent = owner.name;
+      if (detailRating) detailRating.innerHTML = `<span class="stars">★★★★★</span> ${owner.rating} · ${owner.reviews} 則評價`;
+      if (detailPet) detailPet.textContent = `${owner.pet} · ${2 + index % 4} 歲 · ${index % 2 ? '公' : '母'}`;
+      if (openDetail) navigate('sitterDemandDetail');
+      else toast(`已選擇 ${owner.name} 的需求`);
     }
 
     function renderSitterFilterModal() {
@@ -7307,13 +7358,17 @@
       const preserveFavoritePosition = id === 'favorites' && restoreFavoritesOnNextVisit;
       const preserveApplicantPosition = id === 'requestApplicants' && restoreApplicantsOnNextVisit;
       const preserveSitterMapPosition = id === 'sitterMap' && restoreSitterMapOnNextVisit;
+      const preserveSitterMapListPosition = id === 'sitterMapList' && restoreSitterMapListOnNextVisit;
       if (id !== 'bookings') {
         document.querySelectorAll('.book-card.booking-focus').forEach(card => card.classList.remove('booking-focus'));
       }
       appScreens.forEach(screen => {
         screen.classList.toggle('active', screen.id === id);
-        if (screen.id === id && !preserveFavoritePosition && !preserveApplicantPosition && !preserveSitterMapPosition) screen.scrollTop = 0;
+        if (screen.id === id && !preserveFavoritePosition && !preserveApplicantPosition && !preserveSitterMapPosition && !preserveSitterMapListPosition) screen.scrollTop = 0;
       });
+      const phoneViewport = document.getElementById('phone');
+      phoneViewport.scrollLeft = 0;
+      requestAnimationFrame(() => { phoneViewport.scrollLeft = 0; });
       nav.style.display = screensWithNav.has(id) ? 'grid' : 'none';
       sitterNav.style.display = sitterScreensWithNav.has(id) ? 'grid' : 'none';
       const activeTab = tabByScreen[id] || id;
@@ -7369,6 +7424,15 @@
           });
         }
       }
+      if (id === 'sitterMapList') {
+        renderSitterMapPagedList();
+        if (preserveSitterMapListPosition) {
+          requestAnimationFrame(() => {
+            document.getElementById('sitterMapList').scrollTop = sitterMapListSavedScrollTop;
+            restoreSitterMapListOnNextVisit = false;
+          });
+        }
+      }
       if (id === 'sitterChat') {
         requestAnimationFrame(() => {
           const board = document.getElementById('sitterChatBoard');
@@ -7391,6 +7455,9 @@
       if (currentScreen === 'sitterMap' && id === 'sitterDemandDetail') {
         sitterMapSavedScrollTop = document.getElementById('sitterMap').scrollTop;
       }
+      if (currentScreen === 'sitterMapList' && id === 'sitterDemandDetail') {
+        sitterMapListSavedScrollTop = document.getElementById('sitterMapList').scrollTop;
+      }
       if (id === 'favorites') {
         favoriteVisiblePages = 1;
         favoriteSavedScrollTop = 0;
@@ -7406,6 +7473,7 @@
       restoreFavoritesOnNextVisit = target === 'favorites';
       restoreApplicantsOnNextVisit = currentScreen === 'detail' && target === 'requestApplicants';
       restoreSitterMapOnNextVisit = currentScreen === 'sitterDemandDetail' && target === 'sitterMap';
+      restoreSitterMapListOnNextVisit = currentScreen === 'sitterDemandDetail' && target === 'sitterMapList';
       go(target);
     }
 
@@ -8540,10 +8608,32 @@
         selectSitterMapOwner(Number(sitterMapOwner.dataset.sitterMapOwner));
         return;
       }
+      const sitterMapDetail = event.target.closest('[data-sitter-map-detail]');
+      if (sitterMapDetail) {
+        event.preventDefault();
+        selectSitterMapOwner(Number(sitterMapDetail.dataset.sitterMapDetail), true);
+        return;
+      }
       if (event.target.closest('[data-sitter-map-more]')) {
         event.preventDefault();
-        sitterMapVisibleCount = Math.min(sitterMapVisibleCount + 8, sitterMapOwners.length);
-        renderSitterMapRows();
+        sitterMapPage = 1;
+        sitterMapListSavedScrollTop = 0;
+        restoreSitterMapListOnNextVisit = false;
+        navigate('sitterMapList');
+        return;
+      }
+      if (event.target.closest('#sitterMapPrevPage')) {
+        event.preventDefault();
+        sitterMapPage -= 1;
+        renderSitterMapPagedList();
+        document.getElementById('sitterMapList').scrollTop = 0;
+        return;
+      }
+      if (event.target.closest('#sitterMapNextPage')) {
+        event.preventDefault();
+        sitterMapPage += 1;
+        renderSitterMapPagedList();
+        document.getElementById('sitterMapList').scrollTop = 0;
         return;
       }
       if (event.target.closest('[data-sitter-skip]')) {
@@ -9287,6 +9377,7 @@
     wireMatchDrag();
     renderSitterDemand();
     renderSitterMapRows();
+    renderSitterMapPagedList();
     wireSitterDemandSwipe();
     const previewParams = new URLSearchParams(window.location.search);
     const previewState = previewParams.get('state');
