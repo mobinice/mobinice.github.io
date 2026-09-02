@@ -4068,12 +4068,35 @@
     .owner-summary-copy h3 { margin: 0; font-size: 20px; line-height: 24px; }
     .owner-summary-copy .rating-line { margin: 5px 0 4px; color: var(--muted); font-size: 12px; white-space: nowrap; }
     .owner-summary-copy .owner-facts { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .sitter-demand-stack {
+      position: relative;
+      display: grid;
+      perspective: 900px;
+      touch-action: pan-y;
+    }
+    .sitter-demand-stack > .sitter-demand-card { grid-area: 1 / 1; }
     .sitter-demand-card {
       padding: 18px;
+      margin: 0;
       border-radius: 22px;
       touch-action: pan-y;
-      will-change: transform;
-      transition: transform .18s ease, opacity .18s ease;
+      will-change: transform, opacity;
+      transition: transform 175ms cubic-bezier(.2,.75,.25,1), opacity 135ms ease;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .sitter-demand-card * { touch-action: pan-y; -webkit-user-drag: none; }
+    .sitter-demand-card-front { position: relative; z-index: 2; }
+    .sitter-demand-card-back {
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
+      transform: translate3d(0,18px,-28px) scale(.94);
+      opacity: .74;
+      box-shadow: 0 12px 28px rgba(30,47,33,.08);
     }
     .sitter-demand-card.dragging { transition: none; }
     .sitter-demand-card.leaving { opacity: 0; }
@@ -5187,10 +5210,20 @@
         <p class="subtitle">依你的服務區域與空檔，快速找到合適案件</p>
         <button class="shared-filter-trigger" type="button" data-open-sitter-filter="demands" aria-label="篩選可接需求"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="6" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="12" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="18" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/></svg></button>
       </header>
-      <div style="position:relative">
+      <div class="sitter-demand-stack" id="sitterDemandStack">
         <span class="sitter-swipe-indicator no" id="sitterSwipeNo">×</span>
         <span class="sitter-swipe-indicator yes" id="sitterSwipeYes">○</span>
-        <article class="card sitter-demand-card" id="sitterDemandCard" data-go="sitterDemandDetail" tabindex="0" aria-label="查看飼主小安的需求">
+        <article class="card sitter-demand-card sitter-demand-card-back" id="sitterDemandCardBack" aria-hidden="true">
+          <div class="sitter-demand-top"><span class="sitter-status-pill">新需求</span><span class="sitter-distance">距離 1.6 km</span></div>
+          <div class="owner-summary-card"><span class="avatar"></span><div class="owner-summary-copy"><div class="name-cert-row"><h2>飼主 柏宇</h2><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></div><p class="rating-line"><span class="stars">★★★★★</span> 4.8 · 31 則評價</p><p class="owner-facts">多多 · 狗狗 · 5 歲 · 公</p></div></div>
+          <div class="sitter-info-box"><span>服務時間</span><strong>12/13（日）09:00–11:00</strong></div>
+          <div class="sitter-field"><span>服務區域</span><b>台北市大安區 · 和平東路</b></div>
+          <div class="sitter-field"><span>協助事項</span><div class="sitter-assistance"><span class="active">餵食</span><span class="active">清砂</span><span class="active">陪玩</span><span>照片回報</span></div></div>
+          <div class="sitter-field"><div class="sitter-readonly">散步約 20 分鐘，遇到大型犬請保持距離。</div></div>
+          <div class="sitter-fee-row"><div><span class="sitter-label">本次照護費</span><small>平台確認完成後逐筆撥款</small></div><strong>NT$ 520</strong></div>
+          <div class="sitter-dual-actions"><button class="btn light" type="button" tabindex="-1">略過</button><button class="btn" type="button" tabindex="-1">接受需求</button></div>
+        </article>
+        <article class="card sitter-demand-card sitter-demand-card-front" id="sitterDemandCard" data-go="sitterDemandDetail" tabindex="0" aria-label="查看飼主小安的需求">
           <div class="sitter-demand-top"><span class="sitter-status-pill">新需求</span><span class="sitter-distance">距離 1.1 km</span></div>
           <div class="owner-summary-card"><span class="avatar"></span><div class="owner-summary-copy"><div class="name-cert-row"><h2>飼主 小安</h2><span class="cert-badge platform-cert small-cert" aria-label="平台認證">✓</span></div><p class="rating-line"><span class="stars">★★★★★</span> 4.9 · 18 則評價</p><p class="owner-facts">麻糬 · 貓咪 · 3 歲 · 母</p></div></div>
           <div class="sitter-info-box"><span>服務時間</span><strong>12/12（六）14:00–16:00</strong></div>
@@ -6923,10 +6956,8 @@
       };
     });
 
-    function renderSitterDemand() {
-      const card = document.getElementById('sitterDemandCard');
+    function renderSitterDemandCard(card, demand, interactive = false) {
       if (!card) return;
-      const demand = sitterDemandSamples[sitterDemandIndex % sitterDemandSamples.length];
       card.querySelector('.name-cert-row h2').textContent = demand.name;
       card.querySelector('.rating-line').innerHTML = `<span class="stars">★★★★★</span> ${escapeHtml(demand.rating)}`;
       card.querySelector('.owner-facts').textContent = demand.pet;
@@ -6935,7 +6966,17 @@
       card.querySelectorAll('.sitter-field')[0].querySelector('b').textContent = demand.district;
       card.querySelector('.sitter-readonly').textContent = demand.note;
       card.querySelector('.sitter-fee-row > strong').textContent = demand.fee;
-      card.setAttribute('aria-label', `查看${demand.name}的需求`);
+      if (interactive) card.setAttribute('aria-label', `查看${demand.name}的需求`);
+    }
+
+    function renderSitterDemand() {
+      const card = document.getElementById('sitterDemandCard');
+      const back = document.getElementById('sitterDemandCardBack');
+      if (!card || !back) return;
+      const demand = sitterDemandSamples[sitterDemandIndex % sitterDemandSamples.length];
+      const nextDemand = sitterDemandSamples[(sitterDemandIndex + 1) % sitterDemandSamples.length];
+      renderSitterDemandCard(card, demand, true);
+      renderSitterDemandCard(back, nextDemand);
       document.getElementById('sitterDemandHint').textContent = `今天還有 ${Math.max(1, 8 - sitterDemandIndex)} 筆符合你的可接案件`;
     }
 
@@ -7063,9 +7104,10 @@
 
     function wireSitterDemandSwipe() {
       const card = document.getElementById('sitterDemandCard');
+      const back = document.getElementById('sitterDemandCardBack');
       const no = document.getElementById('sitterSwipeNo');
       const yes = document.getElementById('sitterSwipeYes');
-      if (!card || card.dataset.swipeWired) return;
+      if (!card || !back || card.dataset.swipeWired) return;
       card.dataset.swipeWired = 'true';
 
       let activePointerId = null;
@@ -7083,6 +7125,15 @@
       let suppressClick = false;
       let suppressClickTimer = 0;
       let animating = false;
+
+      function setBackCardProgress(progress, animate = false) {
+        const value = Math.max(0, Math.min(1, progress));
+        back.style.transition = animate
+          ? `transform ${matchSwipeSettleMs}ms cubic-bezier(.2,.75,.25,1), opacity ${matchSwipeOpacityMs}ms ease`
+          : 'none';
+        back.style.transform = `translate3d(0, ${18 * (1 - value)}px, ${-28 * (1 - value)}px) scale(${.94 + .06 * value})`;
+        back.style.opacity = String(.74 + .26 * value);
+      }
 
       function releaseClickSuppression(delay = cardSwipeClickReleaseDelayMs) {
         if (suppressClickTimer) clearTimeout(suppressClickTimer);
@@ -7112,6 +7163,7 @@
         card.style.opacity = '';
         no.style.opacity = '0';
         yes.style.opacity = '0';
+        setBackCardProgress(0);
       }
 
       card.addEventListener('pointerdown', event => {
@@ -7166,6 +7218,8 @@
         event.preventDefault();
         const rotate = Math.max(-9, Math.min(9, dx / 22));
         card.style.transform = `translate3d(${dx}px,0,0) rotate(${rotate}deg)`;
+        card.style.opacity = String(1 - Math.min(Math.abs(dx) / 900, .16));
+        setBackCardProgress(Math.min(1, Math.abs(dx) / 180));
         no.style.opacity = String(Math.max(0, Math.min(1, -dx / 100)));
         yes.style.opacity = String(Math.max(0, Math.min(1, dx / 100)));
       }, { passive: false });
@@ -7201,11 +7255,12 @@
         try {
           if (pointerId != null && card.hasPointerCapture(pointerId)) card.releasePointerCapture(pointerId);
         } catch {}
-        card.style.transition = 'transform 150ms ease, opacity 120ms ease';
+        card.style.transition = `transform ${matchSwipeSettleMs}ms cubic-bezier(.2,.75,.25,1), opacity ${matchSwipeOpacityMs}ms ease`;
         if (accepted) {
           animating = true;
           card.style.transform = `translate3d(${releaseDx > 0 ? card.clientWidth * 1.2 : -card.clientWidth * 1.2}px,0,0) rotate(${releaseDx > 0 ? 10 : -10}deg)`;
           card.style.opacity = '0';
+          setBackCardProgress(1, true);
           setTimeout(() => {
             card.style.transition = 'none';
             card.style.transform = '';
@@ -7214,20 +7269,24 @@
             yes.style.opacity = '0';
             if (releaseDx > 0) openSitterAcceptModal();
             else { sitterDemandIndex += 1; renderSitterDemand(); toast('已略過並顯示下一筆需求'); }
+            setBackCardProgress(0);
             requestAnimationFrame(() => {
               card.style.transition = '';
+              back.style.transition = '';
               animating = false;
               releaseClickSuppression();
             });
-          }, 130);
+          }, matchSwipeSettleMs + 5);
         } else {
           card.style.transform = '';
+          card.style.opacity = '';
+          setBackCardProgress(0, true);
           no.style.opacity = '0';
           yes.style.opacity = '0';
           setTimeout(() => {
             resetVisuals();
             releaseClickSuppression();
-          }, 160);
+          }, matchSwipeSettleMs + 5);
         }
       }
 
