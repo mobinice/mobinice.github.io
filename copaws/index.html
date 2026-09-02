@@ -4095,7 +4095,7 @@
       z-index: 1;
       pointer-events: none;
       transform: translate3d(0,18px,-28px) scale(.94);
-      opacity: .74;
+      opacity: 0;
       box-shadow: 0 12px 28px rgba(30,47,33,.08);
     }
     .sitter-demand-card.dragging { transition: none; }
@@ -7132,7 +7132,7 @@
           ? `transform ${matchSwipeSettleMs}ms cubic-bezier(.2,.75,.25,1), opacity ${matchSwipeOpacityMs}ms ease`
           : 'none';
         back.style.transform = `translate3d(0, ${18 * (1 - value)}px, ${-28 * (1 - value)}px) scale(${.94 + .06 * value})`;
-        back.style.opacity = String(.74 + .26 * value);
+        back.style.opacity = String(value);
       }
 
       function releaseClickSuppression(delay = cardSwipeClickReleaseDelayMs) {
@@ -7270,6 +7270,7 @@
             if (releaseDx > 0) openSitterAcceptModal();
             else { sitterDemandIndex += 1; renderSitterDemand(); toast('已略過並顯示下一筆需求'); }
             setBackCardProgress(0);
+            void back.offsetWidth;
             requestAnimationFrame(() => {
               card.style.transition = '';
               back.style.transition = '';
