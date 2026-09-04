@@ -4249,14 +4249,73 @@
     .sitter-swipe-indicator { position:absolute; z-index:6; top:45%; width:54px; height:54px; border:3px solid currentColor; border-radius:50%; display:grid; place-items:center; opacity:0; font-size:30px; font-weight:900; pointer-events:none; }
     .sitter-swipe-indicator.no { left:12px; color:#d84935; }
     .sitter-swipe-indicator.yes { right:12px; color:var(--green); }
-    #sitterAvailabilityCalendar { padding:12px; }
+    .sitter-availability-screen .subtitle { margin-bottom:18px; }
+    .sitter-availability-summary {
+      min-height:86px;
+      margin:0 0 20px;
+      padding:18px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow:none;
+    }
+    .sitter-availability-summary h2 { margin:0 0 7px; font-size:18px; }
+    .sitter-availability-summary p { margin:0; color:var(--muted); font-size:11px; }
+    .sitter-availability-summary strong { color:var(--green); font-size:24px; }
+    #sitterAvailabilityCalendar { padding:20px 18px 22px; border-radius:26px; box-shadow:none; }
     #sitterAvailabilityCalendar .weekdays,
-    #sitterAvailabilityCalendar .days { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:2px; }
-    #sitterAvailabilityCalendar .weekdays { margin:8px 0; color:var(--muted); font-size:11px; font-weight:800; text-align:center; }
-    #sitterAvailabilityCalendar .day { width:100%; min-width:0; min-height:44px; aspect-ratio:1; border:1px solid var(--line); border-radius:50%; color:var(--muted); background:#fff; font-size:12px; font-weight:800; }
+    #sitterAvailabilityCalendar .days { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); justify-items:center; gap:8px 10px; }
+    #sitterAvailabilityCalendar .weekdays { margin:12px 0 14px; color:var(--muted); font-size:11px; font-weight:800; text-align:center; }
+    #sitterAvailabilityCalendar .day { width:32px; height:32px; min-width:32px; min-height:32px; padding:0; border:1px solid var(--line); border-radius:50%; color:var(--muted); background:#fff; font-size:12px; font-weight:800; }
     #sitterAvailabilityCalendar .day.available { color:var(--green); border-color:var(--green); background:var(--green-soft); }
     #sitterAvailabilityCalendar .day.active { color:#fff; border-color:var(--green); background:var(--green); }
     #sitterAvailabilityCalendar .day:disabled { opacity:.3; }
+    .sitter-availability-section-title { margin:24px 0 12px; font-size:15px; }
+    .sitter-availability-list { display:grid; gap:8px; }
+    .sitter-availability-row {
+      min-height:64px;
+      padding:0 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+    }
+    .sitter-availability-row strong { font-size:15px; }
+    .sitter-availability-status {
+      min-width:112px;
+      min-height:34px;
+      padding:0 16px;
+      display:grid;
+      place-items:center;
+      border-radius:999px;
+      color:#fff;
+      background:var(--green);
+      font-size:11px;
+      font-weight:900;
+    }
+    .sitter-availability-row.booked { color:#918b80; background:#f1eee7; }
+    .sitter-availability-row.booked .sitter-availability-status { color:#918b80; background:#e3dfd5; }
+    .sitter-availability-empty { min-height:64px; padding:18px; border:1px dashed var(--line); border-radius:16px; color:var(--muted); background:rgba(255,255,255,.7); font-size:12px; text-align:center; }
+    .sitter-availability-time-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .sitter-availability-time-trigger {
+      min-height:72px;
+      padding:12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border:1px solid var(--line);
+      border-radius:16px;
+      color:var(--ink);
+      background:#fff;
+      text-align:left;
+    }
+    .sitter-availability-time-trigger small { display:block; margin-bottom:7px; color:var(--muted); font-size:10px; }
+    .sitter-availability-time-trigger strong { font-size:17px; }
+    .sitter-availability-time-trigger > span:last-child { color:var(--green); font-size:20px; }
+    .sitter-availability-rule { margin:14px 0; padding:13px 16px; border-radius:14px; color:var(--muted); background:var(--green-soft); font-size:11px; line-height:1.5; }
+    .sitter-availability-add { margin-bottom:8px; }
     #sitterMap { padding-left:clamp(24px,9.8vw,42px); padding-right:clamp(24px,9.8vw,42px); }
 
     @media (max-width: 360px) {
@@ -5315,13 +5374,24 @@
       <p class="sitter-hint">請勿在留言中提供信用卡或敏感個資</p>
     </section>
 
-    <section class="screen" id="sitterAvailability">
+    <section class="screen long sitter-availability-screen" id="sitterAvailability">
       <div class="page-heading"><button class="screen-back" data-back aria-label="返回個人">‹</button><h1 class="screen-title">可服務時段</h1></div>
-      <p class="subtitle">選擇日期並儲存可服務時段</p>
-      <div class="card" style="padding:18px"><div class="sitter-section-title"><div><h3 style="margin:0">本月可服務</h3><p class="subtitle" style="margin:5px 0 0">只有已儲存時段可供飼主預約</p></div><strong style="color:var(--green);font-size:24px">18 天</strong></div></div>
-      <div class="calendar card" id="sitterAvailabilityCalendar"><div class="time-month-trigger" style="margin:0 0 10px"><strong>2026 十二月</strong><span>›</span></div><div class="weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="days"><button class="day" type="button" data-sitter-availability-day="1">1</button><button class="day available" type="button" data-sitter-availability-day="2">2</button><button class="day available" type="button" data-sitter-availability-day="3">3</button><button class="day" type="button" data-sitter-availability-day="4">4</button><button class="day available" type="button" data-sitter-availability-day="5">5</button><button class="day" type="button" data-sitter-availability-day="6">6</button><button class="day" type="button" data-sitter-availability-day="7">7</button><button class="day" type="button" data-sitter-availability-day="8">8</button><button class="day available" type="button" data-sitter-availability-day="9">9</button><button class="day available" type="button" data-sitter-availability-day="10">10</button><button class="day" type="button" data-sitter-availability-day="11">11</button><button class="day available" type="button" data-sitter-availability-day="12">12</button><button class="day" type="button" data-sitter-availability-day="13">13</button><button class="day" type="button" data-sitter-availability-day="14">14</button><button class="day" type="button" data-sitter-availability-day="15">15</button><button class="day available active" type="button" data-sitter-availability-day="16">16</button><button class="day available" type="button" data-sitter-availability-day="17">17</button><button class="day available" type="button" data-sitter-availability-day="18">18</button><button class="day" type="button" data-sitter-availability-day="19">19</button><button class="day" type="button" data-sitter-availability-day="20">20</button><button class="day" type="button" data-sitter-availability-day="21">21</button><button class="day available" type="button" data-sitter-availability-day="22">22</button><button class="day available" type="button" data-sitter-availability-day="23">23</button><button class="day" type="button" data-sitter-availability-day="24">24</button><button class="day" type="button" data-sitter-availability-day="25">25</button><button class="day available" type="button" data-sitter-availability-day="26">26</button><button class="day" type="button" data-sitter-availability-day="27">27</button><button class="day" type="button" data-sitter-availability-day="28">28</button><button class="day available" type="button" data-sitter-availability-day="29">29</button><button class="day available" type="button" data-sitter-availability-day="30">30</button><button class="day" type="button" data-sitter-availability-day="31">31</button><button class="day" disabled>32</button><button class="day" disabled>33</button><button class="day" disabled>34</button><button class="day" disabled>35</button></div></div>
-      <div class="sitter-field"><span id="sitterAvailabilityDateLabel">12/16 可服務時段</span><div class="slots" id="sitterAvailabilitySlots"><button class="slot active" type="button">09:00–12:00</button><button class="slot active" type="button">14:00–18:00</button><button class="slot" type="button">19:00–21:00</button></div></div>
-      <button class="btn full" type="button" data-save-sitter-availability>儲存可服務時段</button>
+      <p class="subtitle">先選日期，再設定開始與結束時間</p>
+      <div class="card sitter-availability-summary"><div><h2>本月已設定</h2><p>綠框為已設定日期，實心為目前選取</p></div><strong id="sitterAvailabilityDayCount">6 天</strong></div>
+      <div class="calendar card" id="sitterAvailabilityCalendar">
+        <button class="time-month-trigger" type="button" data-open-sitter-availability-month aria-label="選擇編輯月份"><strong id="sitterAvailabilityMonthLabel">2026 十二月</strong><span aria-hidden="true">›</span></button>
+        <div class="weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+        <div class="days" id="sitterAvailabilityDays"></div>
+      </div>
+      <h2 class="sitter-availability-section-title" id="sitterAvailabilityDateLabel">12/16 已建立時段</h2>
+      <div class="sitter-availability-list" id="sitterAvailabilitySlots"></div>
+      <h2 class="sitter-availability-section-title">新增可服務時段</h2>
+      <div class="sitter-availability-time-grid">
+        <button class="sitter-availability-time-trigger" type="button" data-open-sitter-availability-time="start"><span><small>開始時間</small><strong id="sitterAvailabilityStartTime">09:00</strong></span><span aria-hidden="true">›</span></button>
+        <button class="sitter-availability-time-trigger" type="button" data-open-sitter-availability-time="end"><span><small>結束時間</small><strong id="sitterAvailabilityEndTime">12:00</strong></span><span aria-hidden="true">›</span></button>
+      </div>
+      <p class="sitter-availability-rule">每個可服務時段最多配對 1 筆需求。配對成功後，該時段會自動反灰並停止預約。</p>
+      <button class="btn full sitter-availability-add" type="button" data-add-sitter-availability>新增可服務時段</button>
     </section>
 
     <section class="screen long" id="sitterIncome">
@@ -5515,8 +5585,28 @@
     let quickStartTime = '00:00';
     let quickEndTime = '00:00';
     let quickTimePickerType = 'start';
+    let quickTimePickerContext = 'quick';
     let pendingQuickHour = '00';
     let pendingQuickMinute = '00';
+    let sitterAvailabilityMonthIndex = 0;
+    let sitterAvailabilitySelectedDay = '16';
+    let sitterAvailabilityStartTime = '09:00';
+    let sitterAvailabilityEndTime = '12:00';
+    const sitterScheduleMonths = [
+      { year:2026, month:12 },
+      { year:2027, month:1 }
+    ];
+    const sitterAvailabilityByMonth = {
+      '2026-12': {
+        '10': [{ start:'10:00', end:'12:00', status:'available' }],
+        '11': [{ start:'09:00', end:'11:00', status:'available' }],
+        '12': [{ start:'13:00', end:'16:00', status:'available' }],
+        '16': [{ start:'09:00', end:'12:00', status:'available' }, { start:'14:00', end:'18:00', status:'booked' }],
+        '18': [{ start:'09:00', end:'13:00', status:'available' }],
+        '22': [{ start:'16:00', end:'20:00', status:'available' }]
+      },
+      '2027-1': {}
+    };
     const regionOptions = {
       "台北市": [
         "松山區",
@@ -6172,8 +6262,98 @@
       return (hour * 60) + minute;
     }
 
+    function currentSitterScheduleMonth() {
+      return sitterScheduleMonths[sitterAvailabilityMonthIndex] || sitterScheduleMonths[0];
+    }
+
+    function sitterScheduleMonthKey() {
+      const config = currentSitterScheduleMonth();
+      return `${config.year}-${config.month}`;
+    }
+
+    function sitterScheduleSlots() {
+      const key = sitterScheduleMonthKey();
+      sitterAvailabilityByMonth[key] ||= {};
+      sitterAvailabilityByMonth[key][sitterAvailabilitySelectedDay] ||= [];
+      return sitterAvailabilityByMonth[key][sitterAvailabilitySelectedDay];
+    }
+
+    function renderSitterAvailabilityCalendar() {
+      const grid = document.getElementById('sitterAvailabilityDays');
+      const monthLabel = document.getElementById('sitterAvailabilityMonthLabel');
+      if (!grid || !monthLabel) return;
+      const config = currentSitterScheduleMonth();
+      const monthData = sitterAvailabilityByMonth[sitterScheduleMonthKey()] || {};
+      const daysInMonth = new Date(config.year, config.month, 0).getDate();
+      const cells = [];
+      for (let day = 1; day <= 35; day += 1) {
+        if (day > daysInMonth) {
+          cells.push(`<button class="day" type="button" disabled>${day}</button>`);
+          continue;
+        }
+        const hasSlots = Boolean(monthData[String(day)]?.length);
+        const active = String(day) === sitterAvailabilitySelectedDay;
+        cells.push(`<button class="day ${hasSlots ? 'available' : ''} ${active ? 'active' : ''}" type="button" data-sitter-availability-day="${day}" aria-pressed="${active}">${day}</button>`);
+      }
+      grid.innerHTML = cells.join('');
+      monthLabel.textContent = `${config.year} ${chineseMonth(config.month)}`;
+      document.getElementById('sitterAvailabilityDayCount').textContent = `${Object.values(monthData).filter(slots => slots.length).length} 天`;
+    }
+
+    function renderSitterAvailabilitySlots() {
+      const list = document.getElementById('sitterAvailabilitySlots');
+      if (!list) return;
+      const config = currentSitterScheduleMonth();
+      const slots = sitterScheduleSlots();
+      document.getElementById('sitterAvailabilityDateLabel').textContent = `${config.month}/${sitterAvailabilitySelectedDay} 已建立時段`;
+      list.innerHTML = slots.length ? slots.map(slot => `
+        <div class="sitter-availability-row ${slot.status === 'booked' ? 'booked' : ''}">
+          <strong>${escapeHtml(slot.start)}–${escapeHtml(slot.end)}</strong>
+          <span class="sitter-availability-status">${slot.status === 'booked' ? '已配對' : '可配對'}</span>
+        </div>`).join('') : '<div class="sitter-availability-empty">此日期尚未建立可服務時段</div>';
+      document.getElementById('sitterAvailabilityStartTime').textContent = sitterAvailabilityStartTime;
+      document.getElementById('sitterAvailabilityEndTime').textContent = sitterAvailabilityEndTime;
+      renderSitterAvailabilityCalendar();
+    }
+
+    function openSitterAvailabilityMonthPicker() {
+      document.getElementById('modalTitle').textContent = '選擇編輯月份';
+      document.getElementById('modalCopy').textContent = '選擇要設定可服務時段的月份';
+      document.getElementById('modalBody').innerHTML = `
+        <div class="availability-month-options">
+          ${sitterScheduleMonths.map((item, index) => `<button class="availability-month-option ${index === sitterAvailabilityMonthIndex ? 'active' : ''}" type="button" data-sitter-schedule-month="${index}"><span>${item.year} ${chineseMonth(item.month)}</span><span class="availability-month-check" aria-hidden="true">${index === sitterAvailabilityMonthIndex ? '✓' : ''}</span></button>`).join('')}
+        </div>
+        <p class="availability-month-rule">可切換本月與未來月份設定服務時段。</p>
+        <button class="availability-month-close" type="button" data-close-sitter-schedule-month>關閉</button>`;
+      const layer = document.getElementById('modalLayer');
+      layer.classList.remove('pet-picker-mode', 'birthday-picker-mode', 'quick-month-mode', 'quick-time-mode', 'decision-mode');
+      layer.classList.add('availability-month-mode', 'show');
+    }
+
+    function selectSitterAvailabilityMonth(index) {
+      if (!sitterScheduleMonths[index]) return;
+      sitterAvailabilityMonthIndex = index;
+      sitterAvailabilitySelectedDay = '1';
+      renderSitterAvailabilitySlots();
+      hideModal();
+    }
+
+    function addSitterAvailabilitySlot() {
+      const start = quickTimeToMinutes(sitterAvailabilityStartTime);
+      const end = quickTimeToMinutes(sitterAvailabilityEndTime);
+      if (end <= start) return toast('結束時間必須晚於開始時間');
+      const slots = sitterScheduleSlots();
+      const overlaps = slots.some(slot => start < quickTimeToMinutes(slot.end) && end > quickTimeToMinutes(slot.start));
+      if (overlaps) return toast('此時段與已建立時段重疊');
+      slots.push({ start:sitterAvailabilityStartTime, end:sitterAvailabilityEndTime, status:'available' });
+      slots.sort((a, b) => quickTimeToMinutes(a.start) - quickTimeToMinutes(b.start));
+      renderSitterAvailabilitySlots();
+      toast('可服務時段已新增');
+    }
+
     function renderQuickTimePicker() {
-      const earliest = quickTimePickerType === 'end' ? quickTimeToMinutes(quickStartTime) : 0;
+      const startTime = quickTimePickerContext === 'sitterAvailability' ? sitterAvailabilityStartTime : quickStartTime;
+      const earliest = quickTimePickerType === 'end' ? quickTimeToMinutes(startTime) : 0;
       document.getElementById('modalBody').innerHTML = `
         <div class="quick-time-picker-grid">
           <div class="quick-time-picker-column"><strong>小時</strong><div class="quick-time-options">${Array.from({ length:24 }, (_, hour) => String(hour).padStart(2,'0')).map(hour => {
@@ -6186,13 +6366,16 @@
             return `<button class="quick-time-option ${minute === pendingQuickMinute ? 'active' : ''}" type="button" data-quick-minute="${minute}" ${disabled ? 'disabled' : ''}>${minute}</button>`;
           }).join('')}</div></div>
         </div>
-        <p class="quick-picker-rule">${quickTimePickerType === 'end' ? `結束時間不得早於開始時間 ${quickStartTime}。` : '開始與結束時間均預設為 00:00。'}</p>
+        <p class="quick-picker-rule">${quickTimePickerType === 'end' ? `結束時間不得早於開始時間 ${startTime}。` : quickTimePickerContext === 'sitterAvailability' ? '請選擇本次可服務時段的開始時間。' : '開始與結束時間均預設為 00:00。'}</p>
         <div class="modal-inline-actions"><button class="btn light" type="button" data-cancel-modal>取消</button><button class="btn" type="button" data-confirm-quick-time>確認時間</button></div>`;
     }
 
-    function openQuickTimePicker(type) {
+    function openQuickTimePicker(type, context = 'quick') {
+      quickTimePickerContext = context;
       quickTimePickerType = type === 'end' ? 'end' : 'start';
-      const current = quickTimePickerType === 'end' ? quickEndTime : quickStartTime;
+      const current = quickTimePickerContext === 'sitterAvailability'
+        ? (quickTimePickerType === 'end' ? sitterAvailabilityEndTime : sitterAvailabilityStartTime)
+        : (quickTimePickerType === 'end' ? quickEndTime : quickStartTime);
       [pendingQuickHour, pendingQuickMinute] = current.split(':');
       document.getElementById('modalTitle').textContent = quickTimePickerType === 'end' ? '選擇結束時間' : '選擇開始時間';
       document.getElementById('modalCopy').textContent = quickTimePickerType === 'end' ? '結束時間不能小於開始時間' : '選擇服務開始的小時與分鐘';
@@ -6203,7 +6386,17 @@
 
     function confirmQuickTime() {
       const value = `${pendingQuickHour}:${pendingQuickMinute}`;
-      if (quickTimePickerType === 'end' && quickTimeToMinutes(value) < quickTimeToMinutes(quickStartTime)) return toast('結束時間不能小於開始時間');
+      const startTime = quickTimePickerContext === 'sitterAvailability' ? sitterAvailabilityStartTime : quickStartTime;
+      if (quickTimePickerType === 'end' && quickTimeToMinutes(value) < quickTimeToMinutes(startTime)) return toast('結束時間不能小於開始時間');
+      if (quickTimePickerContext === 'sitterAvailability') {
+        if (quickTimePickerType === 'start') {
+          sitterAvailabilityStartTime = value;
+          if (quickTimeToMinutes(sitterAvailabilityEndTime) < quickTimeToMinutes(sitterAvailabilityStartTime)) sitterAvailabilityEndTime = sitterAvailabilityStartTime;
+        } else sitterAvailabilityEndTime = value;
+        renderSitterAvailabilitySlots();
+        hideModal();
+        return;
+      }
       if (quickTimePickerType === 'start') {
         quickStartTime = value;
         if (quickTimeToMinutes(quickEndTime) < quickTimeToMinutes(quickStartTime)) quickEndTime = quickStartTime;
@@ -8717,19 +8910,35 @@
       const sitterAvailabilityDay = event.target.closest('[data-sitter-availability-day]');
       if (sitterAvailabilityDay) {
         event.preventDefault();
-        document.querySelectorAll('[data-sitter-availability-day]').forEach(day => day.classList.toggle('active', day === sitterAvailabilityDay));
-        document.getElementById('sitterAvailabilityDateLabel').textContent = `12/${sitterAvailabilityDay.dataset.sitterAvailabilityDay} 可服務時段`;
+        sitterAvailabilitySelectedDay = sitterAvailabilityDay.dataset.sitterAvailabilityDay;
+        renderSitterAvailabilitySlots();
         return;
       }
-      const sitterAvailabilitySlot = event.target.closest('#sitterAvailabilitySlots .slot');
-      if (sitterAvailabilitySlot) {
+      if (event.target.closest('[data-open-sitter-availability-month]')) {
         event.preventDefault();
-        sitterAvailabilitySlot.classList.toggle('active');
+        openSitterAvailabilityMonthPicker();
         return;
       }
-      if (event.target.closest('[data-save-sitter-availability]')) {
+      const sitterScheduleMonth = event.target.closest('[data-sitter-schedule-month]');
+      if (sitterScheduleMonth) {
         event.preventDefault();
-        toast('可服務時段已儲存，飼主現在可以預約');
+        selectSitterAvailabilityMonth(Number(sitterScheduleMonth.dataset.sitterScheduleMonth));
+        return;
+      }
+      if (event.target.closest('[data-close-sitter-schedule-month]')) {
+        event.preventDefault();
+        hideModal();
+        return;
+      }
+      const sitterAvailabilityTime = event.target.closest('[data-open-sitter-availability-time]');
+      if (sitterAvailabilityTime) {
+        event.preventDefault();
+        openQuickTimePicker(sitterAvailabilityTime.dataset.openSitterAvailabilityTime, 'sitterAvailability');
+        return;
+      }
+      if (event.target.closest('[data-add-sitter-availability]')) {
+        event.preventDefault();
+        addSitterAvailabilitySlot();
         return;
       }
       if (event.target.closest('[data-sitter-complete]')) {
@@ -9370,6 +9579,7 @@
     renderFavorites();
     renderPets();
     renderSlots();
+    renderSitterAvailabilitySlots();
     renderQuickDemandCalendar();
     renderRequestList();
     renderRequestApplicants();
