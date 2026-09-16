@@ -1,0 +1,81 @@
+@font-face {
+  font-family: "Inter";
+  src: url("./InterVariable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+.copaws-render-root,
+.copaws-render-root * {
+  box-sizing: border-box;
+}
+
+.copaws-render-root {
+  position: relative;
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  isolation: isolate;
+  font-family: "Inter", "PingFang TC", sans-serif;
+  font-synthesis: none;
+  letter-spacing: 0;
+  text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+}
+
+.copaws-render-node {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  isolation: isolate;
+  transform-origin: 0 0;
+}
+
+.copaws-render-node.copaws-render-root {
+  margin-inline: auto;
+}
+
+.copaws-render-paint,
+.copaws-render-stroke,
+.copaws-render-vector {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.copaws-render-paint {
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.copaws-render-stroke {
+  z-index: 1;
+}
+
+.copaws-render-vector {
+  overflow: visible;
+}
+
+.copaws-render-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.copaws-render-text-content {
+  display: block;
+  flex: 0 0 auto;
+  width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}

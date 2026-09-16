@@ -1,0 +1,64 @@
+{
+  "results": [
+    {
+      "name": "Owner navigation, region, pet and time validation",
+      "status": "PASS"
+    },
+    {
+      "name": "Pet empty -> create -> original demand",
+      "status": "PASS"
+    },
+    {
+      "name": "Independent birth and document months",
+      "status": "PASS"
+    },
+    {
+      "name": "Sitter availability disabled and valid save",
+      "status": "PASS"
+    },
+    {
+      "name": "Accept requires meeting agreement",
+      "status": "PASS"
+    },
+    {
+      "name": "Single party meeting stays waiting",
+      "status": "PASS"
+    },
+    {
+      "name": "Three day cancellation remains disabled",
+      "status": "PASS"
+    },
+    {
+      "name": "Password goes through verification",
+      "status": "PASS"
+    },
+    {
+      "name": "Map 20 owners and page restoration",
+      "status": "PASS"
+    },
+    {
+      "name": "Profile navigation and role switching",
+      "status": "PASS"
+    },
+    {
+      "name": "Chat refresh returns after spinner",
+      "status": "PASS"
+    },
+    {
+      "name": "Escape restores original form and focus",
+      "status": "PASS"
+    },
+    {
+      "name": "Desktop carousel controls and automatic advance",
+      "status": "PASS"
+    },
+    {
+      "name": "Long forms reach final fields without moving fixed navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "Skip request changes card and calendar updates month geometry",
+      "status": "PASS"
+    }
+  ]
+}

@@ -2,6 +2,8 @@
 
 日期：2026-09-16
 
+> PC部分已由同日後續修復版取代，請以`copaws-pc-prototype-repair-2026-09-16.md`及90張Figma狀態對照為準。下方手機引擎延伸、44頁與舊版PC測試數字僅保留歷史，不再代表現行PC交付。管理後台未於此次修復變更。
+
 ## 入口與來源
 
 - PC：`https://mobinice.github.io/copaws/pc.html`
