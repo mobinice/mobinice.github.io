@@ -1,0 +1,177 @@
+{
+  "results": [
+    {
+      "name": "PC two cards",
+      "pass": true
+    },
+    {
+      "name": "Carousel advances",
+      "pass": true
+    },
+    {
+      "name": "Carousel returns",
+      "pass": true
+    },
+    {
+      "name": "Detail opens",
+      "pass": true
+    },
+    {
+      "name": "Pet modal opens",
+      "pass": true
+    },
+    {
+      "name": "City modal opens",
+      "pass": true
+    },
+    {
+      "name": "Time modal opens",
+      "pass": true
+    },
+    {
+      "name": "No invalid calendar days",
+      "pass": true
+    },
+    {
+      "name": "Equal time disabled",
+      "pass": true
+    },
+    {
+      "name": "Overlapping sitter time rejected",
+      "pass": true
+    },
+    {
+      "name": "Map first 20 owners",
+      "pass": true
+    },
+    {
+      "name": "More owners opens paged list",
+      "pass": true
+    },
+    {
+      "name": "Owner list has 8 entries",
+      "pass": true
+    },
+    {
+      "name": "PC no horizontal overflow 1280",
+      "pass": true
+    },
+    {
+      "name": "PC no horizontal overflow 1440",
+      "pass": true
+    },
+    {
+      "name": "PC no horizontal overflow 1920",
+      "pass": true
+    },
+    {
+      "name": "PC no horizontal overflow 768",
+      "pass": true
+    },
+    {
+      "name": "Invalid demo login rejected",
+      "pass": true
+    },
+    {
+      "name": "Dashboard totals correct",
+      "pass": true
+    },
+    {
+      "name": "Range greater than 90 disabled",
+      "pass": true
+    },
+    {
+      "name": "Exactly 90 days enabled",
+      "pass": true
+    },
+    {
+      "name": "Sitter report total 36",
+      "pass": true
+    },
+    {
+      "name": "Real XLSX has four sheets",
+      "pass": true
+    },
+    {
+      "name": "XLSX sitter rows total 36",
+      "pass": true
+    },
+    {
+      "name": "Users first page 20",
+      "pass": true
+    },
+    {
+      "name": "User page preserved after detail",
+      "pass": true
+    },
+    {
+      "name": "Empty user result",
+      "pass": true
+    },
+    {
+      "name": "Campaign overlap rejected",
+      "pass": true
+    },
+    {
+      "name": "Fee confirmation before write",
+      "pass": true
+    },
+    {
+      "name": "Confirmed fee saved",
+      "pass": true
+    },
+    {
+      "name": "Audit stored",
+      "pass": true
+    },
+    {
+      "name": "Admin no horizontal overflow 1280",
+      "pass": true
+    },
+    {
+      "name": "Admin no horizontal overflow 1440",
+      "pass": true
+    },
+    {
+      "name": "Admin no horizontal overflow 1920",
+      "pass": true
+    },
+    {
+      "name": "Admin no horizontal overflow 768",
+      "pass": true
+    },
+    {
+      "name": "No JS page errors",
+      "pass": true
+    }
+  ],
+  "viewportAudits": [
+    {
+      "width": 1280,
+      "screenCount": 44,
+      "bad": []
+    },
+    {
+      "width": 1440,
+      "screenCount": 44,
+      "bad": []
+    },
+    {
+      "width": 1920,
+      "screenCount": 44,
+      "bad": []
+    },
+    {
+      "width": 768,
+      "screenCount": 44,
+      "bad": []
+    }
+  ],
+  "errors": [],
+  "workbook": [
+    "營運摘要",
+    "每日註冊",
+    "每日新增保母",
+    "每日平台費"
+  ]
+}
