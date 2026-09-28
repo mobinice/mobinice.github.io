@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Copaws Interactive Prototype</title>
+  <title>PetMate 互動原型</title>
   <link rel="icon" type="image/png" href="assets/copaws-a-plan-icon.png">
   <link rel="apple-touch-icon" href="assets/copaws-a-plan-icon.png">
   <style>
@@ -418,8 +418,17 @@
       aspect-ratio: 1;
       object-fit: contain;
       display: block;
-      margin: 14px auto 14px;
+      margin: 24px auto 14px;
     }
+    .brand-name {
+      color: #087a40;
+      font-size: 30px;
+      line-height: 36px;
+      font-weight: 900;
+      text-align: center;
+    }
+    .login-brand-name { margin: 0 auto 14px; }
+    .otp-brand-name { margin: 0 auto 20px; }
     .login-hero {
       text-align: center;
       margin-bottom: 42px;
@@ -433,7 +442,7 @@
     }
     .login-hero p {
       width: 250px;
-      margin: 24px auto 0;
+      margin: 20px auto 0;
       color: var(--muted);
       font-size: 12px;
       line-height: 1.55;
@@ -520,7 +529,7 @@
       aspect-ratio: 1;
       object-fit: contain;
       display: block;
-      margin: 14px auto 14px;
+      margin: 24px auto 14px;
     }
     .otp-screen .screen-title {
       margin: 0 auto 10px;
@@ -4163,8 +4172,10 @@
     .sitter-case-card { margin-bottom: 12px; padding: 16px; border-radius: 16px; box-shadow: none; }
     .sitter-case-card h3 { margin: 8px 0 6px; font-size: 18px; }
     .sitter-case-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
-    .sitter-case-actions { display: flex; gap: 24px; margin-top: 14px; }
-    .sitter-case-actions button { min-height: 44px; color: var(--green); font-size: 12px; font-weight: 900; }
+    .sitter-case-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 14px; }
+    .sitter-case-actions.single { grid-template-columns: 1fr; }
+    .sitter-case-actions button { min-height: 44px; border: 1px solid var(--green); border-radius: 12px; background: #fff; color: var(--green); font-size: 13px; font-weight: 900; }
+    .sitter-case-actions button:last-child { background: var(--green); color: #fff; }
     .sitter-status-blue { color: #2673d8; }
     .sitter-status-clay { color: var(--clay); }
     .sitter-status-gold { color: #b77a13; }
@@ -4497,14 +4508,15 @@
 </head>
 <body>
   <div class="phone-shell" id="phoneShell">
-  <main class="phone" id="phone" aria-label="Copaws mobile demo">
+  <main class="phone" id="phone" aria-label="PetMate 手機原型">
     <div class="toast" id="toast">已加入收藏</div>
 
     <section class="screen no-nav active login-screen" id="login">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <img class="login-logo" src="assets/copaws-a-plan-icon.png" alt="Copaws">
+      <img class="login-logo" src="assets/copaws-a-plan-icon.png" alt="PetMate Logo">
+      <div class="brand-name login-brand-name">PetMate</div>
       <div class="login-hero">
-        <h1>找到離家最近的安心寵物保母</h1>
+        <h1>找到離家最近的<br>安心寵物保母</h1>
         <p>不在家時，快速媒合有經驗的養寵人，到家陪伴、餵食與回報。</p>
       </div>
       <div class="card login-card">
@@ -4522,7 +4534,8 @@
 
     <section class="screen no-nav otp-screen" id="otp">
       <div class="status-bar"><span>9:41</span><span class="battery"></span></div>
-      <img class="otp-logo" src="assets/copaws-a-plan-icon.png" alt="Copaws">
+      <img class="otp-logo" src="assets/copaws-a-plan-icon.png" alt="PetMate Logo">
+      <div class="brand-name otp-brand-name">PetMate</div>
       <h1 class="screen-title">輸入驗證碼</h1>
       <p class="subtitle">已發送至 0912 345 678，測試版自動填入。</p>
       <div class="otp-row" aria-label="驗證碼 123456">
@@ -4541,7 +4554,7 @@
         <div class="register-grid">
           <div class="field"><label>暱稱 *</label><input class="input" value="小安"></div>
           <div class="field"><label>生日 *</label><button class="input birth-input register-picker-trigger" type="button" data-open-registration-picker="birthday" aria-haspopup="dialog" aria-label="選擇生日"><span id="registerBirthdayValue">1992年8月12日</span></button><input id="registerBirthdayInput" value="1992-08-12" hidden></div>
-          <div class="field span-2"><label>通訊 Email</label><input class="input" value="hello@copaws.tw"></div>
+          <div class="field span-2"><label>通訊 Email</label><input class="input" value="hello@example.com"></div>
           <div class="field span-2"><label>通訊電話</label><input class="input" value="0912 345 678"></div>
           <div class="field"><label>性別</label><button class="select register-picker-trigger" type="button" data-open-registration-picker="gender" aria-haspopup="dialog"><span id="registerGenderValue">請選擇</span></button><input id="registerGenderInput" value="請選擇" hidden></div>
           <div class="field"><label>興趣</label><button class="select register-picker-trigger" type="button" data-open-registration-picker="interest" aria-haspopup="dialog"><span id="registerInterestValue">攝影、散步</span></button><input id="registerInterestInput" value="攝影、散步" hidden></div>
@@ -5254,7 +5267,7 @@
       <p class="subtitle">訂單 COP-20260708-009</p>
       <div class="receipt-meta card"><div><span>發票日期</span><strong>2026/07/11</strong></div><div><span>發票號碼</span><strong>AB-12345678</strong></div><div><span>四位數隨機碼</span><strong>4827</strong></div></div>
       <article class="receipt-block card"><h3>寵物保母服務收據</h3><div class="receipt-line"><span>到府照護服務</span><strong>NT$ 1,200</strong></div><div class="receipt-line"><span>收款人</span><strong>Nina Lin</strong></div><div class="receipt-line total"><span>服務費小計</span><strong>NT$ 1,200</strong></div></article>
-      <article class="receipt-block card"><h3>平台服務費發票</h3><div class="receipt-line"><span>平台服務費 15%</span><strong>NT$ 180</strong></div><div class="receipt-line"><span>開立單位</span><strong>Copaws</strong></div><div class="receipt-line total"><span>平台費小計</span><strong>NT$ 180</strong></div></article>
+      <article class="receipt-block card"><h3>平台服務費發票</h3><div class="receipt-line"><span>平台服務費 15%</span><strong>NT$ 180</strong></div><div class="receipt-line"><span>開立單位</span><strong>PetMate</strong></div><div class="receipt-line total"><span>平台費小計</span><strong>NT$ 180</strong></div></article>
       <article class="receipt-block card"><div class="receipt-line total" style="margin-top:0"><span>訂單總額</span><strong>NT$ 1,380</strong></div></article>
       <button class="btn full" style="margin-top:18px" onclick="toast('電子發票 PDF 已準備下載')">下載 PDF</button>
     </section>
@@ -5333,7 +5346,7 @@
     <section class="screen long" id="sitterCases">
       <header class="sitter-head"><h1 class="screen-title">我的案件</h1><p class="subtitle">接受進度與服務集中管理</p><button class="shared-filter-trigger" type="button" data-open-sitter-filter="cases" aria-label="篩選我的案件"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="6" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="12" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/><circle cx="11" cy="18" r="2.2" fill="#fff" stroke="currentColor" stroke-width="1.8"/></svg></button></header>
       <div id="sitterCaseList">
-        <article class="card sitter-case-card" data-sitter-case-status="confirming"><b class="sitter-status-blue">需求確認中</b><h3>麻糬 · 到府照護</h3><p>等待飼主確認你的申請。</p><div class="sitter-case-actions"><button data-go="sitterDemandDetail">查看詳情</button><button data-sitter-manage="confirming">管理案件</button></div></article>
+        <article class="card sitter-case-card" data-sitter-case-status="confirming"><b class="sitter-status-blue">需求確認中</b><h3>麻糬 · 到府照護</h3><p>等待飼主確認你的申請。</p><div class="sitter-case-actions single"><button type="button" data-sitter-application-detail>查看詳情</button></div></article>
         <article class="card sitter-case-card" data-sitter-case-status="meeting"><b class="sitter-status-blue">待雙方見面</b><h3>小安 · 麻糬</h3><p>等待你與飼主分別確認完成實體見面。</p><div class="sitter-case-actions"><button data-go="sitterDemandDetail">查看詳情</button><button data-sitter-meeting>確認已見面</button></div></article>
         <article class="card sitter-case-card" data-sitter-case-status="upcoming"><b class="sitter-status-clay">即將服務</b><h3>小芸 · 到府餵食</h3><p>今天 18:30 開始，請提前確認路線。</p><div class="sitter-case-actions"><button data-go="sitterDemandDetail">查看詳情</button><button data-go="sitterService">管理案件</button></div></article>
         <article class="card sitter-case-card" data-sitter-case-status="active"><b>進行中</b><h3>柏宇 · 散步陪伴</h3><p>服務中，請依需求提交照片回報。</p><div class="sitter-case-actions"><button data-go="sitterDemandDetail">查看詳情</button><button data-go="sitterService">回報服務</button></div></article>
@@ -8295,7 +8308,7 @@
       const body = document.getElementById('modalBody');
       if (type === 'platform') {
         title.textContent = '平台認證提示';
-        copy.textContent = '藍色勾勾代表此帳號已通過 Copaws 平台審核；保母卡片會優先展示平台認證。';
+        copy.textContent = '藍色勾勾代表此帳號已通過 PetMate 平台審核；保母卡片會優先展示平台認證。';
       } else if (type === 'identity') {
         title.textContent = '實名認證提示';
         copy.textContent = '這是點擊實名認證 icon 後出現的 tips，讓用戶快速理解此帳號已完成平台驗證。';
@@ -8308,7 +8321,7 @@
       }
       body.innerHTML = `
         <div class="cert-row">
-          <div><strong>已平台認證</strong><span>帳號與服務資料已通過 Copaws 平台審核</span></div>
+          <div><strong>已平台認證</strong><span>帳號與服務資料已通過 PetMate 平台審核</span></div>
           <span class="cert-badge platform-cert" aria-label="平台認證">✓</span>
         </div>
         <div class="cert-row">
@@ -8864,9 +8877,15 @@
         openMeetingConfirmation('sitter');
         return;
       }
-      if (event.target.closest('[data-sitter-manage]')) {
+      if (event.target.closest('[data-sitter-application-detail]')) {
         event.preventDefault();
-        navigate('sitterDemandDetail');
+        document.getElementById('modalTitle').textContent = '申請詳情';
+        document.getElementById('modalCopy').textContent = '等待飼主確認你的申請。';
+        document.getElementById('modalBody').innerHTML = '<div class="sitter-field"><span>寵物</span><strong>麻糬</strong></div><div class="sitter-field"><span>服務</span><strong>到府照護</strong></div><div class="sitter-field"><span>日期</span><strong>2026/12/12（六）14:00–16:00</strong></div><div class="sitter-field"><span>地區</span><strong>台北市大安區</strong></div><div class="sitter-field"><span>目前狀態</span><strong>等待飼主選擇</strong></div>';
+        const action = document.querySelector('#modalLayer .modal > .btn.full');
+        action.textContent = '返回案件';
+        action.onclick = hideModal;
+        document.getElementById('modalLayer').classList.add('show');
         return;
       }
       if (event.target.closest('[data-sitter-add-photo]')) {
