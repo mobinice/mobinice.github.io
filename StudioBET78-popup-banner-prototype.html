@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StudioBET78 — Pengaturan Popup Banner</title>
+  <style>
+    :root{--bg:#191d23;--top:#333840;--sidebar:#343940;--panel:#343941;--line:#4b525c;--text:#f6f7f9;--muted:#aeb5c0;--cyan:#22b9e5;--green:#16823d;--amber:#bd7f12;--red:#bd3e4b}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,"Segoe UI",Arial,"Noto Sans TC",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit}
+    .app{display:flex;min-height:100vh}.sidebar{width:186px;flex:0 0 186px;background:var(--sidebar);border-right:5px solid #4a5058}.nav-spacer{height:46px}.nav-link,.nav-title{display:block;min-height:30px;padding:7px 14px;border-bottom:1px solid #666d75;color:#fff;font-size:12px;text-decoration:none}.nav-link:hover{background:#4a515c}.nav-link.active{background:#707988;font-weight:700}.nav-title{margin-top:8px;background:#2f343b;font-weight:700}.workspace{min-width:0;flex:1}.topbar{height:46px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;background:var(--top);gap:20px}.brand{display:flex;align-items:center;gap:15px;font-size:19px;font-weight:750}.brand button{border:0;background:transparent;color:#fff;font-size:19px}.topmeta{display:flex;align-items:center;gap:9px;white-space:nowrap;font-size:12px}.topmeta b{color:#efa51b}.topmeta a{color:var(--cyan);text-decoration:underline}.flag{width:18px;height:18px;border:1px solid #ddd;border-radius:50%;background:linear-gradient(#e52e39 0 50%,#fff 50%)}
+    main{padding:14px 16px 50px}.page-title{margin:0 0 18px;font-size:15px;font-weight:750}.tabs{display:flex;gap:9px;margin-bottom:18px}.tab{min-width:145px;height:33px;padding:0 16px;border:0;border-radius:4px;background:#464c55;color:#fff;font-size:12px;font-weight:700}.tab.active{background:#707987}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.primary-btn{min-height:35px;padding:0 17px;border:1px solid #14a6d1;border-radius:4px;background:#14a6d1;color:#fff;font-size:12px;font-weight:700}.primary-btn:hover{background:#0799c6}.outline-btn{min-height:35px;padding:0 12px;border:1px solid #636b77;border-radius:4px;background:#414751;color:#fff;font-size:12px}.toolbar-note{color:var(--muted);font-size:12px}.filter{display:grid;grid-template-columns:minmax(140px,1fr) minmax(150px,1fr) minmax(160px,1fr) minmax(250px,2fr) auto;gap:10px;align-items:end;padding:10px;margin-bottom:20px;border-radius:4px;background:#363b43}.field{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:12px;font-weight:650}.field input,.field select,.field textarea{width:100%;min-height:34px;padding:7px 9px;border:1px solid #5d6672;border-radius:4px;background:#121417;color:#fff;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 2px #22b9e536}.field input[type="datetime-local"]{color-scheme:dark}.field textarea{min-height:68px;resize:vertical}.filter button{height:34px;padding:0 14px;border:0;border-radius:4px;background:#4d545e;color:#fff;font-size:12px;font-weight:700}
+    .list-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 9px}.list-head h2{margin:0;font-size:14px}.list-head span{color:#aeb5c0;font-size:12px}.table-wrap{overflow-x:auto;background:#fff;color:#242932}.banner-table{width:100%;min-width:1050px;border-collapse:collapse;font-size:12px}.banner-table th{height:30px;text-align:left;padding:7px 10px;background:#fff;border-bottom:1px solid #e3e5e8;white-space:nowrap}.banner-table td{padding:11px 10px;border-bottom:1px solid #e5e7ea;vertical-align:middle}.banner-table tr:hover td{background:#f7fafc}.banner-table .item-title{font-weight:700}.banner-table .subtext{display:block;margin-top:4px;color:#737b86;font-size:11px}.mini-art{position:relative;width:138px;height:68px;overflow:hidden;display:flex;align-items:center;justify-content:center;border-radius:3px;background:radial-gradient(circle at 70% 30%,#364758 0,#12181f 45%,#090b10 100%);color:#fff;text-align:center;font-size:12px;font-weight:850;letter-spacing:.08em}.mini-art:before{content:"";position:absolute;inset:5px;border:1px solid #ffffff35;border-radius:2px}.mini-art img{width:100%;height:100%;object-fit:cover}.mini-art span{position:relative}.mini-art.alt{background:linear-gradient(135deg,#2b1230,#561c45 50%,#10111e)}.mini-art.blue{background:linear-gradient(135deg,#102c45,#1c78a5 60%,#091b2a)}.pill{display:inline-block;padding:4px 8px;border-radius:12px;font-size:11px;font-weight:750;white-space:nowrap}.pill.active{background:#daf2e0;color:#166b31}.pill.scheduled{background:#e4eafa;color:#315a9a}.pill.ended{background:#eceef0;color:#626c78}.pill.paused,.pill.unconfigured{background:#fff0d7;color:#946217}.actions{display:flex;align-items:center;gap:7px}.small-btn{padding:5px 9px;border:0;border-radius:3px;background:#4b525e;color:#fff;font-size:11px}.switch{position:relative;display:inline-block;width:34px;height:19px}.switch input{position:absolute;opacity:0}.switch span{position:absolute;inset:0;border-radius:20px;background:#a7adb4;transition:.15s}.switch span:before{content:"";position:absolute;left:3px;top:3px;width:13px;height:13px;border-radius:50%;background:white;transition:.15s}.switch input:checked+span{background:#118333}.switch input:checked+span:before{transform:translateX(15px)}.switch input:focus-visible+span{outline:2px solid #00a8e2;outline-offset:2px}.empty{padding:35px;text-align:center;color:#69737e}.rules-note{margin-top:16px;padding:12px 14px;border:1px solid #515a66;border-radius:4px;background:#272c34;color:#cbd1d8;font-size:12px;line-height:1.6}.rules-note strong{color:#fff}
+    .shade{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:18px;background:#000b}.shade.open{display:flex}.modal{width:min(820px,100%);max-height:min(92vh,940px);display:flex;flex-direction:column;border:1px solid #5c6673;border-radius:7px;background:#282e37;box-shadow:0 22px 70px #000b}.modal-head{display:flex;align-items:center;justify-content:space-between;padding:17px 20px;border-bottom:1px solid #444e5a}.modal-head h2{margin:0;font-size:18px}.modal-head p{margin:3px 0 0;color:#aab4c1;font-size:12px}.icon-btn{border:0;background:transparent;color:#fff;font-size:25px;line-height:1}.modal-body{overflow-y:auto;padding:18px 20px}.form-section{margin:0 0 21px;padding:0;border:0}.form-section legend{width:100%;padding:0 0 8px;margin-bottom:11px;border-bottom:1px solid #48525e;color:#fff;font-size:13px;font-weight:800}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px 16px}.audience .form-grid{grid-template-columns:1fr}.span-2{grid-column:1/-1}.required{color:#ff9d9d}.helper{color:#aab4c1;font-size:11px;line-height:1.45;font-weight:400}.upload-line{display:flex;align-items:center;gap:12px}.upload-line input[type="file"]{flex:1;min-width:0;padding:5px;color:#d7dce3}.upload-preview{width:120px;height:64px;flex:0 0 120px;display:grid;place-items:center;overflow:hidden;border:1px dashed #74808e;border-radius:4px;background:#171d26;color:#9ca9b8;font-size:11px}.upload-preview img{width:100%;height:100%;object-fit:contain}.check-panel{padding:10px;border:1px solid #59626e;border-radius:4px;background:#1d222a}.radio-line{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-bottom:9px;font-size:12px}.radio-line label,.check-list label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}.check-list{display:flex;flex-wrap:wrap;gap:8px 16px;padding-top:8px;border-top:1px solid #414c59;font-size:12px}.check-list[hidden]{display:none}.check-panel input[type="checkbox"],.check-panel input[type="radio"]{accent-color:#16add6}.inline-note{padding:9px 11px;border:1px solid #6b5b38;border-radius:4px;background:#4b3b1e70;color:#edcb8a;font-size:11px;line-height:1.45}.error{min-height:18px;margin:10px 0 0;color:#ffa5a5;font-size:12px}.modal-foot{display:flex;justify-content:flex-end;gap:9px;padding:13px 20px;border-top:1px solid #444e5a;background:#272d35}.modal-foot button{min-width:78px}.toast{position:fixed;right:20px;bottom:20px;z-index:40;display:none;max-width:360px;padding:12px 15px;border-radius:5px;background:#143d29;color:#e9fff0;box-shadow:0 10px 30px #0008;font-size:13px}.toast.show{display:block}
+    /* Keep the action buttons visible while the long form scrolls inside the dialog. */
+    .modal{height:min(92dvh,940px);max-height:calc(100dvh - 36px)}
+    .modal-head,.modal-foot{flex:0 0 auto}
+    #bannerForm{display:flex;flex:1;flex-direction:column;min-height:0}
+    .modal-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+    .check-panel input[type="checkbox"],.check-panel input[type="radio"]{width:16px;height:16px;min-height:0;flex:0 0 16px;margin:0;padding:0;box-shadow:none}
+    .provider-cell{min-width:250px;max-width:330px;line-height:1.55;overflow-wrap:anywhere}.provider-scope{display:block;margin-bottom:3px;color:#6a7480;font-size:11px}.provider-names{display:block;white-space:normal}
+    .preview-button{display:block;padding:0;border:0;background:transparent;color:inherit;text-align:left}.preview-button:hover .mini-art{filter:brightness(1.15)}.preview-button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}.mini-art img{position:absolute;inset:0}.mini-art span{z-index:1}
+    .image-shade{z-index:30}.image-dialog{width:min(960px,100%);max-height:calc(100dvh - 36px);overflow:auto;border:1px solid #5c6673;border-radius:7px;background:#282e37;box-shadow:0 22px 70px #000b}.image-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;border-bottom:1px solid #444e5a}.image-dialog-head h2{margin:0;font-size:16px}.image-dialog-head button{border:0;background:transparent;color:#fff;font-size:25px;line-height:1}.image-stage{padding:16px}.large-art{position:relative;display:flex;align-items:center;justify-content:center;width:100%;min-height:230px;max-height:70vh;aspect-ratio:16/6;overflow:hidden;border:1px solid #657281;border-radius:4px;background:radial-gradient(circle at 70% 30%,#364758 0,#12181f 45%,#090b10 100%);color:#fff;text-align:center;font-size:clamp(22px,4vw,46px);font-weight:850;letter-spacing:.08em}.large-art:before{content:"";position:absolute;inset:12px;border:1px solid #ffffff35;border-radius:3px}.large-art.alt{background:linear-gradient(135deg,#2b1230,#561c45 50%,#10111e)}.large-art.blue{background:linear-gradient(135deg,#102c45,#1c78a5 60%,#091b2a)}.large-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}.large-art span{position:relative;z-index:1}
+    .confirm-shade{z-index:40}.confirm-dialog{width:min(500px,100%);border:1px solid #5c6673;border-radius:7px;background:#282e37;box-shadow:0 22px 70px #000b}.confirm-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #444e5a}.confirm-head h2{margin:0;font-size:18px}.confirm-head button{border:0;background:transparent;color:#fff;font-size:24px;line-height:1}.confirm-body{padding:18px}.confirm-body p{margin:0 0 14px;color:#dce2e9;font-size:13px;line-height:1.5}.confirm-details{display:grid;grid-template-columns:110px 1fr;gap:10px;padding:13px;border:1px solid #525c69;border-radius:4px;background:#1d232b;font-size:12px}.confirm-details dt{color:#aab4c1}.confirm-details dd{min-width:0;margin:0;color:#fff;font-weight:700;overflow-wrap:anywhere}.confirm-note{margin-top:13px;color:#b8c4d0;font-size:11px;line-height:1.5}.confirm-foot{display:flex;justify-content:flex-end;gap:9px;padding:13px 18px;border-top:1px solid #444e5a}.danger-btn{min-height:35px;padding:0 16px;border:1px solid #b6424a;border-radius:4px;background:#b6424a;color:#fff;font-size:12px;font-weight:700}
+    .banner-table{min-width:1540px}.banner-table .serial-no{width:120px;min-width:120px;white-space:nowrap;font-weight:750;font-variant-numeric:tabular-nums}.target-link{display:block;width:190px;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#087fad}.schedule-cell{min-width:220px}.schedule-cell .created-time{display:block;margin-top:7px;padding-top:6px;border-top:1px solid #e3e7eb;color:#66717d;font-size:11px}.schedule-cell .created-time strong{font-weight:700;color:#535d69}
+    .image-stage{display:flex;justify-content:center}.large-art{width:min(400px,100%);min-height:0;aspect-ratio:700/1110}
+    .schedule-options{display:flex;flex-wrap:wrap;gap:10px 22px;margin:0 0 14px;font-size:12px}.schedule-options label{display:inline-flex;align-items:center;gap:7px;cursor:pointer}.schedule-options input[type="radio"]{width:16px;height:16px;min-height:0;margin:0;padding:0;accent-color:#16add6}#rangeFields[hidden]{display:none}.frequency-grid{grid-template-columns:1fr 1fr}.help-wrap{position:relative;display:inline-flex;vertical-align:middle;margin-left:5px}.help-button{width:17px;height:17px;padding:0;border:1px solid #9aacbc;border-radius:50%;background:#3d5264;color:#fff;font-size:11px;font-weight:800;line-height:15px;text-align:center}.help-popover{display:none;position:absolute;z-index:5;left:0;bottom:calc(100% + 8px);width:min(310px,calc(100vw - 70px));padding:10px 12px;border:1px solid #728496;border-radius:5px;background:#141c26;box-shadow:0 10px 28px #0009;color:#f4f7fa;font-size:12px;font-weight:400;line-height:1.5}.help-wrap:hover .help-popover,.help-wrap:focus-within .help-popover,.help-wrap.open .help-popover{display:block}
+    .language-picker{display:inline-flex;align-items:center;gap:6px}.language-picker select{height:27px;min-width:100px;padding:3px 7px;border:1px solid #727c88;border-radius:3px;background:#242a32;color:#fff;font-size:12px}
+    .banner-table .provider-cell{width:250px;min-width:250px;max-width:250px;overflow:hidden}.banner-table .provider-names{display:block;width:230px;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.provider-more{margin-top:5px;padding:0;border:0;background:transparent;color:#087fad;font-size:11px;font-weight:700;text-decoration:underline}.provider-more[hidden]{display:none}.form-provider-entry{margin-left:auto;padding:5px 9px;border:1px solid #2f9ebc;border-radius:3px;background:#173642;color:#d9f6ff;font-size:11px;font-weight:700}.form-provider-entry:hover{background:#205065}.form-provider-entry:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}.form-provider-entry[hidden]{display:none}
+    .provider-shade{z-index:35}.provider-dialog{width:min(620px,100%);max-height:calc(100dvh - 36px);display:flex;flex-direction:column;border:1px solid #5c6673;border-radius:7px;background:#282e37;box-shadow:0 22px 70px #000b}.provider-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid #444e5a}.provider-dialog-head h2{margin:0;font-size:18px}.provider-dialog-head button{border:0;background:transparent;color:#fff;font-size:24px}.provider-dialog-body{display:flex;flex-direction:column;min-height:0;padding:16px 18px}.provider-dialog-body .field{margin-bottom:12px}.provider-meta{margin-bottom:10px;color:#aeb5c0;font-size:12px}.provider-list{min-height:0;overflow-y:auto;margin:0;padding:0;list-style:none;border:1px solid #59626e;border-radius:4px;background:#1d222a}.provider-list li{padding:10px 12px;border-bottom:1px solid #3e4752;font-size:12px}.provider-list li:last-child{border-bottom:0}.provider-list li.empty-provider{color:#aeb5c0;text-align:center}.provider-pages{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;font-size:12px}.provider-pages button{min-height:30px;padding:0 10px;border:1px solid #66717e;border-radius:3px;background:#414a56;color:#fff}.provider-pages button:disabled{opacity:.4;cursor:not-allowed}
+    .list-pagination{display:flex;align-items:center;justify-content:flex-end;gap:9px;min-height:55px;padding:10px 4px;color:#f7f8fa;font-size:12px}.page-size-field{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}.page-size-field select{height:30px;min-width:45px;padding:3px;border:1px solid #aab2bd;border-radius:5px;background:#242932;color:#fff;font-size:12px}.page-nav,#pageButtons{display:flex;align-items:center;gap:2px}.page-nav button{min-width:27px;height:27px;padding:0 5px;border:0;border-radius:2px;background:#414750;color:#fff;font-size:12px}.page-nav button:hover:not(:disabled){background:#626b78}.page-nav button.active{background:#737c8a;font-weight:700}.page-nav button:disabled{opacity:.45;cursor:not-allowed}.page-nav button:focus-visible,.page-size-field select:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+    .delete-btn{width:25px;height:27px;display:grid;place-items:center;padding:0;border:0;border-radius:3px;background:transparent;color:#616b75}.delete-btn:hover{background:#f8e8ea;color:#b6424a}.delete-btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}.delete-btn svg{width:17px;height:17px}.delete-shade{z-index:45}.delete-warning{margin-top:12px;padding:10px 12px;border:1px solid #886137;border-radius:4px;background:#4b3b1e70;color:#ffdb9c;font-size:12px;line-height:1.5}.delete-warning[hidden],#applyDelete[hidden]{display:none}
+    .audience-spacing{margin-top:12px}.audience #platformFirstFields{order:1}.audience #providerPickerField{order:2}.audience #platformFirstFields[hidden],.audience #providerPickerField[hidden],.provider-picker-menu[hidden]{display:none}.audience .form-provider-entry{margin-left:0}.provider-picker{position:relative}.provider-picker>button{width:100%;min-height:34px;padding:7px 10px;border:1px solid #5d6672;border-radius:4px;background:#121417;color:#fff;text-align:left}.provider-picker>button:after{content:"⌄";float:right}.provider-picker>button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}.provider-picker-menu{max-height:190px;overflow-y:auto;margin-top:3px;padding:5px;border:1px solid #6d7b88;border-radius:4px;background:#1d222a;box-shadow:0 10px 28px #0009}.provider-picker-menu label{display:flex;align-items:center;gap:8px;min-height:31px;padding:5px 7px;border-radius:3px;cursor:pointer;font-size:12px}.provider-picker-menu label:hover{background:#35404c}.provider-picker-menu input{width:15px;height:15px;min-height:0;margin:0;accent-color:#16add6}.provider-picker-empty{padding:10px;color:#aab4c1;font-size:12px}
+    .toolbar-actions{display:flex;align-items:center;gap:9px}.banner-table .display-priority{font-weight:800;font-variant-numeric:tabular-nums}.audience #displayPriorityField{order:3}
+    body.preview-mode{background:#080808}body.preview-mode .app{display:none}.mainsite-page[hidden]{display:none}.mainsite-page{min-height:100dvh;background:#111;color:#fff;font-family:Arial,"Noto Sans TC",sans-serif}.mainsite-header{height:50px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 clamp(16px,8vw,160px);background:#560807}.mainsite-brand{display:flex;align-items:center;gap:8px;color:#f8d9d1;font-size:25px;font-weight:900}.mainsite-brand span{font-size:12px;line-height:1;letter-spacing:.16em}.mainsite-wallet{font-size:13px;white-space:nowrap}.mainsite-tools{display:flex;gap:7px}.mainsite-tools button{padding:7px 11px;border:1px solid #9c3934;border-radius:3px;background:#721916;color:#fff;font-size:12px}.mainsite-tools button:last-child{background:#348044}.mainsite-nav{padding:14px 12px;background:#191919;color:#e3e3e3;text-align:center;font-size:13px;white-space:nowrap;overflow-x:auto}.preview-controls{display:flex;align-items:end;justify-content:center;gap:12px;flex-wrap:wrap;padding:12px 18px;background:#24272b}.preview-controls .field{width:155px}.preview-controls .field select{min-height:31px}.preview-controls .outline-btn{min-height:31px}.preview-simulation-note{color:#aeb8c5;font-size:11px}.mainsite-hero{position:relative;min-height:380px;overflow:hidden;display:flex;align-items:center;justify-content:space-between;padding:45px clamp(35px,17vw,340px);background:radial-gradient(circle at 72% 40%,#216398 0,#0a1c36 27%,transparent 55%),linear-gradient(115deg,#261b13,#47230a 46%,#07213c);border-bottom:8px solid #0b0b0b}.mainsite-hero-copy{position:relative;z-index:1}.mainsite-hero-copy small{color:#f5c865;letter-spacing:.2em;font-weight:800}.mainsite-hero-copy h1{margin:12px 0;font-size:clamp(30px,5vw,65px);line-height:1.05;text-transform:uppercase;text-shadow:0 3px 18px #000}.mainsite-hero-copy p{color:#ddd}.mainsite-hero-copy button{margin-top:14px;padding:10px 24px;border:0;border-radius:20px;background:#d8a641;color:#2a1800;font-weight:900}.mainsite-orbit{font-size:220px;color:#fbd36e;text-shadow:0 0 45px #f3ad2c}.mainsite-ticker{padding:13px clamp(20px,15vw,290px);background:#111;color:#c9c9c9;font-size:12px}.mainsite-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;max-width:1160px;margin:28px auto;padding:0 20px}.mainsite-cards>div{height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;border:1px solid #4a4140;border-radius:8px;background:linear-gradient(140deg,#38303a,#1c1e29);font-size:42px}.mainsite-cards span{font-size:15px;font-weight:700}.carousel-overlay{position:fixed;z-index:50;inset:0;display:flex;align-items:center;justify-content:center;padding:10px;background:#000b}.carousel-overlay[hidden],.preview-reopen[hidden]{display:none}.carousel-shell{position:relative;max-width:100%;background:transparent}.carousel-stage{position:relative}.carousel-close{position:absolute;z-index:2;top:10px;right:10px;width:43px;height:43px;border:2px solid white;border-radius:50%;background:#e7af35;color:white;font-size:31px;line-height:36px;box-shadow:0 3px 12px #0008}.carousel-image{width:min(390px,44dvh,calc(100vw - 28px));aspect-ratio:700/1110;overflow:hidden;border:0;border-radius:4px;background:linear-gradient(150deg,#0d3663,#120e30);display:grid;place-items:center;touch-action:none;cursor:grab;user-select:none}.carousel-image.dragging{cursor:grabbing}.carousel-image img{width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none;pointer-events:none}.carousel-image .fallback-art{width:100%;height:100%;display:grid;place-items:center;padding:22px;text-align:center;background:linear-gradient(145deg,#1269a7,#112346 50%,#140f29);font-size:clamp(18px,3vw,35px);font-weight:900}.carousel-optout{position:absolute;z-index:2;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:6px 12px;background:#000a;color:#fff;font-size:12px;font-weight:700;cursor:pointer}.carousel-optout input{width:17px;height:17px;margin:0;accent-color:#e7af35;cursor:pointer}.carousel-dots{display:flex;justify-content:center;gap:7px;max-width:100%;margin-top:11px;overflow-x:auto;scrollbar-width:none}.carousel-dots::-webkit-scrollbar{display:none}.carousel-dots span{flex:0 0 9px;width:9px;height:9px;border-radius:50%;background:#8a8a8a}.carousel-dots span.active{background:#d71920}.preview-reopen{position:fixed;right:20px;bottom:20px;padding:12px 18px;border:0;border-radius:25px;background:#e6a932;color:#211800;font-weight:800;box-shadow:0 6px 18px #0008}
+    @media(max-width:1100px){.filter{grid-template-columns:repeat(2,minmax(0,1fr))}.filter .search-field{grid-column:1/-1}.filter button{justify-self:start}.toolbar-note{display:none}}
+    @media(max-width:760px){.sidebar{display:none}.topmeta span:not(.flag),.topmeta a,.topmeta b{display:none}.tabs{overflow-x:auto}.tab{min-width:115px}.form-grid{grid-template-columns:1fr}.span-2{grid-column:auto}.filter{grid-template-columns:1fr}.filter .search-field{grid-column:auto}.upload-line{align-items:flex-start;flex-direction:column}.modal-body{padding:15px}.modal-head,.modal-foot{padding:13px 15px}.list-pagination{flex-wrap:wrap}.mainsite-header{padding:0 12px}.mainsite-wallet,.mainsite-tools{display:none}.mainsite-hero{min-height:280px;padding:35px}.mainsite-orbit{display:none}.mainsite-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.preview-controls{justify-content:flex-start}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" aria-label="Menu utama">
+    <div class="nav-spacer"></div>
+    <a class="nav-link" href="#">Peran</a><a class="nav-link" href="#">Pengaturan SEO</a><a class="nav-link" href="#">Pengaturan Web</a><a class="nav-link" href="#">Pengaturan Domain</a><a class="nav-link" href="#">Pengaturan Platform</a><a class="nav-link" href="#">Pengaturan Izin</a><a class="nav-link" href="#">Pengaturan Pemeliharaan</a><a class="nav-link" href="#">Pengaturan Provider</a><a class="nav-link" href="#">Konfigurasi Provider</a><a class="nav-link active" href="#" aria-current="page">Pengaturan Konten</a><a class="nav-link" href="#">Pengaturan Tema Game</a><a class="nav-link" href="#">Info Daftar Game</a><a class="nav-link" href="#">Pengaturan VIP</a><a class="nav-link" href="#">Pengaturan Promosi</a><div class="nav-title">Admin ⌃</div><a class="nav-link" href="#">Daftar Admin</a><a class="nav-link" href="#">Log Operasi</a><a class="nav-link" href="#">Log Masuk Admin</a>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><div class="brand"><button type="button" aria-label="Menu">☰</button><span>Unset</span></div><div class="topmeta"><span>↻</span><span>Kredit</span><b>IDR 000</b><a href="#">Ubah Kata Sandi</a><span>♟</span><span class="flag" aria-label="Bahasa Indonesia"></span><label class="language-picker"><span>Bahasa</span><select id="languageSelect" aria-label="Bahasa"><option value="id" selected>Bahasa Indonesia</option><option value="en">English</option></select></label></div></header>
+    <main>
+      <h1 class="page-title">Pengaturan - Konten - Banner</h1>
+      <div class="tabs" aria-label="Jenis konten"><button class="tab" type="button" disabled title="Prototipe ini hanya menampilkan Popup Banner">Banner</button><button class="tab active" type="button" aria-current="page">Popup Banner</button><button class="tab" type="button" disabled title="Prototipe ini hanya menampilkan Popup Banner">Pengumuman</button><button class="tab" type="button" disabled title="Prototipe ini hanya menampilkan Popup Banner">Promosi</button></div>
+      <div class="toolbar"><div class="toolbar-actions"><button class="primary-btn" id="addBanner" type="button">＋ Tambah Popup Banner</button><button class="outline-btn" id="mainsitePreview" type="button">Mainsite Preview ↗</button></div><span class="toolbar-note">Situs saat ini: Belum diatur　·　Data contoh</span></div>
+      <section class="filter" aria-label="Filter daftar">
+        <label class="field"><span>Platform</span><select id="platformFilter"><option value="">Semua</option><option>StudioBET78</option><option>MediaSlot78</option><option>OXIBET88</option><option>KratonBet</option><option>BosDeal88</option></select></label>
+        <label class="field"><span>Status</span><select id="statusFilter"><option value="">Semua</option><option value="active">Aktif</option><option value="scheduled">Terjadwal</option><option value="ended">Nonaktif otomatis</option><option value="paused">Nonaktif</option><option value="unconfigured">Platform belum diatur</option></select></label>
+        <label class="field"><span>Sort</span><select id="sortFilter"><option value="priority" selected>Prioritas Tertinggi</option><option value="updated">Update Terakhir</option><option value="created">Created At</option><option value="start">Waktu mulai</option><option value="end">Waktu selesai</option></select></label>
+        <label class="field search-field"><span>Cari</span><input id="searchFilter" type="search" placeholder="Cari No., judul, provider, atau URL"></label>
+        <button id="resetFilters" type="button">Atur ulang</button>
+      </section>
+      <div class="list-head"><h2>Daftar Popup Banner</h2><span id="resultCount"></span></div>
+      <div class="table-wrap"><table class="banner-table"><thead><tr><th scope="col" title="Format No.: YYYYMMDD + nomor urut harian. No. tetap saat daftar diurutkan atau dihapus.">No.</th><th>Pratinjau / Judul</th><th>Provider</th><th>Platform</th><th>Prioritas Tayang</th><th>Waktu Tayang / Created At</th><th>Frekuensi Tayang / Jeda Carousel</th><th>URL Tautan</th><th>Status</th><th>Operating</th></tr></thead><tbody id="bannerRows"></tbody></table></div>
+      <nav class="list-pagination" aria-label="Halaman daftar Banner"><label class="page-size-field"><span>Item per halaman</span><select id="itemsPerPage" aria-label="Item per halaman"><option value="5">5</option><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option><option value="100">100</option></select></label><div class="page-nav"><button id="firstPage" type="button" aria-label="Halaman pertama">|‹</button><button id="previousPage" type="button" aria-label="Halaman sebelumnya">‹</button><span id="pageButtons"></span><button id="nextPage" type="button" aria-label="Halaman berikutnya">›</button><button id="lastPage" type="button" aria-label="Halaman terakhir">›|</button></div></nav>
+      <div class="rules-note"><strong>Informasi jadwal dan data</strong>　Banner dengan jadwal terus-menerus tetap aktif sampai dinonaktifkan. Untuk periode tayang, status berubah menjadi "Nonaktif otomatis" setelah waktu selesai dan pengaturan tetap tersedia dalam daftar. Ini adalah prototipe lokal; proses penjadwalan, pembatasan frekuensi di situs, daftar Provider yang aktif untuk merchant, zona waktu, serta aturan penyimpanan dan penghapusan data masih perlu dikonfirmasi.</div>
+    </main>
+  </div>
+</div>
+
+<section class="mainsite-page" id="previewPage" hidden aria-label="Mainsite Preview">
+  <header class="mainsite-header"><div class="mainsite-brand">◇ <span>STUDIO<br>BET78</span></div><div class="mainsite-wallet">mobinice　◆　Dompet: Rp 20.000,00</div><div class="mainsite-tools"><button type="button">Deposit</button><button type="button">Penarikan</button><button type="button">Transaksi</button><button type="button">Bonus Saya</button></div></header>
+  <nav class="mainsite-nav">Sports　 Poker　 Casino　 Togel　 Slot　 Crash　 Fishing　 Arcade　 Sabung Ayam　 Prediksi　 Promosi　 🏆 Turnamen　 VIP</nav>
+  <div class="preview-controls"><button class="outline-btn" id="backToAdmin" type="button">← Kembali ke Backoffice</button><label class="field"><span>Platform</span><select id="previewSite"><option>StudioBET78</option><option>MediaSlot78</option><option>OXIBET88</option><option>KratonBet</option><option>BosDeal88</option></select></label><label class="field"><span>Provider</span><select id="previewProvider"><option value="">Tanpa Provider</option><option>PG Soft</option><option>Pragmatic Play</option><option>Evolution</option><option>JILI</option><option>CMD</option><option>SBO</option></select></label><label class="field"><span>Bahasa</span><select id="previewLanguage"><option value="id">Bahasa Indonesia</option><option value="en">English</option></select></label><span class="preview-simulation-note">Simulasi carousel; batas frekuensi tidak diterapkan.</span></div>
+  <div class="mainsite-hero"><div class="mainsite-hero-copy"><small>STUDIOBET78 · PROMOSI</small><h1>Bonus &amp; Game<br>Spesial Hari Ini</h1><p>Temukan penawaran dan permainan terbaru.</p><button type="button">Jelajahi Sekarang</button></div><div class="mainsite-orbit" aria-hidden="true">✦</div></div>
+  <div class="mainsite-ticker">📣　Pengumuman　　Promo terbaru tersedia untuk Anda　　✦　Mainkan game favorit hari ini</div>
+  <div class="mainsite-cards" aria-hidden="true"><div>🎮<span>Game Populer</span></div><div>🏆<span>Turnamen</span></div><div>🎁<span>Bonus Spesial</span></div><div>⚡<span>Game Baru</span></div></div>
+  <div class="carousel-overlay" id="carouselOverlay"><div class="carousel-shell" role="dialog" aria-modal="true" aria-label="Popup Banner"><div class="carousel-stage"><div class="carousel-image" id="carouselImage" aria-label="Geser gambar ke kiri atau kanan untuk melihat Banner lain"></div><button class="carousel-close" id="closeCarousel" type="button" aria-label="Tutup Popup Banner">×</button><label class="carousel-optout"><input id="hidePopupToday" type="checkbox"><span>Jangan tampilkan Popup Banner lagi hari ini</span></label></div><div class="carousel-dots" id="carouselDots" aria-hidden="true"></div></div></div>
+  <button class="preview-reopen" id="reopenCarousel" type="button" hidden>Lihat Popup Banner</button>
+</section>
+
+<div class="shade" id="shade" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head"><div><h2 id="modalTitle">Tambah Popup Banner</h2><p>Atur konten, target, dan jadwal tayang</p></div><button class="icon-btn" id="closeModal" type="button" aria-label="Tutup">×</button></div>
+    <form id="bannerForm" novalidate>
+      <div class="modal-body">
+        <fieldset class="form-section"><legend>Informasi Banner</legend><div class="form-grid">
+          <label class="field span-2"><span>Judul <i class="required">*</i></span><input name="title" maxlength="80" placeholder="Contoh: Promo Akhir Pekan" required></label>
+          <label class="field span-2"><span>URL Gambar Banner</span><input name="imageUrl" type="url" placeholder="https://example.com/banner.jpg"><span class="helper">Masukkan URL gambar atau unggah gambar di bawah untuk pratinjau.</span></label>
+          <label class="field span-2"><span>Unggah Gambar</span><span class="upload-line"><input id="imageFile" type="file" accept="image/*" aria-describedby="imageDimensionHint imageStorageHint"><span class="upload-preview" id="uploadPreview">Pratinjau gambar</span></span><span class="helper" id="imageDimensionHint">Ukuran yang disarankan: 700 × 1110 px. Ukuran lain tetap dapat diunggah; periksa pratinjau sebelum menyimpan.</span><span class="helper" id="imageStorageHint">Max Size: 100 KB (disarankan, bukan batas unggah). Batas file prototipe: 2 MB; gambar disimpan di browser ini, bukan di server.</span></label>
+          <label class="field span-2"><span>URL Tautan</span><input name="targetUrl" type="url" placeholder="https://example.com/promosi/akhir-pekan"><span class="helper">Alamat tujuan saat Banner diklik. Opsional.</span></label>
+        </div></fieldset>
+        <fieldset class="form-section"><legend>Jadwal Tayang <i class="required">*</i></legend>
+          <div class="schedule-options"><label><input type="radio" name="scheduleMode" value="continuous" required checked> Tayang terus-menerus</label><label><input type="radio" name="scheduleMode" value="range" required> Periode tayang</label></div>
+          <div class="form-grid" id="rangeFields" hidden>
+            <label class="field"><span>Waktu Mulai <i class="required">*</i></span><input name="start" type="datetime-local"></label>
+            <label class="field"><span>Waktu Selesai <i class="required">*</i></span><input name="end" type="datetime-local"></label>
+            <div class="inline-note span-2">Waktu selesai harus setelah waktu mulai. Setelah periode berakhir, status berubah menjadi "Nonaktif otomatis". Zona waktu sistem masih perlu dikonfirmasi.</div>
+          </div>
+        </fieldset>
+        <fieldset class="form-section"><legend>Frekuensi Tayang <span class="help-wrap" id="frequencyHelpWrap"><button class="help-button" id="frequencyHelp" type="button" aria-label="Penjelasan frekuensi tayang" aria-expanded="false" title="Setiap Banner dihitung satu kali per perangkat per hari, meskipun muncul lagi atau dipilih kembali dalam carousel.">?</button><span class="help-popover" role="tooltip">Setiap Banner dihitung satu kali per perangkat per hari, meskipun muncul lagi atau dipilih kembali dalam carousel.</span></span></legend><div class="form-grid frequency-grid">
+          <label class="field"><span>Satuan Waktu <i class="required">*</i></span><select name="frequencyUnit" required><option value="">Pilih satuan</option><option value="daily">Harian</option><option value="weekly">Mingguan</option></select></label>
+          <label class="field"><span>Jumlah Maksimum <i class="required">*</i></span><input name="frequencyCount" type="number" min="1" step="1" inputmode="numeric" placeholder="Contoh: 2" required></label>
+          <label class="field span-2"><span>Jeda Carousel (detik) <i class="required">*</i></span><input name="carouselInterval" type="number" min="3" max="15" step="1" inputmode="numeric" placeholder="Contoh: 5" required><span class="helper">3–15 detik per Banner. Setelah berpindah gambar, waktu tayang dimulai lagi.</span></label>
+        </div></fieldset>
+        <fieldset class="form-section audience"><legend>Target Tayang</legend><div class="form-grid">
+          <label class="field"><span>Prioritas Target <i class="required">*</i></span><select name="targetPriority" required><option value="">Pilih prioritas</option><option value="platform">Platform lebih dulu</option><option value="provider">Provider lebih dulu</option></select></label>
+          <div id="platformFirstFields" hidden>
+            <label class="field"><span>Platform <i class="required">*</i></span><select id="platformFirstSelect" name="platform" required><option value="">Pilih platform</option><option value="All">Semua</option><option>StudioBET78</option><option>MediaSlot78</option><option>OXIBET88</option><option>KratonBet</option><option>BosDeal88</option></select><span class="helper">Platform adalah nama situs.</span></label>
+          </div>
+          <div class="field" id="providerPickerField" hidden><span>Pilih Provider <i class="required">*</i></span><div class="provider-picker"><button id="providerPickerButton" type="button" aria-expanded="false" aria-controls="providerChoices">Pilih Provider</button><div class="provider-picker-menu" id="providerChoices" hidden></div></div><span class="helper">Daftar Provider adalah contoh; versi resmi harus mengikuti Provider yang aktif untuk merchant.</span></div>
+          <label class="field" id="displayPriorityField"><span>Prioritas Tayang <i class="required">*</i></span><input name="displayPriority" type="number" min="0" max="1000" step="1" inputmode="numeric" placeholder="Contoh: 999" required><span class="helper">Angka 0–1000; angka lebih besar ditampilkan lebih dulu dalam carousel.</span></label>
+        </div></fieldset>
+        <p class="error" id="formError" role="alert"></p>
+      </div>
+      <div class="modal-foot"><button class="outline-btn" id="cancelModal" type="button">Batal</button><button class="primary-btn" type="submit">Simpan</button></div>
+    </form>
+  </div>
+</div>
+<div class="shade image-shade" id="imageShade" aria-hidden="true">
+  <div class="image-dialog" role="dialog" aria-modal="true" aria-labelledby="imageTitle">
+    <div class="image-dialog-head"><h2 id="imageTitle">Pratinjau Gambar Banner</h2><button id="closeImage" type="button" aria-label="Tutup pratinjau">×</button></div>
+    <div class="image-stage" id="largeArtHost"></div>
+  </div>
+</div>
+<div class="shade confirm-shade" id="confirmShade" aria-hidden="true">
+  <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="confirm-head"><h2 id="confirmTitle">Konfirmasi Nonaktifkan Popup Banner</h2><button id="closeConfirm" type="button" aria-label="Tutup konfirmasi">×</button></div>
+    <div class="confirm-body"><p id="confirmLead"></p><dl class="confirm-details"><dt>Platform</dt><dd id="confirmPlatform"></dd><dt>Judul</dt><dd id="confirmBannerTitle"></dd><dt>Periode Tayang</dt><dd id="confirmRange"></dd><dt>Frekuensi Tayang</dt><dd id="confirmFrequency"></dd></dl><div class="confirm-note" id="confirmNote"></div></div>
+    <div class="confirm-foot"><button class="outline-btn" id="cancelConfirm" type="button">Batal</button><button class="danger-btn" id="applyConfirm" type="button">Ya, nonaktifkan</button></div>
+  </div>
+</div>
+<div class="shade provider-shade" id="providerShade" aria-hidden="true">
+  <div class="provider-dialog" role="dialog" aria-modal="true" aria-labelledby="providerModalTitle">
+    <div class="provider-dialog-head"><h2 id="providerModalTitle">Daftar Provider</h2><button id="closeProvider" type="button" aria-label="Tutup daftar Provider">×</button></div>
+    <div class="provider-dialog-body"><label class="field"><span>Cari Provider</span><input id="providerSearch" type="search" placeholder="Cari nama Provider"></label><div class="provider-meta" id="providerCount"></div><ul class="provider-list" id="providerList"></ul><div class="provider-pages"><button id="providerPrev" type="button">Sebelumnya</button><span id="providerPageInfo"></span><button id="providerNext" type="button">Berikutnya</button></div></div>
+  </div>
+</div>
+<div class="shade delete-shade" id="deleteShade" aria-hidden="true">
+  <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+    <div class="confirm-head"><h2 id="deleteTitle"></h2><button id="closeDelete" type="button" aria-label="Tutup">×</button></div>
+    <div class="confirm-body"><p id="deleteLead"></p><dl class="confirm-details"><dt>Platform</dt><dd id="deletePlatform"></dd><dt>Judul</dt><dd id="deleteBannerTitle"></dd></dl><div class="delete-warning" id="deleteWarning" hidden></div></div>
+    <div class="confirm-foot"><button class="outline-btn" id="cancelDelete" type="button">Batal</button><button class="danger-btn" id="applyDelete" type="button">Hapus</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  let language = 'id';
+  const en = {
+    'StudioBET78 — Pengaturan Popup Banner':'StudioBET78 — Popup Banner Settings',
+    'Menu utama':'Main menu','Peran':'Role','Pengaturan SEO':'SEO Settings','Pengaturan Web':'Web Settings','Pengaturan Domain':'Domain Settings','Pengaturan Platform':'Platform Settings','Pengaturan Izin':'Permission Settings','Pengaturan Pemeliharaan':'Maintenance Settings','Pengaturan Provider':'Provider Settings','Konfigurasi Provider':'Provider Configuration','Pengaturan Konten':'Content Settings','Pengaturan Tema Game':'Game Theme Settings','Info Daftar Game':'Game List Info','Pengaturan VIP':'VIP Settings','Pengaturan Promosi':'Promotion Settings','Daftar Admin':'Admin List','Log Operasi':'Operation Log','Log Masuk Admin':'Admin Login Log',
+    'Belum diatur':'Not configured','Kredit':'Credit','Ubah Kata Sandi':'Change Password','Bahasa Indonesia':'Indonesian','Bahasa':'Language','Indonesia':'Indonesian','Pengaturan - Konten - Banner':'Settings - Content - Banners','Pengumuman':'Announcement','Promosi':'Promotions','＋ Tambah Popup Banner':'＋ Add Popup Banner','Situs saat ini: Belum diatur　·　Data contoh':'Current site: Not configured　·　Sample data','Semua':'All','Aktif':'Active','Terjadwal':'Scheduled','Nonaktif otomatis':'Ended automatically','Nonaktif':'Inactive','Platform belum diatur':'Platform not configured','Update Terakhir':'Latest Update','Waktu mulai':'Start time','Waktu selesai':'End time','Cari':'Search','Atur ulang':'Reset','Daftar Popup Banner':'Popup Banner List','Pratinjau / Judul':'Preview / Title','Format No.: YYYYMMDD + nomor urut harian. No. tetap saat daftar diurutkan atau dihapus.':'No. format: YYYYMMDD + daily sequence. The number stays the same when the list is sorted or items are deleted.','Waktu Tayang / Created At':'Display Time / Created At','Frekuensi Tayang':'Display Frequency','Frekuensi Tayang / Jeda Carousel':'Display Frequency / Carousel Interval','URL Tautan':'Link URL',
+    'Informasi jadwal dan data':'Schedule and data information','Banner dengan jadwal terus-menerus tetap aktif sampai dinonaktifkan. Untuk periode tayang, status berubah menjadi "Nonaktif otomatis" setelah waktu selesai dan pengaturan tetap tersedia dalam daftar. Ini adalah prototipe lokal; proses penjadwalan, pembatasan frekuensi di situs, daftar Provider yang aktif untuk merchant, zona waktu, serta aturan penyimpanan dan penghapusan data masih perlu dikonfirmasi.':'A continuous Banner stays active until disabled. For a date range, the status changes to "Ended automatically" after the end time, and its settings remain in the list. This is a local prototype; scheduling, site frequency limits, merchant-enabled Providers, time zone, and data retention and deletion rules still need confirmation.',
+    'Tambah Popup Banner':'Add Popup Banner','Atur konten, target, dan jadwal tayang':'Set content, audience, and display schedule','Informasi Banner':'Banner Information','Judul':'Title','URL Gambar Banner':'Banner Image URL','Masukkan URL gambar atau unggah gambar di bawah untuk pratinjau.':'Enter an image URL or upload an image below to preview it.','Unggah Gambar':'Upload Image','Pratinjau gambar':'Image preview','Ukuran yang disarankan: 700 × 1110 px. Ukuran lain tetap dapat diunggah; periksa pratinjau sebelum menyimpan.':'Recommended size: 700 × 1110 px. Other sizes can still be uploaded; check the preview before saving.','Max Size: 100 KB (disarankan, bukan batas unggah). Batas file prototipe: 2 MB; gambar disimpan di browser ini, bukan di server.':'Max Size: 100 KB (recommended, not an upload limit). Prototype file limit: 2 MB; images are stored in this browser, not on a server.','Alamat tujuan saat Banner diklik. Opsional.':'Destination when the Banner is clicked. Optional.','Jadwal Tayang':'Display Schedule','Tayang terus-menerus':'Display continuously','Periode tayang':'Date range','Waktu Mulai':'Start Time','Waktu Selesai':'End Time','Waktu selesai harus setelah waktu mulai. Setelah periode berakhir, status berubah menjadi "Nonaktif otomatis". Zona waktu sistem masih perlu dikonfirmasi.':'The end time must be after the start time. When the period ends, the status changes to "Ended automatically". The system time zone still needs confirmation.','Setiap Banner dihitung satu kali per perangkat per hari, meskipun muncul lagi atau dipilih kembali dalam carousel.':'Each Banner is counted once per device per day, even when it appears again or is revisited in the carousel.','Satuan Waktu':'Time Unit','Pilih satuan':'Select a unit','Harian':'Daily','Mingguan':'Weekly','Jumlah Maksimum':'Maximum Count','Jeda Carousel (detik)':'Carousel Interval (seconds)','3–15 detik per Banner. Setelah berpindah gambar, waktu tayang dimulai lagi.':'3–15 seconds per Banner. The timer restarts after switching images.','detik / gambar':'seconds / image','Target Tayang':'Target Audience','Semua Provider yang aktif':'All enabled Providers','Pilih Provider':'Select Provider','Daftar Provider adalah contoh; versi resmi harus mengikuti Provider yang aktif untuk merchant.':'The Provider list is sample data; production must use the Providers enabled for the merchant.','Pilih platform':'Select a platform','Platform adalah nama situs.':'Platform refers to a site name.','(Opsional)':'(Optional)','Batal':'Cancel','Simpan':'Save','Pratinjau Gambar Banner':'Banner Image Preview','Konfirmasi Nonaktifkan Popup Banner':'Confirm Disable Popup Banner','Konfirmasi Aktifkan Popup Banner':'Confirm Enable Popup Banner','Periode Tayang':'Display Period','Ya, nonaktifkan':'Yes, disable','Ya, aktifkan':'Yes, enable',
+    'Daftar Provider':'Provider List','Lihat daftar Provider':'View Provider list','Cari Provider':'Search Providers','Cari nama Provider':'Search Provider names','Sebelumnya':'Previous','Berikutnya':'Next','Item per halaman':'Items per page','Halaman daftar Banner':'Banner list pagination','Halaman pertama':'First page','Halaman sebelumnya':'Previous page','Halaman berikutnya':'Next page','Halaman terakhir':'Last page','Halaman':'Page','Hapus':'Delete','Tidak dapat menghapus Popup Banner':'Cannot Delete Popup Banner','Konfirmasi Hapus Popup Banner':'Confirm Delete Popup Banner','Popup Banner ini belum dinonaktifkan.':'This Popup Banner is still enabled.','Nonaktifkan Banner ini terlebih dahulu sebelum menghapusnya.':'Disable this Banner before deleting it.','Apakah Anda yakin ingin menghapus Popup Banner ini?':'Are you sure you want to delete this Popup Banner?','Popup Banner berhasil dihapus.':'Popup Banner deleted.','Tutup daftar Provider':'Close Provider list','Tutup':'Close','Tutup pratinjau':'Close preview','Tutup konfirmasi':'Close confirmation','Menu':'Menu','Filter daftar':'List filters','Jenis konten':'Content type','Pilih satuan waktu':'Select a time unit','Aktifkan / nonaktifkan':'Enable / disable','Penjelasan frekuensi tayang':'Display frequency help','Jumlah maksimum Banner yang muncul per hari atau minggu, termasuk setelah pengguna menutup Banner sebelumnya.':'Maximum Banner appearances per day or week, even after the user closes it.','Prototipe ini hanya menampilkan Popup Banner':'This prototype only shows Popup Banners',
+    'Contoh: Promo Akhir Pekan':'Example: Weekend Promotion','Contoh: 2':'Example: 2','Cari No., judul, provider, atau URL':'Search No., title, Provider, or URL','Promo Akhir Pekan':'Weekend Promotion','Game Baru Segera Hadir':'New Games Coming Soon','Contoh Kampanye Berakhir':'Ended Campaign Example','Lihat gambar':'View image of','dalam ukuran besar':'in full size','Aktifkan':'Enable','Ubah':'Edit','Menampilkan':'Showing','dari':'of','banner':'banners','halaman':'page',
+    'Ubah Popup Banner':'Edit Popup Banner','Semua Provider':'All Providers','sampai':'to','hari':'day','minggu':'week','kali':'times','Lihat semua Provider':'View all Providers','Tidak ada Provider yang sesuai.':'No matching Providers.','Tidak ada Popup Banner yang sesuai.':'No matching Popup Banners.','Data tidak dapat disimpan di browser. Periksa ruang penyimpanan lokal.':'Could not save data in this browser. Check local storage space.','Banner diaktifkan. Penayangan mengikuti jadwal.':'Banner enabled. Display follows its schedule.','Banner dinonaktifkan.':'Banner disabled.','Popup Banner berhasil diperbarui.':'Popup Banner updated.','Popup Banner berhasil ditambahkan.':'Popup Banner added.','Gambar tidak dapat dibaca. Pilih file kembali.':'Could not read the image. Select the file again.',
+    'Apakah Anda yakin ingin mengaktifkan Popup Banner ini?':'Are you sure you want to enable this Popup Banner?','Apakah Anda yakin ingin menonaktifkan Popup Banner ini?':'Are you sure you want to disable this Popup Banner?','Setelah diaktifkan, penayangan tetap mengikuti jadwal dan frekuensi yang telah diatur.':'Once enabled, display follows the configured schedule and frequency.','Setelah dinonaktifkan, Banner berhenti tayang dan pengaturannya tetap tersimpan dalam daftar.':'Once disabled, the Banner stops displaying and its settings remain in the list.',
+    'Masukkan judul Banner.':'Enter a Banner title.','Pilih jadwal tayang.':'Choose a display schedule.','Masukkan waktu mulai dan selesai yang valid.':'Enter valid start and end times.','Waktu selesai harus setelah waktu mulai.':'End time must be after start time.','Pilih satuan waktu untuk frekuensi tayang.':'Select a display frequency unit.','Masukkan jumlah maksimum tayang berupa bilangan bulat positif.':'Enter a positive whole number for the maximum count.','Masukkan jeda Carousel berupa angka bulat 3–15 detik.':'Enter a Carousel interval from 3 to 15 whole seconds.','Pilih setidaknya satu Provider.':'Select at least one Provider.','Pilih Platform.':'Select a Platform.','URL gambar Banner harus diawali https://.':'The Banner image URL must start with https://.','URL Tautan harus diawali https://.':'The link URL must start with https://.','Ukuran file gambar maksimal 2 MB, atau gunakan URL gambar.':'The image file limit is 2 MB, or use an image URL.',
+    'Prioritas Target':'Target Priority','Pilih prioritas':'Select priority','Platform lebih dulu':'Platform first','Provider lebih dulu':'Provider first','Provider dipilih':'Providers selected','Pilih prioritas target.':'Select a target priority.','Tidak ada Provider yang tersedia untuk Platform ini.':'No Providers are available on this Platform.',
+    'Prioritas Tayang':'Display Priority','Prioritas Tertinggi':'Highest Priority','Angka 0–1000; angka lebih besar ditampilkan lebih dulu dalam carousel.':'Enter 0–1000; higher numbers appear first in the carousel.','Prioritas tayang harus berupa angka bulat dari 0 sampai 1000.':'Display Priority must be a whole number from 0 to 1000.','Contoh: 999':'Example: 999','Contoh: 5':'Example: 5','Bonus VIP Eksklusif':'Exclusive VIP Bonus',
+    '← Kembali ke Backoffice':'← Back to Backoffice','Tanpa Provider':'No Provider','Bonus & Game':'Bonus & Games','Spesial Hari Ini':'Special Today','Temukan penawaran dan permainan terbaru.':'Discover the latest offers and games.','Jelajahi Sekarang':'Explore Now','📣　Pengumuman　　Promo terbaru tersedia untuk Anda　　✦　Mainkan game favorit hari ini':'📣　Announcement　　New offers are available　　✦　Play your favorite games today','Game Populer':'Popular Games','Bonus Spesial':'Special Bonuses','Game Baru':'New Games','Tutup Popup Banner':'Close Popup Banner','Banner sebelumnya':'Previous Banner','Banner berikutnya':'Next Banner','Lihat Popup Banner':'View Popup Banner','Tidak ada Popup Banner aktif untuk target ini.':'No active Popup Banner for this target.','Simulasi carousel; batas frekuensi tidak diterapkan.':'Carousel simulation; frequency limits are not applied.','Jangan tampilkan Popup Banner lagi hari ini':"Don't show any Popup Banners again today"
+  };
+  const t = key => language === 'en' ? (en[key] || key) : key;
+  const STORE = 'studiobet78-popup-banner-prototype-v8';
+  const PRIOR_STORES = ['studiobet78-popup-banner-prototype-v7','studiobet78-popup-banner-prototype-v6','studiobet78-popup-banner-prototype-v5','studiobet78-popup-banner-prototype-v4','studiobet78-popup-banner-prototype-v3','studiobet78-popup-banner-prototype-v2'];
+  const providers = ['PG Soft','Pragmatic Play','Evolution','JILI','CMD','SBO'];
+  const platforms = ['StudioBET78','MediaSlot78','OXIBET88','KratonBet','BosDeal88'];
+  // Illustrative mapping only. Production must load each merchant's enabled Providers per site.
+  const siteProviders = {
+    StudioBET78:['PG Soft','Pragmatic Play','Evolution','JILI'],
+    MediaSlot78:['Pragmatic Play','Evolution','CMD'],
+    OXIBET88:['PG Soft','JILI','CMD'],
+    KratonBet:['PG Soft','SBO','Evolution'],
+    BosDeal88:['Pragmatic Play','CMD','SBO']
+  };
+  const providersForSite = site => site === 'All' ? providers : (siteProviders[site] || []);
+  const $ = (selector) => document.querySelector(selector);
+  const dynamicRoots = '#bannerRows,#resultCount,#modalTitle,#uploadPreview,#formError,#toast,#imageTitle,#largeArtHost,#confirmTitle,#confirmLead,#confirmPlatform,#confirmBannerTitle,#confirmRange,#confirmFrequency,#confirmNote,#applyConfirm,#providerModalTitle,#providerList,#providerCount,#providerPageInfo,#pageButtons,#deleteTitle,#deleteLead,#deletePlatform,#deleteBannerTitle,#deleteWarning,#cancelDelete,#applyDelete';
+  const staticText = [];
+  const staticAttributes = [];
+  for (const element of document.body.querySelectorAll('*')) {
+    if (element.matches('script,style') || element.closest(dynamicRoots)) continue;
+    for (const node of element.childNodes) if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim()) staticText.push({node,original:node.nodeValue});
+    for (const attribute of ['aria-label','placeholder','title']) if (element.hasAttribute(attribute)) staticAttributes.push({element,attribute,original:element.getAttribute(attribute)});
+  }
+  function applyStaticLanguage() {
+    document.documentElement.lang = language;
+    document.title = t('StudioBET78 — Pengaturan Popup Banner');
+    for (const {node,original} of staticText) { const key = original.trim(); node.nodeValue = en[key] && language === 'en' ? original.replace(key,en[key]) : original; }
+    for (const {element,attribute,original} of staticAttributes) element.setAttribute(attribute,t(original));
+  }
+  const esc = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const pad = n => String(n).padStart(2,'0');
+  const serialDate = (date=new Date()) => `${date.getFullYear()}${pad(date.getMonth()+1)}${pad(date.getDate())}`;
+  const serialFor = (date,sequence) => `${date}${String(sequence).padStart(3,'0')}`;
+  const isDatedSerial = value => typeof value === 'string' && /^\d{8}\d{3,}$/.test(value) && Number.isSafeInteger(Number(value.slice(8))) && Number(value.slice(8)) > 0;
+  const localValue = date => `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  const dayOffset = (days, hour=12) => { const d = new Date(); d.setDate(d.getDate()+days); d.setHours(hour,0,0,0); return localValue(d); };
+  const labelDate = value => value ? value.replace('T',' ') : '—';
+  const labelCreated = value => { const d = new Date(value); return value && Number.isFinite(d.getTime()) ? `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}` : '—'; };
+  const sampleImage = variant => {
+    const first = variant === 'first';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="700" height="1110" viewBox="0 0 700 1110"><defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="${first ? '#08a8ea' : '#6114a6'}"/><stop offset=".55" stop-color="${first ? '#105ab5' : '#ca3a6d'}"/><stop offset="1" stop-color="${first ? '#070d40' : '#28104d'}"/></linearGradient><radialGradient id="glow"><stop stop-color="${first ? '#b8f8ff' : '#ffda80'}" stop-opacity=".88"/><stop offset="1" stop-color="${first ? '#b8f8ff' : '#ffda80'}" stop-opacity="0"/></radialGradient><linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff3b2"/><stop offset=".48" stop-color="#f7c448"/><stop offset="1" stop-color="#c37819"/></linearGradient></defs><rect width="700" height="1110" fill="url(#bg)"/><circle cx="350" cy="430" r="360" fill="url(#glow)"/><circle cx="350" cy="430" r="280" fill="none" stroke="#ffffffaa" stroke-width="9"/><circle cx="350" cy="430" r="325" fill="none" stroke="#ffffff55" stroke-width="3"/><path d="M0 170 Q350 60 700 170 M0 900 Q350 1030 700 900" fill="none" stroke="#ffffff32" stroke-width="22"/><text x="350" y="115" text-anchor="middle" fill="#fff" font-family="Arial" font-size="31" font-weight="900" letter-spacing="8">STUDIOBET78</text><text x="350" y="250" text-anchor="middle" fill="#fff" font-family="Arial" font-size="${first ? 62 : 68}" font-weight="900">${first ? 'PROMO AKHIR' : 'BONUS VIP'}</text><text x="350" y="322" text-anchor="middle" fill="url(#gold)" stroke="#3d2461" stroke-width="2" paint-order="stroke" font-family="Arial" font-size="${first ? 76 : 65}" font-weight="900">${first ? 'PEKAN' : 'EKSKLUSIF'}</text>${first ? '<rect x="180" y="410" width="340" height="240" rx="30" fill="#f8fdff" stroke="#a3e9ff" stroke-width="12"/><path d="M180 428 L350 540 L520 428" fill="none" stroke="#2b8fc8" stroke-width="18" stroke-linecap="round"/><circle cx="445" cy="620" r="74" fill="#64d550" stroke="#fff" stroke-width="11"/><path d="M409 619 l25 26 47 -53" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>' : '<rect x="188" y="465" width="324" height="230" rx="22" fill="url(#gold)" stroke="#fff0b0" stroke-width="10"/><rect x="165" y="427" width="370" height="75" rx="20" fill="#ffe58b" stroke="#fff3c9" stroke-width="9"/><path d="M350 430 v260" stroke="#d7346d" stroke-width="43"/><path d="M350 429 C240 350 244 275 307 295 C346 309 350 390 350 429 C457 350 456 279 395 297 C356 309 350 390 350 429" fill="none" stroke="#f8b1cf" stroke-width="28"/>'}<text x="350" y="795" text-anchor="middle" fill="#fff" font-family="Arial" font-size="45" font-weight="900">${first ? 'HADIAH SPESIAL' : 'HADIAH MENANTI'}</text><rect x="102" y="835" width="496" height="93" rx="47" fill="url(#gold)" stroke="#fff6cb" stroke-width="7"/><text x="350" y="895" text-anchor="middle" fill="#5b2800" font-family="Arial" font-size="42" font-weight="900">${first ? 'MAIN SEKARANG' : 'CLAIM SEKARANG'}</text><text x="350" y="1023" text-anchor="middle" fill="#fff" font-family="Arial" font-size="29" font-weight="700">${first ? 'Nikmati promo akhir pekan' : 'Bonus spesial untuk Anda'}</text></svg>`;
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  };
+  const seed = [
+    {id:'demo-1',title:'Promo Akhir Pekan',imageUrl:sampleImage('first'),targetUrl:'https://example.com/promosi/akhir-pekan/penawaran-khusus-untuk-semua-pengguna',scheduleMode:'range',start:dayOffset(-2),end:dayOffset(3),frequencyUnit:'daily',frequencyCount:2,carouselInterval:5,displayPriority:999,targetPriority:'platform',providerMode:'all',providers:[],platform:'StudioBET78',enabled:true,createdAt:'2026-09-21T17:16:01',updated:Date.now()-4000,art:'blue'},
+    {id:'demo-4',title:'Bonus VIP Eksklusif',imageUrl:sampleImage('second'),targetUrl:'https://example.com/promosi/bonus-vip',scheduleMode:'range',start:dayOffset(-2),end:dayOffset(3),frequencyUnit:'daily',frequencyCount:2,carouselInterval:8,displayPriority:998,targetPriority:'platform',providerMode:'all',providers:[],platform:'StudioBET78',enabled:true,createdAt:'2026-09-22T09:00:00',updated:Date.now()-6000,art:'alt'},
+    {id:'demo-2',title:'Game Baru Segera Hadir',imageUrl:'',targetUrl:'https://example.com/game/baru/daftar-provider-dan-informasi-peluncuran',scheduleMode:'continuous',start:'',end:'',frequencyUnit:'weekly',frequencyCount:3,carouselInterval:6,displayPriority:300,targetPriority:'provider',providerMode:'selected',providers:['Pragmatic Play'],platform:'All',enabled:true,createdAt:'2026-09-20T10:30:00',updated:Date.now()-8000,art:'alt'},
+    {id:'demo-3',title:'Contoh Kampanye Berakhir',imageUrl:'',targetUrl:'https://example.com/promosi/arsip/kampanye-yang-sudah-berakhir',scheduleMode:'range',start:dayOffset(-14),end:dayOffset(-1),frequencyUnit:'daily',frequencyCount:1,carouselInterval:5,displayPriority:100,targetPriority:'platform',providerMode:'all',providers:[],platform:'All',enabled:true,createdAt:'2026-09-10T09:00:00',updated:Date.now()-12000,art:''}
+  ];
+  let banners;
+  const normalizeBanner = b => {
+    const site = typeof b.platform === 'string' ? b.platform : (b.platformMode === 'all' ? 'All' : (b.platforms?.length === 1 && platforms.includes(b.platforms[0]) ? b.platforms[0] : ''));
+    const demo = seed.find(item => item.id === b.id);
+    const oldDemoTitles = {'demo-1':'週末限定活動','demo-2':'新遊戲上線預告','demo-3':'檔期結束示例'};
+    const {gaUrl,gaParam,platformMode,platforms:oldPlatforms,...rest} = b;
+    const priority = b.targetPriority === 'provider' ? 'provider' : 'platform';
+    const displayPriority = Number(b.displayPriority);
+    return {...rest,title:demo && b.title === oldDemoTitles[b.id] ? demo.title : b.title,imageUrl:b.imageUrl || demo?.imageUrl || '',platform:priority === 'provider' ? 'All' : site,targetPriority:priority,providerMode:priority === 'platform' ? 'all' : 'selected',providers:priority === 'platform' ? [] : (Array.isArray(b.providers) ? b.providers : []),displayPriority:Number.isSafeInteger(displayPriority) && displayPriority >= 0 && displayPriority <= 1000 ? displayPriority : (demo?.displayPriority ?? 0),targetUrl:b.targetUrl || demo?.targetUrl || '',scheduleMode:b.scheduleMode === 'continuous' ? 'continuous' : 'range',start:b.scheduleMode === 'continuous' ? '' : (b.start || ''),end:b.scheduleMode === 'continuous' ? '' : (b.end || ''),frequencyUnit:['daily','weekly'].includes(b.frequencyUnit) ? b.frequencyUnit : (demo?.frequencyUnit || ''),frequencyCount:Number.isSafeInteger(Number(b.frequencyCount)) && Number(b.frequencyCount) > 0 ? Number(b.frequencyCount) : (demo?.frequencyCount || ''),carouselInterval:Number.isSafeInteger(Number(b.carouselInterval)) && Number(b.carouselInterval) >= 3 && Number(b.carouselInterval) <= 15 ? Number(b.carouselInterval) : (demo?.carouselInterval || 5),createdAt:b.createdAt || demo?.createdAt || null};
+  };
+  let nextSerialByDate = {};
+  try {
+    const currentText = localStorage.getItem(STORE);
+    const savedText = currentText || PRIOR_STORES.map(key => localStorage.getItem(key)).find(Boolean);
+    const saved = savedText ? JSON.parse(savedText) : null;
+    const items = Array.isArray(saved) ? [...saved] : (Array.isArray(saved?.items) ? [...saved.items] : [...seed]);
+    if (!currentText && !items.some(item => item.id === 'demo-4')) {
+      const first = items.find(item => item.id === 'demo-1');
+      const second = {...seed.find(item => item.id === 'demo-4')};
+      if (first && ['range','continuous'].includes(first.scheduleMode)) { second.scheduleMode = first.scheduleMode; second.start = first.start || ''; second.end = first.end || ''; }
+      items.splice(1,0,second);
+    }
+    banners = items.map(normalizeBanner);
+    const migrationDate = serialDate();
+    const used = new Set();
+    const legacyNumbers = new Map();
+    if (saved?.nextSerialByDate && typeof saved.nextSerialByDate === 'object') {
+      for (const [date,next] of Object.entries(saved.nextSerialByDate)) {
+        if (/^\d{8}$/.test(date) && Number.isSafeInteger(next) && next > 0) nextSerialByDate[date] = next;
+      }
+    }
+    for (const banner of banners) {
+      if (isDatedSerial(banner.serialNo) && !used.has(banner.serialNo)) {
+        used.add(banner.serialNo);
+        const date = banner.serialNo.slice(0,8);
+        nextSerialByDate[date] = Math.max(nextSerialByDate[date] || 1,Number(banner.serialNo.slice(8)) + 1);
+      } else {
+        if (Number.isSafeInteger(banner.serialNo) && banner.serialNo > 0) legacyNumbers.set(banner,banner.serialNo);
+        banner.serialNo = null;
+      }
+    }
+    let candidate = 1;
+    for (const banner of banners) if (banner.serialNo === null) {
+      const legacy = legacyNumbers.get(banner);
+      let sequence = legacy && !used.has(serialFor(migrationDate,legacy)) ? legacy : candidate;
+      while (used.has(serialFor(migrationDate,sequence))) sequence++;
+      banner.serialNo = serialFor(migrationDate,sequence);
+      used.add(banner.serialNo);
+      candidate = Math.max(candidate,sequence + 1);
+      nextSerialByDate[migrationDate] = Math.max(nextSerialByDate[migrationDate] || 1,sequence + 1);
+    }
+    if (Number.isSafeInteger(saved?.nextSerialNo) && saved.nextSerialNo > 0) nextSerialByDate[migrationDate] = Math.max(nextSerialByDate[migrationDate] || 1,saved.nextSerialNo);
+  } catch {
+    banners = seed.map((item,index) => ({...normalizeBanner(item),serialNo:serialFor(serialDate(),index + 1)}));
+    nextSerialByDate[serialDate()] = banners.length + 1;
+  }
+  let editingId = null;
+  let activeObjectUrl = '';
+  let focusReturn = null;
+  let imageFocusReturn = null;
+  let imageBannerId = null;
+  let pendingToggle = null;
+  let providerFocusReturn = null;
+  let providerBannerId = null;
+  let providerPage = 1;
+  const providerPageSize = 30;
+  let pendingDeleteId = null;
+  let deleteFocusReturn = null;
+  let listPage = 1;
+  let listTotalPages = 1;
+  const previewMode = new URLSearchParams(window.location.search).get('view') === 'mainsite';
+  let carouselItems = [];
+  let carouselIndex = 0;
+  let carouselTimer = null;
+  let carouselDismissed = false;
+  const persist = () => { try { localStorage.setItem(STORE, JSON.stringify({items:banners,nextSerialByDate})); return true; } catch { showToast('Data tidak dapat disimpan di browser. Periksa ruang penyimpanan lokal.'); return false; } };
+  const statusOf = banner => { const now = Date.now(); if (!['All',...platforms].includes(banner.platform)) return 'unconfigured'; if (!banner.enabled) return 'paused'; if (banner.scheduleMode === 'continuous') return 'active'; if (now >= new Date(banner.end).getTime()) return 'ended'; if (now < new Date(banner.start).getTime()) return 'scheduled'; return 'active'; };
+  const statusLabel = {active:'Aktif',scheduled:'Terjadwal',ended:'Nonaktif otomatis',paused:'Nonaktif',unconfigured:'Platform belum diatur'};
+  const periodLabel = banner => banner.scheduleMode === 'continuous' ? t('Tayang terus-menerus') : `${labelDate(banner.start)} ${t('sampai')} ${labelDate(banner.end)}`;
+  const frequencyLabel = banner => banner.frequencyUnit && banner.frequencyCount ? `${banner.frequencyCount} ${t('kali')} / ${t(banner.frequencyUnit === 'daily' ? 'hari' : 'minggu')}` : t('Belum diatur');
+  const carouselIntervalLabel = banner => `${banner.carouselInterval} ${t('detik / gambar')}`;
+  const providerNamesOf = banner => banner.providerMode === 'all' ? providersForSite(banner.platform) : (banner.providers || []);
+  const displayTitle = banner => banner.id?.startsWith('demo-') ? t(banner.title) : banner.title;
+  const trashIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 10v7m4-7v7"/></svg>';
+  const artMarkup = banner => banner.imageUrl
+    ? `<img src="${esc(banner.imageUrl)}" alt="${esc(t('Pratinjau Gambar Banner'))}: ${esc(displayTitle(banner))}" onerror="this.style.display='none';this.nextElementSibling.hidden=false"><span hidden>${esc(displayTitle(banner))}</span>`
+    : `<span>${esc(displayTitle(banner))}</span>`;
+  function showToast(message) { const toast = $('#toast'); toast.dataset.message = message; toast.textContent = t(message); toast.classList.add('show'); clearTimeout(showToast.timer); showToast.timer = setTimeout(() => toast.classList.remove('show'), 3500); }
+  function setFormError(message) { $('#formError').dataset.message = message; $('#formError').textContent = t(message); }
+  function render() {
+    const q = $('#searchFilter').value.trim().toLowerCase();
+    const platform = $('#platformFilter').value;
+    const status = $('#statusFilter').value;
+    const sort = $('#sortFilter').value;
+    const rows = banners.filter(b => {
+      const statusMatch = !status || statusOf(b) === status;
+      const platformMatch = !platform || b.platform === 'All' || b.platform === platform;
+      const haystack = [b.serialNo,b.title,displayTitle(b),b.targetUrl,b.platform,providerNamesOf(b).join(' ')].join(' ').toLowerCase();
+      return statusMatch && platformMatch && (!q || haystack.includes(q));
+    }).sort((a,b) => sort === 'start' || sort === 'end' ? (a.scheduleMode === 'continuous' ? Infinity : new Date(a[sort]).getTime()) - (b.scheduleMode === 'continuous' ? Infinity : new Date(b[sort]).getTime()) || b.updated-a.updated : sort === 'priority' ? b.displayPriority-a.displayPriority || String(a.serialNo).localeCompare(String(b.serialNo)) : sort === 'created' ? (new Date(b.createdAt).getTime() || 0) - (new Date(a.createdAt).getTime() || 0) : b.updated-a.updated);
+    const pageSize = Number($('#itemsPerPage').value) || 25;
+    listTotalPages = Math.max(1,Math.ceil(rows.length / pageSize));
+    listPage = Math.min(listPage,listTotalPages);
+    const startIndex = (listPage - 1) * pageSize;
+    const visibleRows = rows.slice(startIndex,startIndex + pageSize);
+    $('#resultCount').textContent = rows.length ? `${t('Menampilkan')} ${startIndex + 1}–${startIndex + visibleRows.length} ${t('dari')} ${rows.length} ${t('banner')}` : `${t('Menampilkan')} 0 ${t('dari')} 0 ${t('banner')}`;
+    $('#bannerRows').innerHTML = visibleRows.length ? visibleRows.map(b => {
+      const state = statusOf(b);
+      const providerScope = b.providerMode === 'all' ? `<span class="provider-scope">${esc(t('Semua Provider'))}</span>` : '';
+      const targetLink = b.targetUrl ? `<a class="target-link" href="${esc(b.targetUrl)}" target="_blank" rel="noopener noreferrer" title="${esc(b.targetUrl)}" aria-label="${esc(t('URL Tautan'))}: ${esc(b.targetUrl)}">${esc(b.targetUrl)}</a>` : '—';
+      const title = displayTitle(b);
+      return `<tr><td class="serial-no">${esc(b.serialNo)}</td><td><button class="preview-button" type="button" data-preview="${esc(b.id)}" aria-label="${esc(t('Lihat gambar'))} ${esc(title)} ${esc(t('dalam ukuran besar'))}"><span class="mini-art ${esc(b.art||'')}">${artMarkup(b)}</span></button><span class="item-title">${esc(title)}</span></td><td class="provider-cell">${providerScope}<span class="provider-names" title="${esc(providerNamesOf(b).join(', '))}">${esc(providerNamesOf(b).join(', '))}</span><button class="provider-more" type="button" data-providers="${esc(b.id)}" hidden>${esc(t('Lihat semua Provider'))}</button></td><td>${esc(b.targetPriority === 'provider' ? '—' : b.platform === 'All' ? t('Semua') : (b.platform || t('Platform belum diatur')))}</td><td class="display-priority">${esc(b.displayPriority)}</td><td class="schedule-cell">${b.scheduleMode === 'continuous' ? esc(t('Tayang terus-menerus')) : `${esc(labelDate(b.start))}<span class="subtext">${esc(t('sampai'))} ${esc(labelDate(b.end))}</span>`}<span class="created-time"><strong>Created At:</strong> ${esc(labelCreated(b.createdAt))}</span></td><td>${esc(frequencyLabel(b))}<span class="subtext">${esc(carouselIntervalLabel(b))}</span></td><td>${targetLink}</td><td><span class="pill ${state}">${esc(t(statusLabel[state]))}</span></td><td><div class="actions"><label class="switch" title="${esc(t('Aktifkan / nonaktifkan'))}"><input type="checkbox" data-toggle="${esc(b.id)}" aria-label="${esc(t('Aktifkan'))} ${esc(title)}" ${b.enabled?'checked':''}><span></span></label><button class="small-btn" type="button" data-edit="${esc(b.id)}">Edit</button><button class="delete-btn" type="button" data-delete="${esc(b.id)}" aria-label="${esc(t('Hapus'))} ${esc(title)}" title="${esc(t('Hapus'))}">${trashIcon}</button></div></td></tr>`;
+    }).join('') : `<tr><td class="empty" colspan="10">${esc(t('Tidak ada Popup Banner yang sesuai.'))}</td></tr>`;
+    for (const name of document.querySelectorAll('.provider-names')) { const button = name.nextElementSibling; button.hidden = name.scrollWidth <= name.clientWidth + 1; }
+    const lastVisiblePage = Math.min(listTotalPages,Math.max(5,listPage + 2));
+    const firstVisiblePage = Math.max(1,lastVisiblePage - 4);
+    $('#pageButtons').innerHTML = Array.from({length:lastVisiblePage-firstVisiblePage+1},(_,i) => firstVisiblePage+i).map(page => `<button type="button" data-list-page="${page}" class="${page === listPage ? 'active' : ''}" aria-label="${esc(t('Halaman'))} ${page}" ${page === listPage ? 'aria-current="page"' : ''}>${page}</button>`).join('');
+    $('#firstPage').disabled = listPage === 1;
+    $('#previousPage').disabled = listPage === 1;
+    $('#nextPage').disabled = listPage === listTotalPages;
+    $('#lastPage').disabled = listPage === listTotalPages;
+  }
+  function goToListPage(page) { const next = Math.max(1,Math.min(listTotalPages,page)); if (next !== listPage) { listPage = next; render(); } }
+  function showCarouselSlide() {
+    const banner = carouselItems[carouselIndex];
+    const image = $('#carouselImage');
+    if (!banner) {
+      image.innerHTML = `<div class="fallback-art">${esc(t('Tidak ada Popup Banner aktif untuk target ini.'))}</div>`;
+      $('#carouselDots').innerHTML = '';
+      return;
+    }
+    const fallback = `<div class="fallback-art">${esc(displayTitle(banner))}</div>`;
+    image.innerHTML = banner.imageUrl ? `<img src="${esc(banner.imageUrl)}" alt="${esc(displayTitle(banner))}" draggable="false">` : fallback;
+    image.querySelector('img')?.addEventListener('error',() => { image.innerHTML = fallback; },{once:true});
+    $('#carouselDots').innerHTML = carouselItems.map((_,index) => `<span class="${index === carouselIndex ? 'active' : ''}"></span>`).join('');
+  }
+  function restartCarouselTimer() {
+    clearTimeout(carouselTimer);
+    if (previewMode && !$('#carouselOverlay').hidden && carouselItems.length > 1) {
+      const delay = carouselItems[carouselIndex].carouselInterval * 1000;
+      carouselTimer = setTimeout(() => {
+        carouselIndex = (carouselIndex + 1) % carouselItems.length;
+        showCarouselSlide();
+        restartCarouselTimer();
+      },delay);
+    }
+  }
+  function renderMainsitePreview(reset=false) {
+    if (!previewMode) return;
+    const currentId = carouselItems[carouselIndex]?.id;
+    const site = $('#previewSite').value;
+    const provider = $('#previewProvider').value;
+    carouselItems = banners.filter(b => statusOf(b) === 'active' && (b.targetPriority === 'provider' ? !!provider && providersForSite(site).includes(provider) && (b.providers || []).includes(provider) : b.platform === 'All' || b.platform === site))
+      .sort((a,b) => b.displayPriority-a.displayPriority || String(a.serialNo).localeCompare(String(b.serialNo)));
+    carouselIndex = reset ? 0 : Math.max(0,carouselItems.findIndex(b => b.id === currentId));
+    $('#carouselOverlay').hidden = carouselDismissed;
+    $('#reopenCarousel').hidden = !carouselDismissed;
+    showCarouselSlide();
+    restartCarouselTimer();
+  }
+  function moveCarousel(delta) {
+    if (carouselItems.length < 2) return;
+    carouselIndex = (carouselIndex + delta + carouselItems.length) % carouselItems.length;
+    showCarouselSlide();
+    restartCarouselTimer();
+  }
+  function closeCarousel() { carouselDismissed = true; $('#carouselOverlay').hidden = true; $('#reopenCarousel').hidden = false; clearTimeout(carouselTimer); $('#reopenCarousel').focus(); }
+  function renderProviderModal() {
+    if (!providerBannerId) return;
+    const banner = banners.find(item => item.id === providerBannerId);
+    if (!banner) return;
+    const names = providerNamesOf(banner).filter(name => name.toLowerCase().includes($('#providerSearch').value.trim().toLowerCase()));
+    const pages = Math.max(1,Math.ceil(names.length / providerPageSize));
+    providerPage = Math.min(providerPage,pages);
+    const start = (providerPage-1) * providerPageSize;
+    const visible = names.slice(start,start+providerPageSize);
+    $('#providerModalTitle').textContent = `${t('Daftar Provider')} — ${displayTitle(banner)}`;
+    $('#providerCount').textContent = names.length ? `${t('Menampilkan')} ${start+1}–${start+visible.length} ${t('dari')} ${names.length} Provider` : `${t('Menampilkan')} 0 ${t('dari')} 0 Provider`;
+    $('#providerList').innerHTML = visible.length ? visible.map(name => `<li>${esc(name)}</li>`).join('') : `<li class="empty-provider">${esc(t('Tidak ada Provider yang sesuai.'))}</li>`;
+    $('#providerPageInfo').textContent = `${t('halaman')} ${providerPage} / ${pages}`;
+    $('#providerPrev').disabled = providerPage === 1;
+    $('#providerNext').disabled = providerPage === pages;
+  }
+  function openProviderModal(id) {
+    if (!banners.some(item => item.id === id)) return;
+    providerFocusReturn = document.activeElement;
+    providerBannerId = id;
+    providerPage = 1;
+    $('#providerSearch').value = '';
+    renderProviderModal();
+    $('#providerShade').classList.add('open'); $('#providerShade').setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; $('#providerSearch').focus();
+  }
+  function closeProviderModal() {
+    $('#providerShade').classList.remove('open'); $('#providerShade').setAttribute('aria-hidden','true'); document.body.style.overflow = $('#shade').classList.contains('open') ? 'hidden' : '';
+    providerBannerId = null;
+    providerFocusReturn?.focus();
+  }
+  function selectedProviderValues() { return [...document.querySelectorAll('#providerChoices [name="providers"]:checked')].map(el => el.value); }
+  function fillProviderChoices(available, selected=selectedProviderValues()) {
+    $('#providerChoices').innerHTML = available.length ? available.map(v => `<label><input type="checkbox" name="providers" value="${esc(v)}" ${selected.includes(v) ? 'checked' : ''}>${esc(v)}</label>`).join('') : `<div class="provider-picker-empty">${esc(t('Tidak ada Provider yang tersedia untuk Platform ini.'))}</div>`;
+    syncPickerLabel();
+  }
+  function syncPickerLabel() {
+    const count = selectedProviderValues().length;
+    $('#providerPickerButton').textContent = count ? `${count} ${t('Provider dipilih')}` : t('Pilih Provider');
+  }
+  function closeProviderPicker() { $('#providerChoices').hidden = true; $('#providerPickerButton').setAttribute('aria-expanded','false'); }
+  function syncTargetPriority(reset=false) {
+    const form = $('#bannerForm');
+    const priority = form.elements.targetPriority.value;
+    $('#platformFirstFields').hidden = priority !== 'platform';
+    $('#providerPickerField').hidden = priority !== 'provider';
+    $('#platformFirstSelect').disabled = priority !== 'platform';
+    if (reset) {
+      $('#platformFirstSelect').value = '';
+      fillProviderChoices(providers,[]);
+    }
+    if (priority === 'provider') fillProviderChoices(providers,reset ? [] : selectedProviderValues());
+    else closeProviderPicker();
+    syncPickerLabel();
+  }
+  function syncSchedule() { $('#rangeFields').hidden = $('#bannerForm [name="scheduleMode"]:checked').value !== 'range'; }
+  function previewImage(url) { $('#uploadPreview').innerHTML = url ? `<img src="${esc(url)}" alt="${esc(t('Pratinjau Gambar Banner'))}">` : t('Pratinjau gambar'); }
+  function openImage(id) {
+    const banner = banners.find(item => item.id === id);
+    if (!banner) return;
+    imageFocusReturn = document.activeElement;
+    imageBannerId = id;
+    $('#imageTitle').textContent = displayTitle(banner);
+    $('#largeArtHost').innerHTML = `<div class="large-art ${esc(banner.art||'')}">${artMarkup(banner)}</div>`;
+    $('#imageShade').classList.add('open'); $('#imageShade').setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; $('#closeImage').focus();
+  }
+  function closeImage() { $('#imageShade').classList.remove('open'); $('#imageShade').setAttribute('aria-hidden','true'); $('#largeArtHost').innerHTML = ''; imageBannerId = null; document.body.style.overflow = ''; imageFocusReturn?.focus(); }
+  function openConfirmToggle(banner, enabled) {
+    pendingToggle = {id:banner.id,enabled};
+    updateConfirmTexts();
+    $('#confirmShade').classList.add('open'); $('#confirmShade').setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; $('#cancelConfirm').focus();
+  }
+  function updateConfirmTexts() {
+    if (!pendingToggle) return;
+    const banner = banners.find(item => item.id === pendingToggle.id);
+    if (!banner) return;
+    const enabled = pendingToggle.enabled;
+    $('#confirmTitle').textContent = t(enabled ? 'Konfirmasi Aktifkan Popup Banner' : 'Konfirmasi Nonaktifkan Popup Banner');
+    $('#confirmLead').textContent = t(enabled ? 'Apakah Anda yakin ingin mengaktifkan Popup Banner ini?' : 'Apakah Anda yakin ingin menonaktifkan Popup Banner ini?');
+    $('#confirmPlatform').textContent = banner.targetPriority === 'provider' ? '—' : banner.platform === 'All' ? t('Semua') : (banner.platform || t('Platform belum diatur'));
+    $('#confirmBannerTitle').textContent = displayTitle(banner);
+    $('#confirmRange').textContent = periodLabel(banner);
+    $('#confirmFrequency').textContent = `${frequencyLabel(banner)} · ${carouselIntervalLabel(banner)}`;
+    $('#confirmNote').textContent = t(enabled ? 'Setelah diaktifkan, penayangan tetap mengikuti jadwal dan frekuensi yang telah diatur.' : 'Setelah dinonaktifkan, Banner berhenti tayang dan pengaturannya tetap tersimpan dalam daftar.');
+    const action = $('#applyConfirm'); action.textContent = t(enabled ? 'Ya, aktifkan' : 'Ya, nonaktifkan'); action.className = enabled ? 'primary-btn' : 'danger-btn';
+  }
+  function closeConfirm() {
+    const id = pendingToggle?.id;
+    $('#confirmShade').classList.remove('open'); $('#confirmShade').setAttribute('aria-hidden','true'); document.body.style.overflow = '';
+    pendingToggle = null;
+    [...document.querySelectorAll('[data-toggle]')].find(el => el.dataset.toggle === id)?.focus();
+  }
+  function applyConfirmToggle() {
+    if (!pendingToggle) return;
+    const banner = banners.find(item => item.id === pendingToggle.id);
+    if (!banner) { closeConfirm(); return; }
+    const before = {enabled:banner.enabled,updated:banner.updated};
+    banner.enabled = pendingToggle.enabled; banner.updated = Date.now();
+    if (!persist()) { Object.assign(banner,before); render(); closeConfirm(); return; }
+    const enabled = banner.enabled;
+    render(); closeConfirm(); showToast(enabled ? 'Banner diaktifkan. Penayangan mengikuti jadwal.' : 'Banner dinonaktifkan.');
+  }
+  function updateDeleteTexts() {
+    if (!pendingDeleteId) return;
+    const banner = banners.find(item => item.id === pendingDeleteId);
+    if (!banner) return;
+    const blocked = banner.enabled;
+    $('#deleteTitle').textContent = t(blocked ? 'Tidak dapat menghapus Popup Banner' : 'Konfirmasi Hapus Popup Banner');
+    $('#deleteLead').textContent = t(blocked ? 'Popup Banner ini belum dinonaktifkan.' : 'Apakah Anda yakin ingin menghapus Popup Banner ini?');
+    $('#deletePlatform').textContent = banner.targetPriority === 'provider' ? '—' : banner.platform === 'All' ? t('Semua') : (banner.platform || t('Platform belum diatur'));
+    $('#deleteBannerTitle').textContent = displayTitle(banner);
+    $('#deleteWarning').hidden = !blocked;
+    $('#deleteWarning').textContent = blocked ? t('Nonaktifkan Banner ini terlebih dahulu sebelum menghapusnya.') : '';
+    $('#cancelDelete').textContent = t(blocked ? 'Tutup' : 'Batal');
+    $('#applyDelete').hidden = blocked;
+    $('#applyDelete').textContent = t('Hapus');
+  }
+  function openDelete(id) {
+    if (!banners.some(item => item.id === id)) return;
+    pendingDeleteId = id;
+    deleteFocusReturn = document.activeElement;
+    updateDeleteTexts();
+    $('#deleteShade').classList.add('open'); $('#deleteShade').setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; $('#cancelDelete').focus();
+  }
+  function closeDelete() {
+    $('#deleteShade').classList.remove('open'); $('#deleteShade').setAttribute('aria-hidden','true'); document.body.style.overflow = '';
+    pendingDeleteId = null;
+    (deleteFocusReturn?.isConnected ? deleteFocusReturn : $('#addBanner')).focus();
+  }
+  function applyDelete() {
+    const banner = banners.find(item => item.id === pendingDeleteId);
+    if (!banner) { closeDelete(); return; }
+    if (banner.enabled) { updateDeleteTexts(); return; }
+    const before = banners;
+    banners = banners.filter(item => item.id !== banner.id);
+    if (!persist()) { banners = before; render(); closeDelete(); return; }
+    render(); closeDelete(); showToast('Popup Banner berhasil dihapus.');
+  }
+  function openModal(id=null) {
+    focusReturn = document.activeElement;
+    editingId = id;
+    const form = $('#bannerForm'); form.reset(); setFormError('');
+    if (activeObjectUrl) { URL.revokeObjectURL(activeObjectUrl); activeObjectUrl = ''; }
+    const b = banners.find(item => item.id === id);
+    $('#modalTitle').textContent = t(b ? 'Ubah Popup Banner' : 'Tambah Popup Banner');
+    form.elements.start.value = b?.start || dayOffset(0,0);
+    form.elements.end.value = b?.end || dayOffset(7,23);
+    form.querySelector(`[name="scheduleMode"][value="${b?.scheduleMode || 'continuous'}"]`).checked = true;
+    form.elements.frequencyUnit.value = b?.frequencyUnit || '';
+    form.elements.frequencyCount.value = b?.frequencyCount || '';
+    form.elements.carouselInterval.value = b?.carouselInterval || '';
+    form.elements.displayPriority.value = b?.displayPriority ?? '';
+    form.elements.targetPriority.value = b ? (b.targetPriority || 'platform') : '';
+    syncTargetPriority(true);
+    if (b) {
+      for (const key of ['title','targetUrl']) form.elements[key].value = b[key] || '';
+      form.elements.imageUrl.value = b.imageUrl?.startsWith('data:') ? '' : (b.imageUrl || '');
+      if (b.targetPriority === 'provider') {
+        fillProviderChoices(providers,b.providers || []);
+      } else {
+        $('#platformFirstSelect').value = b.platform || '';
+      }
+    }
+    syncSchedule(); previewImage(b?.imageUrl || '');
+    $('#shade').classList.add('open'); $('#shade').setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; form.elements.title.focus();
+  }
+  function closeModal() { $('#shade').classList.remove('open'); $('#shade').setAttribute('aria-hidden','true'); document.body.style.overflow = ''; if(activeObjectUrl){URL.revokeObjectURL(activeObjectUrl);activeObjectUrl='';} focusReturn?.focus(); }
+  function validUrl(value) { try { const url = new URL(value); return url.protocol === 'https:'; } catch { return false; } }
+  function readImage(file) { return new Promise((resolve,reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); }); }
+  function setLanguage(next) {
+    language = next === 'en' ? 'en' : 'id';
+    $('#languageSelect').value = language;
+    $('#previewLanguage').value = language;
+    applyStaticLanguage();
+    render();
+    renderMainsitePreview();
+    if (providerBannerId) renderProviderModal();
+    if ($('#shade').classList.contains('open')) {
+      $('#modalTitle').textContent = t(editingId ? 'Ubah Popup Banner' : 'Tambah Popup Banner');
+      setFormError($('#formError').dataset.message || '');
+      previewImage($('#uploadPreview img')?.getAttribute('src') || '');
+      if ($('#providerPickerField').hidden === false && !$('#providerChoices [name="providers"]')) fillProviderChoices([],[]);
+      syncPickerLabel();
+    }
+    if (pendingToggle) updateConfirmTexts();
+    if (pendingDeleteId) updateDeleteTexts();
+    if (imageBannerId) { const banner = banners.find(item => item.id === imageBannerId); if (banner) { $('#imageTitle').textContent = displayTitle(banner); $('#largeArtHost').innerHTML = `<div class="large-art ${esc(banner.art||'')}">${artMarkup(banner)}</div>`; } }
+    if ($('#toast').classList.contains('show')) $('#toast').textContent = t($('#toast').dataset.message || '');
+  }
+  async function submitForm(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const title = String(data.get('title')||'').trim();
+    const enteredImageUrl = String(data.get('imageUrl')||'').trim();
+    const targetUrl = String(data.get('targetUrl')||'').trim();
+    const scheduleMode = String(data.get('scheduleMode')||'');
+    const start = scheduleMode === 'range' ? String(data.get('start')||'') : '';
+    const end = scheduleMode === 'range' ? String(data.get('end')||'') : '';
+    const frequencyUnit = String(data.get('frequencyUnit')||'');
+    const frequencyCount = Number(data.get('frequencyCount'));
+    const carouselIntervalText = String(data.get('carouselInterval')||'').trim();
+    const carouselInterval = Number(carouselIntervalText);
+    const displayPriorityText = String(data.get('displayPriority')||'').trim();
+    const displayPriority = Number(displayPriorityText);
+    const targetPriority = String(data.get('targetPriority')||'');
+    const providerMode = targetPriority === 'provider' ? 'selected' : 'all';
+    const platform = targetPriority === 'platform' ? String(data.get('platform')||'') : 'All';
+    const selectedProviders = data.getAll('providers').map(String);
+    const file = $('#imageFile').files[0];
+    let error = '';
+    if (!title) error = 'Masukkan judul Banner.';
+    else if (!['continuous','range'].includes(scheduleMode)) error = 'Pilih jadwal tayang.';
+    else if (scheduleMode === 'range' && (!start || !end || !Number.isFinite(new Date(start).getTime()) || !Number.isFinite(new Date(end).getTime()))) error = 'Masukkan waktu mulai dan selesai yang valid.';
+    else if (scheduleMode === 'range' && new Date(end) <= new Date(start)) error = 'Waktu selesai harus setelah waktu mulai.';
+    else if (!['daily','weekly'].includes(frequencyUnit)) error = 'Pilih satuan waktu untuk frekuensi tayang.';
+    else if (!Number.isSafeInteger(frequencyCount) || frequencyCount < 1) error = 'Masukkan jumlah maksimum tayang berupa bilangan bulat positif.';
+    else if (!carouselIntervalText || !Number.isSafeInteger(carouselInterval) || carouselInterval < 3 || carouselInterval > 15) error = 'Masukkan jeda Carousel berupa angka bulat 3–15 detik.';
+    else if (!displayPriorityText || !Number.isSafeInteger(displayPriority) || displayPriority < 0 || displayPriority > 1000) error = 'Prioritas tayang harus berupa angka bulat dari 0 sampai 1000.';
+    else if (!['platform','provider'].includes(targetPriority)) error = 'Pilih prioritas target.';
+    else if (targetPriority === 'provider' && !selectedProviders.length) error = 'Pilih setidaknya satu Provider.';
+    else if (targetPriority === 'platform' && !['All',...platforms].includes(platform)) error = 'Pilih Platform.';
+    else if (targetPriority === 'provider' && selectedProviders.some(provider => !providers.includes(provider))) error = 'Pilih setidaknya satu Provider.';
+    else if (enteredImageUrl && !validUrl(enteredImageUrl)) error = 'URL gambar Banner harus diawali https://.';
+    else if (targetUrl && !validUrl(targetUrl)) error = 'URL Tautan harus diawali https://.';
+    else if (file && file.size > 2 * 1024 * 1024) error = 'Ukuran file gambar maksimal 2 MB, atau gunakan URL gambar.';
+    setFormError(error);
+    if (error) return;
+    const existing = banners.find(b => b.id === editingId);
+    let imageUrl = enteredImageUrl || (existing?.imageUrl?.startsWith('data:') ? existing.imageUrl : '');
+    if (file) { try { imageUrl = await readImage(file); } catch { setFormError('Gambar tidak dapat dibaca. Pilih file kembali.'); return; } }
+    const previousBanners = banners;
+    const previousCounters = {...nextSerialByDate};
+    const today = serialDate();
+    let sequence = nextSerialByDate[today] || 1;
+    while (!existing && banners.some(b => b.serialNo === serialFor(today,sequence))) sequence++;
+    const serialNo = existing ? existing.serialNo : serialFor(today,sequence);
+    if (!existing) nextSerialByDate[today] = sequence + 1;
+    const record = {id:editingId || `banner-${Date.now()}-${serialNo}`,serialNo,title,imageUrl,targetUrl,scheduleMode,start,end,frequencyUnit,frequencyCount,carouselInterval,displayPriority,targetPriority,providerMode,providers:providerMode==='all'?[]:selectedProviders,platform,enabled:existing?.enabled ?? true,createdAt:existing?.createdAt || new Date().toISOString(),updated:Date.now(),art:existing?.art||''};
+    banners = existing ? banners.map(b => b.id === editingId ? record : b) : [record,...banners];
+    if (!persist()) { banners = previousBanners; nextSerialByDate = previousCounters; return; }
+    render(); closeModal(); showToast(existing ? 'Popup Banner berhasil diperbarui.' : 'Popup Banner berhasil ditambahkan.');
+  }
+  $('#addBanner').addEventListener('click',() => openModal());
+  function navigatePreview(open) { const url = new URL(window.location.href); if (open) url.searchParams.set('view','mainsite'); else url.searchParams.delete('view'); url.searchParams.set('lang',language); window.location.assign(url.href); }
+  $('#mainsitePreview').addEventListener('click',() => navigatePreview(true));
+  $('#backToAdmin').addEventListener('click',() => navigatePreview(false));
+  $('#previewSite').addEventListener('change',() => { carouselDismissed = false; renderMainsitePreview(true); });
+  $('#previewProvider').addEventListener('change',() => { carouselDismissed = false; renderMainsitePreview(true); });
+  $('#previewLanguage').addEventListener('change',e => setLanguage(e.target.value));
+  const carouselImage = $('#carouselImage');
+  let swipeStart = null;
+  function swipeDirection(start,e) {
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+    return Math.abs(dx) >= 24 && Math.abs(dx) > Math.abs(dy) * 1.05 ? (dx < 0 ? 1 : -1) : 0;
+  }
+  function endSwipe(e) {
+    if (!swipeStart || e.pointerId !== swipeStart.id) return;
+    const direction = e.type === 'pointerup' && !swipeStart.handled ? swipeDirection(swipeStart,e) : 0;
+    const handled = swipeStart.handled;
+    swipeStart = null;
+    carouselImage.classList.remove('dragging');
+    if (direction) moveCarousel(direction);
+    else if (!handled) restartCarouselTimer();
+  }
+  carouselImage.addEventListener('pointerdown',e => {
+    if ((e.pointerType === 'mouse' && e.button !== 0) || swipeStart) return;
+    swipeStart = {id:e.pointerId,x:e.clientX,y:e.clientY,handled:false};
+    carouselImage.classList.add('dragging');
+    carouselImage.setPointerCapture(e.pointerId);
+    clearTimeout(carouselTimer);
+  });
+  carouselImage.addEventListener('pointermove',e => {
+    if (!swipeStart || swipeStart.id !== e.pointerId || swipeStart.handled) return;
+    const direction = swipeDirection(swipeStart,e);
+    if (direction) {
+      swipeStart.handled = true;
+      moveCarousel(direction);
+    }
+  });
+  carouselImage.addEventListener('pointerup',endSwipe);
+  carouselImage.addEventListener('pointercancel',endSwipe);
+  carouselImage.addEventListener('dragstart',e => e.preventDefault());
+  $('#closeCarousel').addEventListener('click',closeCarousel);
+  $('#reopenCarousel').addEventListener('click',() => { carouselDismissed = false; renderMainsitePreview(); $('#closeCarousel').focus(); });
+  $('#closeModal').addEventListener('click',closeModal); $('#cancelModal').addEventListener('click',closeModal);
+  $('#shade').addEventListener('mousedown',e => { if(e.target === $('#shade')) closeModal(); });
+  $('#closeImage').addEventListener('click',closeImage);
+  $('#imageShade').addEventListener('mousedown',e => { if(e.target === $('#imageShade')) closeImage(); });
+  $('#closeProvider').addEventListener('click',closeProviderModal);
+  $('#providerPickerButton').addEventListener('click',() => { const menu = $('#providerChoices'); menu.hidden = !menu.hidden; $('#providerPickerButton').setAttribute('aria-expanded',String(!menu.hidden)); });
+  document.addEventListener('click',e => { if (!e.target.closest('.provider-picker')) closeProviderPicker(); });
+  $('#providerShade').addEventListener('mousedown',e => { if(e.target === $('#providerShade')) closeProviderModal(); });
+  $('#providerSearch').addEventListener('input',() => { providerPage = 1; renderProviderModal(); });
+  $('#providerPrev').addEventListener('click',() => { if (providerPage > 1) { providerPage--; renderProviderModal(); } });
+  $('#providerNext').addEventListener('click',() => { providerPage++; renderProviderModal(); });
+  $('#closeConfirm').addEventListener('click',closeConfirm); $('#cancelConfirm').addEventListener('click',closeConfirm); $('#applyConfirm').addEventListener('click',applyConfirmToggle);
+  $('#confirmShade').addEventListener('mousedown',e => { if(e.target === $('#confirmShade')) closeConfirm(); });
+  $('#closeDelete').addEventListener('click',closeDelete); $('#cancelDelete').addEventListener('click',closeDelete); $('#applyDelete').addEventListener('click',applyDelete);
+  $('#deleteShade').addEventListener('mousedown',e => { if(e.target === $('#deleteShade')) closeDelete(); });
+  document.addEventListener('keydown',e => { if (previewMode && !$('#carouselOverlay').hidden && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); moveCarousel(e.key === 'ArrowRight' ? 1 : -1); return; } if(e.key !== 'Escape') return; if ($('#deleteShade').classList.contains('open')) closeDelete(); else if ($('#confirmShade').classList.contains('open')) closeConfirm(); else if ($('#providerShade').classList.contains('open')) closeProviderModal(); else if ($('#imageShade').classList.contains('open')) closeImage(); else if ($('#shade').classList.contains('open')) closeModal(); else if (previewMode && !$('#carouselOverlay').hidden) closeCarousel(); });
+  $('#bannerForm').addEventListener('change',e => {
+    if (e.target.name === 'targetPriority') syncTargetPriority(true);
+    if (e.target.name === 'providers') syncPickerLabel();
+    if (e.target.name === 'scheduleMode') syncSchedule();
+  });
+  $('#frequencyHelp').addEventListener('click',() => { const wrap = $('#frequencyHelpWrap'); const open = wrap.classList.toggle('open'); $('#frequencyHelp').setAttribute('aria-expanded',String(open)); });
+  document.addEventListener('click',e => { if (!e.target.closest('#frequencyHelpWrap')) { $('#frequencyHelpWrap').classList.remove('open'); $('#frequencyHelp').setAttribute('aria-expanded','false'); } });
+  $('#bannerForm').addEventListener('submit',submitForm);
+  $('#imageFile').addEventListener('change',e => { if(activeObjectUrl) URL.revokeObjectURL(activeObjectUrl); const file = e.target.files[0]; activeObjectUrl = file ? URL.createObjectURL(file) : ''; previewImage(activeObjectUrl || $('#bannerForm').elements.imageUrl.value); });
+  $('#bannerForm').elements.imageUrl.addEventListener('input',e => { if(!$('#imageFile').files.length) previewImage(e.target.value); });
+  $('#bannerRows').addEventListener('click',e => { const deleteButton = e.target.closest('[data-delete]'); if (deleteButton) { openDelete(deleteButton.dataset.delete); return; } const providersButton = e.target.closest('[data-providers]'); if (providersButton) { openProviderModal(providersButton.dataset.providers); return; } const preview = e.target.closest('[data-preview]'); if(preview) { openImage(preview.dataset.preview); return; } const edit = e.target.closest('[data-edit]'); if(edit) openModal(edit.dataset.edit); });
+  $('#bannerRows').addEventListener('change',e => { if(!e.target.matches('[data-toggle]')) return; const banner = banners.find(item => item.id === e.target.dataset.toggle); if(!banner) return; const enabled = e.target.checked; e.target.checked = banner.enabled; openConfirmToggle(banner,enabled); });
+  for (const id of ['platformFilter','statusFilter','sortFilter','searchFilter']) $(`#${id}`).addEventListener(id === 'searchFilter' ? 'input' : 'change',() => { listPage = 1; render(); });
+  $('#resetFilters').addEventListener('click',() => { for(const id of ['platformFilter','statusFilter','searchFilter']) $(`#${id}`).value = ''; $('#sortFilter').value='priority'; listPage = 1; render(); });
+  $('#itemsPerPage').addEventListener('change',() => { listPage = 1; render(); });
+  $('#firstPage').addEventListener('click',() => goToListPage(1));
+  $('#previousPage').addEventListener('click',() => goToListPage(listPage-1));
+  $('#nextPage').addEventListener('click',() => goToListPage(listPage+1));
+  $('#lastPage').addEventListener('click',() => goToListPage(listTotalPages));
+  $('#pageButtons').addEventListener('click',e => { const button = e.target.closest('[data-list-page]'); if (button) goToListPage(Number(button.dataset.listPage)); });
+  $('#languageSelect').addEventListener('change',e => setLanguage(e.target.value));
+  persist();
+  $('#previewPage').hidden = !previewMode;
+  document.body.classList.toggle('preview-mode',previewMode);
+  $('#itemsPerPage').value = '25'; setLanguage(new URLSearchParams(window.location.search).get('lang'));
+  setInterval(() => { render(); renderMainsitePreview(); },30000);
+})();
+</script>
+</body>
+</html>
