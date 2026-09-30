@@ -67,7 +67,7 @@
 <section class="mainsite-page" id="previewPage" hidden aria-label="Mainsite Preview">
   <header class="mainsite-header"><div class="mainsite-brand">◇ <span>STUDIO<br>BET78</span></div><div class="mainsite-wallet">mobinice　◆　Dompet: Rp 20.000,00</div><div class="mainsite-tools"><button type="button">Deposit</button><button type="button">Penarikan</button><button type="button">Transaksi</button><button type="button">Bonus Saya</button></div></header>
   <nav class="mainsite-nav" id="mainsiteNav" aria-label="Kategori"><button class="active" type="button" aria-current="page">Sports</button><button type="button">Poker</button><button type="button">Casino</button><button type="button">Togel</button><button type="button">Slot</button><button type="button">Crash</button><button type="button">Fishing</button><button type="button">Arcade</button><button type="button">Promosi</button><button type="button">VIP</button></nav>
-  <div class="preview-controls"><button class="outline-btn" id="backToAdmin" type="button">← Kembali ke Backoffice</button><button class="outline-btn" id="simulateRefresh" type="button">Simulasikan refresh</button><label class="field"><span>Platform</span><select id="previewSite"><option>StudioBET78</option><option>MediaSlot78</option><option>OXIBET88</option><option>KratonBet</option><option>BosDeal88</option></select></label><label class="field"><span>Provider</span><select id="previewProvider"><option value="">Tanpa Provider</option><option>PG Soft</option><option>Pragmatic Play</option><option>Evolution</option><option>JILI</option><option>CMD</option><option>SBO</option></select></label><label class="field"><span>Bahasa</span><select id="previewLanguage"><option value="id">Bahasa Indonesia</option><option value="en">English</option></select></label><span class="preview-simulation-note" id="previewSimulationNote">Satu Banner per refresh. Pindah kategori tidak membuka ulang Popup Banner. Simulasi ini belum menerapkan batas frekuensi dan centang hari ini.</span></div>
+  <div class="preview-controls"><button class="outline-btn" id="backToAdmin" type="button">← Kembali ke Backoffice</button><button class="outline-btn" id="simulateRefresh" type="button">Simulasikan refresh</button><label class="field"><span>Platform</span><select id="previewSite"><option>StudioBET78</option><option>MediaSlot78</option><option>OXIBET88</option><option>KratonBet</option><option>BosDeal88</option></select></label><label class="field"><span>Bahasa</span><select id="previewLanguage"><option value="id">Bahasa Indonesia</option><option value="en">English</option></select></label><span class="preview-simulation-note" id="previewSimulationNote">Satu Banner per refresh. Pindah kategori tidak membuka ulang Popup Banner. Simulasi ini belum menerapkan batas frekuensi dan centang hari ini.</span></div>
   <div class="mainsite-hero"><div class="mainsite-hero-copy"><small>STUDIOBET78 · PROMOSI</small><h1>Bonus &amp; Game<br>Spesial Hari Ini</h1><p>Temukan penawaran dan permainan terbaru.</p><button type="button">Jelajahi Sekarang</button></div><div class="mainsite-orbit" aria-hidden="true">✦</div></div>
   <div class="mainsite-ticker">📣　Pengumuman　　Promo terbaru tersedia untuk Anda　　✦　Mainkan game favorit hari ini</div>
   <div class="mainsite-cards" aria-hidden="true"><div>🎮<span>Game Populer</span></div><div>🏆<span>Turnamen</span></div><div>🎁<span>Bonus Spesial</span></div><div>⚡<span>Game Baru</span></div></div>
@@ -174,7 +174,7 @@
   const t = key => language === 'en' ? (en[key] || key) : key;
   const STORE = 'studiobet78-popup-banner-prototype-v9';
   const PRIOR_STORES = ['studiobet78-popup-banner-prototype-v8','studiobet78-popup-banner-prototype-v7','studiobet78-popup-banner-prototype-v6','studiobet78-popup-banner-prototype-v5','studiobet78-popup-banner-prototype-v4','studiobet78-popup-banner-prototype-v3','studiobet78-popup-banner-prototype-v2'];
-  const PREVIEW_CYCLE_STORE = 'studiobet78-popup-banner-preview-cycle-v1';
+  const PREVIEW_CYCLE_STORE = 'studiobet78-popup-banner-preview-cycle-v2';
   const providers = ['PG Soft','Pragmatic Play','Evolution','JILI','CMD','SBO'];
   const platforms = ['StudioBET78','MediaSlot78','OXIBET88','KratonBet','BosDeal88'];
   // Illustrative mapping only. Production must load each merchant's enabled Providers per site.
@@ -357,9 +357,9 @@
   function goToListPage(page) { const next = Math.max(1,Math.min(listTotalPages,page)); if (next !== listPage) { listPage = next; render(); } }
   function previewCandidates() {
     const site = $('#previewSite').value;
-    const provider = $('#previewProvider').value;
+    const enabledProviders = providersForSite(site);
     return banners.filter(b => statusOf(b) === 'active' && (b.targetPriority === 'provider'
-      ? !!provider && providersForSite(site).includes(provider) && (b.providers || []).includes(provider)
+      ? (b.providers || []).some(provider => enabledProviders.includes(provider))
       : b.platform === 'All' || b.platform === site))
       .sort((a,b) => b.displayWeight-a.displayWeight || b.lastUploadedAt-a.lastUploadedAt || String(a.serialNo).localeCompare(String(b.serialNo)));
   }
@@ -381,7 +381,7 @@
     previewClosed = false;
     $('#hidePopupToday').checked = false;
     const candidates = previewCandidates();
-    const key = `${$('#previewSite').value}|${$('#previewProvider').value}`;
+    const key = $('#previewSite').value;
     const cycles = loadPreviewCycle();
     const cycle = cycles[key] || {seen:[],blankPending:false};
     const ids = new Set(candidates.map(b => b.id));
@@ -658,7 +658,6 @@
   $('#mainsitePreview').addEventListener('click',() => navigatePreview(true));
   $('#backToAdmin').addEventListener('click',() => navigatePreview(false));
   $('#previewSite').addEventListener('change',selectPreviewBanner);
-  $('#previewProvider').addEventListener('change',selectPreviewBanner);
   $('#previewLanguage').addEventListener('change',e => setLanguage(e.target.value));
   $('#simulateRefresh').addEventListener('click',() => window.location.reload());
   $('#mainsiteNav').addEventListener('click',e => {
