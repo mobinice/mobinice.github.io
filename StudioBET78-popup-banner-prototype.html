@@ -167,7 +167,7 @@
     'Bonus Harian Spesial':'Special Daily Bonus',
     'Simulasikan refresh':'Simulate refresh',
     'Satu Banner per refresh. Pindah kategori tidak membuka ulang Popup Banner. Simulasi ini belum menerapkan batas frekuensi dan centang hari ini.':'One Banner per refresh. Changing categories does not reopen the Popup Banner. This simulation does not apply frequency limits or the today checkbox.',
-    'Refresh ini kosong. Refresh berikutnya mulai lagi dari Bobot tertinggi.':'This refresh is blank. The next refresh starts again with the highest weight.',
+    'Refresh ini kosong agar Banner yang sama tidak muncul dua kali berturut-turut.':'This refresh is blank so the same Banner does not appear twice in a row.',
     'Setiap Banner dihitung satu kali per perangkat per hari.':'Each Banner is counted once per device per day.',
     'Kategori':'Categories'
   });
@@ -387,23 +387,28 @@
     const candidates = previewCandidates();
     const key = $('#previewSite').value;
     const cycles = loadPreviewCycle();
-    const cycle = cycles[key] || {seen:[],blankPending:false};
+    const cycle = cycles[key] || {seen:[],lastShown:null};
+    if (!Object.hasOwn(cycle,'lastShown')) cycle.lastShown = Array.isArray(cycle.seen) ? cycle.seen.at(-1) || null : null;
     const ids = new Set(candidates.map(b => b.id));
     cycle.seen = Array.isArray(cycle.seen) ? cycle.seen.filter(id => ids.has(id)) : [];
     if (!candidates.length) {
       previewBanner = null;
       previewBlank = false;
-    } else if (cycle.blankPending) {
-      previewBanner = null;
-      previewBlank = true;
-      cycle.seen = [];
-      cycle.blankPending = false;
     } else {
-      previewBanner = candidates.find(b => !cycle.seen.includes(b.id)) || candidates[0];
-      previewBlank = false;
-      cycle.seen.push(previewBanner.id);
-      cycle.blankPending = cycle.seen.length >= candidates.length;
+      let next = candidates.find(b => !cycle.seen.includes(b.id));
+      if (!next) { cycle.seen = []; next = candidates[0]; }
+      if (next.id === cycle.lastShown) {
+        previewBanner = null;
+        previewBlank = true;
+        cycle.lastShown = null;
+      } else {
+        previewBanner = next;
+        previewBlank = false;
+        cycle.seen.push(next.id);
+        cycle.lastShown = next.id;
+      }
     }
+    delete cycle.blankPending;
     cycles[key] = cycle;
     try { localStorage.setItem(PREVIEW_CYCLE_STORE,JSON.stringify(cycles)); } catch {}
     renderMainsitePreview();
@@ -413,7 +418,7 @@
     showPreviewBanner();
     $('#previewSimulationNote').textContent = t(previewBanner
       ? 'Satu Banner per refresh. Pindah kategori tidak membuka ulang Popup Banner. Simulasi ini belum menerapkan batas frekuensi dan centang hari ini.'
-      : previewBlank ? 'Refresh ini kosong. Refresh berikutnya mulai lagi dari Bobot tertinggi.'
+      : previewBlank ? 'Refresh ini kosong agar Banner yang sama tidak muncul dua kali berturut-turut.'
       : 'Tidak ada Popup Banner aktif untuk target ini.');
   }
   function closePreviewBanner() { previewClosed = true; $('#popupOverlay').hidden = true; $('#simulateRefresh').focus(); }
