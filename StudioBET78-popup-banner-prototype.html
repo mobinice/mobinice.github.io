@@ -62,7 +62,7 @@
         <button id="resetFilters" type="button">Atur ulang</button>
       </section>
       <div class="list-head"><h2>Daftar Popup Banner</h2><span id="resultCount"></span></div>
-      <div class="table-wrap"><table class="banner-table"><thead><tr><th scope="col" title="Format Promotion id: YYYYMMDD + nomor urut harian. ID tetap saat daftar diurutkan atau dihapus.">Promotion id</th><th>Pratinjau / Judul</th><th>Provider</th><th>Platform</th><th class="display-weight">Bobot Tayang</th><th>Waktu Tayang / Created At</th><th>Frekuensi Tayang</th><th>URL Tautan / Rute Internal</th><th>Status</th><th>Operating</th></tr></thead><tbody id="bannerRows"></tbody></table></div>
+      <div class="table-wrap"><table class="banner-table"><thead><tr><th scope="col" title="Promotion id terdiri dari 4 digit acak yang unik dan tidak berubah setelah dibuat.">Promotion id</th><th>Pratinjau / Judul</th><th>Provider</th><th>Platform</th><th class="display-weight">Bobot Tayang</th><th>Waktu Tayang / Created At</th><th>Frekuensi Tayang</th><th>URL Tautan / Rute Internal</th><th>Status</th><th>Operating</th></tr></thead><tbody id="bannerRows"></tbody></table></div>
       <nav class="list-pagination" aria-label="Halaman daftar Banner"><label class="page-size-field"><span>Item per halaman</span><select id="itemsPerPage" aria-label="Item per halaman"><option value="5">5</option><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option><option value="100">100</option></select></label><div class="page-nav"><button id="firstPage" type="button" aria-label="Halaman pertama">|‹</button><button id="previousPage" type="button" aria-label="Halaman sebelumnya">‹</button><span id="pageButtons"></span><button id="nextPage" type="button" aria-label="Halaman berikutnya">›</button><button id="lastPage" type="button" aria-label="Halaman terakhir">›|</button></div></nav>
       <div class="rules-note"><strong>Informasi jadwal dan data</strong>　Banner dengan jadwal terus-menerus tetap aktif sampai dinonaktifkan. Untuk periode tayang, status berubah menjadi "Nonaktif otomatis" setelah waktu selesai. Pratinjau mengundi satu Banner per refresh secara proporsional terhadap bobot; Banner yang baru tampil tidak dipilih lagi pada refresh berikutnya. Refresh kosong hanya terjadi bila itu satu-satunya Banner yang memenuhi syarat. Ini adalah prototipe lokal; batas frekuensi, centang hari ini, dan penghapusan data otomatis belum dijalankan.</div>
     </main>
@@ -126,7 +126,7 @@
 <div class="shade confirm-shade" id="confirmShade" aria-hidden="true">
   <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
     <div class="confirm-head"><h2 id="confirmTitle">Konfirmasi Nonaktifkan Popup Banner</h2><button id="closeConfirm" type="button" aria-label="Tutup konfirmasi">×</button></div>
-    <div class="confirm-body"><p id="confirmLead"></p><dl class="confirm-details"><dt>Platform</dt><dd id="confirmPlatform"></dd><dt>Judul</dt><dd id="confirmBannerTitle"></dd><dt>Periode Tayang</dt><dd id="confirmRange"></dd><dt>Frekuensi Tayang</dt><dd id="confirmFrequency"></dd></dl><div class="confirm-note" id="confirmNote"></div></div>
+    <div class="confirm-body"><p id="confirmLead"></p><dl class="confirm-details"><dt>Kanal</dt><dd id="confirmChannel"></dd><dt id="confirmAudienceLabel">Platform</dt><dd id="confirmAudience"></dd><dt>Judul</dt><dd id="confirmBannerTitle"></dd><dt>Periode Tayang</dt><dd id="confirmRange"></dd><dt>Frekuensi Tayang</dt><dd id="confirmFrequency"></dd></dl><div class="confirm-note" id="confirmNote"></div></div>
     <div class="confirm-foot"><button class="outline-btn" id="cancelConfirm" type="button">Batal</button><button class="danger-btn" id="applyConfirm" type="button">Ya, nonaktifkan</button></div>
   </div>
 </div>
@@ -172,9 +172,10 @@
     'Akun':'Account',
     'Saat Banner APP diklik, arahkan ke satu Provider, Deposit, atau Withdraw.':'When an APP Banner is clicked, open one Provider, Deposit, or Withdraw destination.',
     'Pilih satu rute internal untuk Banner APP.':'Select one internal route for the APP Banner.',
+    'Tidak ada Promotion id 4 digit yang tersedia.':'No 4-digit Promotion id is available.',
     'URL Tautan / Rute Internal':'Link URL / Internal Route',
     'Hanya Semua':'Only All',
-    'Format Promotion id: YYYYMMDD + nomor urut harian. ID tetap saat daftar diurutkan atau dihapus.':'Promotion id format: YYYYMMDD + daily sequence. The ID stays the same when the list is sorted or items are deleted.',
+    'Promotion id terdiri dari 4 digit acak yang unik dan tidak berubah setelah dibuat.':'Promotion id is a unique, randomly generated 4-digit number that stays the same after creation.',
     'Cari Promotion id, judul, Provider, URL, atau rute':'Search Promotion id, title, Provider, URL, or route',
     'Dibuat pada':'Created At',
     'Diperbarui pada':'Updated At',
@@ -189,6 +190,7 @@
     'Banner dengan jadwal terus-menerus tetap aktif sampai dinonaktifkan. Untuk periode tayang, status berubah menjadi "Nonaktif otomatis" setelah waktu selesai. Pratinjau mengundi satu Banner per refresh secara proporsional terhadap bobot; Banner yang baru tampil tidak dipilih lagi pada refresh berikutnya. Refresh kosong hanya terjadi bila itu satu-satunya Banner yang memenuhi syarat. Ini adalah prototipe lokal; batas frekuensi, centang hari ini, dan penghapusan data otomatis belum dijalankan.':'A continuous Banner stays active until disabled. For a date range, the status becomes "Ended automatically" after the end time. The preview draws one Banner per refresh in proportion to its weight. The previously displayed Banner is excluded from the next draw. A refresh is blank only if that is the sole eligible Banner. This is a local prototype; frequency limits, the today checkbox, and automatic deletion are not applied.',
     'Contoh: 95':'Example: 95',
     'Bonus Harian Spesial':'Special Daily Bonus',
+    'Bonus APP Eksklusif':'Exclusive APP Bonus',
     'Simulasikan refresh':'Simulate refresh',
     'Satu Banner per refresh. Pindah kategori tidak membuka ulang Popup Banner. Simulasi ini belum menerapkan batas frekuensi dan centang hari ini.':'One Banner per refresh. Changing categories does not reopen the Popup Banner. This simulation does not apply frequency limits or the today checkbox.',
     'Refresh ini kosong agar Banner yang sama tidak muncul dua kali berturut-turut.':'This refresh is blank so the same Banner does not appear twice in a row.',
@@ -197,8 +199,8 @@
   });
   const t = key => language === 'en' ? (en[key] || key) : key;
   const CURRENT_ADMIN = 'Demo Admin'; // Prototype-only actor; production uses the signed-in administrator.
-  const STORE = 'studiobet78-popup-banner-prototype-v9';
-  const PRIOR_STORES = ['studiobet78-popup-banner-prototype-v8','studiobet78-popup-banner-prototype-v7','studiobet78-popup-banner-prototype-v6','studiobet78-popup-banner-prototype-v5','studiobet78-popup-banner-prototype-v4','studiobet78-popup-banner-prototype-v3','studiobet78-popup-banner-prototype-v2'];
+  const STORE = 'studiobet78-popup-banner-prototype-v10';
+  const PRIOR_STORES = ['studiobet78-popup-banner-prototype-v9','studiobet78-popup-banner-prototype-v8','studiobet78-popup-banner-prototype-v7','studiobet78-popup-banner-prototype-v6','studiobet78-popup-banner-prototype-v5','studiobet78-popup-banner-prototype-v4','studiobet78-popup-banner-prototype-v3','studiobet78-popup-banner-prototype-v2'];
   const PREVIEW_CYCLE_STORE = 'studiobet78-popup-banner-preview-cycle-v2';
   const providers = ['PG Soft','Pragmatic Play','Evolution','JILI','CMD','SBO'];
   const platforms = ['StudioBET78','MediaSlot78','OXIBET88','KratonBet','BosDeal88'];
@@ -251,7 +253,7 @@
     window.addEventListener('resize',() => closeSearchableSelects());
     document.querySelector('.modal-body').addEventListener('scroll',() => closeSearchableSelects());
   }
-  const dynamicRoots = '#bannerRows,#resultCount,#modalTitle,#uploadPreview,#formError,#toast,#imageTitle,#largeArtHost,#confirmTitle,#confirmLead,#confirmPlatform,#confirmBannerTitle,#confirmRange,#confirmFrequency,#confirmNote,#applyConfirm,#providerModalTitle,#providerList,#providerCount,#providerPageInfo,#pageButtons,#deleteTitle,#deleteLead,#deletePlatform,#deleteBannerTitle,#deleteWarning,#cancelDelete,#applyDelete';
+  const dynamicRoots = '#bannerRows,#resultCount,#modalTitle,#uploadPreview,#formError,#toast,#imageTitle,#largeArtHost,#confirmTitle,#confirmLead,#confirmChannel,#confirmAudienceLabel,#confirmAudience,#confirmBannerTitle,#confirmRange,#confirmFrequency,#confirmNote,#applyConfirm,#providerModalTitle,#providerList,#providerCount,#providerPageInfo,#pageButtons,#deleteTitle,#deleteLead,#deletePlatform,#deleteBannerTitle,#deleteWarning,#cancelDelete,#applyDelete';
   const staticText = [];
   const staticAttributes = [];
   for (const element of document.body.querySelectorAll('*')) {
@@ -267,14 +269,25 @@
   }
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const pad = n => String(n).padStart(2,'0');
-  const serialDate = (date=new Date()) => `${date.getFullYear()}${pad(date.getMonth()+1)}${pad(date.getDate())}`;
-  const serialFor = (date,sequence) => `${date}${String(sequence).padStart(3,'0')}`;
-  const isDatedSerial = value => typeof value === 'string' && /^\d{8}\d{3,}$/.test(value) && Number.isSafeInteger(Number(value.slice(8))) && Number(value.slice(8)) > 0;
+  const isPromotionId = value => typeof value === 'string' && /^[1-9]\d{3}$/.test(value);
+  function randomPromotionId(used) {
+    if (used.size >= 9000) return null;
+    const first = Math.floor(Math.random() * 9000);
+    for (let step = 0; step < 9000; step++) {
+      const id = String(1000 + (first + step) % 9000);
+      if (!used.has(id)) return id;
+    }
+    return null;
+  }
   const localValue = date => `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   const dayOffset = (days, hour=12) => { const d = new Date(); d.setDate(d.getDate()+days); d.setHours(hour,0,0,0); return localValue(d); };
   const labelDate = value => value ? value.replace('T',' ') : '—';
   const labelCreated = value => { const d = new Date(value); return value && Number.isFinite(d.getTime()) ? `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}` : '—'; };
   const sampleImage = variant => {
+    if (variant === 'app') {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="700" height="1110" viewBox="0 0 700 1110"><defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#152554"/><stop offset=".55" stop-color="#4a2895"/><stop offset="1" stop-color="#0b1033"/></linearGradient><linearGradient id="screen" x2="0" y2="1"><stop stop-color="#4ce2ff"/><stop offset="1" stop-color="#7257ea"/></linearGradient></defs><rect width="700" height="1110" fill="url(#bg)"/><circle cx="350" cy="475" r="315" fill="#ffffff12" stroke="#a2dbff" stroke-width="8"/><text x="350" y="130" text-anchor="middle" fill="#fff" font-family="Arial" font-size="33" font-weight="900" letter-spacing="7">STUDIOBET78</text><text x="350" y="260" text-anchor="middle" fill="#fff" font-family="Arial" font-size="72" font-weight="900">APP BONUS</text><rect x="195" y="335" width="310" height="495" rx="42" fill="#0e1536" stroke="#e9faff" stroke-width="13"/><rect x="218" y="395" width="264" height="360" rx="18" fill="url(#screen)"/><circle cx="350" cy="565" r="93" fill="#ffffffdd"/><text x="350" y="605" text-anchor="middle" fill="#392787" font-family="Arial" font-size="114" font-weight="900">★</text><circle cx="350" cy="791" r="13" fill="#e9faff"/><text x="350" y="920" text-anchor="middle" fill="#fff" font-family="Arial" font-size="43" font-weight="900">MAIN DI APP</text><text x="350" y="1000" text-anchor="middle" fill="#cfefff" font-family="Arial" font-size="27" font-weight="700">BONUS KHUSUS PENGGUNA APP</text></svg>`;
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
     if (variant === 'fourth') {
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="700" height="1110" viewBox="0 0 700 1110"><defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#632258"/><stop offset=".55" stop-color="#391b49"/><stop offset="1" stop-color="#160f30"/></linearGradient><linearGradient id="gold" x2="0" y2="1"><stop stop-color="#ffe8a5"/><stop offset="1" stop-color="#df9f35"/></linearGradient></defs><rect width="700" height="1110" fill="url(#bg)"/><circle cx="350" cy="460" r="300" fill="#ffffff0d" stroke="#ffbdf0" stroke-width="8"/><circle cx="350" cy="460" r="245" fill="none" stroke="#ffffff55" stroke-width="5"/><text x="350" y="115" text-anchor="middle" fill="#fff" font-family="Arial" font-size="31" font-weight="900" letter-spacing="8">STUDIOBET78</text><text x="350" y="275" text-anchor="middle" fill="#fff" font-family="Arial" font-size="73" font-weight="900">GAME BARU</text><text x="350" y="360" text-anchor="middle" fill="url(#gold)" font-family="Arial" font-size="75" font-weight="900">SEGERA HADIR</text><rect x="150" y="445" width="400" height="285" rx="38" fill="#ffe6ff" stroke="#e999dc" stroke-width="14"/><path d="M250 560 h100 m-50 -50 v100 M430 535 a13 13 0 1 0 1 0 M475 600 a13 13 0 1 0 1 0" stroke="#8c3587" stroke-width="24" stroke-linecap="round"/><text x="350" y="840" text-anchor="middle" fill="#fff" font-family="Arial" font-size="44" font-weight="900">PETUALANGAN BARU</text><rect x="105" y="875" width="490" height="90" rx="45" fill="url(#gold)"/><text x="350" y="935" text-anchor="middle" fill="#4a2445" font-family="Arial" font-size="42" font-weight="900">LIHAT SEKARANG</text><text x="350" y="1040" text-anchor="middle" fill="#ffe5f8" font-family="Arial" font-size="27" font-weight="700">Game favorit segera hadir</text></svg>`;
       return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
@@ -292,7 +305,8 @@
     {id:'demo-4',title:'Bonus VIP Eksklusif',imageUrl:sampleImage('second'),targetUrl:'https://example.com/promosi/bonus-vip',scheduleMode:'range',start:dayOffset(-2),end:dayOffset(3),frequencyUnit:'daily',frequencyCount:2,displayWeight:40,targetPriority:'platform',providerMode:'all',providers:[],platform:'StudioBET78',enabled:true,createdAt:'2026-09-22T09:00:00',lastUploadedAt:Date.now()-6000,updated:Date.now()-6000,createdBy:'Demo Admin',updatedAt:'2026-09-23T11:30:00',updatedBy:'Demo Admin',art:'alt'},
     {id:'demo-5',title:'Bonus Harian Spesial',imageUrl:sampleImage('third'),targetUrl:'https://example.com/promosi/bonus-harian',scheduleMode:'range',start:dayOffset(-2),end:dayOffset(3),frequencyUnit:'daily',frequencyCount:2,displayWeight:30,targetPriority:'platform',providerMode:'all',providers:[],platform:'StudioBET78',enabled:true,createdAt:'2026-09-23T09:00:00',lastUploadedAt:Date.now()-7000,updated:Date.now()-7000,createdBy:'Demo Admin',updatedAt:'2026-09-24T08:10:00',updatedBy:'Demo Admin',art:'blue'},
     {id:'demo-2',title:'Game Baru Segera Hadir',imageUrl:sampleImage('fourth'),targetUrl:'https://example.com/game/baru/daftar-provider-dan-informasi-peluncuran',scheduleMode:'continuous',start:'',end:'',frequencyUnit:'weekly',frequencyCount:3,displayWeight:25,targetPriority:'provider',providerMode:'selected',providers:['Pragmatic Play'],platform:'All',enabled:true,createdAt:'2026-09-20T10:30:00',lastUploadedAt:Date.now()-8000,updated:Date.now()-8000,createdBy:'Demo Admin',updatedAt:'2026-09-21T13:25:00',updatedBy:'Demo Admin',art:'alt'},
-    {id:'demo-3',title:'Contoh Kampanye Berakhir',imageUrl:'',targetUrl:'https://example.com/promosi/arsip/kampanye-yang-sudah-berakhir',scheduleMode:'range',start:dayOffset(-14),end:dayOffset(-1),frequencyUnit:'daily',frequencyCount:1,displayWeight:10,targetPriority:'platform',providerMode:'all',providers:[],platform:'All',enabled:true,createdAt:'2026-09-10T09:00:00',lastUploadedAt:Date.now()-12000,updated:Date.now()-12000,createdBy:'Demo Admin',updatedAt:'2026-09-11T15:00:00',updatedBy:'Demo Admin',art:''}
+    {id:'demo-3',title:'Contoh Kampanye Berakhir',imageUrl:'',targetUrl:'https://example.com/promosi/arsip/kampanye-yang-sudah-berakhir',scheduleMode:'range',start:dayOffset(-14),end:dayOffset(-1),frequencyUnit:'daily',frequencyCount:1,displayWeight:10,targetPriority:'platform',providerMode:'all',providers:[],platform:'All',enabled:true,createdAt:'2026-09-10T09:00:00',lastUploadedAt:Date.now()-12000,updated:Date.now()-12000,createdBy:'Demo Admin',updatedAt:'2026-09-11T15:00:00',updatedBy:'Demo Admin',art:''},
+    {id:'demo-app-1',title:'Bonus APP Eksklusif',imageUrl:sampleImage('app'),channel:'app',appRoute:'provider:Evolution',targetUrl:'',scheduleMode:'continuous',start:'',end:'',frequencyUnit:'daily',frequencyCount:2,displayWeight:35,targetPriority:'platform',providerMode:'all',providers:[],platform:'StudioBET78',enabled:true,createdAt:'2026-09-24T10:00:00',lastUploadedAt:Date.now()-5000,updated:Date.now()-5000,createdBy:'Demo Admin',updatedAt:'2026-09-25T09:30:00',updatedBy:'Demo Admin',art:'blue'}
   ];
   let banners;
   const normalizeBanner = b => {
@@ -308,7 +322,7 @@
     const updatedTime = updatedAt ? new Date(updatedAt).getTime() : Number(b.updated);
     return {...rest,title:demo && b.title === oldDemoTitles[b.id] ? demo.title : b.title,imageUrl:b.imageUrl || demo?.imageUrl || '',channel:b.channel === 'app' ? 'app' : 'web',appRoute:b.channel === 'app' ? (b.appRoute || '') : '',platform:priority === 'provider' ? 'All' : site,targetPriority:priority,providerMode:priority === 'platform' ? 'all' : 'selected',providers:priority === 'platform' ? [] : (Array.isArray(b.providers) ? b.providers : []),displayWeight,lastUploadedAt:Number(b.lastUploadedAt) || Number(b.updated) || Date.now(),targetUrl:b.channel === 'app' ? '' : (b.targetUrl || demo?.targetUrl || ''),scheduleMode:b.scheduleMode === 'continuous' ? 'continuous' : 'range',start:b.scheduleMode === 'continuous' ? '' : (b.start || ''),end:b.scheduleMode === 'continuous' ? '' : (b.end || ''),frequencyUnit:['daily','weekly'].includes(b.frequencyUnit) ? b.frequencyUnit : (demo?.frequencyUnit || ''),frequencyCount:Number.isSafeInteger(Number(b.frequencyCount)) && Number(b.frequencyCount) > 0 ? Number(b.frequencyCount) : (demo?.frequencyCount || ''),createdAt:b.createdAt || demo?.createdAt || null,createdBy:b.createdBy || demo?.createdBy || '',updatedAt,updatedBy:b.updatedBy || demo?.updatedBy || '',updated:Number.isFinite(updatedTime) ? updatedTime : Date.now()};
   };
-  let nextSerialByDate = {};
+  let usedPromotionIds = new Set();
   try {
     const currentText = localStorage.getItem(STORE);
     const savedText = currentText || PRIOR_STORES.map(key => localStorage.getItem(key)).find(Boolean);
@@ -326,39 +340,33 @@
       if (first && ['range','continuous'].includes(first.scheduleMode)) { third.scheduleMode = first.scheduleMode; third.start = first.start || ''; third.end = first.end || ''; }
       items.splice(2,0,third);
     }
+    if (!currentText && items.some(item => item.id?.startsWith('demo-')) && !items.some(item => item.id === 'demo-app-1')) {
+      items.push({...seed.find(item => item.id === 'demo-app-1')});
+    }
     banners = items.map(normalizeBanner);
-    const migrationDate = serialDate();
-    const used = new Set();
-    const legacyNumbers = new Map();
-    if (saved?.nextSerialByDate && typeof saved.nextSerialByDate === 'object') {
-      for (const [date,next] of Object.entries(saved.nextSerialByDate)) {
-        if (/^\d{8}$/.test(date) && Number.isSafeInteger(next) && next > 0) nextSerialByDate[date] = next;
-      }
-    }
+    for (const id of saved?.usedPromotionIds || []) if (isPromotionId(String(id))) usedPromotionIds.add(String(id));
+    const assigned = new Set();
     for (const banner of banners) {
-      if (isDatedSerial(banner.serialNo) && !used.has(banner.serialNo)) {
-        used.add(banner.serialNo);
-        const date = banner.serialNo.slice(0,8);
-        nextSerialByDate[date] = Math.max(nextSerialByDate[date] || 1,Number(banner.serialNo.slice(8)) + 1);
-      } else {
-        if (Number.isSafeInteger(banner.serialNo) && banner.serialNo > 0) legacyNumbers.set(banner,banner.serialNo);
-        banner.serialNo = null;
-      }
+      const id = String(banner.serialNo ?? '');
+      if (isPromotionId(id) && !assigned.has(id)) {
+        banner.serialNo = id;
+        assigned.add(id);
+        usedPromotionIds.add(id);
+      } else banner.serialNo = null;
     }
-    let candidate = 1;
-    for (const banner of banners) if (banner.serialNo === null) {
-      const legacy = legacyNumbers.get(banner);
-      let sequence = legacy && !used.has(serialFor(migrationDate,legacy)) ? legacy : candidate;
-      while (used.has(serialFor(migrationDate,sequence))) sequence++;
-      banner.serialNo = serialFor(migrationDate,sequence);
-      used.add(banner.serialNo);
-      candidate = Math.max(candidate,sequence + 1);
-      nextSerialByDate[migrationDate] = Math.max(nextSerialByDate[migrationDate] || 1,sequence + 1);
+    for (const banner of banners) if (!banner.serialNo) {
+      const id = randomPromotionId(usedPromotionIds);
+      if (!id) throw new Error('No unused four-digit Promotion id remains.');
+      banner.serialNo = id;
+      usedPromotionIds.add(id);
     }
-    if (Number.isSafeInteger(saved?.nextSerialNo) && saved.nextSerialNo > 0) nextSerialByDate[migrationDate] = Math.max(nextSerialByDate[migrationDate] || 1,saved.nextSerialNo);
   } catch {
-    banners = seed.map((item,index) => ({...normalizeBanner(item),serialNo:serialFor(serialDate(),index + 1)}));
-    nextSerialByDate[serialDate()] = banners.length + 1;
+    usedPromotionIds = new Set();
+    banners = seed.map(item => {
+      const id = randomPromotionId(usedPromotionIds);
+      usedPromotionIds.add(id);
+      return {...normalizeBanner(item),serialNo:id};
+    });
   }
   let editingId = null;
   let activeObjectUrl = '';
@@ -378,7 +386,7 @@
   let previewBanner = null;
   let previewBlank = false;
   let previewClosed = false;
-  const persist = () => { try { localStorage.setItem(STORE, JSON.stringify({items:banners,nextSerialByDate})); return true; } catch { showToast('Data tidak dapat disimpan di browser. Periksa ruang penyimpanan lokal.'); return false; } };
+  const persist = () => { try { localStorage.setItem(STORE, JSON.stringify({items:banners,usedPromotionIds:[...usedPromotionIds]})); return true; } catch { showToast('Data tidak dapat disimpan di browser. Periksa ruang penyimpanan lokal.'); return false; } };
   const statusOf = banner => { const now = Date.now(); if (!['All',...platforms].includes(banner.platform)) return 'unconfigured'; if (!banner.enabled) return 'paused'; if (banner.scheduleMode === 'continuous') return 'active'; if (now >= new Date(banner.end).getTime()) return 'ended'; if (now < new Date(banner.start).getTime()) return 'scheduled'; return 'active'; };
   const statusLabel = {active:'Aktif',scheduled:'Terjadwal',ended:'Nonaktif otomatis',paused:'Nonaktif',unconfigured:'Platform belum diatur'};
   const periodLabel = banner => banner.scheduleMode === 'continuous' ? t('Tayang terus-menerus') : `${labelDate(banner.start)} ${t('sampai')} ${labelDate(banner.end)}`;
@@ -419,7 +427,7 @@
     $('#bannerRows').innerHTML = visibleRows.length ? visibleRows.map(b => {
       const state = statusOf(b);
       const providerScope = b.providerMode === 'all' ? `<span class="provider-scope">${esc(t('Semua Provider'))}</span>` : '';
-      const appRouteLabel = b.appRoute?.startsWith('provider:') ? `Provider: ${b.appRoute.slice('provider:'.length)}` : b.appRoute === 'deposit' ? 'Deposit' : b.appRoute === 'withdraw' ? 'Withdraw' : '';
+      const appRouteLabel = b.appRoute || '';
       const targetLink = b.channel === 'app'
         ? (appRouteLabel ? `<span class="route-value" title="${esc(appRouteLabel)}">${esc(appRouteLabel)}</span>` : '—')
         : b.targetUrl ? `<a class="target-link" href="${esc(b.targetUrl)}" target="_blank" rel="noopener noreferrer" title="${esc(b.targetUrl)}" aria-label="${esc(t('URL Tautan'))}: ${esc(b.targetUrl)}">${esc(b.targetUrl)}</a>` : '—';
@@ -608,7 +616,11 @@
     const enabled = pendingToggle.enabled;
     $('#confirmTitle').textContent = t(enabled ? 'Konfirmasi Aktifkan Popup Banner' : 'Konfirmasi Nonaktifkan Popup Banner');
     $('#confirmLead').textContent = t(enabled ? 'Apakah Anda yakin ingin mengaktifkan Popup Banner ini?' : 'Apakah Anda yakin ingin menonaktifkan Popup Banner ini?');
-    $('#confirmPlatform').textContent = banner.targetPriority === 'provider' ? '—' : banner.platform === 'All' ? t('Semua') : (banner.platform || t('Platform belum diatur'));
+    $('#confirmChannel').textContent = banner.channel === 'app' ? 'APP' : 'WEB / PWA';
+    $('#confirmAudienceLabel').textContent = banner.targetPriority === 'provider' ? 'Provider' : t('Platform');
+    $('#confirmAudience').textContent = banner.targetPriority === 'provider'
+      ? (banner.providers || []).join(', ') || '—'
+      : banner.platform === 'All' ? t('Semua') : (banner.platform || t('Platform belum diatur'));
     $('#confirmBannerTitle').textContent = displayTitle(banner);
     $('#confirmRange').textContent = periodLabel(banner);
     $('#confirmFrequency').textContent = frequencyLabel(banner);
@@ -764,17 +776,15 @@
     let imageUrl = existing?.imageUrl || '';
     if (file) { try { imageUrl = await readImage(file); } catch { setFormError('Gambar tidak dapat dibaca. Pilih file kembali.'); return; } }
     const previousBanners = banners;
-    const previousCounters = {...nextSerialByDate};
-    const today = serialDate();
-    let sequence = nextSerialByDate[today] || 1;
-    while (!existing && banners.some(b => b.serialNo === serialFor(today,sequence))) sequence++;
-    const serialNo = existing ? existing.serialNo : serialFor(today,sequence);
-    if (!existing) nextSerialByDate[today] = sequence + 1;
+    const previousUsedIds = new Set(usedPromotionIds);
+    const serialNo = existing ? existing.serialNo : randomPromotionId(usedPromotionIds);
+    if (!serialNo) { setFormError('Tidak ada Promotion id 4 digit yang tersedia.'); return; }
+    if (!existing) usedPromotionIds.add(serialNo);
     const now = Date.now();
     const imageChanged = !existing || !!file;
     const record = {id:editingId || `banner-${now}-${serialNo}`,serialNo,title,imageUrl,channel,targetUrl:channel === 'web' ? targetUrl : '',appRoute:channel === 'app' ? appRoute : '',scheduleMode,start,end,frequencyUnit,frequencyCount,displayWeight,lastUploadedAt:imageChanged ? now : existing.lastUploadedAt,targetPriority,providerMode,providers:providerMode==='all'?[]:selectedProviders,platform,enabled:existing?.enabled ?? true,createdAt:existing?.createdAt || new Date(now).toISOString(),createdBy:existing?.createdBy || CURRENT_ADMIN,updatedAt:existing ? new Date(now).toISOString() : null,updatedBy:existing ? CURRENT_ADMIN : '',updated:now,art:existing?.art||''};
     banners = existing ? banners.map(b => b.id === editingId ? record : b) : [record,...banners];
-    if (!persist()) { banners = previousBanners; nextSerialByDate = previousCounters; return; }
+    if (!persist()) { banners = previousBanners; usedPromotionIds = previousUsedIds; return; }
     render(); closeModal(); showToast(existing ? 'Popup Banner berhasil diperbarui.' : 'Popup Banner berhasil ditambahkan.');
   }
   $('#addBanner').addEventListener('click',() => openModal());
