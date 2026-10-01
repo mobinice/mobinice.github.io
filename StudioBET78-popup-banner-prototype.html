@@ -255,7 +255,7 @@
   for (const element of document.body.querySelectorAll('*')) {
     if (element.matches('script,style') || element.closest(dynamicRoots)) continue;
     for (const node of element.childNodes) if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim()) staticText.push({node,original:node.nodeValue});
-    for (const attribute of ['aria-label','placeholder','title']) if (element.hasAttribute(attribute)) staticAttributes.push({element,attribute,original:element.getAttribute(attribute)});
+    for (const attribute of ['aria-label','placeholder','title','label']) if (element.hasAttribute(attribute)) staticAttributes.push({element,attribute,original:element.getAttribute(attribute)});
   }
   function applyStaticLanguage() {
     document.documentElement.lang = language;
