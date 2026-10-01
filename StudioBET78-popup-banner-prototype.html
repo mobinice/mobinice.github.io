@@ -89,7 +89,7 @@
           <label class="field span-2"><span>Judul <i class="required">*</i></span><input name="title" maxlength="80" placeholder="Contoh: Promo Akhir Pekan" required></label>
           <label class="field span-2"><span>Unggah Gambar</span><span class="upload-line"><input id="imageFile" type="file" accept="image/*" aria-describedby="imageDimensionHint imageStorageHint"><span class="upload-preview" id="uploadPreview">Pratinjau gambar</span></span><span class="helper" id="imageDimensionHint">Ukuran yang disarankan: 700 × 1110 px. Ukuran lain tetap dapat diunggah; periksa pratinjau sebelum menyimpan.</span><span class="helper" id="imageStorageHint">Max Size: 100 KB (disarankan, bukan batas unggah). Batas file prototipe: 2 MB; gambar disimpan di browser ini, bukan di server.</span></label>
           <label class="field span-2" id="webLinkField"><span>URL Tautan</span><input name="targetUrl" type="url" placeholder="https://example.com/promosi/akhir-pekan"><span class="helper">Alamat tujuan saat Banner diklik. Opsional.</span></label>
-          <label class="field span-2" id="appRouteField" hidden><span>Rute Internal <i class="required">*</i></span><select id="appRouteSelect" name="appRoute" data-searchable><option value="">Pilih satu rute</option><optgroup label="Provider"><option value="provider:PG Soft">PG Soft</option><option value="provider:Pragmatic Play">Pragmatic Play</option><option value="provider:Evolution">Evolution</option><option value="provider:JILI">JILI</option><option value="provider:CMD">CMD</option><option value="provider:SBO">SBO</option></optgroup><optgroup label="Akun"><option value="deposit">Deposit</option><option value="withdraw">Withdraw</option></optgroup></select><span class="helper">Saat Banner APP diklik, arahkan ke satu Provider, Deposit, atau Withdraw.</span></label>
+          <label class="field span-2" id="appRouteField" hidden><span>Rute Internal <i class="required">*</i></span><select id="appRouteSelect" name="appRoute" data-searchable><option value="">Pilih satu rute</option><optgroup label="Provider"></optgroup><optgroup label="Akun"><option value="deposit">Deposit</option><option value="withdraw">Withdraw</option></optgroup></select><span class="helper">Pilih Provider yang aktif untuk target Banner, atau pilih Deposit / Withdraw.</span></label>
         </div></fieldset>
         <fieldset class="form-section"><legend>Jadwal Tayang <i class="required">*</i></legend>
           <div class="schedule-options"><label><input type="radio" name="scheduleMode" value="continuous" required checked> Tayang terus-menerus</label><label><input type="radio" name="scheduleMode" value="range" required> Periode tayang</label></div>
@@ -171,6 +171,8 @@
     'Pilih satu rute':'Select one route',
     'Akun':'Account',
     'Saat Banner APP diklik, arahkan ke satu Provider, Deposit, atau Withdraw.':'When an APP Banner is clicked, open one Provider, Deposit, or Withdraw destination.',
+    'Pilih Provider yang aktif untuk target Banner, atau pilih Deposit / Withdraw.':'Choose a Provider enabled for the Banner audience, or choose Deposit / Withdraw.',
+    'Provider untuk rute internal belum aktif pada Platform yang berlaku.':'The Provider for this internal route is not enabled on an applicable Platform.',
     'Pilih satu rute internal untuk Banner APP.':'Select one internal route for the APP Banner.',
     'Tidak ada Promotion id 4 digit yang tersedia.':'No 4-digit Promotion id is available.',
     'URL Tautan / Rute Internal':'Link URL / Internal Route',
@@ -213,6 +215,24 @@
     BosDeal88:['Pragmatic Play','CMD','SBO']
   };
   const providersForSite = site => site === 'All' ? providers : (siteProviders[site] || []);
+  function routeSitesForAudience(priority, platform, selectedProviders) {
+    if (priority === 'platform') return platform === 'All' ? platforms : (platforms.includes(platform) ? [platform] : []);
+    if (priority === 'provider') return platforms.filter(site => selectedProviders.some(provider => providersForSite(site).includes(provider)));
+    return [];
+  }
+  const routeProviderEnabledForAudience = (provider, priority, platform, selectedProviders) =>
+    routeSitesForAudience(priority, platform, selectedProviders).some(site => providersForSite(site).includes(provider));
+  function syncAppRouteOptions(preserve = $('#appRouteSelect').value) {
+    const form = $('#bannerForm');
+    const priority = form.elements.targetPriority.value;
+    const platform = form.elements.platform.value;
+    const selected = selectedProviderValues();
+    const available = providers.filter(provider => routeProviderEnabledForAudience(provider, priority, platform, selected));
+    const select = $('#appRouteSelect');
+    select.innerHTML = `<option value="">${esc(t('Pilih satu rute'))}</option><optgroup label="Provider">${available.map(provider => `<option value="${esc(`provider:${provider}`)}">${esc(provider)}</option>`).join('')}</optgroup><optgroup label="${esc(t('Akun'))}"><option value="deposit">Deposit</option><option value="withdraw">Withdraw</option></optgroup>`;
+    select.value = [...select.options].some(option => option.value === preserve) ? preserve : '';
+    syncSearchableSelects();
+  }
   const $ = (selector) => document.querySelector(selector);
   const searchableSelects = [];
   function closeSearchableSelects(except=null) { for (const widget of searchableSelects) if (widget !== except) widget.close(); }
@@ -574,6 +594,7 @@
     if (priority === 'provider') fillProviderChoices(providers,reset ? [] : selectedProviderValues());
     else closeProviderPicker();
     syncPickerLabel();
+    syncAppRouteOptions();
     syncSearchableSelects();
   }
   function syncSchedule() { $('#rangeFields').hidden = $('#bannerForm [name="scheduleMode"]:checked').value !== 'range'; }
@@ -706,6 +727,7 @@
         $('#platformFirstSelect').value = b.platform || '';
       }
     }
+    syncAppRouteOptions(b?.appRoute || '');
     syncSchedule(); syncSearchableSelects(); previewImage(b?.imageUrl || '');
     $('#shade').classList.add('open'); $('#shade').setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; form.elements.title.focus();
   }
@@ -727,6 +749,7 @@
       previewImage($('#uploadPreview img')?.getAttribute('src') || '');
       if ($('#providerPickerField').hidden === false) fillProviderChoices(providers,selectedProviderValues());
       syncPickerLabel();
+      syncAppRouteOptions();
     }
     if (pendingToggle) updateConfirmTexts();
     if (pendingDeleteId) updateDeleteTexts();
@@ -768,6 +791,7 @@
     else if (targetPriority === 'provider' && selectedProviders.some(provider => !providers.includes(provider))) error = 'Pilih setidaknya satu Provider.';
     else if (channel === 'web' && targetUrl && !validUrl(targetUrl)) error = 'URL Tautan harus diawali https://.';
     else if (channel === 'app' && !['deposit','withdraw',...providers.map(provider => `provider:${provider}`)].includes(appRoute)) error = 'Pilih satu rute internal untuk Banner APP.';
+    else if (channel === 'app' && appRoute.startsWith('provider:') && !routeProviderEnabledForAudience(appRoute.slice('provider:'.length),targetPriority,platform,selectedProviders)) error = 'Provider untuk rute internal belum aktif pada Platform yang berlaku.';
     else if (file && file.size > 2 * 1024 * 1024) error = 'Ukuran file gambar maksimal 2 MB.';
     else if (!file && !banners.some(b => b.id === editingId && b.imageUrl)) error = 'Unggah gambar Banner.';
     setFormError(error);
@@ -830,7 +854,8 @@
   document.addEventListener('keydown',e => { if(e.key !== 'Escape') return; if ($('#deleteShade').classList.contains('open')) closeDelete(); else if ($('#confirmShade').classList.contains('open')) closeConfirm(); else if ($('#providerShade').classList.contains('open')) closeProviderModal(); else if ($('#imageShade').classList.contains('open')) closeImage(); else if ($('#shade').classList.contains('open')) closeModal(); else if (previewMode && !$('#popupOverlay').hidden) closePreviewBanner(); });
   $('#bannerForm').addEventListener('change',e => {
     if (e.target.name === 'targetPriority') syncTargetPriority(true);
-    if (e.target.name === 'providers') syncPickerLabel();
+    if (e.target.name === 'providers') { syncPickerLabel(); syncAppRouteOptions(); }
+    if (e.target.name === 'platform') syncAppRouteOptions();
     if (e.target.name === 'scheduleMode') syncSchedule();
   });
   $('#frequencyHelp').addEventListener('click',() => { const wrap = $('#frequencyHelpWrap'); const open = wrap.classList.toggle('open'); $('#frequencyHelp').setAttribute('aria-expanded',String(open)); });
